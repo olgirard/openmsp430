@@ -1,0 +1,39 @@
+Welcome to Xilinx CORE Generator.
+Opened project file
+/home/pitchu/Projects/verilog/openMSP430/fpga/diligent_s3board/rtl/verilog/coreg
+en/coregen.cgp.
+Customizing IP...
+ WARNING! Program tries to unlock a connection without having acquired
+        a lock first, which indicates a programming error.
+        There will be no further warnings about this issue.
+libxcb: WARNING! Program tries to lock an already locked connection,
+        which indicates a programming error.
+        There will be no further warnings about this issue.
+Finished Customizing.
+Generating IP...
+ WARNING! Program tries to unlock a connection without having acquired
+        a lock first, which indicates a programming error.
+        There will be no further warnings about this issue.
+libxcb: WARNING! Program tries to lock an already locked connection,
+        which indicates a programming error.
+        There will be no further warnings about this issue.
+Generating Implementation files.
+Generating ISE symbol file...
+Generating NGC file.
+Finished Generating.
+Successfully generated rom_8x2k_hi.
+Customizing IP...
+Finished Customizing.
+Generating IP...
+ WARNING! Program tries to unlock a connection without having acquired
+        a lock first, which indicates a programming error.
+        There will be no further warnings about this issue.
+libxcb: WARNING! Program tries to lock an already locked connection,
+        which indicates a programming error.
+        There will be no further warnings about this issue.
+Generating Implementation files.
+Generating ISE symbol file...
+Generating NGC file.
+Finished Generating.
+Successfully generated rom_8x2k_lo.
+Closed project file.

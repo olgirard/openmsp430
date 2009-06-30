@@ -1,0 +1,633 @@
+/*===========================================================================*/
+/* Copyright (C) 2001 Authors                                                */
+/*                                                                           */
+/* This source file may be used and distributed without restriction provided */
+/* that this copyright statement is not removed from the file and that any   */
+/* derivative work contains the original copyright notice and the associated */
+/* disclaimer.                                                               */
+/*                                                                           */
+/* This source file is free software; you can redistribute it and/or modify  */
+/* it under the terms of the GNU Lesser General Public License as published  */
+/* by the Free Software Foundation; either version 2.1 of the License, or    */
+/* (at your option) any later version.                                       */
+/*                                                                           */
+/* This source is distributed in the hope that it will be useful, but WITHOUT*/
+/* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     */
+/* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public       */
+/* License for more details.                                                 */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this source; if not, write to the Free Software Foundation,    */
+/* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA        */
+/*                                                                           */
+/*===========================================================================*/
+/*                 SINGLE-OPERAND ARITHMETIC: RRC[.B] INSTRUCTION            */
+/*---------------------------------------------------------------------------*/
+/* Test the RRC[.B] instruction.                                             */
+/*===========================================================================*/
+
+
+.global main
+
+main:
+        /* -------------- TEST INSTRUCTION IN WORD MODE ------------------- */
+
+
+        # Addressing mode: Rn
+	#------------------------
+
+	mov     #0x0000, r2        ;# Test 1
+	mov     #0x3332, r4
+	rrc          r4            ;# RRC ({C=0, r4=0x3332}  => {r4=0x1999, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2
+	mov     #0x3333, r6
+	rrc          r6            ;# RRC ({C=0, r6=0x3333}  => {r6=0x1999, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3
+	mov     #0x3332, r8
+	rrc          r8            ;# RRC ({C=1, r9=0x3332}  => {r9=0x9999, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4
+	mov     #0x3333, r10
+	rrc         r10            ;# RRC ({C=1, r10=0x3333} => {r10=0x9999, C=1})
+	mov          r2, r11
+
+	mov     #0x1000, r15
+
+
+        # Addressing mode: @Rn
+	#------------------------
+
+	mov     #0x0000, r2        ;# Test 1
+	mov     #0x3332, &0x0200
+	mov     #0x0200, r4
+	mov     #0xaaaa, &0x0202
+	rrc         @r4            ;# RRC ({C=0, mem00=0x3332}  => {mem00=0x1999, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2
+	mov     #0x3333, &0x0202
+	mov     #0x0202, r6
+	mov     #0xaaaa, &0x0204
+	rrc         @r6            ;# RRC ({C=0, mem01=0x3333}  => {mem01=0x1999, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3
+	mov     #0x3332, &0x0204
+	mov     #0x0204, r8
+	mov     #0xaaaa, &0x0206
+	rrc         @r8            ;# RRC ({C=1, mem02=0x3332}  => {mem02=0x9999, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4
+	mov     #0x3333, &0x0206
+	mov     #0x0206, r10
+	mov     #0xaaaa, &0x0208
+	rrc        @r10            ;# RRC ({C=1, mem03=0x3333}  => {mem03=0x9999, C=1})
+	mov          r2, r11
+
+	mov     #0x2000, r15
+
+
+        # Addressing mode: @Rn+
+	#------------------------
+
+	mov     #0x0000, r2        ;# Test 1
+	mov     #0x3332, &0x0208
+	mov     #0x0208, r4
+	mov     #0xaaaa, &0x020A
+	rrc        @r4+            ;# RRC ({C=0, mem04=0x3332}  => {mem04=0x1999, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2
+	mov     #0x3333, &0x020A
+	mov     #0x020A, r6
+	mov     #0xaaaa, &0x020C
+	rrc        @r6+            ;# RRC ({C=0, mem05=0x3333}  => {mem05=0x1999, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3
+	mov     #0x3332, &0x020C
+	mov     #0x020C, r8
+	mov     #0xaaaa, &0x020E
+	rrc        @r8+            ;# RRC ({C=1, mem06=0x3332}  => {mem06=0x9999, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4
+	mov     #0x3333, &0x020E
+	mov     #0x020E, r10
+	mov     #0xaaaa, &0x0210
+	rrc       @r10+            ;# RRC ({C=1, mem07=0x3333}  => {mem07=0x9999, C=1})
+	mov          r2, r11
+
+	mov     #0x3000, r15
+
+
+        # Addressing mode: X(Rn)
+	#------------------------
+
+	mov     #0x0000, r2        ;# Test 1
+	mov     #0x3332, &0x0210
+	mov     #0x0200, r4
+	mov     #0xaaaa, &0x0212
+	rrc       16(r4)            ;# RRC ({C=0, mem08=0x3332}  => {mem08=0x1999, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2
+	mov     #0x3333, &0x0212
+	mov     #0x0200, r6
+	mov     #0xaaaa, &0x0214
+	rrc       18(r6)            ;# RRC ({C=0, mem09=0x3333}  => {mem09=0x1999, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3
+	mov     #0x3332, &0x0214
+	mov     #0x0200, r8
+	mov     #0xaaaa, &0x0216
+	rrc       20(r8)            ;# RRC ({C=1, mem0a=0x3332}  => {mem0a=0x9999, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4
+	mov     #0x3333, &0x0216
+	mov     #0x0200, r10
+	mov     #0xaaaa, &0x0218
+	rrc      22(r10)            ;# RRC ({C=1, mem0b=0x3333}  => {mem0b=0x9999, C=1})
+	mov          r2, r11
+
+	mov     #0x4000, r15
+
+
+        # Addressing mode: EDE
+	#------------------------
+.set   EDE_218,  (__data_start+0x0018)
+.set   EDE_21A,  (__data_start+0x001A)
+.set   EDE_21C,  (__data_start+0x001C)
+.set   EDE_21E,  (__data_start+0x001E)
+
+	mov     #0x0000, r2        ;# Test 1
+	mov     #0x3332, &0x0218
+	mov     #0xaaaa, &0x021A
+	rrc     EDE_218            ;# RRC ({C=0, mem0c=0x3332}  => {mem0c=0x1999, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2
+	mov     #0x3333, &0x021A
+	mov     #0xaaaa, &0x021C
+	rrc     EDE_21A            ;# RRC ({C=0, mem0d=0x3333}  => {mem0d=0x1999, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3
+	mov     #0x3332, &0x021C
+	mov     #0xaaaa, &0x021E
+	rrc     EDE_21C            ;# RRC ({C=1, mem0e=0x3332}  => {mem0e=0x9999, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4
+	mov     #0x3333, &0x021E
+	mov     #0xaaaa, &0x0220
+	rrc     EDE_21E            ;# RRC ({C=1, mem0f=0x3333}  => {mem0f=0x9999, C=1})
+	mov          r2, r11
+
+	mov     #0x5000, r15
+
+
+        # Addressing mode: &EDE
+	#------------------------
+.set   aEDE_220,  0x0220
+.set   aEDE_222,  0x0222
+.set   aEDE_224,  0x0224
+.set   aEDE_226,  0x0226
+
+	mov     #0x0000, r2        ;# Test 1
+	mov     #0x3332, &0x0220
+	mov     #0xaaaa, &0x0222
+	rrc   &aEDE_220            ;# RRC ({C=0, mem10=0x3332}  => {mem10=0x1999, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2
+	mov     #0x3333, &0x0222
+	mov     #0xaaaa, &0x0224
+	rrc   &aEDE_222            ;# RRC ({C=0, mem11=0x3333}  => {mem11=0x1999, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3
+	mov     #0x3332, &0x0224
+	mov     #0xaaaa, &0x0226
+	rrc   &aEDE_224            ;# RRC ({C=1, mem12=0x3332}  => {mem12=0x9999, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4
+	mov     #0x3333, &0x0226
+	mov     #0xaaaa, &0x0228
+	rrc   &aEDE_226            ;# RRC ({C=1, mem13=0x3333}  => {mem13=0x9999, C=1})
+	mov          r2, r11
+
+	mov     #0x6000, r15
+
+
+        /* ----------------------- CLEAR MEMORY --------------------------- */
+	mov     #0x0015, r4
+	mov     #0x0200, r5
+clear_mem_loop:
+	clr    0(r5)
+	incd     r5
+	dec      r4
+	jnz     clear_mem_loop 
+
+	mov     #0x7000, r15
+
+
+        /* -------------- TEST INSTRUCTION IN BYTE MODE ------------------- */
+
+        # Addressing mode: Rn
+	#------------------------
+
+	mov     #0x0000, r2    ;# Test 1
+	mov     #0xff32, r4
+	rrc.b        r4        ;# RRC.B ({C=0, r4=0x32}  => {r4=0x19, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2    ;# Test 2
+	mov     #0xff33, r6
+	rrc.b        r6        ;# RRC.B ({C=0, r6=0x33}  => {r6=0x19, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2    ;# Test 3
+	mov     #0xf032, r8
+	rrc.b        r8        ;# RRC.B ({C=1, r9=0x32}  => {r9=0x99, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2    ;# Test 4
+	mov     #0xf033, r10
+	rrc.b       r10        ;# RRC.B ({C=1, r10=0x33} => {r10=0x99, C=1})
+	mov          r2, r11
+
+	mov     #0x8000, r15
+
+
+        # Addressing mode: @Rn (Low Byte)
+	#---------------------------------
+
+	mov     #0x0000, r2        ;# Test 1: Low Byte
+	mov     #0x2532, &0x0200
+	mov     #0x0200, r4
+	mov     #0xaaaa, &0x0202
+	rrc.b       @r4            ;# RRC.B ({C=0, mem00=0x2532}  => {mem00=0x2519, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2: Low Byte
+	mov     #0x2533, &0x0202
+	mov     #0x0202, r6
+	mov     #0xaaaa, &0x0204
+	rrc.b       @r6            ;# RRC.B ({C=0, mem01=0x2533}  => {mem01=0x2519, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3: Low Byte
+	mov     #0x2532, &0x0204
+	mov     #0x0204, r8
+	mov     #0xaaaa, &0x0206
+	rrc.b       @r8            ;# RRC.B ({C=1, mem02=0x2532}  => {mem02=0x2599, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4: Low Byte
+	mov     #0x2533, &0x0206
+	mov     #0x0206, r10
+	mov     #0xaaaa, &0x0208
+	rrc.b      @r10            ;# RRC.B ({C=1, mem03=0x2533}  => {mem03=0x2599, C=1})
+	mov          r2, r11
+
+	mov     #0x9000, r15
+
+        # Addressing mode: @Rn (High Byte)
+	#---------------------------------
+
+	mov     #0x0000, r2        ;# Test 1: High Byte
+	mov     #0x3225, &0x0208
+	mov     #0x0209, r4
+	mov     #0xaaaa, &0x020A
+	rrc.b       @r4            ;# RRC.B ({C=0, mem04=0x3225}  => {mem04=0x1925, C=0})
+	mov          r2, r6
+
+	mov     #0x0000, r2        ;# Test 2: High Byte
+	mov     #0x3325, &0x020A
+	mov     #0x020B, r6
+	mov     #0xaaaa, &0x020C
+	rrc.b       @r6            ;# RRC.B ({C=0, mem05=0x3325}  => {mem05=0x1925, C=1})
+	mov          r2, r8
+
+	mov     #0x0001, r2        ;# Test 3: High Byte
+	mov     #0x3225, &0x020C
+	mov     #0x020D, r8
+	mov     #0xaaaa, &0x020E
+	rrc.b       @r8            ;# RRC.B ({C=1, mem06=0x3225}  => {mem06=0x9925, C=0})
+	mov          r2, r10
+
+	mov     #0x0001, r2        ;# Test 4: High Byte
+	mov     #0x3325, &0x020E
+	mov     #0x020F, r10
+	mov     #0xaaaa, &0x0210
+	rrc.b      @r10            ;# RRC.B ({C=1, mem07=0x3325}  => {mem07=0x9925, C=1})
+	mov          r2, r11
+
+	mov     #0x9001, r15
+
+
+        # Addressing mode: @Rn+ (Low Byte)
+	#---------------------------------
+
+	mov     #0x0000, r2        ;# Test 1: Low Byte
+	mov     #0x2532, &0x0210
+	mov     #0x0210, r4
+	mov     #0xaaaa, &0x0212
+	rrc.b      @r4+            ;# RRC.B ({C=0, mem08=0x2532}  => {mem08=0x2519, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2: Low Byte
+	mov     #0x2533, &0x0212
+	mov     #0x0212, r6
+	mov     #0xaaaa, &0x0214
+	rrc.b      @r6+            ;# RRC.B ({C=0, mem09=0x2533}  => {mem09=0x2519, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3: Low Byte
+	mov     #0x2532, &0x0214
+	mov     #0x0214, r8
+	mov     #0xaaaa, &0x0216
+	rrc.b      @r8+            ;# RRC.B ({C=1, mem0a=0x2532}  => {mem0a=0x2599, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4: Low Byte
+	mov     #0x2533, &0x0216
+	mov     #0x0216, r10
+	mov     #0xaaaa, &0x0218
+	rrc.b     @r10+            ;# RRC.B ({C=1, mem0b=0x2533}  => {mem0b=0x2599, C=1})
+	mov          r2, r11
+
+	mov     #0xA000, r15
+
+        # Addressing mode: @Rn+ (High Byte)
+	#-----------------------------------
+
+	mov     #0x0000, r2        ;# Test 1: High Byte
+	mov     #0x3225, &0x0218
+	mov     #0x0219, r4
+	mov     #0xaaaa, &0x021A
+	rrc.b      @r4+            ;# RRC.B ({C=0, mem0c=0x3225}  => {mem0c=0x1925, C=0})
+	mov          r2, r6
+
+	mov     #0x0000, r2        ;# Test 2: High Byte
+	mov     #0x3325, &0x021A
+	mov     #0x021B, r6
+	mov     #0xaaaa, &0x021C
+	rrc.b      @r6+            ;# RRC.B ({C=0, mem0d=0x3325}  => {mem0d=0x1925, C=1})
+	mov          r2, r8
+
+	mov     #0x0001, r2        ;# Test 3: High Byte
+	mov     #0x3225, &0x021C
+	mov     #0x021D, r8
+	mov     #0xaaaa, &0x021E
+	rrc.b      @r8+            ;# RRC.B ({C=1, mem0e=0x3225}  => {mem0e=0x9925, C=0})
+	mov          r2, r10
+
+	mov     #0x0001, r2        ;# Test 4: High Byte
+	mov     #0x3325, &0x021E
+	mov     #0x021F, r10
+	mov     #0xaaaa, &0x0220
+	rrc.b     @r10+            ;# RRC.B ({C=1, mem0f=0x3325}  => {mem0f=0x9925, C=1})
+	mov          r2, r11
+
+	mov     #0xA001, r15
+
+
+        # Addressing mode: X(Rn) (Low Byte)
+	#-----------------------------------
+
+	mov     #0x0000, r2        ;# Test 1
+	mov     #0x2532, &0x0220
+	mov     #0x0200, r4
+	mov     #0xaaaa, &0x0222
+	rrc.b     32(r4)           ;# RRC ({C=0, mem10=0x2532}  => {mem10=0x2519, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2
+	mov     #0x2533, &0x0222
+	mov     #0x0200, r6
+	mov     #0xaaaa, &0x0224
+	rrc.b     34(r6)           ;# RRC ({C=0, mem11=0x2533}  => {mem11=0x2519, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3
+	mov     #0x2532, &0x0224
+	mov     #0x0200, r8
+	mov     #0xaaaa, &0x0226
+	rrc.b     36(r8)           ;# RRC ({C=1, mem12=0x2532}  => {mem12=0x2599, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4
+	mov     #0x2533, &0x0226
+	mov     #0x0200, r10
+	mov     #0xaaaa, &0x0228
+	rrc.b    38(r10)           ;# RRC ({C=1, mem13=0x2533}  => {mem13=0x2599, C=1})
+	mov          r2, r11
+
+	mov     #0xB000, r15
+
+        # Addressing mode: X(Rn) (High Byte)
+	#------------------------------------
+
+	mov     #0x0000, r2        ;# Test 1
+	mov     #0x3225, &0x0228
+	mov     #0x0200, r4
+	mov     #0xaaaa, &0x022A
+	rrc.b     41(r4)           ;# RRC ({C=0, mem14=0x3225}  => {mem14=0x1925, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2
+	mov     #0x3325, &0x022A
+	mov     #0x0200, r6
+	mov     #0xaaaa, &0x022C
+	rrc.b     43(r6)           ;# RRC ({C=0, mem15=0x3325}  => {mem15=0x1925, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3
+	mov     #0x3225, &0x022C
+	mov     #0x0200, r8
+	mov     #0xaaaa, &0x022E
+	rrc.b     45(r8)           ;# RRC ({C=1, mem16=0x3225}  => {mem16=0x9925, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4
+	mov     #0x3325, &0x022E
+	mov     #0x0200, r10
+	mov     #0xaaaa, &0x0230
+	rrc.b    47(r10)           ;# RRC ({C=1, mem17=0x3325}  => {mem17=0x9925, C=1})
+	mov          r2, r11
+
+	mov     #0xB001, r15
+
+
+        # Addressing mode: EDE (Low Byte)
+	#---------------------------------
+.set   EDE_230,  (__data_start+0x0030)
+.set   EDE_232,  (__data_start+0x0032)
+.set   EDE_234,  (__data_start+0x0034)
+.set   EDE_236,  (__data_start+0x0036)
+
+	mov     #0x0000, r2        ;# Test 1
+	mov     #0x2532, &0x0230
+	mov     #0xaaaa, &0x0232
+	rrc.b   EDE_230            ;# RRC ({C=0, mem18=0x2532}  => {mem18=0x2519, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2
+	mov     #0x2533, &0x0232
+	mov     #0xaaaa, &0x0234
+	rrc.b   EDE_232            ;# RRC ({C=0, mem19=0x2533}  => {mem19=0x2519, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3
+	mov     #0x2532, &0x0234
+	mov     #0xaaaa, &0x0236
+	rrc.b   EDE_234            ;# RRC ({C=1, mem1a=0x2532}  => {mem1a=0x2599, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4
+	mov     #0x2533, &0x0236
+	mov     #0xaaaa, &0x0238
+	rrc.b   EDE_236            ;# RRC ({C=1, mem1b=0x2533}  => {mem1b=0x2599, C=1})
+	mov          r2, r11
+
+	mov     #0xC000, r15
+
+        # Addressing mode: EDE (High Byte)
+	#----------------------------------
+.set   EDE_239,  (__data_start+0x0039)
+.set   EDE_23B,  (__data_start+0x003B)
+.set   EDE_23D,  (__data_start+0x003D)
+.set   EDE_23F,  (__data_start+0x003F)
+
+	mov     #0x0000, r2        ;# Test 1
+	mov     #0x3225, &0x0238
+	mov     #0xaaaa, &0x023A
+	rrc.b   EDE_239            ;# RRC ({C=0, mem1c=0x3225}  => {mem1c=0x1925, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2
+	mov     #0x3325, &0x023A
+	mov     #0xaaaa, &0x023C
+	rrc.b   EDE_23B            ;# RRC ({C=0, mem1d=0x3325}  => {mem1d=0x1925, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3
+	mov     #0x3225, &0x023C
+	mov     #0xaaaa, &0x023E
+	rrc.b   EDE_23D            ;# RRC ({C=1, mem1e=0x3225}  => {mem1e=0x9925, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4
+	mov     #0x3325, &0x023E
+	mov     #0xaaaa, &0x0240
+	rrc.b   EDE_23F            ;# RRC ({C=1, mem1f=0x3325}  => {mem1f=0x9925, C=1})
+	mov          r2, r11
+
+	mov     #0xC001, r15
+
+
+        # Addressing mode: &EDE (Low Byte)
+	#----------------------------------
+.set   aEDE_240,  0x0240
+.set   aEDE_242,  0x0242
+.set   aEDE_244,  0x0244
+.set   aEDE_246,  0x0246
+
+	mov     #0x0000, r2        ;# Test 1
+	mov     #0x2532, &0x0240
+	mov     #0xaaaa, &0x0242
+	rrc.b &aEDE_240            ;# RRC ({C=0, mem20=0x2532}  => {mem20=0x2519, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2
+	mov     #0x2533, &0x0242
+	mov     #0xaaaa, &0x0244
+	rrc.b &aEDE_242            ;# RRC ({C=0, mem21=0x2533}  => {mem21=0x2519, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3
+	mov     #0x2532, &0x0244
+	mov     #0xaaaa, &0x0246
+	rrc.b &aEDE_244            ;# RRC ({C=1, mem22=0x2532}  => {mem22=0x2599, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4
+	mov     #0x2533, &0x0246
+	mov     #0xaaaa, &0x0248
+	rrc.b &aEDE_246            ;# RRC ({C=1, mem23=0x2533}  => {mem23=0x2599, C=1})
+	mov          r2, r11
+
+	mov     #0xD000, r15
+
+        # Addressing mode: &EDE (High Byte)
+	#-----------------------------------
+.set   aEDE_249,  0x0249
+.set   aEDE_24B,  0x024B
+.set   aEDE_24D,  0x024D
+.set   aEDE_24F,  0x024F
+
+	mov     #0x0000, r2        ;# Test 1
+	mov     #0x3225, &0x0248
+	mov     #0xaaaa, &0x024A
+	rrc.b &aEDE_249            ;# RRC ({C=0, mem24=0x3225}  => {mem24=0x1925, C=0})
+	mov          r2, r5
+
+	mov     #0x0000, r2        ;# Test 2
+	mov     #0x3325, &0x024A
+	mov     #0xaaaa, &0x024C
+	rrc.b &aEDE_24B            ;# RRC ({C=0, mem25=0x3325}  => {mem25=0x1925, C=1})
+	mov          r2, r7
+
+	mov     #0x0001, r2        ;# Test 3
+	mov     #0x3225, &0x024C
+	mov     #0xaaaa, &0x024E
+	rrc.b &aEDE_24D            ;# RRC ({C=1, mem26=0x3225}  => {mem26=0x9925, C=0})
+	mov          r2, r9
+
+	mov     #0x0001, r2        ;# Test 4
+	mov     #0x3325, &0x024E
+	mov     #0xaaaa, &0x0250
+	rrc.b &aEDE_24F            ;# RRC ({C=1, mem27=0x3325}  => {mem27=0x9925, C=1})
+	mov          r2, r11
+
+	mov     #0xD001, r15
+
+
+
+        /* ----------------------         END OF TEST        --------------- */
+end_of_test:
+	nop
+	br #0xffff
+
+
+
+        /* ----------------------         INTERRUPT VECTORS  --------------- */
+
+.section .vectors, "a"
+.word end_of_test  ; Interrupt  0 (lowest priority)    <unused>
+.word end_of_test  ; Interrupt  1                      <unused>
+.word end_of_test  ; Interrupt  2                      <unused>
+.word end_of_test  ; Interrupt  3                      <unused>
+.word end_of_test  ; Interrupt  4                      <unused>
+.word end_of_test  ; Interrupt  5                      <unused>
+.word end_of_test  ; Interrupt  6                      <unused>
+.word end_of_test  ; Interrupt  7                      <unused>
+.word end_of_test  ; Interrupt  8                      <unused>
+.word end_of_test  ; Interrupt  9                      <unused>
+.word end_of_test  ; Interrupt 10                      Watchdog timer
+.word end_of_test  ; Interrupt 11                      <unused>
+.word end_of_test  ; Interrupt 12                      <unused>
+.word end_of_test  ; Interrupt 13                      <unused>
+.word end_of_test  ; Interrupt 14                      NMI
+.word main         ; Interrupt 15 (highest priority)   RESET

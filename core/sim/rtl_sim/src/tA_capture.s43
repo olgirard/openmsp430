@@ -1,0 +1,515 @@
+/*===========================================================================*/
+/* Copyright (C) 2001 Authors                                                */
+/*                                                                           */
+/* This source file may be used and distributed without restriction provided */
+/* that this copyright statement is not removed from the file and that any   */
+/* derivative work contains the original copyright notice and the associated */
+/* disclaimer.                                                               */
+/*                                                                           */
+/* This source file is free software; you can redistribute it and/or modify  */
+/* it under the terms of the GNU Lesser General Public License as published  */
+/* by the Free Software Foundation; either version 2.1 of the License, or    */
+/* (at your option) any later version.                                       */
+/*                                                                           */
+/* This source is distributed in the hope that it will be useful, but WITHOUT*/
+/* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     */
+/* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public       */
+/* License for more details.                                                 */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this source; if not, write to the Free Software Foundation,    */
+/* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA        */
+/*                                                                           */
+/*===========================================================================*/
+/*                                  TIMER A                                  */
+/*---------------------------------------------------------------------------*/
+/* Test the timer A:                                                         */
+/*                        - Check the timer capture unit.                    */
+/*===========================================================================*/
+
+.global main
+
+.set   TACTL,   0x0160
+.set   TAR,     0x0170
+.set   TACCTL0, 0x0162
+.set   TACCR0,  0x0172
+.set   TACCTL1, 0x0164
+.set   TACCR1,  0x0174
+.set   TACCTL2, 0x0166
+.set   TACCR2,  0x0176
+.set   TAIV,    0x012E
+
+
+WAIT_FUNC:
+	dec r14
+	jnz WAIT_FUNC
+	ret
+	
+main:
+ 	mov  #0x0250, r1 	; # Initialize stack pointer
+	mov  #0x0000, &0x0200
+	mov  #0x0000, r15
+
+       /* --------------   TIMER A TEST:  INPUT MUX (CCI) ----------------- */
+
+	mov  #0x0200, &TACTL
+	mov  #0x0000, &TACCTL0
+	mov  #0x0000, &TACCTL1
+	mov  #0x0000, &TACCTL2
+	dint
+
+	                        ; # --------- Comparator 0 ----------
+	mov  #0x0204, &TACTL
+	mov  #0x0000, &TACCR0
+	mov  #0x0000, &TACCTL0  ; # CCIxA
+ 	mov  #0x0001, &0x0200
+	mov &TACCTL0, &0x0202
+ 	mov  #0x0002, &0x0200
+	mov &TACCTL0, &0x0204
+ 	mov  #0x0003, &0x0200
+
+	mov  #0x1000, &TACCTL0  ; # CCIxB
+ 	mov  #0x0004, &0x0200
+	mov &TACCTL0, &0x0202
+ 	mov  #0x0005, &0x0200
+	mov &TACCTL0, &0x0204
+ 	mov  #0x0006, &0x0200
+
+	mov  #0x2000, &TACCTL0  ; # GND
+ 	mov  #0x0007, &0x0200
+	mov &TACCTL0, &0x0202
+ 	mov  #0x0008, &0x0200
+	mov &TACCTL0, &0x0204
+ 	mov  #0x0009, &0x0200
+
+	mov  #0x3000, &TACCTL0  ; # VDD
+ 	mov  #0x000A, &0x0200
+	mov &TACCTL0, &0x0202
+ 	mov  #0x000B, &0x0200
+	mov &TACCTL0, &0x0204
+ 	mov  #0x000C, &0x0200
+
+	                        ; # --------- Comparator 1 ----------
+	mov  #0x0204, &TACTL
+	mov  #0x0000, &TACCR1
+	mov  #0x0000, &TACCTL1  ; # CCIxA
+ 	mov  #0x0011, &0x0200
+	mov &TACCTL1, &0x0202
+ 	mov  #0x0012, &0x0200
+	mov &TACCTL1, &0x0204
+ 	mov  #0x0013, &0x0200
+
+	mov  #0x1000, &TACCTL1  ; # CCIxB
+ 	mov  #0x0014, &0x0200
+	mov &TACCTL1, &0x0202
+ 	mov  #0x0015, &0x0200
+	mov &TACCTL1, &0x0204
+ 	mov  #0x0016, &0x0200
+
+	mov  #0x2000, &TACCTL1  ; # GND
+ 	mov  #0x0017, &0x0200
+	mov &TACCTL1, &0x0202
+ 	mov  #0x0018, &0x0200
+	mov &TACCTL1, &0x0204
+ 	mov  #0x0019, &0x0200
+
+	mov  #0x3000, &TACCTL1  ; # VDD
+ 	mov  #0x001A, &0x0200
+	mov &TACCTL1, &0x0202
+ 	mov  #0x001B, &0x0200
+	mov &TACCTL1, &0x0204
+ 	mov  #0x001C, &0x0200
+
+	                        ; # --------- Comparator 2 ----------
+	mov  #0x0204, &TACTL
+	mov  #0x0000, &TACCR2
+	mov  #0x0000, &TACCTL2  ; # CCIxA
+ 	mov  #0x0021, &0x0200
+	mov &TACCTL2, &0x0202
+ 	mov  #0x0022, &0x0200
+	mov &TACCTL2, &0x0204
+ 	mov  #0x0023, &0x0200
+
+	mov  #0x1000, &TACCTL2  ; # CCIxB
+ 	mov  #0x0024, &0x0200
+	mov &TACCTL2, &0x0202
+ 	mov  #0x0025, &0x0200
+	mov &TACCTL2, &0x0204
+ 	mov  #0x0026, &0x0200
+
+	mov  #0x2000, &TACCTL2  ; # GND
+ 	mov  #0x0027, &0x0200
+	mov &TACCTL2, &0x0202
+ 	mov  #0x0028, &0x0200
+	mov &TACCTL2, &0x0204
+ 	mov  #0x0029, &0x0200
+
+	mov  #0x3000, &TACCTL2  ; # VDD
+ 	mov  #0x002A, &0x0200
+	mov &TACCTL2, &0x0202
+ 	mov  #0x002B, &0x0200
+	mov &TACCTL2, &0x0204
+ 	mov  #0x002C, &0x0200
+
+	
+	dint		
+	mov  #0x0000, &0x0200
+	mov  #0x1000, r15
+
+       /* --------------   TIMER A TEST:  CAPTURE, EDGE SELECTION AND INTERRUPT ----------------- */
+
+	mov  #0x0200, &TACTL
+	mov  #0x0000, &TACCTL0
+	mov  #0x0000, &TACCTL1
+	mov  #0x0000, &TACCTL2
+	dint
+
+	                        ; # --------- Comparator 0 ----------
+	mov  #0x0204, &TACTL
+	mov  #0x1234, &TAR
+	mov  #0x0110, &TACCTL0  ; # No capture, Interrupt enable
+	mov  #0x0000, &TACCR0
+ 	mov  #0x0001, &0x0200
+	nop
+	nop
+	mov  &TACCR0, &0x0202
+	mov  #0x0110, &TACCTL0  ; # No capture, Interrupt enable
+	mov  #0x0000, &TACCR0
+ 	mov  #0x0002, &0x0200
+	nop
+	nop
+	mov  &TACCR0, &0x0204
+	mov  #0x0000, &TACCTL0
+ 	mov  #0x0003, &0x0200
+	
+	mov  #0x0204, &TACTL
+	mov  #0x1234, &TAR
+	mov  #0x4110, &TACCTL0  ; # Rising edge, Interrupt enable
+	mov  #0x0000, &TACCR0
+ 	mov  #0x0004, &0x0200
+	nop
+	nop
+	mov  &TACCR0, &0x0202
+	mov  #0x4110, &TACCTL0  ; # Rising edge, Interrupt enable
+ 	mov  #0x0000, &TACCR0
+	mov  #0x0005, &0x0200
+	nop
+	nop
+	mov  &TACCR0, &0x0204
+	mov  #0x0000, &TACCTL0
+ 	mov  #0x0006, &0x0200
+	
+	mov  #0x0204, &TACTL
+	mov  #0x1234, &TAR
+	mov  #0x8110, &TACCTL0  ; # Falling edge, Interrupt enable
+	mov  #0x0000, &TACCR0
+ 	mov  #0x0007, &0x0200
+	nop
+	nop
+	mov  &TACCR0, &0x0202
+	mov  #0x8110, &TACCTL0  ; # Falling edge, Interrupt enable
+ 	mov  #0x0000, &TACCR0
+	mov  #0x0008, &0x0200
+	nop
+	nop
+	mov  &TACCR0, &0x0204
+	mov  #0x0000, &TACCTL0
+ 	mov  #0x0009, &0x0200
+	
+	mov  #0x0204, &TACTL
+	mov  #0x1234, &TAR
+	mov  #0xC110, &TACCTL0  ; # Rising/Falling edge, Interrupt enable
+	mov  #0x0000, &TACCR0
+ 	mov  #0x000A, &0x0200
+	nop
+	nop
+	mov  &TACCR0, &0x0202
+	mov  #0xC110, &TACCTL0  ; # Rising/Falling edge, Interrupt enable
+ 	mov  #0x0000, &TACCR0
+	mov  #0x000B, &0x0200
+	nop
+	nop
+	mov  &TACCR0, &0x0204
+	mov  #0x0000, &TACCTL0
+ 	mov  #0x000C, &0x0200
+	
+
+	                        ; # --------- Comparator 1 ----------
+	mov  #0x0204, &TACTL
+	mov  #0x1234, &TAR
+	mov  #0x0110, &TACCTL1  ; # No capture, Interrupt enable
+	mov  #0x0000, &TACCR1
+ 	mov  #0x0001, &0x0200
+	nop
+	nop
+	mov  &TACCR1, &0x0202
+	mov  #0x0110, &TACCTL1  ; # No capture, Interrupt enable
+	mov  #0x0000, &TACCR1
+ 	mov  #0x0002, &0x0200
+	nop
+	nop
+	mov  &TACCR1, &0x0204
+	mov  #0x0000, &TACCTL1
+ 	mov  #0x0003, &0x0200
+	
+	mov  #0x0204, &TACTL
+	mov  #0x1234, &TAR
+	mov  #0x4110, &TACCTL1  ; # Rising edge, Interrupt enable
+	mov  #0x0000, &TACCR1
+ 	mov  #0x0004, &0x0200
+	nop
+	nop
+	mov  &TACCR1, &0x0202
+	mov  #0x4110, &TACCTL1  ; # Rising edge, Interrupt enable
+ 	mov  #0x0000, &TACCR1
+	mov  #0x0005, &0x0200
+	nop
+	nop
+	mov  &TACCR1, &0x0204
+	mov  #0x0000, &TACCTL1
+ 	mov  #0x0006, &0x0200
+	
+	mov  #0x0204, &TACTL
+	mov  #0x1234, &TAR
+	mov  #0x8110, &TACCTL1  ; # Falling edge, Interrupt enable
+	mov  #0x0000, &TACCR1
+ 	mov  #0x0007, &0x0200
+	nop
+	nop
+	mov  &TACCR1, &0x0202
+	mov  #0x8110, &TACCTL1  ; # Falling edge, Interrupt enable
+ 	mov  #0x0000, &TACCR1
+	mov  #0x0008, &0x0200
+	nop
+	nop
+	mov  &TACCR1, &0x0204
+	mov  #0x0000, &TACCTL1
+ 	mov  #0x0009, &0x0200
+	
+	mov  #0x0204, &TACTL
+	mov  #0x1234, &TAR
+	mov  #0xC110, &TACCTL1  ; # Rising/Falling edge, Interrupt enable
+	mov  #0x0000, &TACCR1
+ 	mov  #0x000A, &0x0200
+	nop
+	nop
+	mov  &TACCR1, &0x0202
+	mov  #0xC110, &TACCTL1  ; # Rising/Falling edge, Interrupt enable
+ 	mov  #0x0000, &TACCR1
+	mov  #0x000B, &0x0200
+	nop
+	nop
+	mov  &TACCR1, &0x0204
+	mov  #0x0000, &TACCTL1
+ 	mov  #0x000C, &0x0200
+
+	
+	                        ; # --------- Comparator 2 ----------
+	mov  #0x0204, &TACTL
+	mov  #0x1234, &TAR
+	mov  #0x0110, &TACCTL2  ; # No capture, Interrupt enable
+	mov  #0x0000, &TACCR2
+ 	mov  #0x0001, &0x0200
+	nop
+	nop
+	mov  &TACCR2, &0x0202
+	mov  #0x0110, &TACCTL2  ; # No capture, Interrupt enable
+	mov  #0x0000, &TACCR2
+ 	mov  #0x0002, &0x0200
+	nop
+	nop
+	mov  &TACCR2, &0x0204
+	mov  #0x0000, &TACCTL2
+ 	mov  #0x0003, &0x0200
+	
+	mov  #0x0204, &TACTL
+	mov  #0x1234, &TAR
+	mov  #0x4110, &TACCTL2  ; # Rising edge, Interrupt enable
+	mov  #0x0000, &TACCR2
+ 	mov  #0x0004, &0x0200
+	nop
+	nop
+	mov  &TACCR2, &0x0202
+	mov  #0x4110, &TACCTL2  ; # Rising edge, Interrupt enable
+ 	mov  #0x0000, &TACCR2
+	mov  #0x0005, &0x0200
+	nop
+	nop
+	mov  &TACCR2, &0x0204
+	mov  #0x0000, &TACCTL2
+ 	mov  #0x0006, &0x0200
+	
+	mov  #0x0204, &TACTL
+	mov  #0x1234, &TAR
+	mov  #0x8110, &TACCTL2  ; # Falling edge, Interrupt enable
+	mov  #0x0000, &TACCR2
+ 	mov  #0x0007, &0x0200
+	nop
+	nop
+	mov  &TACCR2, &0x0202
+	mov  #0x8110, &TACCTL2  ; # Falling edge, Interrupt enable
+ 	mov  #0x0000, &TACCR2
+	mov  #0x0008, &0x0200
+	nop
+	nop
+	mov  &TACCR2, &0x0204
+	mov  #0x0000, &TACCTL2
+ 	mov  #0x0009, &0x0200
+	
+	mov  #0x0204, &TACTL
+	mov  #0x1234, &TAR
+	mov  #0xC110, &TACCTL2  ; # Rising/Falling edge, Interrupt enable
+	mov  #0x0000, &TACCR2
+ 	mov  #0x000A, &0x0200
+	nop
+	nop
+	mov  &TACCR2, &0x0202
+	mov  #0xC110, &TACCTL2  ; # Rising/Falling edge, Interrupt enable
+ 	mov  #0x0000, &TACCR2
+	mov  #0x000B, &0x0200
+	nop
+	nop
+	mov  &TACCR2, &0x0204
+	mov  #0x0000, &TACCTL2
+ 	mov  #0x000C, &0x0200
+	
+
+	dint		
+	mov  #0x0000, &0x0200
+	mov  #0x2000, r15
+	
+       /* --------------   TIMER A TEST:  CAPTURE OVERFLOW ----------------- */
+
+	mov  #0x0200, &TACTL
+	mov  #0x0000, &TACCTL0
+	mov  #0x0000, &TACCTL1
+	mov  #0x0000, &TACCTL2
+	dint
+
+	                        ; # --------- Comparator 0 ----------
+	mov  #0x0204, &TACTL
+	mov  #0xC000, &TACCTL0  ; # Both edges:	 No read -> overflow
+ 	mov  #0x0001, &0x0200
+	nop
+	nop
+	mov &TACCTL0, &0x0202
+ 	mov  #0x0002, &0x0200
+	nop
+	nop
+	mov &TACCTL0, &0x0204
+	mov  #0x0000, &TACCTL0
+ 	mov  #0x0003, &0x0200
+
+	mov  #0x0204, &TACTL
+	mov  #0xC000, &TACCTL0  ; # Both edges:	 Read -> no overflow
+ 	mov  #0x0004, &0x0200
+	nop
+	nop
+	mov &TACCTL0, &0x0202
+	mov  &TACCR0, r10       ; # Read
+ 	mov  #0x0005, &0x0200
+	nop
+	nop
+	mov &TACCTL0, &0x0204
+	mov  #0x0000, &TACCTL0
+ 	mov  #0x0006, &0x0200
+
+	                        ; # --------- Comparator 1 ----------
+	mov  #0x0204, &TACTL
+	mov  #0xC000, &TACCTL1  ; # Both edges:	 No read -> overflow
+ 	mov  #0x0001, &0x0200
+	nop
+	nop
+	mov &TACCTL1, &0x0202
+ 	mov  #0x0002, &0x0200
+	nop
+	nop
+	mov &TACCTL1, &0x0204
+	mov  #0x0000, &TACCTL1
+ 	mov  #0x0003, &0x0200
+
+ 	mov  #0x0204, &TACTL
+ 	mov  #0xC000, &TACCTL1  ; # Both edges:	 Read -> no overflow
+  	mov  #0x0004, &0x0200
+	nop
+	nop
+ 	mov &TACCTL1, &0x0202
+ 	mov  &TACCR1, r10       ; # Read
+  	mov  #0x0005, &0x0200
+	nop
+	nop
+ 	mov &TACCTL1, &0x0204
+ 	mov  #0x0000, &TACCTL1
+  	mov  #0x0006, &0x0200
+
+	                        ; # --------- Comparator 2 ----------
+ 	mov  #0x0204, &TACTL
+ 	mov  #0xC000, &TACCTL2  ; # Both edges:	 No read -> overflow
+  	mov  #0x0001, &0x0200
+	nop
+	nop
+ 	mov &TACCTL2, &0x0202
+  	mov  #0x0002, &0x0200
+	nop
+	nop
+ 	mov &TACCTL2, &0x0204
+ 	mov  #0x0000, &TACCTL2
+  	mov  #0x0003, &0x0200
+
+ 	mov  #0x0204, &TACTL
+ 	mov  #0xC000, &TACCTL2  ; # Both edges:	 Read -> no overflow
+  	mov  #0x0004, &0x0200
+	nop
+	nop
+ 	mov &TACCTL2, &0x0202
+ 	mov  &TACCR2, r10       ; # Read
+  	mov  #0x0005, &0x0200
+	nop
+	nop
+ 	mov &TACCTL2, &0x0204
+ 	mov  #0x0000, &TACCTL2
+  	mov  #0x0006, &0x0200
+
+	dint		
+	mov  #0x0000, &0x0200
+	mov  #0x3000, r15
+
+		
+        /* ----------------------         END OF TEST        --------------- */
+end_of_test:
+	nop
+	br #0xffff
+
+
+        /* ----------------------      INTERRUPT ROUTINES    --------------- */
+
+TIMERA_CCR0_VECTOR:
+	inc  &0x0200
+	reti
+
+	
+TIMERA_TAIV_VECTOR:
+	mov     &TAR, &0x0204
+	mov    &TAIV, &0x0206
+	reti
+
+
+        /* ----------------------         INTERRUPT VECTORS  --------------- */
+
+.section .vectors, "a"
+.word end_of_test        ; Interrupt  0 (lowest priority)    <unused>
+.word end_of_test        ; Interrupt  1                      <unused>
+.word end_of_test        ; Interrupt  2                      <unused>
+.word end_of_test        ; Interrupt  3                      <unused>
+.word end_of_test        ; Interrupt  4                      <unused>
+.word end_of_test        ; Interrupt  5                      <unused>
+.word end_of_test        ; Interrupt  6                      <unused>
+.word end_of_test        ; Interrupt  7                      <unused>
+.word TIMERA_TAIV_VECTOR ; Interrupt  8                      <unused>
+.word TIMERA_CCR0_VECTOR ; Interrupt  9                      <unused>
+.word end_of_test        ; Interrupt 10                      Watchdog timer
+.word end_of_test        ; Interrupt 11                      <unused>
+.word end_of_test        ; Interrupt 12                      <unused>
+.word end_of_test        ; Interrupt 13                      <unused>
+.word end_of_test        ; Interrupt 14                      NMI
+.word main               ; Interrupt 15 (highest priority)   RESET

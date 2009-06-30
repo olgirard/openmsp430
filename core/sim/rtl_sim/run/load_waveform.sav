@@ -1,0 +1,21 @@
+[timestart] 0
+[size] 1680 991
+[pos] -1 -1
+*-21.526770 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] tb_openMSP430.
+@22
+tb_openMSP430.r15[15:0]
+tb_openMSP430.error[31:0]
+@820
+tb_openMSP430.inst_full[255:0]
+@22
+tb_openMSP430.inst_pc[15:0]
+@820
+tb_openMSP430.e_state[255:0]
+tb_openMSP430.i_state[255:0]
+@22
+tb_openMSP430.r1[15:0]
+tb_openMSP430.r4[15:0]
+tb_openMSP430.r6[15:0]
+tb_openMSP430.mem250[15:0]
+tb_openMSP430.mem24E[15:0]
