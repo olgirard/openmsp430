@@ -60,9 +60,6 @@
 // Include Debug interface
 `define DBG_EN
 
-// Debug interface ID
-`define DBG_ID       32'h6F4D5350
-
 // Debug interface selection
 //             `define DBG_UART -> Enable UART (8N1) debug interface
 //             `define DBG_JTAG -> DON'T UNCOMMENT, NOT SUPPORTED YET
@@ -246,6 +243,9 @@
 
 // Debug interface: Software breakpoint opcode
 `define DBG_SWBRK_OP 16'h4343
+
+// Debug interface ID
+`define DBG_ID  24'h4D5350
 
 // Debug UART interface auto data synchronization
 // If the following define is commented out, then
