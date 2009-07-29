@@ -28,7 +28,7 @@ Building on the serial debug interface capabilities provided by the openMSP430, 
 	<li><b>openmsp430-gdbproxy:</b> GDB Proxy server to be used together with MSP430-GDB and the Eclipse, DDD, or Insight graphical front-ends.</li>
 </ul> 
 
-All these software development tools have been developed in TCL/TK and have been successfully tested on both Linux and Windows XP.
+All these software development tools have been developed in TCL/TK and were successfully tested on both Linux and Windows XP.
 <br /><br />
 <b>Note:</b> in order to be able to directly execute the scripts, <a href="http://www.tcl.tk/software/tcltk/">TCL/TK</a> needs to be installed on your system. Optionaly for Windows users, the scripts have been turned into single-file binary executable programs using <a href="http://freewrap.sourceforge.net/">freeWrap</a>.
 
@@ -36,7 +36,7 @@ All these software development tools have been developed in TCL/TK and have been
 <a name="2. openmsp430-loader"></a>
 <h1>2. openmsp430-loader</h1>
 
-This simple program allows the user to load the openMSP430 program memory with the executable file (ELF format) provided as argument.<br />
+This simple program allows the user to load the openMSP430 program memory with an executable file (ELF format) provided as argument.<br />
 It is typically used in conjunction with '<b><i>make</i></b>' in order to automatically load the program after the compile step (see '<b><i>Makefile</i></b>' from software examples provided with the project's FPGA implementation).<br />
 The program can be called with the following syntax:
 <br /><br />
@@ -58,28 +58,28 @@ Examples: openmsp430-loader.tcl -device /dev/ttyUSB0 -baudrate  9600  leds.elf<b
 These screenshots show the script in action under linux and windows:
 <br /><br />
 <img src="getimg.php?1248897300" width="75%" height="75%" alt="openmsp430-loader Linux" title="openmsp430-loader Linux" />
-<br />
+<br /><br />
 <img src="getimg.php?1248897356" width="75%" height="75%" alt="openmsp430-loader Windows" title="openmsp430-loader Windows" />
 <br />
 <a name="3. openmsp430-minidebug"></a>
 <h1>3. openmsp430-minidebug</h1>
-This small programm provides a minimalistic graphical interface enabling simple interaction with the openMSP430:
+This small program provides a minimalistic graphical interface enabling simple interaction with the openMSP430:
 <br /><br />
 <img src="getimg.php?1248897416" width="65%" height="65%" alt="openmsp430-minidebug" title="openmsp430-minidebug" />
 <br /><br />
 As you can see from the screenshot, it allows the following actions:
 <ul>
-	<li><b><font  color="#FF0000">(1)</font></b>&nbsp;&nbsp;load the program memory with an ELF file</li>
-	<li><b><font  color="#FF0000">(2)</font></b>&nbsp;&nbsp;reset the CPU</li>
-	<li><b><font  color="#FF0000">(3)</font></b>&nbsp;&nbsp;stop/start the program execution</li>
-	<li><b><font  color="#FF0000">(4)</font></b>&nbsp;&nbsp;read/write access to the CPU registers</li>
-	<li><b><font  color="#FF0000">(5)</font></b>&nbsp;&nbsp;read/write access to the whole memory range (program, data, peripherals)</li>
+	<li><b><font  color="#FF0000">(1)</font></b>&nbsp;&nbsp;Load the program memory with an ELF file</li>
+	<li><b><font  color="#FF0000">(2)</font></b>&nbsp;&nbsp;Reset the CPU</li>
+	<li><b><font  color="#FF0000">(3)</font></b>&nbsp;&nbsp;Stop/Start the program execution</li>
+	<li><b><font  color="#FF0000">(4)</font></b>&nbsp;&nbsp;Read/Write access of the CPU registers</li>
+	<li><b><font  color="#FF0000">(5)</font></b>&nbsp;&nbsp;Read/Write access of the whole memory range (program, data, peripherals)</li>
 </ul>
 
 <a name="4. openmsp430-gdbproxy"></a>
 <h1>4. openmsp430-gdbproxy</h1>
 The purpose of this program is to replace the '<b><i>msp430-gdbproxy</i></b>' utility provided by the mspgcc toolchain.<br />
-Typically, a GDB proxy creates a local port for gdb to connect to and handles the communication with the target hardware. In our case, it is basically a bridge between the RSP communication protocol from GDB and the serial debug interface from the openMSP430.<br />
+Typically, a GDB proxy creates a local port for gdb to connect to, and handles the communication with the target hardware. In our case, it is basically a bridge between the RSP communication protocol from GDB and the serial debug interface from the openMSP430.<br />
 Schematically the communication flow looks as following:
 <br /><br />
 <img src="getimg.php?1248897690" width="40%" height="40%" alt="GDB Proxy flow" title="GDB Proxy flow" />
@@ -116,7 +116,7 @@ There is fortunately a <a href="http://www.nabble.com/Useful-new-GDB-fixes-td195
 The following table aims to help selecting the proper <b>-mmcu</b> option for the <b>msp430-gcc</b> call.<br />
 Note that only the ROM size should imperatively match the openMSP430 configuration. 
 <br /><br /> 
-<table border="1">
+<table align="center" border="1">
 <tr align="center"><td colspan="3"><b>ROM Size: 1 kB</b></td></tr>             
 <tr align="center"><td>msp430x110  </td><td> 1 kB</td><td>  128 B</td></tr>
 <tr align="center"><td>msp430x1101 </td><td> 1 kB</td><td>  128 B</td></tr> 
