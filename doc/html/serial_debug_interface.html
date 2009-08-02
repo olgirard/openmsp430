@@ -363,7 +363,7 @@ This 8 bit read-write register is used to control the CPU and to configure some 
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>RST_BRK_EN</b></li></td>
-   <td>: If set to 1, the CPU will automatically break after a PUC occurence.</td>
+   <td>: If set to 1, the CPU will automatically break after a PUC occurrence.</td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>FRZ_BRK_EN</b></li></td>
@@ -422,23 +422,23 @@ This 8 bit read-write register gives the global status of the debug interface. A
 <table border="0">
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>HWBRK3_PND</b></li></td>
-   <td>: This bit reflects if one of the Hardware Breapoint Unit 3 status bit is set (i.e. BRK3_STAT&ne;0).</td>
+   <td>: This bit reflects if one of the Hardware Breakpoint Unit 3 status bit is set (i.e. BRK3_STAT&ne;0).</td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>HWBRK2_PND</b></li></td>
-   <td>: This bit reflects if one of the Hardware Breapoint Unit 2 status bit is set (i.e. BRK2_STAT&ne;0).</td>
+   <td>: This bit reflects if one of the Hardware Breakpoint Unit 2 status bit is set (i.e. BRK2_STAT&ne;0).</td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>HWBRK1_PND</b></li></td>
-   <td>: This bit reflects if one of the Hardware Breapoint Unit 1 status bit is set (i.e. BRK1_STAT&ne;0).</td>
+   <td>: This bit reflects if one of the Hardware Breakpoint Unit 1 status bit is set (i.e. BRK1_STAT&ne;0).</td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>HWBRK0_PND</b></li></td>
-   <td>: This bit reflects if one of the Hardware Breapoint Unit 0 status bit is set (i.e. BRK0_STAT&ne;0).</td>
+   <td>: This bit reflects if one of the Hardware Breakpoint Unit 0 status bit is set (i.e. BRK0_STAT&ne;0).</td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>SWBRK_PND</b></li></td>
-   <td>: This bit is set to 1 when a software breakpoint occured. It can be cleared by writing 1 to it.</td>
+   <td>: This bit is set to 1 when a software breakpoint occurred. It can be cleared by writing 1 to it.</td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>PUC_PND</b></li></td>
@@ -462,7 +462,7 @@ This 8 bit read-write register gives the global status of the debug interface. A
 <h2>2.3 Memory Access Registers</h2>
 
 The following four registers enable single and burst read/write access to both CPU-Registers and full memory address range.
-<br />In ordre to perform an access, the following sequences are typically done:
+<br />In order to perform an access, the following sequences are typically done:
 <ul>
    <li>single read access (MEM_CNT=0):</li>
 	<ol>
@@ -624,7 +624,7 @@ This 16 bit read-write register specifies (wr) or receive (rd) the Memory or CPU
 <a name="2.3.4 MEM_CNT"></a>
 <h3>2.3.4 MEM_CNT</h3>
 
-This 16 bit read-write register controls the burst access to the Memory or CPU-Registers. If set to 0, a single access will occure, otherwise, a burst will be performed. The burst being optimized for the communication interface, more details are given <a href="#3.4 Read/Write burst implementation for the CPU Memory access">there</a>. After a POR, this register is set to 0x0000.
+This 16 bit read-write register controls the burst access to the Memory or CPU-Registers. If set to 0, a single access will occur, otherwise, a burst will be performed. The burst being optimized for the communication interface, more details are given <a href="#3.4 Read/Write burst implementation for the CPU Memory access">there</a>. After a POR, this register is set to 0x0000.
 <br /><br />
 <table border="1">
 <tr align="center">
@@ -663,7 +663,7 @@ This 16 bit read-write register controls the burst access to the Memory or CPU-R
 <a name="2.4 Hardware Breakpoint Unit Registers"></a>
 <div style="text-align: right"><a href="#TOC">Top</a></div>
 <h2>2.4 Hardware Breakpoint Unit Registers</h2>
-Depending on the <a href="http://www.opencores.org/project/openmsp430/core#2.1.3 Configuration">defines</a> located in the "openmsp430.inc" file, up to four hardware breakpoint units can be included in the design. These units can be individually controled with the following registers.
+Depending on the <a href="http://www.opencores.org/project/openmsp430/core#2.1.3 Configuration">defines</a> located in the "openmsp430.inc" file, up to four hardware breakpoint units can be included in the design. These units can be individually controlled with the following registers.
 <a name="2.4.1 BRKx_CTL"></a>
 <h3>2.4.1 BRKx_CTL</h3>
 
@@ -867,7 +867,7 @@ Using an standard <a href="http://www.google.com/search?q=usb+to+rs232+converter
 
 <a name="3.1 Serial communication protocol: 8N1"></a>
 <h2>3.1 Serial communication protocol: 8N1</h2>
-There are plenty tutorials on internet regarding RS232 based protocols. However, here is quick recap about 8N1 (1 Start bit, 8 Data bits, No Parity, 1 Stop bit):<br />
+There are plenty tutorials on Internet regarding RS232 based protocols. However, here is quick recap about 8N1 (1 Start bit, 8 Data bits, No Parity, 1 Stop bit):<br />
 <br />
 <img src="getimg.php?1247419201" alt="8N1 Serial Protocol" title="8N1 Serial Protocol" />
 <br />
@@ -875,14 +875,14 @@ As you can see in the above diagram, data transmission starts with a Start bit, 
 
 <a name="3.2 Synchronization frame"></a>
 <h2>3.2 Synchronization frame</h2>
-After a POR, the Serial Debug Interface expects a synchronization frame from the host computer in order to determine the communicatin speed (i.e. the baud rate).<br />
+After a POR, the Serial Debug Interface expects a synchronization frame from the host computer in order to determine the communication speed (i.e. the baud rate).<br />
 The synchronization frame looks as following: 
 <br />
 <img src="getimg.php?1247420610" alt="Debug Synchronization Frame" title="Debug Synchronization Frame" />
 <br />
 As you can see, the host simply sends the 0x80 value. The openMSP430 will then measure the time between the falling and rising edge, divide it by 8 and automatically deduce the baud rate it should use to properly communicate with the host.
 <br /><br />
-<b>Important note</b>: if you want to change the communication speed between two debuging sessions, the openMSP430 needs to go over a POR cycle and a new synchronization frame needs to be send.
+<b>Important note</b>: if you want to change the communication speed between two debugging sessions, the openMSP430 needs to go over a POR cycle and a new synchronization frame needs to be send.
 
 <a name="3.3 Read/Write access to the debug registers"></a>
 <h2>3.3 Read/Write access to the debug registers</h2>
@@ -925,7 +925,7 @@ A read access transaction looks like this:
 <a name="3.4 Read/Write burst implementation for the CPU Memory access"></a>
 <h2>3.4 Read/Write burst implementation for the CPU Memory access</h2>
 In order to optimize the data burst transactions for the UART, read/write access are not done by reading or writing the MEM_DATA register.<br />
-Instead, the data transfer starts immediatelly after the MEM_CTL.START bit has been set. 
+Instead, the data transfer starts immediately after the MEM_CTL.START bit has been set. 
 
 <a name="3.4.1 Write Burst access"></a>
 <h3>3.4.1 Write Burst access</h3>

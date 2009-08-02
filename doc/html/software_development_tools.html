@@ -30,7 +30,7 @@ Building on the serial debug interface capabilities provided by the openMSP430, 
 
 All these software development tools have been developed in TCL/TK and were successfully tested on both Linux and Windows XP.
 <br /><br />
-<b>Note:</b> in order to be able to directly execute the scripts, <a href="http://www.tcl.tk/software/tcltk/">TCL/TK</a> needs to be installed on your system. Optionaly for Windows users, the scripts have been turned into single-file binary executable programs using <a href="http://freewrap.sourceforge.net/">freeWrap</a>.
+<b>Note:</b> in order to be able to directly execute the scripts, <a href="http://www.tcl.tk/software/tcltk/">TCL/TK</a> needs to be installed on your system. Optionally for Windows users, the scripts have been turned into single-file binary executable programs using <a href="http://freewrap.sourceforge.net/">freeWrap</a>.
 
 
 <a name="2. openmsp430-loader"></a>
@@ -55,11 +55,11 @@ Examples: openmsp430-loader.tcl -device /dev/ttyUSB0 -baudrate  9600  leds.elf<b
 </tr>
 </table>
 <br />
-These screenshots show the script in action under linux and windows:
+These screenshots show the script in action under Linux and Windows:
 <br /><br />
 <img src="getimg.php?1248897300" width="75%" height="75%" alt="openmsp430-loader Linux" title="openmsp430-loader Linux" />
 <br /><br />
-<img src="getimg.php?1248897356" width="75%" height="75%" alt="openmsp430-loader Windows" title="openmsp430-loader Windows" />
+<img src="getimg.php?1249244501" width="75%" height="75%" alt="openmsp430-loader Windows" title="openmsp430-loader Windows" />
 <br />
 <a name="3. openmsp430-minidebug"></a>
 <h1>3. openmsp430-minidebug</h1>
@@ -94,7 +94,7 @@ These two additional screenshots show the script in action together with the Ecl
 <br /><br />
 <img src="getimg.php?1248897887" width="100%" height="100%" alt="openmsp430-gdbproxy and DDD" title="openmsp430-gdbproxy and DDD" />
 <br /><br />
-<b>Tip:</b> There are serveral tutorials on internet explaining how to configure Eclipse for the MSP430. As an Eclipse newbie, I found the followings quite helpful:
+<b>Tip:</b> There are several tutorials on Internet explaining how to configure Eclipse for the MSP430. As an Eclipse newbie, I found the followings quite helpful:
 <ul>
 	<li><a href="http://matthias-hartmann.blogspot.com/2009/02/use-eclipse-and-mspgcc-easy-way.html">Use Eclipse and mspgcc - The easy way</a> (English)</li>
 	<li><a href="http://msp430.ms.funpic.de/doku.php?id=msp430:entwicklungumgebung">MSP430 - Entwicklungumgebung</a> (German)</li>
@@ -108,7 +108,7 @@ These two additional screenshots show the script in action together with the Ecl
 
 As of today (July 2009), the GDB port for the MSP430 has some problems (<a href="http://www.nabble.com/Help-with-gdb-commands-td21942613.html">here</a>).<br />
 The stepping over function is not available and the backtrace and finish commands don't work properly.<br />
-There is fortunately a <a href="http://www.nabble.com/Useful-new-GDB-fixes-td19554922.html">patch</a> existing, and until it is included into GDB, I can only recommand to recompile GDB with it (I didn't try it for Windows but it is quite straight forward to do for linux). 
+There is fortunately a <a href="http://www.nabble.com/Useful-new-GDB-fixes-td19554922.html">patch</a> existing, and until it is included into GDB, I can only recommend to recompile GDB with it (I didn't try it for Windows but it is quite straight forward to do for Linux). 
 
 <a name="5.2 CPU selection for msp430-gcc"></a>
 <h2>5.2 CPU selection for msp430-gcc</h2>
