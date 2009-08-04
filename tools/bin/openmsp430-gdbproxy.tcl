@@ -25,6 +25,13 @@
 # 
 # File Name: openmsp430-gdbproxy.tcl
 # 
+# Author(s):
+#             - Olivier Girard,    olgirard@gmail.com
+#
+#------------------------------------------------------------------------------
+# $Rev$
+# $LastChangedBy$
+# $LastChangedDate$
 #------------------------------------------------------------------------------
 
 global serial_baudrate
