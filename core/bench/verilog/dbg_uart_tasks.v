@@ -31,6 +31,10 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
+// $Rev$
+// $LastChangedBy$
+// $LastChangedDate$
+//----------------------------------------------------------------------------
 
 // Register B/W and addresses
 parameter           CPU_ID_LO    =  (8'h00 | 8'h00);

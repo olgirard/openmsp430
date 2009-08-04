@@ -35,6 +35,10 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
+// $Rev$
+// $LastChangedBy$
+// $LastChangedDate$
+//----------------------------------------------------------------------------
 `timescale 1ns / 100ps
 
 module  clock_module (

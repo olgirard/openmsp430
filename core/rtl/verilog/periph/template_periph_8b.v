@@ -31,6 +31,10 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
+// $Rev$
+// $LastChangedBy$
+// $LastChangedDate$
+//----------------------------------------------------------------------------
 `timescale 1ns / 100ps
 
 module  template_periph_8b (
