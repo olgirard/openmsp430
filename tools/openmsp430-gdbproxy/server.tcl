@@ -25,6 +25,13 @@
 # 
 # File Name: server.tcl
 # 
+# Author(s):
+#             - Olivier Girard,    olgirard@gmail.com
+#
+#------------------------------------------------------------------------------
+# $Rev$
+# $LastChangedBy$
+# $LastChangedDate$
 #------------------------------------------------------------------------------
 
 global clients

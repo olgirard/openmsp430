@@ -24,6 +24,15 @@
 # 
 # File Name:   dbg_functions.tcl
 #
+# Author(s):
+#             - Olivier Girard,    olgirard@gmail.com
+#
+#------------------------------------------------------------------------------
+# $Rev$
+# $LastChangedBy$
+# $LastChangedDate$
+#------------------------------------------------------------------------------
+#
 # Description: Main utility functions for the openMSP430 serial debug
 #             interface.
 #

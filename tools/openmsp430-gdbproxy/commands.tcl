@@ -25,6 +25,13 @@
 # 
 # File Name: commands.tcl
 # 
+# Author(s):
+#             - Olivier Girard,    olgirard@gmail.com
+#
+#------------------------------------------------------------------------------
+# $Rev$
+# $LastChangedBy$
+# $LastChangedDate$
 #------------------------------------------------------------------------------
 
 global mem_breakpoint

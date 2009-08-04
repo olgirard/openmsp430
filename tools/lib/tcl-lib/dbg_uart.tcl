@@ -24,6 +24,15 @@
 # 
 # File Name:   dbg_uart.tcl
 #
+# Author(s):
+#             - Olivier Girard,    olgirard@gmail.com
+#
+#------------------------------------------------------------------------------
+# $Rev$
+# $LastChangedBy$
+# $LastChangedDate$
+#------------------------------------------------------------------------------
+#
 # Description: Some UART utility functions for the openMSP430 serial debug
 #             interface:
 #
