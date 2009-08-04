@@ -26,6 +26,9 @@
 /* Test the Watdog timer:                                                    */
 /*                        - Watchdog mode.                                   */
 /*                                                                           */
+/* Author(s):                                                                */
+/*             - Olivier Girard,    olgirard@gmail.com                       */
+/*                                                                           */
 /*---------------------------------------------------------------------------*/
 /* $Rev$                                                                */
 /* $LastChangedBy$                                          */

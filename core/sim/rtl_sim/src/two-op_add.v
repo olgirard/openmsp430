@@ -24,6 +24,14 @@
 /*                 TWO-OPERAND ARITHMETIC: ADD INSTRUCTION                   */
 /*---------------------------------------------------------------------------*/
 /* Test the ADD instruction with all addressing modes                        */
+/*                                                                           */
+/* Author(s):                                                                */
+/*             - Olivier Girard,    olgirard@gmail.com                       */
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
+/* $Rev: 17 $                                                                */
+/* $LastChangedBy: olivier.girard $                                          */
+/* $LastChangedDate: 2009-08-04 23:15:39 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
 initial

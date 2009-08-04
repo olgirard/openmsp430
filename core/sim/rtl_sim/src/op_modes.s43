@@ -27,6 +27,14 @@
 /*                                 - CPUOFF (<=> R2[4]): turn off CPU.       */
 /*                                 - OSCOFF (<=> R2[5]): turn off LFXT_CLK.  */
 /*                                 - SCG1   (<=> R2[7]): turn off SMCLK.     */
+/*                                                                           */
+/* Author(s):                                                                */
+/*             - Olivier Girard,    olgirard@gmail.com                       */
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
+/* $Rev: 17 $                                                                */
+/* $LastChangedBy: olivier.girard $                                          */
+/* $LastChangedDate: 2009-08-04 23:15:39 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
 .global main

@@ -26,6 +26,14 @@
 /* Test the Digital I/O interface:                                           */
 /*                                   - Read/Write register access.           */
 /*                                   - I/O Functionality.                    */
+/*                                                                           */
+/* Author(s):                                                                */
+/*             - Olivier Girard,    olgirard@gmail.com                       */
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
+/* $Rev: 17 $                                                                */
+/* $LastChangedBy: olivier.girard $                                          */
+/* $LastChangedDate: 2009-08-04 23:15:39 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
 initial
