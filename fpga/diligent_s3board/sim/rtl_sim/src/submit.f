@@ -48,7 +48,6 @@
 //=============================================================================
 
 +incdir+../../../rtl/verilog/
-../../../rtl/verilog/openMSP430.inc
 ../../../rtl/verilog/openMSP430_fpga.v
 ../../../rtl/verilog/io_mux.v
 ../../../rtl/verilog/driver_7segment.v

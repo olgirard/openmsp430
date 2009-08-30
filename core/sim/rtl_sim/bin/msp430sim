@@ -52,7 +52,7 @@ fi
 asmfile=../src/$1.s43;
 verfile=../src/$1.v;
 submitfile=../src/submit.f;
-incfile=../../../rtl/verilog/openMSP430.inc;
+incfile=../../../rtl/verilog/openMSP430_defines.v;
 deffile=../bin/template.def;
 
 if [ ! -e $asmfile ]; then

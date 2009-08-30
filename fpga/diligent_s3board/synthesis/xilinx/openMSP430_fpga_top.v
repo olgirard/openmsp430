@@ -37,7 +37,6 @@
 // FPGA Specific modules
 //=============================================================================
 
-`include "../../../rtl/verilog/openMSP430.inc"
 `include "../../../rtl/verilog/openMSP430_fpga.v"
 `include "../../../rtl/verilog/io_mux.v"
 `include "../../../rtl/verilog/driver_7segment.v"

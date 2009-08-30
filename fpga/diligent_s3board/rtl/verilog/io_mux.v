@@ -35,7 +35,7 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`timescale 1ns / 100ps
+`include "timescale.v"
 
 module  io_mux (
 

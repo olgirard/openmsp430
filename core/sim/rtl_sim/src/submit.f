@@ -38,7 +38,6 @@
 //=============================================================================
 
 +incdir+../../../rtl/verilog/
-../../../rtl/verilog/openMSP430.inc
 ../../../rtl/verilog/openMSP430.v
 ../../../rtl/verilog/frontend.v
 ../../../rtl/verilog/execution_unit.v

@@ -53,7 +53,7 @@ softdir=../../../software/$1;
 elffile=../../../software/$1/$1.elf;
 verfile=../src/$1.v;
 submitfile=../src/submit.f;
-incfile=../../../rtl/verilog/openMSP430.inc;
+incfile=../../../rtl/verilog/openMSP430_defines.v;
 
 if [ ! -e $softdir ]; then
     echo "Software directory doesn't exist: $softdir"

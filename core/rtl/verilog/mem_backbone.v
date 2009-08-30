@@ -35,7 +35,8 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`timescale 1ns / 100ps
+`include "timescale.v"
+`include "openMSP430_defines.v"
 
 module  mem_backbone (
 

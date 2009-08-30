@@ -1,3 +1,6 @@
+`ifdef OPENMSP430_DEFINES
+`else
+`define OPENMSP430_DEFINES
 //----------------------------------------------------------------------------
 // Copyright (C) 2001 Authors
 //
@@ -22,7 +25,7 @@
 //
 //----------------------------------------------------------------------------
 // 
-// *File Name: openMSP430.inc
+// *File Name: openMSP430_defines.v
 // 
 // *Module Description:
 //                      openMSP430 Configuration file
@@ -47,7 +50,7 @@
 //                   11 ->  4kB
 //                   12 ->  8kB
 //                   13 -> 16kB
-`define ROM_AWIDTH   10
+`define ROM_AWIDTH   11
 
 // RAM Size:
 //                    6 ->  128 B
@@ -55,7 +58,7 @@
 //                    8 ->  512 B
 //                    9 ->    1 kB
 //                   10 ->    2 kB
-`define RAM_AWIDTH    6
+`define RAM_AWIDTH    9
 
 //----------------------------------------------------------------------------
 // REMOTE DEBUGGING INTERFACE CONFIGURATION
@@ -78,9 +81,9 @@
 //             `define DBG_HWBRK_3 -> Include hardware breakpoints unit 3
 //
 `define  DBG_HWBRK_0
-`define  DBG_HWBRK_1
-`define  DBG_HWBRK_2
-`define  DBG_HWBRK_3
+//`define  DBG_HWBRK_1
+//`define  DBG_HWBRK_2
+//`define  DBG_HWBRK_3
 
 
 //==========================================================================//
@@ -288,4 +291,7 @@ CONFIGURATION ERROR: JTAG INTERFACE NOT SUPPORTED YET
 CONFIGURATION ERROR: JTAG OR UART DEBUG INTERFACE SHOULD BE ENABLED
    `endif
  `endif
+`endif
+
+
 `endif
