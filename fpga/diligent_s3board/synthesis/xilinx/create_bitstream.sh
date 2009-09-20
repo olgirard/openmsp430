@@ -1,4 +1,9 @@
 #!/bin/tcsh
+######################################################
+#                                                    #
+# Xilinx Synthesis, Place & Route script for LINUX   #
+#                                                    #
+######################################################
 
 # Cleanup
 rm -rf ./WORK
