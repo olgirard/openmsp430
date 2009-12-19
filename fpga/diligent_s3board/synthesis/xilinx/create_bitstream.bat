@@ -15,21 +15,17 @@ XCOPY ..\..\..\rtl\verilog\coregen\ram_8x512_lo.ngc .
 XCOPY ..\..\..\rtl\verilog\coregen\rom_8x2k_hi.ngc  .
 XCOPY ..\..\..\rtl\verilog\coregen\rom_8x2k_lo.ngc  .
 
-:: Copy the timescale and the openMSP430 configuration files
-XCOPY ..\..\..\rtl\verilog\timescale.v              .
-XCOPY ..\..\..\rtl\verilog\openMSP430_defines.v     .
-
 :: Copy the Xilinx constraints file
-XCOPY ..\openMSP430_fpga_top.ucf                    .
+XCOPY ..\openMSP430_fpga.ucf                        .
 
 
 :: XFLOW
 ::---------------
 
-xflow -p 3S200FT256-4 -implement high_effort.opt ^
-                      -config    bitgen.opt      ^
-                      -synth     xst_verilog.opt ^
-                      ..\openMSP430_fpga_top.v
+xflow -p 3S200FT256-4 -implement high_effort.opt    ^
+                      -config    bitgen.opt         ^
+                      -synth     ..\xst_verilog.opt ^
+                      ..\openMSP430_fpga.prj
 
 :: MANUAL FLOW
 ::---------------

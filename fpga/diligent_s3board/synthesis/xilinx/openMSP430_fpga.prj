@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 // 
-// *File Name: openMSP430_fpga_top.v
+// *File Name: openMSP430_fpga.prj
 // 
 // *Author(s):
 //              - Olivier Girard,    olgirard@gmail.com
@@ -50,17 +50,17 @@
 // openMSP430
 //=============================================================================
 
-`include "../../../../../core/rtl/verilog/openMSP430.v"
-`include "../../../../../core/rtl/verilog/frontend.v"
-`include "../../../../../core/rtl/verilog/execution_unit.v"
-`include "../../../../../core/rtl/verilog/register_file.v"
-`include "../../../../../core/rtl/verilog/alu.v"
-`include "../../../../../core/rtl/verilog/mem_backbone.v"
-`include "../../../../../core/rtl/verilog/clock_module.v"
-`include "../../../../../core/rtl/verilog/dbg.v"
-`include "../../../../../core/rtl/verilog/dbg_hwbrk.v"
-`include "../../../../../core/rtl/verilog/dbg_uart.v"
-`include "../../../../../core/rtl/verilog/sfr.v"
-`include "../../../../../core/rtl/verilog/watchdog.v"
-`include "../../../../../core/rtl/verilog/periph/gpio.v"
-`include "../../../../../core/rtl/verilog/periph/timerA.v"
+`include "../../../rtl/verilog/openmsp430/openMSP430.v"
+`include "../../../rtl/verilog/openmsp430/frontend.v"
+`include "../../../rtl/verilog/openmsp430/execution_unit.v"
+`include "../../../rtl/verilog/openmsp430/register_file.v"
+`include "../../../rtl/verilog/openmsp430/alu.v"
+`include "../../../rtl/verilog/openmsp430/mem_backbone.v"
+`include "../../../rtl/verilog/openmsp430/clock_module.v"
+`include "../../../rtl/verilog/openmsp430/dbg.v"
+`include "../../../rtl/verilog/openmsp430/dbg_hwbrk.v"
+`include "../../../rtl/verilog/openmsp430/dbg_uart.v"
+`include "../../../rtl/verilog/openmsp430/sfr.v"
+`include "../../../rtl/verilog/openmsp430/watchdog.v"
+`include "../../../rtl/verilog/openmsp430/periph/gpio.v"
+`include "../../../rtl/verilog/openmsp430/periph/timerA.v"

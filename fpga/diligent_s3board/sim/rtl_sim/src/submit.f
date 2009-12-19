@@ -61,20 +61,21 @@
 // openMSP430
 //=============================================================================
 
-../../../../../core/rtl/verilog/openMSP430.v
-../../../../../core/rtl/verilog/frontend.v
-../../../../../core/rtl/verilog/execution_unit.v
-../../../../../core/rtl/verilog/register_file.v
-../../../../../core/rtl/verilog/alu.v
-../../../../../core/rtl/verilog/mem_backbone.v
-../../../../../core/rtl/verilog/clock_module.v
-../../../../../core/rtl/verilog/sfr.v
-../../../../../core/rtl/verilog/dbg.v
-../../../../../core/rtl/verilog/dbg_hwbrk.v
-../../../../../core/rtl/verilog/dbg_uart.v
-../../../../../core/rtl/verilog/watchdog.v
-../../../../../core/rtl/verilog/periph/gpio.v
-../../../../../core/rtl/verilog/periph/timerA.v
++incdir+../../../rtl/verilog/openmsp430/
+../../../rtl/verilog/openmsp430/openMSP430.v
+../../../rtl/verilog/openmsp430/frontend.v
+../../../rtl/verilog/openmsp430/execution_unit.v
+../../../rtl/verilog/openmsp430/register_file.v
+../../../rtl/verilog/openmsp430/alu.v
+../../../rtl/verilog/openmsp430/mem_backbone.v
+../../../rtl/verilog/openmsp430/clock_module.v
+../../../rtl/verilog/openmsp430/sfr.v
+../../../rtl/verilog/openmsp430/dbg.v
+../../../rtl/verilog/openmsp430/dbg_hwbrk.v
+../../../rtl/verilog/openmsp430/dbg_uart.v
+../../../rtl/verilog/openmsp430/watchdog.v
+../../../rtl/verilog/openmsp430/periph/gpio.v
+../../../rtl/verilog/openmsp430/periph/timerA.v
 
 
 //=============================================================================
