@@ -1,0 +1,3 @@
+#!/bin/csh -f
+
+../bin/msp430sim memledtest

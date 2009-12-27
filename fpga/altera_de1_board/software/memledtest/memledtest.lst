@@ -1,0 +1,634 @@
+
+memledtest.elf:     file format elf32-msp430
+
+SYMBOL TABLE:
+0000f000 l    d  .text	00000000 .text
+00000200 l    d  .data	00000000 .data
+00000206 l    d  .bss	00000000 .bss
+0000ffe0 l    d  .vectors	00000000 .vectors
+00000000 l    d  .stab	00000000 .stab
+00000000 l    d  .stabstr	00000000 .stabstr
+00000056 l       *ABS*	00000000 DCOCTL
+00000057 l       *ABS*	00000000 BCSCTL1
+00000058 l       *ABS*	00000000 BCSCTL2
+00000128 l       *ABS*	00000000 FCTL1
+0000012a l       *ABS*	00000000 FCTL2
+0000012c l       *ABS*	00000000 FCTL3
+00000054 l       *ABS*	00000000 EPCTL
+0000012e l       *ABS*	00000000 TA0IV
+00000160 l       *ABS*	00000000 TA0CTL
+00000170 l       *ABS*	00000000 TA0R
+00000162 l       *ABS*	00000000 TA0CCTL0
+00000164 l       *ABS*	00000000 TA0CCTL1
+00000172 l       *ABS*	00000000 TA0CCR0
+00000174 l       *ABS*	00000000 TA0CCR1
+00000166 l       *ABS*	00000000 TA0CCTL2
+00000176 l       *ABS*	00000000 TA0CCR2
+00000020 l       *ABS*	00000000 P1IN
+00000021 l       *ABS*	00000000 P1OUT
+00000022 l       *ABS*	00000000 P1DIR
+00000023 l       *ABS*	00000000 P1IFG
+00000024 l       *ABS*	00000000 P1IES
+00000025 l       *ABS*	00000000 P1IE
+00000026 l       *ABS*	00000000 P1SEL
+00000028 l       *ABS*	00000000 P2IN
+00000029 l       *ABS*	00000000 P2OUT
+0000002a l       *ABS*	00000000 P2DIR
+0000002b l       *ABS*	00000000 P2IFG
+0000002c l       *ABS*	00000000 P2IES
+0000002d l       *ABS*	00000000 P2IE
+0000002e l       *ABS*	00000000 P2SEL
+00000059 l       *ABS*	00000000 CACTL1
+0000005a l       *ABS*	00000000 CACTL2
+0000005b l       *ABS*	00000000 CAPD
+00000120 l       *ABS*	00000000 WDTCTL
+00000000 l       *ABS*	00000000 IE1
+00000002 l       *ABS*	00000000 IFG1
+00000000 l    df *ABS*	00000000 main.c
+00000202 l     O .data	00000002 count.0
+00000204 l     O .data	00000001 gray.1
+00000206 l       .bss	00000000 array1.2
+000003c6 l       .bss	00000000 array2.3
+0000f14c l       .text	00000000 Letext
+00000000 l    df *ABS*	00000000 7seg.c
+0000f236 l       .text	00000000 Letext
+00000000 l    df *ABS*	00000000 gray.c
+0000f266 l       .text	00000000 Letext
+00000000 l    df *ABS*	00000000 memtest.c
+0000f2f4 l       .text	00000000 Letext
+00000006 g       *ABS*	00000000 __data_size
+0000f266 g     F .text	0000004c rnd_array
+0000f2b2 g     F .text	00000020 cmp_array
+0000f14c g     O .text	00000008 DispSegTbl
+0000f2f6 g       .text	00000000 _etext
+00000381 g       *ABS*	00000000 __bss_size
+0000f2f4  w      .text	00000000 __stop_progExec__
+0000f030 g       .text	00000000 _unexpected_1_
+0000f030  w      .text	00000000 vector_ffe0
+0000f154 g     O .text	0000005b DispASCIItoSegTbl
+0000f030  w      .text	00000000 vector_ffec
+0000f064 g       .text	00000000 vector_fff0
+0000f2f6 g       *ABS*	00000000 __data_load_start
+0000f030 g       .text	00000000 __dtors_end
+0000f236 g     F .text	0000000c bin2gray
+0000f030  w      .text	00000000 vector_fffc
+0000f030  w      .text	00000000 vector_ffe4
+0000f242 g     F .text	00000024 gray2bin
+0000ffe0 g     O .vectors	00000020 InterruptVectors
+00000586 g     O .bss	00000001 tctr
+0000f01c  w      .text	00000000 __do_clear_bss
+0000f030  w      .text	00000000 vector_ffe2
+0000f030  w      .text	00000000 vector_ffe8
+0000f034  w      .text	00000000 _unexpected_
+0000f030  w      .text	00000000 vector_fffa
+0000f000  w      .text	00000000 _reset_vector__
+0000f030 g       .text	00000000 __ctors_start
+0000f00a  w      .text	00000000 __do_copy_data
+0000f2d2 g     F .text	00000010 init_array
+00000206 g       .bss	00000000 __bss_start
+0000f030  w      .text	00000000 vector_ffee
+0000f036 g       .text	00000000 vector_fff4
+0000f0aa g     F .text	000000a2 main
+0000f030  w      .text	00000000 vector_fff8
+0000f030  w      .text	00000000 vector_fff2
+00010000 g       .vectors	00000000 _vectors_end
+0000f030  w      .text	00000000 vector_ffe6
+0000f000  w      .text	00000000 __init_stack
+0000f030 g       .text	00000000 __dtors_start
+0000f030 g       .text	00000000 __ctors_end
+00000600 g       *ABS*	00000000 __stack
+0000f1ea g     F .text	0000004c DispWord
+00000206 g       .data	00000000 _edata
+00000587 g       .bss	00000000 _end
+00000200 g     O .data	00000001 upd_count
+0000f2e2 g     F .text	00000012 copy_array
+0000f030  w      .text	00000000 vector_fff6
+0000f1b0 g     F .text	0000003a DispStr
+0000f004  w      .text	00000000 __low_level_init
+0000f02c  w      .text	00000000 __jump_to_main
+00000200 g       .data	00000000 __data_start
+0000f064 g     F .text	00000046 INT_Timer_overflow
+0000f030  w      .text	00000000 vector_ffea
+0000f036 g     F .text	0000002e INT_Watchdog
+
+
+Disassembly of section .text:
+
+0000f000 <__init_stack>:
+    f000:	31 40 00 06 	mov	#1536,	r1	;#0x0600
+
+0000f004 <__low_level_init>:
+    f004:	b2 40 80 5a 	mov	#23168,	&0x0120	;#0x5a80
+    f008:	20 01 
+
+0000f00a <__do_copy_data>:
+    f00a:	3f 40 06 00 	mov	#6,	r15	;#0x0006
+    f00e:	0f 93       	tst	r15		
+    f010:	05 24       	jz	$+12     	;abs 0xf01c
+    f012:	2f 83       	decd	r15		
+    f014:	9f 4f f6 f2 	mov	-3338(r15),512(r15);0xf2f6(r15), 0x0200(r15)
+    f018:	00 02 
+    f01a:	fb 23       	jnz	$-8      	;abs 0xf012
+
+0000f01c <__do_clear_bss>:
+    f01c:	3f 40 81 03 	mov	#897,	r15	;#0x0381
+    f020:	0f 93       	tst	r15		
+    f022:	04 24       	jz	$+10     	;abs 0xf02c
+    f024:	1f 83       	dec	r15		
+    f026:	cf 43 06 02 	mov.b	#0,	518(r15);r3 As==00, 0x0206(r15)
+    f02a:	fc 23       	jnz	$-6      	;abs 0xf024
+
+0000f02c <__jump_to_main>:
+    f02c:	30 40 aa f0 	br	#0xf0aa	
+
+0000f030 <__ctors_end>:
+    f030:	30 40 34 f0 	br	#0xf034	
+
+0000f034 <_unexpected_>:
+    f034:	00 13       	reti			
+
+0000f036 <INT_Watchdog>:
+
+
+volatile unsigned char upd_count=1;
+
+wakeup interrupt (WDT_VECTOR) INT_Watchdog(void)
+{
+    f036:	0f 12       	push	r15		
+    f038:	0e 12       	push	r14		
+    f03a:	0d 12       	push	r13		
+    f03c:	0c 12       	push	r12		
+	static unsigned int count=0xFFFF;
+
+	if( upd_count )
+    f03e:	c2 93 00 02 	tst.b	&0x0200	
+    f042:	08 24       	jz	$+18     	;abs 0xf054
+	{
+		upd_count=0;
+    f044:	c2 43 00 02 	mov.b	#0,	&0x0200	;r3 As==00
+		count++;
+    f048:	92 53 02 02 	inc	&0x0202	
+
+		DispWord(count);
+    f04c:	1f 42 02 02 	mov	&0x0202,r15	
+    f050:	b0 12 ea f1 	call	#0xf1ea	
+	}
+}
+    f054:	3c 41       	pop	r12		
+    f056:	3d 41       	pop	r13		
+    f058:	3e 41       	pop	r14		
+    f05a:	3f 41       	pop	r15		
+    f05c:	b1 c0 f0 00 	bic	#240,	0(r1)	;#0x00f0, 0x0000(r1)
+    f060:	00 00 
+    f062:	00 13       	reti			
+
+0000f064 <INT_Timer_overflow>:
+
+
+volatile unsigned char tctr;
+
+wakeup interrupt (TIMERA1_VECTOR) INT_Timer_overflow(void)
+{
+    f064:	0f 12       	push	r15		
+    f066:	0e 12       	push	r14		
+    f068:	0d 12       	push	r13		
+    f06a:	0c 12       	push	r12		
+	static unsigned char gray=0;
+
+	tctr++;
+    f06c:	d2 53 86 05 	inc.b	&0x0586	
+	if( tctr&0x40 )
+    f070:	f2 b0 40 00 	bit.b	#64,	&0x0586	;#0x0040
+    f074:	86 05 
+    f076:	0f 24       	jz	$+32     	;abs 0xf096
+	{
+		tctr&=0x3F;
+    f078:	f2 f0 3f 00 	and.b	#63,	&0x0586	;#0x003f
+    f07c:	86 05 
+
+		P3OUT = gray;
+    f07e:	d2 42 04 02 	mov.b	&0x0204,&0x0019	
+    f082:	19 00 
+		gray = bin2gray( 1 + gray2bin( gray ) );
+    f084:	5f 42 04 02 	mov.b	&0x0204,r15	
+    f088:	b0 12 42 f2 	call	#0xf242	
+    f08c:	5f 53       	inc.b	r15		
+    f08e:	b0 12 36 f2 	call	#0xf236	
+    f092:	c2 4f 04 02 	mov.b	r15,	&0x0204	
+	}
+
+	TACTL &= ~TAIFG; // clear int flag
+    f096:	92 c3 60 01 	bic	#1,	&0x0160	;r3 As==01
+}
+    f09a:	3c 41       	pop	r12		
+    f09c:	3d 41       	pop	r13		
+    f09e:	3e 41       	pop	r14		
+    f0a0:	3f 41       	pop	r15		
+    f0a2:	b1 c0 f0 00 	bic	#240,	0(r1)	;#0x00f0, 0x0000(r1)
+    f0a6:	00 00 
+    f0a8:	00 13       	reti			
+
+0000f0aa <main>:
+
+
+/**
+Main function with some blinking leds
+*/
+int main(void) {
+    f0aa:	31 40 00 06 	mov	#1536,	r1	;#0x0600
+	int i;
+
+
+    int o = 0;
+
+    WDTCTL = WDTPW | WDTHOLD;          // Disable watchdog timer
+    f0ae:	b2 40 80 5a 	mov	#23168,	&0x0120	;#0x5a80
+    f0b2:	20 01 
+
+    P1OUT  = 0x00;                     // Port data output
+    f0b4:	c2 43 21 00 	mov.b	#0,	&0x0021	;r3 As==00
+    P2OUT  = 0x00;
+    f0b8:	c2 43 29 00 	mov.b	#0,	&0x0029	;r3 As==00
+
+    P1DIR  = 0x00;                     // Port direction register
+    f0bc:	c2 43 22 00 	mov.b	#0,	&0x0022	;r3 As==00
+    P2DIR  = 0x00;
+    f0c0:	c2 43 2a 00 	mov.b	#0,	&0x002a	;r3 As==00
+    P3DIR  = 0xff;
+    f0c4:	f2 43 1a 00 	mov.b	#-1,	&0x001a	;r3 As==11
+
+    P1IES  = 0x00;                     // Port interrupt enable (0=dis 1=enabled)
+    f0c8:	c2 43 24 00 	mov.b	#0,	&0x0024	;r3 As==00
+    P2IES  = 0x00;
+    f0cc:	c2 43 2c 00 	mov.b	#0,	&0x002c	;r3 As==00
+    P1IE   = 0x00;                     // Port interrupt Edge Select (0=pos 1=neg)
+    f0d0:	c2 43 25 00 	mov.b	#0,	&0x0025	;r3 As==00
+    P2IE   = 0x00;
+    f0d4:	c2 43 2d 00 	mov.b	#0,	&0x002d	;r3 As==00
+
+    WDTCTL = WDTPW | WDTTMSEL | WDTCNTCL;// | WDTIS1  | WDTIS0 ;          // Configure watchdog interrupt
+    f0d8:	b2 40 18 5a 	mov	#23064,	&0x0120	;#0x5a18
+    f0dc:	20 01 
+
+
+
+	TAR = 0x0000;
+    f0de:	82 43 70 01 	mov	#0,	&0x0170	;r3 As==00
+	TACTL = TASSEL1 | MC1 | TAIE; // run on smclk, no div, count to ffff, interrupt
+    f0e2:	b2 40 22 02 	mov	#546,	&0x0160	;#0x0222
+    f0e6:	60 01 
+
+
+
+
+    IE1 |= 0x01;
+    f0e8:	d2 d3 00 00 	bis.b	#1,	&0x0000	;r3 As==01
+    eint();                            //enable interrupts
+    f0ec:	32 d2       	eint			
+
+
+
+
+	init_array(array1);
+    f0ee:	3f 40 06 02 	mov	#518,	r15	;#0x0206
+    f0f2:	b0 12 d2 f2 	call	#0xf2d2	
+	copy_array(array1,array2);
+    f0f6:	3e 40 c6 03 	mov	#966,	r14	;#0x03c6
+    f0fa:	3f 40 06 02 	mov	#518,	r15	;#0x0206
+    f0fe:	b0 12 e2 f2 	call	#0xf2e2	
+
+	i=1000;
+    f102:	3b 40 e8 03 	mov	#1000,	r11	;#0x03e8
+	do
+	{
+		rnd_array(array1);
+    f106:	3f 40 06 02 	mov	#518,	r15	;#0x0206
+    f10a:	b0 12 66 f2 	call	#0xf266	
+
+	} while( --i );
+    f10e:	3b 53       	add	#-1,	r11	;r3 As==11
+    f110:	fa 23       	jnz	$-10     	;abs 0xf106
+
+
+
+	while (1)
+	{
+		i=1000;
+    f112:	3b 40 e8 03 	mov	#1000,	r11	;#0x03e8
+		do rnd_array(array2); while( --i );
+    f116:	3f 40 c6 03 	mov	#966,	r15	;#0x03c6
+    f11a:	b0 12 66 f2 	call	#0xf266	
+    f11e:	3b 53       	add	#-1,	r11	;r3 As==11
+    f120:	fa 23       	jnz	$-10     	;abs 0xf116
+
+		if( cmp_array(array1,array2) )
+    f122:	3e 40 c6 03 	mov	#966,	r14	;#0x03c6
+    f126:	3f 40 06 02 	mov	#518,	r15	;#0x0206
+    f12a:	b0 12 b2 f2 	call	#0xf2b2	
+    f12e:	0f 93       	tst	r15		
+    f130:	02 24       	jz	$+6      	;abs 0xf136
+		{
+			upd_count++;
+    f132:	d2 53 00 02 	inc.b	&0x0200	
+		}
+
+		i=1000;
+    f136:	3b 40 e8 03 	mov	#1000,	r11	;#0x03e8
+		do rnd_array(array1); while( --i );
+    f13a:	3f 40 06 02 	mov	#518,	r15	;#0x0206
+    f13e:	b0 12 66 f2 	call	#0xf266	
+    f142:	3b 53       	add	#-1,	r11	;r3 As==11
+    f144:	fa 23       	jnz	$-10     	;abs 0xf13a
+    f146:	e5 3f       	jmp	$-52     	;abs 0xf112
+	}
+}
+    f148:	30 40 f4 f2 	br	#0xf2f4	
+
+0000f14c <DispSegTbl>:
+    f14c:	93 00 92 00 91 00 90 00                             ........
+
+0000f154 <DispASCIItoSegTbl>:
+    f154:	00 00 44 00 00 00 00 40 9c f0 00 00 00 02 00 00     ..D....@........
+    f164:	fc 60 da f2 66 b6 be e0 fe f6 00 00 00 12 00 ca     .`..f...........
+    f174:	00 ee 3e 9c 7a 9e 8e bc 6e 60 78 00 1c 6e 2a fc     ..>.z...n`x..n*.
+    f184:	ce 00 0a b6 1e 7c 00 00 00 76 00 00 00 00 00 00     .....|...v......
+    f194:	00 fa 3e 1a 7a de 8e bc 2e 20 78 00 1c 00 2a 3a     ..>.z.... x...*:
+    f1a4:	ce 00 0a b6 1e 38 00 00 00 76 00 00                 .....8...v..
+
+0000f1b0 <DispStr>:
+    f1b0:	0b 12       	push	r11		
+    f1b2:	0a 12       	push	r10		
+    f1b4:	09 12       	push	r9		
+    f1b6:	0d 4e       	mov	r14,	r13	
+    f1b8:	0c 43       	clr	r12		
+    f1ba:	4b 4f       	mov.b	r15,	r11	
+    f1bc:	39 40 4c f1 	mov	#-3764,	r9	;#0xf14c
+    f1c0:	3a 40 54 f1 	mov	#-3756,	r10	;#0xf154
+    f1c4:	0f 4c       	mov	r12,	r15	
+    f1c6:	0f 5f       	rla	r15		
+    f1c8:	0f 59       	add	r9,	r15	
+    f1ca:	2e 4f       	mov	@r15,	r14	
+    f1cc:	0f 4d       	mov	r13,	r15	
+    f1ce:	0f 5b       	add	r11,	r15	
+    f1d0:	6f 4f       	mov.b	@r15,	r15	
+    f1d2:	0f 5a       	add	r10,	r15	
+    f1d4:	de 4f e0 ff 	mov.b	-32(r15),0(r14)	;0xffe0(r15), 0x0000(r14)
+    f1d8:	00 00 
+    f1da:	1c 53       	inc	r12		
+    f1dc:	1d 53       	inc	r13		
+    f1de:	2c 92       	cmp	#4,	r12	;r2 As==10
+    f1e0:	f1 3b       	jl	$-28     	;abs 0xf1c4
+    f1e2:	39 41       	pop	r9		
+    f1e4:	3a 41       	pop	r10		
+    f1e6:	3b 41       	pop	r11		
+    f1e8:	30 41       	ret			
+
+0000f1ea <DispWord>:
+    f1ea:	0b 12       	push	r11		
+    f1ec:	0a 12       	push	r10		
+    f1ee:	0d 4f       	mov	r15,	r13	
+    f1f0:	3b 40 4c f1 	mov	#-3764,	r11	;#0xf14c
+    f1f4:	0c 43       	clr	r12		
+    f1f6:	3a 40 54 f1 	mov	#-3756,	r10	;#0xf154
+    f1fa:	0f 4d       	mov	r13,	r15	
+    f1fc:	8f 10       	swpb	r15		
+    f1fe:	4e 4f       	mov.b	r15,	r14	
+    f200:	12 c3       	clrc			
+    f202:	0e 10       	rrc	r14		
+    f204:	0e 11       	rra	r14		
+    f206:	0e 11       	rra	r14		
+    f208:	0e 11       	rra	r14		
+    f20a:	3e f0 0f 00 	and	#15,	r14	;#0x000f
+    f20e:	0d 5d       	rla	r13		
+    f210:	0d 5d       	rla	r13		
+    f212:	0d 5d       	rla	r13		
+    f214:	0d 5d       	rla	r13		
+    f216:	3e 90 0a 00 	cmp	#10,	r14	;#0x000a
+    f21a:	02 28       	jnc	$+6      	;abs 0xf220
+    f21c:	3e 50 07 00 	add	#7,	r14	;#0x0007
+    f220:	3f 4b       	mov	@r11+,	r15	
+    f222:	0e 5a       	add	r10,	r14	
+    f224:	df 4e 10 00 	mov.b	16(r14),0(r15)	;0x0010(r14), 0x0000(r15)
+    f228:	00 00 
+    f22a:	1c 53       	inc	r12		
+    f22c:	2c 92       	cmp	#4,	r12	;r2 As==10
+    f22e:	e5 2b       	jnc	$-52     	;abs 0xf1fa
+    f230:	3a 41       	pop	r10		
+    f232:	3b 41       	pop	r11		
+    f234:	30 41       	ret			
+
+0000f236 <bin2gray>:
+#include "hardware.h"
+#include "7seg.h"
+#include "gray.h"
+#include "memtest.h"
+
+
+    f236:	4e 4f       	mov.b	r15,	r14	
+    f238:	12 c3       	clrc			
+    f23a:	4e 10       	rrc.b	r14		
+    f23c:	4e ef       	xor.b	r15,	r14	
+    f23e:	4f 4e       	mov.b	r14,	r15	
+
+    f240:	30 41       	ret			
+
+0000f242 <gray2bin>:
+
+volatile unsigned char upd_count=1;
+
+    f242:	4e 4f       	mov.b	r15,	r14	
+wakeup interrupt (WDT_VECTOR) INT_Watchdog(void)
+{
+	static unsigned int count=0xFFFF;
+    f244:	12 c3       	clrc			
+    f246:	4f 10       	rrc.b	r15		
+    f248:	4f ee       	xor.b	r14,	r15	
+
+    f24a:	4e 4f       	mov.b	r15,	r14	
+    f24c:	12 c3       	clrc			
+    f24e:	4e 10       	rrc.b	r14		
+    f250:	4e 11       	rra.b	r14		
+    f252:	4f ee       	xor.b	r14,	r15	
+	if( upd_count )
+    f254:	4e 4f       	mov.b	r15,	r14	
+    f256:	12 c3       	clrc			
+    f258:	4e 10       	rrc.b	r14		
+    f25a:	4e 11       	rra.b	r14		
+    f25c:	4e 11       	rra.b	r14		
+    f25e:	4e 11       	rra.b	r14		
+    f260:	4f ee       	xor.b	r14,	r15	
+	{
+		upd_count=0;
+    f262:	7f f3       	and.b	#-1,	r15	;r3 As==11
+		count++;
+    f264:	30 41       	ret			
+
+0000f266 <rnd_array>:
+#include "7seg.h"
+#include "gray.h"
+#include "memtest.h"
+
+
+
+    f266:	0b 12       	push	r11		
+    f268:	0a 12       	push	r10		
+wakeup interrupt (WDT_VECTOR) INT_Watchdog(void)
+{
+	static unsigned int count=0xFFFF;
+
+	if( upd_count )
+	{
+    f26a:	0a 4f       	mov	r15,	r10	
+		upd_count=0;
+    f26c:	0b 4f       	mov	r15,	r11	
+    f26e:	1b 53       	inc	r11		
+    f270:	0c 4b       	mov	r11,	r12	
+		count++;
+    f272:	0e 4f       	mov	r15,	r14	
+    f274:	3e 50 3f 00 	add	#63,	r14	;#0x003f
+
+    f278:	3d 40 80 01 	mov	#384,	r13	;#0x0180
+		DispWord(count);
+	}
+}
+
+    f27c:	6f 4f       	mov.b	@r15,	r15	
+    f27e:	6f 5c       	add.b	@r12,	r15	
+    f280:	ce 4f 00 00 	mov.b	r15,	0(r14)	;0x0000(r14)
+    f284:	1c 53       	inc	r12		
+    f286:	0f 4b       	mov	r11,	r15	
+    f288:	1e 53       	inc	r14		
+
+    f28a:	3d 53       	add	#-1,	r13	;r3 As==11
+    f28c:	03 24       	jz	$+8      	;abs 0xf294
+	{
+		upd_count=0;
+		count++;
+
+		DispWord(count);
+	}
+    f28e:	0b 4f       	mov	r15,	r11	
+    f290:	1b 53       	inc	r11		
+    f292:	f4 3f       	jmp	$-22     	;abs 0xf27c
+
+
+
+volatile unsigned char tctr;
+
+wakeup interrupt (TIMERA1_VECTOR) INT_Timer_overflow(void)
+    f294:	0e 4a       	mov	r10,	r14	
+{
+    f296:	0f 4a       	mov	r10,	r15	
+    f298:	3f 50 80 01 	add	#384,	r15	;#0x0180
+	static unsigned char gray=0;
+    f29c:	3d 40 3f 00 	mov	#63,	r13	;#0x003f
+
+	tctr++;
+	if( tctr&0x40 )
+	{
+    f2a0:	ee 4f 00 00 	mov.b	@r15,	0(r14)	;0x0000(r14)
+    f2a4:	1f 53       	inc	r15		
+    f2a6:	1e 53       	inc	r14		
+		tctr&=0x3F;
+    f2a8:	3d 53       	add	#-1,	r13	;r3 As==11
+    f2aa:	fa 23       	jnz	$-10     	;abs 0xf2a0
+
+    f2ac:	3a 41       	pop	r10		
+    f2ae:	3b 41       	pop	r11		
+    f2b0:	30 41       	ret			
+
+0000f2b2 <cmp_array>:
+		P3OUT = gray;
+		gray = bin2gray( 1 + gray2bin( gray ) );
+	}
+    f2b2:	0b 12       	push	r11		
+
+	TACTL &= ~TAIFG; // clear int flag
+}
+
+
+    f2b4:	0b 4f       	mov	r15,	r11	
+
+    f2b6:	0c 4e       	mov	r14,	r12	
+
+/**
+    f2b8:	3d 40 c0 00 	mov	#192,	r13	;#0x00c0
+Main function with some blinking leds
+*/
+int main(void) {
+
+    f2bc:	3e 4c       	mov	@r12+,	r14	
+    f2be:	3f 4b       	mov	@r11+,	r15	
+    f2c0:	0f 9e       	cmp	r14,	r15	
+    f2c2:	04 20       	jnz	$+10     	;abs 0xf2cc
+
+
+    f2c4:	3d 53       	add	#-1,	r13	;r3 As==11
+    f2c6:	fa 23       	jnz	$-10     	;abs 0xf2bc
+
+	static UBYTE array1[448];
+    f2c8:	1f 43       	mov	#1,	r15	;r3 As==01
+    f2ca:	01 3c       	jmp	$+4      	;abs 0xf2ce
+/**
+Main function with some blinking leds
+*/
+int main(void) {
+
+
+    f2cc:	0f 43       	clr	r15		
+
+
+	static UBYTE array1[448];
+	static UBYTE array2[448];
+    f2ce:	3b 41       	pop	r11		
+    f2d0:	30 41       	ret			
+
+0000f2d2 <init_array>:
+
+
+
+	int i;
+
+
+    f2d2:	3e 40 c0 00 	mov	#192,	r14	;#0x00c0
+    int o = 0;
+
+    WDTCTL = WDTPW | WDTHOLD;          // Disable watchdog timer
+
+    f2d6:	df d3 00 00 	bis.b	#1,	0(r15)	;r3 As==01, 0x0000(r15)
+    f2da:	1f 53       	inc	r15		
+    P1OUT  = 0x00;                     // Port data output
+    P2OUT  = 0x00;
+    f2dc:	3e 53       	add	#-1,	r14	;r3 As==11
+    f2de:	fb 23       	jnz	$-8      	;abs 0xf2d6
+
+    f2e0:	30 41       	ret			
+
+0000f2e2 <copy_array>:
+    P2DIR  = 0x00;
+    P3DIR  = 0xff;
+
+    P1IES  = 0x00;                     // Port interrupt enable (0=dis 1=enabled)
+    P2IES  = 0x00;
+    P1IE   = 0x00;                     // Port interrupt Edge Select (0=pos 1=neg)
+    f2e2:	3d 40 c0 00 	mov	#192,	r13	;#0x00c0
+    P2IE   = 0x00;
+
+    WDTCTL = WDTPW | WDTTMSEL | WDTCNTCL;// | WDTIS1  | WDTIS0 ;          // Configure watchdog interrupt
+
+    f2e6:	ee 4f 00 00 	mov.b	@r15,	0(r14)	;0x0000(r14)
+    f2ea:	1f 53       	inc	r15		
+    f2ec:	1e 53       	inc	r14		
+
+    f2ee:	3d 53       	add	#-1,	r13	;r3 As==11
+    f2f0:	fa 23       	jnz	$-10     	;abs 0xf2e6
+
+    f2f2:	30 41       	ret			
+
+0000f2f4 <__stop_progExec__>:
+    f2f4:	ff 3f       	jmp	$+0      	;abs 0xf2f4
+Disassembly of section .vectors:
+
+0000ffe0 <InterruptVectors>:
+    ffe0:	30 f0 30 f0 30 f0 30 f0 30 f0 30 f0 30 f0 30 f0     0.0.0.0.0.0.0.0.
+    fff0:	64 f0 30 f0 36 f0 30 f0 30 f0 30 f0 30 f0 00 f0     d.0.6.0.0.0.0...
