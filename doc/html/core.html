@@ -55,13 +55,13 @@ In addition to the CPU core itself, several peripherals are also provided and ca
 
 The following diagram shows the openMSP430 design structure:
 <br /><br />
-<img src="getimg.php?1246433777" alt="CPU Structure" title="CPU Structure" />
+<img src="getimg.php?1261910416" alt="CPU Structure" title="CPU Structure" />
 <br />
 <ul>
 	<li><b>Frontend</b>: This module performs the instruction Fetch and Decode tasks. It also contains the execution state machine.</li>
 	<li><b>Execution unit</b>: Containing the ALU and the register file, this module executes the current decoded instruction according to the execution state.</li>
 	<li><b>Serial Debug Interface</b>: Contains all the required logic for a Nexus class 3 debugging unit (without trace). Communication with the host is done with a standard 8N1 serial interface.</li>
-   <li><b>Memory backbone</b>: This block performs a simple arbitration between the frontend and execution-unit for ROM and RAM access.</li>
+   <li><b>Memory backbone</b>: This block performs a simple arbitration between the frontend and execution-unit for instruction and data memory access.</li>
    <li><b>Basic Clock Module</b>: Generates the ACLK and SMCLK enable signals.</li>
    <li><b>SFRs</b>: The <b>S</b>pecial <b>F</b>unction <b>R</b>egister<b>s</b> block contain diverse configuration registers (NMI, Watchdog, ...).</li>
    <li><b>Watchdog</b>: Although it is a peripheral, the watchdog is permanently included in the core because of its tight links with the NMI interrupts and the PUC reset generation.</li>
@@ -73,7 +73,7 @@ The following diagram shows the openMSP430 design structure:
 The known core limitations are the following:
 <br />
 <ul>
-	<li>Instructions can't be executed from RAM.</li>
+	<li>Instructions can't be executed from the data memory.</li>
 	<li>SCG0 is not implemented (turns off DCO).</li>
 	<li>MCLK can't be divided and can only have DCO_CLK as source (see <a href="#2.2.1 Basic Clock Module">Basic Clock Module</a> section).</li>
 </ul>
