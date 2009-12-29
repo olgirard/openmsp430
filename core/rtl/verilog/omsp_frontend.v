@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: frontend.v
+// *File Name: omsp_frontend.v
 // 
 // *Module Description:
 //                       openMSP430 Instruction fetch and decode unit
@@ -38,7 +38,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  frontend (
+module  omsp_frontend (
 
 // OUTPUTs
     dbg_halt_st,                   // Halt/Run status from CPU
@@ -753,6 +753,6 @@ always @(posedge mclk or posedge puc)
                                 alu_src_inv};
 
 
-endmodule // frontend
+endmodule // omsp_frontend
 
 `include "openMSP430_undefines.v"

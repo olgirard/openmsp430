@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: alu.v
+// *File Name: omsp_alu.v
 // 
 // *Module Description:
 //                       openMSP430 ALU
@@ -38,7 +38,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  alu (
+module  omsp_alu (
 
 // OUTPUTs
     alu_out,                       // ALU output value
@@ -243,6 +243,6 @@ assign  alu_stat    = inst_alu[`ALU_SHIFT]  ? {1'b0, N,Z,op_src_in[0]} :
 assign  alu_stat_wr = (inst_alu[`ALU_STAT_F] & exec_cycle) ? 4'b1111 : 4'b0000;
 
 
-endmodule // alu
+endmodule // omsp_alu
 
 `include "openMSP430_undefines.v"

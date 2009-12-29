@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: register_file.v
+// *File Name: omsp_register_file.v
 // 
 // *Module Description:
 //                       openMSP430 Register files
@@ -38,7 +38,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  register_file (
+module  omsp_register_file (
 
 // OUTPUTs
     cpuoff,                       // Turns off the CPU
@@ -340,6 +340,6 @@ assign reg_dest = (r0      & {16{inst_dest[0]}})  |
                   (r15     & {16{inst_dest[15]}});
 
 
-endmodule // register_file
+endmodule // omsp_register_file
 
 `include "openMSP430_undefines.v"

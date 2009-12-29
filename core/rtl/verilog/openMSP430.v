@@ -155,7 +155,7 @@ wire         [15:0] per_dout_clk;
 // 2)  GLOBAL CLOCK & RESET MANAGEMENT
 //=============================================================================
 
-clock_module clock_module_0 (
+omsp_clock_module clock_module_0 (
 
 // OUTPUTs
     .aclk_en      (aclk_en),       // ACLK enablex
@@ -184,7 +184,7 @@ clock_module clock_module_0 (
 // 3)  FRONTEND (<=> FETCH & DECODE)
 //=============================================================================
 
-frontend frontend_0 (
+omsp_frontend frontend_0 (
 
 // OUTPUTs
     .dbg_halt_st  (dbg_halt_st),   // Halt/Run status from CPU
@@ -231,7 +231,7 @@ frontend frontend_0 (
 // 4)  EXECUTION UNIT
 //=============================================================================
 
-execution_unit execution_unit_0 (
+omsp_execution_unit execution_unit_0 (
 
 // OUTPUTs
     .cpuoff       (cpuoff),        // Turns off the CPU
@@ -276,7 +276,7 @@ execution_unit execution_unit_0 (
 // 5)  MEMORY BACKBONE
 //=============================================================================
 
-mem_backbone mem_backbone_0 (
+omsp_mem_backbone mem_backbone_0 (
 
 // OUTPUTs
     .dbg_mem_din  (dbg_mem_din),   // Debug unit Memory data input
@@ -320,7 +320,7 @@ mem_backbone mem_backbone_0 (
 // 6)  SPECIAL FUNCTION REGISTERS
 //=============================================================================
 
-sfr sfr_0 (
+omsp_sfr sfr_0 (
 
 // OUTPUTs
     .nmie         (nmie),          // Non-maskable interrupt enable
@@ -349,7 +349,7 @@ sfr sfr_0 (
 // 7)  WATCHDOG TIMER
 //=============================================================================
 
-watchdog watchdog_0 (
+omsp_watchdog watchdog_0 (
 
 // OUTPUTs
     .nmi_evt      (nmi_evt),       // NMI Event
@@ -389,7 +389,7 @@ assign  per_dout_or  =  per_dout      |
 //=============================================================================
 
 `ifdef DBG_EN
-dbg dbg_0 (
+omsp_dbg dbg_0 (
 
 // OUTPUTs
     .dbg_freeze   (dbg_freeze),    // Freeze peripherals

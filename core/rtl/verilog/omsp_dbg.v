@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: dbg.v
+// *File Name: omsp_dbg.v
 // 
 // *Module Description:
 //                       Debug interface
@@ -38,7 +38,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  dbg (
+module  omsp_dbg (
 
 // OUTPUTs
     dbg_freeze,                     // Freeze peripherals
@@ -416,7 +416,7 @@ wire [3:0] brk0_reg_wr = {reg_wr[BRK0_ADDR1],
                           reg_wr[BRK0_STAT],
                           reg_wr[BRK0_CTL]};
 
-dbg_hwbrk dbg_hwbr_0 (
+omsp_dbg_hwbrk dbg_hwbr_0 (
 
 // OUTPUTs
     .brk_halt   (brk0_halt),   // Hardware breakpoint command
@@ -458,7 +458,7 @@ wire [3:0] brk1_reg_wr = {reg_wr[BRK1_ADDR1],
                           reg_wr[BRK1_STAT],
                           reg_wr[BRK1_CTL]};
 
-dbg_hwbrk dbg_hwbr_1 (
+omsp_dbg_hwbrk dbg_hwbr_1 (
 
 // OUTPUTs
     .brk_halt   (brk1_halt),   // Hardware breakpoint command
@@ -500,7 +500,7 @@ wire [3:0] brk2_reg_wr = {reg_wr[BRK2_ADDR1],
                           reg_wr[BRK2_STAT],
                           reg_wr[BRK2_CTL]};
 
-dbg_hwbrk dbg_hwbr_2 (
+omsp_dbg_hwbrk dbg_hwbr_2 (
 
 // OUTPUTs
     .brk_halt   (brk2_halt),   // Hardware breakpoint command
@@ -542,7 +542,7 @@ wire [3:0] brk3_reg_wr = {reg_wr[BRK3_ADDR1],
                           reg_wr[BRK3_STAT],
                           reg_wr[BRK3_CTL]};
 
-dbg_hwbrk dbg_hwbr_3 (
+omsp_dbg_hwbrk dbg_hwbr_3 (
 
 // OUTPUTs
     .brk_halt   (brk3_halt),   // Hardware breakpoint command
@@ -748,7 +748,7 @@ always @(posedge mclk or posedge por)
 // 9)  UART COMMUNICATION
 //=============================================================================
 `ifdef DBG_UART
-dbg_uart dbg_uart_0 (
+omsp_dbg_uart dbg_uart_0 (
 
 // OUTPUTs
     .dbg_addr     (dbg_addr),      // Debug register address

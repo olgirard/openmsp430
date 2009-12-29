@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: execution_unit.v
+// *File Name: omsp_execution_unit.v
 // 
 // *Module Description:
 //                       openMSP430 Execution unit
@@ -38,7 +38,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  execution_unit (
+module  omsp_execution_unit (
 
 // OUTPUTs
     cpuoff,                        // Turns off the CPU
@@ -161,7 +161,7 @@ wire reg_incr     =  (exec_done          & inst_as[`INDIR_I]) |
 assign dbg_reg_din = reg_dest;
 
 
-register_file register_file_0 (
+omsp_register_file register_file_0 (
 
 // OUTPUTs
     .cpuoff       (cpuoff),       // Turns off the CPU
@@ -278,7 +278,7 @@ assign op_dst = dbg_halt_st        ? dbg_mem_dout  :
 
 wire exec_cycle = (e_state==`E_EXEC);
 
-alu alu_0 (
+omsp_alu alu_0 (
 
 // OUTPUTs
     .alu_out      (alu_out),      // ALU output value
@@ -362,6 +362,6 @@ always @(posedge mclk or posedge puc)
 assign mdb_in_val = mdb_in_buf_valid ? mdb_in_buf : mdb_in_bw;
 
 
-endmodule // execution_unit
+endmodule // omsp_execution_unit
 
 `include "openMSP430_undefines.v"

@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: sfr.v
+// *File Name: omsp_sfr.v
 // 
 // *Module Description:
 //                       Processor Special function register
@@ -38,7 +38,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  sfr (
+module  omsp_sfr (
 
 // OUTPUTs
     nmie,                         // Non-maskable interrupt enable
@@ -199,6 +199,6 @@ always @ (posedge mclk or posedge por)
   else     wdt_reset <= wdtpw_error | (wdtifg_set & ~wdttmsel);
 
 
-endmodule // sfr
+endmodule // omsp_sfr
 
 `include "openMSP430_undefines.v"

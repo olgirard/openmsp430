@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: clock_module.v
+// *File Name: omsp_clock_module.v
 // 
 // *Module Description:
 //                       Basic clock module implementation.
@@ -42,7 +42,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  clock_module (
+module  omsp_clock_module (
 
 // OUTPUTs
     aclk_en,                      // ACLK enable
@@ -242,6 +242,6 @@ always @(posedge mclk_n or posedge puc_reset)
 wire   puc = puc_s[1];
 
 
-endmodule // clock_module
+endmodule // omsp_clock_module
 
 `include "openMSP430_undefines.v"

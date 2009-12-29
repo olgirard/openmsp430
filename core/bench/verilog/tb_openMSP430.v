@@ -300,12 +300,12 @@ openMSP430 dut (
 // Digital I/O
 //----------------------------------
 
-gpio #(.P1_EN(1),
-       .P2_EN(1),
-       .P3_EN(1),
-       .P4_EN(1),
-       .P5_EN(1),
-       .P6_EN(1)) gpio_0 (
+omsp_gpio #(.P1_EN(1),
+            .P2_EN(1),
+            .P3_EN(1),
+            .P4_EN(1),
+            .P5_EN(1),
+            .P6_EN(1)) gpio_0 (
 
 // OUTPUTs
     .irq_port1    (irq_port1),         // Port 1 interrupt
@@ -349,7 +349,7 @@ gpio #(.P1_EN(1),
 // Timers
 //----------------------------------
 
-timerA timerA_0 (
+omsp_timerA timerA_0 (
 
 // OUTPUTs
     .irq_ta0      (irq_ta0),           // Timer A interrupt: TACCR0

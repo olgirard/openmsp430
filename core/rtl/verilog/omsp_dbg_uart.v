@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: dbg_uart.v
+// *File Name: omsp_dbg_uart.v
 // 
 // *Module Description:
 //                       Debug UART communication interface (8N1, Half-duplex)
@@ -38,7 +38,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  dbg_uart (
+module  omsp_dbg_uart (
 
 // OUTPUTs
     dbg_addr,                       // Debug register address
@@ -263,6 +263,6 @@ wire        dbg_rd     = mem_burst ? (xfer_done & (uart_state==TX_DATA2)) :
 
 	    
    
-endmodule // dbg_uart
+endmodule // omsp_dbg_uart
 
 `include "openMSP430_undefines.v"

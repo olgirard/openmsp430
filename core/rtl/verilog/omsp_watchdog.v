@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: watchdog.v
+// *File Name: omsp_watchdog.v
 // 
 // *Module Description:
 //                       Watchdog Timer
@@ -38,7 +38,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  watchdog (
+module  omsp_watchdog (
 
 // OUTPUTs
     nmi_evt,                        // NMI Event
@@ -212,6 +212,6 @@ always @ (posedge mclk or posedge puc)
 wire       wdtifg_set =  (~wdtqn_dly & wdtqn) | wdtpw_error;
 
 
-endmodule // watchdog
+endmodule // omsp_watchdog
 
 `include "openMSP430_undefines.v"

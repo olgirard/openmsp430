@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: gpio.v
+// *File Name: omsp_gpio.v
 // 
 // *Module Description:
 //                       Digital I/O interface
@@ -38,7 +38,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  gpio (
+module  omsp_gpio (
 
 // OUTPUTs
     irq_port1,                      // Port 1 interrupt
@@ -769,6 +769,6 @@ wire [15:0] per_dout  =  p1in_rd   |
                          p6dir_rd  |
                          p6sel_rd;
 
-endmodule // gpio
+endmodule // omsp_gpio
 
 `include "openMSP430_undefines.v"

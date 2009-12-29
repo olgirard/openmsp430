@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: dbg_hwbrk.v
+// *File Name: omsp_dbg_hwbrk.v
 // 
 // *Module Description:
 //                       Hardware Breakpoint / Watchpoint module
@@ -38,7 +38,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  dbg_hwbrk (
+module  omsp_dbg_hwbrk (
 
 // OUTPUTs
     brk_halt,                // Hardware breakpoint command
@@ -264,6 +264,6 @@ assign range_wr_set = brk_ctl[`BRK_MODE_WR] &  d_range_wr;
 assign brk_halt     = brk_ctl[`BRK_EN] & |brk_stat_set;
    
      
-endmodule // dbg_hwbrk
+endmodule // omsp_dbg_hwbrk
 
 `include "openMSP430_undefines.v"

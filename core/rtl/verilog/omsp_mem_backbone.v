@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: mem_backbone.v
+// *File Name: omsp_mem_backbone.v
 // 
 // *Module Description:
 //                       Memory interface backbone (decoder + arbiter)
@@ -38,7 +38,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  mem_backbone (
+module  omsp_mem_backbone (
 
 // OUTPUTs
     dbg_mem_din,                    // Debug unit Memory data input
@@ -239,6 +239,6 @@ assign      dbg_mem_din  = dbg_mem_din_sel[1] ? pmem_dout    :
                            dbg_mem_din_sel[0] ? per_dout_val : dmem_dout;
 
    
-endmodule // mem_backbone
+endmodule // omsp_mem_backbone
 
 `include "openMSP430_undefines.v"

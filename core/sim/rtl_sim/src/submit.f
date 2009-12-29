@@ -39,19 +39,19 @@
 
 +incdir+../../../rtl/verilog/
 ../../../rtl/verilog/openMSP430.v
-../../../rtl/verilog/frontend.v
-../../../rtl/verilog/execution_unit.v
-../../../rtl/verilog/register_file.v
-../../../rtl/verilog/alu.v
-../../../rtl/verilog/mem_backbone.v
-../../../rtl/verilog/clock_module.v
-../../../rtl/verilog/sfr.v
-../../../rtl/verilog/dbg.v
-../../../rtl/verilog/dbg_hwbrk.v
-../../../rtl/verilog/dbg_uart.v
-../../../rtl/verilog/watchdog.v
-../../../rtl/verilog/periph/gpio.v
-../../../rtl/verilog/periph/timerA.v
+../../../rtl/verilog/omsp_frontend.v
+../../../rtl/verilog/omsp_execution_unit.v
+../../../rtl/verilog/omsp_register_file.v
+../../../rtl/verilog/omsp_alu.v
+../../../rtl/verilog/omsp_mem_backbone.v
+../../../rtl/verilog/omsp_clock_module.v
+../../../rtl/verilog/omsp_sfr.v
+../../../rtl/verilog/omsp_dbg.v
+../../../rtl/verilog/omsp_dbg_hwbrk.v
+../../../rtl/verilog/omsp_dbg_uart.v
+../../../rtl/verilog/omsp_watchdog.v
+../../../rtl/verilog/periph/omsp_gpio.v
+../../../rtl/verilog/periph/omsp_timerA.v
 ../../../rtl/verilog/periph/template_periph_8b.v
 ../../../rtl/verilog/periph/template_periph_16b.v
 

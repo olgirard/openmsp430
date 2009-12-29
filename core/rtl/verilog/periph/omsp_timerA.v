@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: timerA.v
+// *File Name: omsp_timerA.v
 // 
 // *Module Description:
 //                       Timer A top-level
@@ -38,7 +38,7 @@
 `include "timescale.v"
 `include "openMSP430_defines.v"
 
-module  timerA (
+module  omsp_timerA (
 
 // OUTPUTs
     irq_ta0,                        // Timer A interrupt: TACCR0
@@ -684,6 +684,6 @@ wire     irq_ta1    = (tactl[`TAIFG]     & tactl[`TAIE])     |
                       (tacctl2[`TACCIFG] & tacctl2[`TACCIE]);
    
 
-endmodule // timerA
+endmodule // omsp_timerA
 
 `include "openMSP430_undefines.v"
