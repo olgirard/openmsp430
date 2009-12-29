@@ -181,9 +181,4 @@ wire [15:0] per_dout  =  cntrl1_rd  |
    
 endmodule // template_periph_8b
 
-
-
-
-
-
-
+`include "openMSP430_undefines.v"

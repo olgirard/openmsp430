@@ -3,8 +3,8 @@ OUTPUT_FORMAT("elf32-msp430","elf32-msp430","elf32-msp430")
 OUTPUT_ARCH(msp:110)
 MEMORY
 {
-  text   (rx)   	: ORIGIN = ROM_BASE,    LENGTH = ROM_SIZE
-  data   (rwx)  	: ORIGIN = 0x0200, 	LENGTH = RAM_SIZE
+  text   (rx)   	: ORIGIN = PMEM_BASE,   LENGTH = PMEM_SIZE
+  data   (rwx)  	: ORIGIN = 0x0200, 	LENGTH = DMEM_SIZE
   vectors (rw)   	: ORIGIN = 0xffe0,      LENGTH = 0x20
   bootloader(rx)	: ORIGIN = 0x0c00,	LENGTH = 1K
   infomem(rx)		: ORIGIN = 0x1000,	LENGTH = 256

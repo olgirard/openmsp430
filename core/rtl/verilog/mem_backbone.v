@@ -42,21 +42,21 @@ module  mem_backbone (
 
 // OUTPUTs
     dbg_mem_din,                    // Debug unit Memory data input
+    dmem_addr,                      // Data Memory address
+    dmem_cen,                       // Data Memory chip enable (low active)
+    dmem_din,                       // Data Memory data input
+    dmem_wen,                       // Data Memory write enable (low active)
     eu_mdb_in,                      // Execution Unit Memory data bus input
     fe_mdb_in,                      // Frontend Memory data bus input
-    fe_rom_wait,                    // Frontend wait for ROM
+    fe_pmem_wait,                   // Frontend wait for Instruction fetch
     per_addr,                       // Peripheral address
     per_din,                        // Peripheral data input
     per_wen,                        // Peripheral write enable (high active)
     per_en,                         // Peripheral enable (high active)
-    ram_addr,                       // RAM address
-    ram_cen,                        // RAM chip enable (low active)
-    ram_din,                        // RAM data input
-    ram_wen,                        // RAM write enable (low active)
-    rom_addr,                       // ROM address
-    rom_cen,                        // ROM chip enable (low active)
-    rom_din_dbg,                    // ROM data input --FOR DEBUG INTERFACE--
-    rom_wen_dbg,                    // ROM write enable (low active) --FOR DBG IF--
+    pmem_addr,                      // Program Memory address
+    pmem_cen,                       // Program Memory chip enable (low active)
+    pmem_din,                       // Program Memory data input (optional)
+    pmem_wen,                       // Program Memory write enable (low active) (optional)
 
 // INPUTs
     dbg_halt_st,                    // Halt/Run status from CPU
@@ -64,6 +64,7 @@ module  mem_backbone (
     dbg_mem_dout,                   // Debug unit data output
     dbg_mem_en,                     // Debug unit memory enable
     dbg_mem_wr,                     // Debug unit memory write
+    dmem_dout,                      // Data Memory data output
     eu_mab,                         // Execution Unit Memory address bus
     eu_mb_en,                       // Execution Unit Memory bus enable
     eu_mb_wr,                       // Execution Unit Memory bus write transfer
@@ -72,48 +73,47 @@ module  mem_backbone (
     fe_mb_en,                       // Frontend Memory bus enable
     mclk,                           // Main system clock
     per_dout,                       // Peripheral data output
-    puc,                            // Main system reset
-    ram_dout,                       // RAM data output
-    rom_dout                        // ROM data output
+    pmem_dout,                      // Program Memory data output
+    puc                             // Main system reset
 );
 
 // OUTPUTs
 //=========
-output       [15:0] dbg_mem_din;    // Debug unit Memory data input
-output       [15:0] eu_mdb_in;      // Execution Unit Memory data bus input
-output       [15:0] fe_mdb_in;      // Frontend Memory data bus input
-output              fe_rom_wait;    // Frontend wait for ROM
-output        [7:0] per_addr;       // Peripheral address
-output       [15:0] per_din;        // Peripheral data input
-output        [1:0] per_wen;        // Peripheral write enable (high active)
-output              per_en;         // Peripheral enable (high active)
-output [`RAM_MSB:0] ram_addr;       // RAM address
-output              ram_cen;        // RAM chip enable (low active)
-output       [15:0] ram_din;        // RAM data input
-output        [1:0] ram_wen;        // RAM write enable (low active)
-output [`ROM_MSB:0] rom_addr;       // ROM address
-output              rom_cen;        // ROM chip enable (low active)
-output       [15:0] rom_din_dbg;    // ROM data input --FOR DEBUG INTERFACE--
-output        [1:0] rom_wen_dbg;    // ROM write enable (low active) --FOR DBG IF--
+output        [15:0] dbg_mem_din;   // Debug unit Memory data input
+output [`DMEM_MSB:0] dmem_addr;     // Data Memory address
+output               dmem_cen;      // Data Memory chip enable (low active)
+output        [15:0] dmem_din;      // Data Memory data input
+output         [1:0] dmem_wen;      // Data Memory write enable (low active)
+output        [15:0] eu_mdb_in;     // Execution Unit Memory data bus input
+output        [15:0] fe_mdb_in;     // Frontend Memory data bus input
+output               fe_pmem_wait;  // Frontend wait for Instruction fetch
+output         [7:0] per_addr;      // Peripheral address
+output        [15:0] per_din;       // Peripheral data input
+output         [1:0] per_wen;       // Peripheral write enable (high active)
+output               per_en;        // Peripheral enable (high active)
+output [`PMEM_MSB:0] pmem_addr;     // Program Memory address
+output               pmem_cen;      // Program Memory chip enable (low active)
+output        [15:0] pmem_din;      // Program Memory data input (optional)
+output         [1:0] pmem_wen;      // Program Memory write enable (low active) (optional)
 
 // INPUTs
 //=========
-input               dbg_halt_st;    // Halt/Run status from CPU
-input        [15:0] dbg_mem_addr;   // Debug address for rd/wr access
-input        [15:0] dbg_mem_dout;   // Debug unit data output
-input               dbg_mem_en;     // Debug unit memory enable
-input         [1:0] dbg_mem_wr;     // Debug unit memory write
-input        [14:0] eu_mab;         // Execution Unit Memory address bus
-input               eu_mb_en;       // Execution Unit Memory bus enable
-input         [1:0] eu_mb_wr;       // Execution Unit Memory bus write transfer
-input        [15:0] eu_mdb_out;     // Execution Unit Memory data bus output
-input        [14:0] fe_mab;         // Frontend Memory address bus
-input               fe_mb_en;       // Frontend Memory bus enable
-input               mclk;           // Main system clock
-input        [15:0] per_dout;       // Peripheral data output
-input               puc;            // Main system reset
-input        [15:0] ram_dout;       // RAM data output
-input        [15:0] rom_dout;       // ROM data output
+input                dbg_halt_st;   // Halt/Run status from CPU
+input         [15:0] dbg_mem_addr;  // Debug address for rd/wr access
+input         [15:0] dbg_mem_dout;  // Debug unit data output
+input                dbg_mem_en;    // Debug unit memory enable
+input          [1:0] dbg_mem_wr;    // Debug unit memory write
+input         [15:0] dmem_dout;     // Data Memory data output
+input         [14:0] eu_mab;        // Execution Unit Memory address bus
+input                eu_mb_en;      // Execution Unit Memory bus enable
+input          [1:0] eu_mb_wr;      // Execution Unit Memory bus write transfer
+input         [15:0] eu_mdb_out;    // Execution Unit Memory data bus output
+input         [14:0] fe_mab;        // Frontend Memory address bus
+input                fe_mb_en;      // Frontend Memory bus enable
+input                mclk;          // Main system clock
+input         [15:0] per_dout;      // Peripheral data output
+input         [15:0] pmem_dout;     // Program Memory data output
+input                puc;           // Main system reset
 
 
 //=============================================================================
@@ -124,48 +124,48 @@ input        [15:0] rom_dout;       // ROM data output
 //------------------
 
 // Execution unit access
-wire              eu_ram_cen    = ~(eu_mb_en & (eu_mab>=(`RAM_BASE>>1)) &
-                                               (eu_mab<((`RAM_BASE+`RAM_SIZE)>>1)));
-wire       [15:0] eu_ram_addr   = eu_mab-(`RAM_BASE>>1);
+wire               eu_dmem_cen   = ~(eu_mb_en & (eu_mab>=(`DMEM_BASE>>1)) &
+                                                (eu_mab<((`DMEM_BASE+`DMEM_SIZE)>>1)));
+wire        [15:0] eu_dmem_addr  = eu_mab-(`DMEM_BASE>>1);
 
 // Debug interface access
-wire              dbg_ram_cen   = ~(dbg_mem_en & (dbg_mem_addr[15:1]>=(`RAM_BASE>>1)) &
-                                                 (dbg_mem_addr[15:1]<((`RAM_BASE+`RAM_SIZE)>>1)));
-wire       [15:0] dbg_ram_addr  = dbg_mem_addr[15:1]-(`RAM_BASE>>1);
+wire               dbg_dmem_cen  = ~(dbg_mem_en & (dbg_mem_addr[15:1]>=(`DMEM_BASE>>1)) &
+                                                  (dbg_mem_addr[15:1]<((`DMEM_BASE+`DMEM_SIZE)>>1)));
+wire        [15:0] dbg_dmem_addr = dbg_mem_addr[15:1]-(`DMEM_BASE>>1);
 
    
 // RAM Interface
-wire [`RAM_MSB:0] ram_addr      = ~dbg_ram_cen ? dbg_ram_addr[`RAM_MSB:0] : eu_ram_addr[`RAM_MSB:0];
-wire              ram_cen       = dbg_ram_cen & eu_ram_cen;
-wire        [1:0] ram_wen       = ~(dbg_mem_wr | eu_mb_wr);
-wire       [15:0] ram_din       = ~dbg_ram_cen ? dbg_mem_dout : eu_mdb_out;
+wire [`DMEM_MSB:0] dmem_addr     = ~dbg_dmem_cen ? dbg_dmem_addr[`DMEM_MSB:0] : eu_dmem_addr[`DMEM_MSB:0];
+wire               dmem_cen      =  dbg_dmem_cen & eu_dmem_cen;
+wire         [1:0] dmem_wen      = ~(dbg_mem_wr | eu_mb_wr);
+wire        [15:0] dmem_din      = ~dbg_dmem_cen ? dbg_mem_dout : eu_mdb_out;
 
 
 // ROM Interface
 //------------------
-parameter         ROM_OFFSET    = (16'hFFFF-`ROM_SIZE+1);
+parameter          PMEM_OFFSET   = (16'hFFFF-`PMEM_SIZE+1);
 
 // Execution unit access (only read access are accepted)
-wire              eu_rom_cen    = ~(eu_mb_en & ~|eu_mb_wr & (eu_mab>=(ROM_OFFSET>>1)));
-wire       [15:0] eu_rom_addr   = eu_mab-(ROM_OFFSET>>1);
+wire               eu_pmem_cen   = ~(eu_mb_en & ~|eu_mb_wr & (eu_mab>=(PMEM_OFFSET>>1)));
+wire        [15:0] eu_pmem_addr  = eu_mab-(PMEM_OFFSET>>1);
 
 // Front-end access
-wire              fe_rom_cen    = ~(fe_mb_en & (fe_mab>=(ROM_OFFSET>>1)));
-wire       [15:0] fe_rom_addr   = fe_mab-(ROM_OFFSET>>1);
+wire               fe_pmem_cen   = ~(fe_mb_en & (fe_mab>=(PMEM_OFFSET>>1)));
+wire        [15:0] fe_pmem_addr  = fe_mab-(PMEM_OFFSET>>1);
 
 // Debug interface access
-wire              dbg_rom_cen   = ~(dbg_mem_en & (dbg_mem_addr[15:1]>=(ROM_OFFSET>>1)));
-wire       [15:0] dbg_rom_addr  = dbg_mem_addr[15:1]-(ROM_OFFSET>>1);
+wire               dbg_pmem_cen  = ~(dbg_mem_en & (dbg_mem_addr[15:1]>=(PMEM_OFFSET>>1)));
+wire        [15:0] dbg_pmem_addr = dbg_mem_addr[15:1]-(PMEM_OFFSET>>1);
 
    
 // ROM Interface (Execution unit has priority)
-wire [`ROM_MSB:0] rom_addr      = ~dbg_rom_cen ? dbg_rom_addr[`ROM_MSB:0] :
-                                  ~eu_rom_cen  ? eu_rom_addr[`ROM_MSB:0]  : fe_rom_addr[`ROM_MSB:0];
-wire              rom_cen       = fe_rom_cen & eu_rom_cen & dbg_rom_cen;
-wire        [1:0] rom_wen_dbg   = ~dbg_mem_wr;
-wire       [15:0] rom_din_dbg   =  dbg_mem_dout;
+wire [`PMEM_MSB:0] pmem_addr     = ~dbg_pmem_cen ? dbg_pmem_addr[`PMEM_MSB:0] :
+                                   ~eu_pmem_cen  ? eu_pmem_addr[`PMEM_MSB:0]  : fe_pmem_addr[`PMEM_MSB:0];
+wire               pmem_cen      =  fe_pmem_cen & eu_pmem_cen & dbg_pmem_cen;
+wire         [1:0] pmem_wen      = ~dbg_mem_wr;
+wire        [15:0] pmem_din      =  dbg_mem_dout;
 
-wire              fe_rom_wait   = (~fe_rom_cen & ~eu_rom_cen);
+wire               fe_pmem_wait  = (~fe_pmem_cen & ~eu_pmem_cen);
 
 
 // Peripherals
@@ -189,27 +189,27 @@ always @ (posedge mclk or posedge puc)
 // Whenever the frontend doesn't access the ROM,  backup the data
 
 // Detect whenever the data should be backuped and restored
-reg 	    fe_rom_cen_dly;
+reg 	    fe_pmem_cen_dly;
 always @(posedge mclk or posedge puc)
-  if (puc)     fe_rom_cen_dly <=  1'b0;
-  else         fe_rom_cen_dly <=  fe_rom_cen;
+  if (puc)     fe_pmem_cen_dly <=  1'b0;
+  else         fe_pmem_cen_dly <=  fe_pmem_cen;
 
-wire fe_rom_save    = ( fe_rom_cen & ~fe_rom_cen_dly) & ~dbg_halt_st;
-wire fe_rom_restore = (~fe_rom_cen &  fe_rom_cen_dly) |  dbg_halt_st;
+wire fe_pmem_save    = ( fe_pmem_cen & ~fe_pmem_cen_dly) & ~dbg_halt_st;
+wire fe_pmem_restore = (~fe_pmem_cen &  fe_pmem_cen_dly) |  dbg_halt_st;
    
-reg  [15:0] rom_dout_bckup;
+reg  [15:0] pmem_dout_bckup;
 always @(posedge mclk or posedge puc)
-  if (puc)              rom_dout_bckup     <=  16'h0000;
-  else if (fe_rom_save) rom_dout_bckup     <=  rom_dout;
+  if (puc)               pmem_dout_bckup     <=  16'h0000;
+  else if (fe_pmem_save) pmem_dout_bckup     <=  pmem_dout;
 
 // Mux between the ROM data and the backup
-reg         rom_dout_bckup_sel;
+reg         pmem_dout_bckup_sel;
 always @(posedge mclk or posedge puc)
-  if (puc)                 rom_dout_bckup_sel <=  1'b0;
-  else if (fe_rom_save)    rom_dout_bckup_sel <=  1'b1;
-  else if (fe_rom_restore) rom_dout_bckup_sel <=  1'b0;
+  if (puc)                  pmem_dout_bckup_sel <=  1'b0;
+  else if (fe_pmem_save)    pmem_dout_bckup_sel <=  1'b1;
+  else if (fe_pmem_restore) pmem_dout_bckup_sel <=  1'b0;
     
-assign fe_mdb_in = rom_dout_bckup_sel ? rom_dout_bckup : rom_dout;
+assign fe_mdb_in = pmem_dout_bckup_sel ? pmem_dout_bckup : pmem_dout;
 
 
 // Execution-Unit data Mux
@@ -219,11 +219,11 @@ assign fe_mdb_in = rom_dout_bckup_sel ? rom_dout_bckup : rom_dout;
 reg [1:0] eu_mdb_in_sel;
 always @(posedge mclk or posedge puc)
   if (puc)  eu_mdb_in_sel <= 2'b00;
-  else      eu_mdb_in_sel <= {~eu_rom_cen, per_en};
+  else      eu_mdb_in_sel <= {~eu_pmem_cen, per_en};
 
 // Mux
-assign      eu_mdb_in      = eu_mdb_in_sel[1] ? rom_dout     :
-                             eu_mdb_in_sel[0] ? per_dout_val : ram_dout;
+assign      eu_mdb_in      = eu_mdb_in_sel[1] ? pmem_dout    :
+                             eu_mdb_in_sel[0] ? per_dout_val : dmem_dout;
 
 // Debug interface  data Mux
 //---------------------------------
@@ -232,15 +232,13 @@ assign      eu_mdb_in      = eu_mdb_in_sel[1] ? rom_dout     :
 reg [1:0] dbg_mem_din_sel;
 always @(posedge mclk or posedge puc)
   if (puc)  dbg_mem_din_sel <= 2'b00;
-  else      dbg_mem_din_sel <= {~dbg_rom_cen, dbg_per_en};
+  else      dbg_mem_din_sel <= {~dbg_pmem_cen, dbg_per_en};
 
 // Mux
-assign      dbg_mem_din  = dbg_mem_din_sel[1] ? rom_dout     :
-                           dbg_mem_din_sel[0] ? per_dout_val : ram_dout;
+assign      dbg_mem_din  = dbg_mem_din_sel[1] ? pmem_dout    :
+                           dbg_mem_din_sel[0] ? per_dout_val : dmem_dout;
 
    
 endmodule // mem_backbone
 
-
-
-
+`include "openMSP430_undefines.v"

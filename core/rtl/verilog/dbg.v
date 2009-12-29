@@ -265,9 +265,9 @@ wire [511:0] reg_rd    = reg_dec & {64{reg_read}};
 // CPU_ID Register
 //-----------------   
 
-wire  [3:0] cpu_id_rom = `ROM_AWIDTH;
-wire  [3:0] cpu_id_ram = `RAM_AWIDTH;
-wire [31:0] cpu_id     = {`DBG_ID, cpu_id_rom, cpu_id_ram};
+wire  [3:0] cpu_id_pmem = `PMEM_AWIDTH;
+wire  [3:0] cpu_id_dmem = `DMEM_AWIDTH;
+wire [31:0] cpu_id      = {`DBG_ID, cpu_id_pmem, cpu_id_dmem};
 
 
 // CPU_CTL Register
@@ -789,8 +789,4 @@ JTAG INTERFACE IS NOT SUPPORTED YET
 
 endmodule // dbg
 
-
-
-
-
-
+`include "openMSP430_undefines.v"

@@ -41,72 +41,72 @@
 module  openMSP430 (
 
 // OUTPUTs
-    aclk_en,                      // ACLK enable
-    dbg_freeze,                   // Freeze peripherals
-    dbg_uart_txd,                 // Debug interface: UART TXD
-    irq_acc,                      // Interrupt request accepted (one-hot signal)
-    mclk,                         // Main system clock
-    per_addr,                     // Peripheral address
-    per_din,                      // Peripheral data input
-    per_wen,                      // Peripheral write enable (high active)
-    per_en,                       // Peripheral enable (high active)
-    puc,                          // Main system reset
-    ram_addr,                     // RAM address
-    ram_cen,                      // RAM chip enable (low active)
-    ram_din,                      // RAM data input
-    ram_wen,                      // RAM write enable (low active)
-    rom_addr,                     // ROM address
-    rom_cen,                      // ROM chip enable (low active)
-    rom_din_dbg,                  // ROM data input --FOR DEBUG INTERFACE--
-    rom_wen_dbg,                  // ROM write enable (low active) --FOR DBG IF--
-    smclk_en,                     // SMCLK enable
+    aclk_en,                       // ACLK enable
+    dbg_freeze,                    // Freeze peripherals
+    dbg_uart_txd,                  // Debug interface: UART TXD
+    dmem_addr,                     // Data Memory address
+    dmem_cen,                      // Data Memory chip enable (low active)
+    dmem_din,                      // Data Memory data input
+    dmem_wen,                      // Data Memory write enable (low active)
+    irq_acc,                       // Interrupt request accepted (one-hot signal)
+    mclk,                          // Main system clock
+    per_addr,                      // Peripheral address
+    per_din,                       // Peripheral data input
+    per_wen,                       // Peripheral write enable (high active)
+    per_en,                        // Peripheral enable (high active)
+    pmem_addr,                     // Program Memory address
+    pmem_cen,                      // Program Memory chip enable (low active)
+    pmem_din,                      // Program Memory data input (optional)
+    pmem_wen,                      // Program Memory write enable (low active) (optional)
+    puc,                           // Main system reset
+    smclk_en,                      // SMCLK enable
 
 // INPUTs
-    dbg_uart_rxd,                 // Debug interface: UART RXD
-    dco_clk,                      // Fast oscillator (fast clock)
-    irq,                          // Maskable interrupts
-    lfxt_clk,                     // Low frequency oscillator (typ 32kHz)
-    nmi,                          // Non-maskable interrupt (asynchronous)
-    per_dout,                     // Peripheral data output
-    ram_dout,                     // RAM data output
-    reset_n,                      // Reset Pin (low active)
-    rom_dout                      // ROM data output
+    dbg_uart_rxd,                  // Debug interface: UART RXD
+    dco_clk,                       // Fast oscillator (fast clock)
+    dmem_dout,                     // Data Memory data output
+    irq,                           // Maskable interrupts
+    lfxt_clk,                      // Low frequency oscillator (typ 32kHz)
+    nmi,                           // Non-maskable interrupt (asynchronous)
+    per_dout,                      // Peripheral data output
+    pmem_dout,                     // Program Memory data output
+    reset_n                        // Reset Pin (low active)
 );
 
 // OUTPUTs
 //=========
-output              aclk_en;      // ACLK enable
-output              dbg_freeze;   // Freeze peripherals
-output              dbg_uart_txd; // Debug interface: UART TXD
-output       [13:0] irq_acc;      // Interrupt request accepted (one-hot signal)
-output              mclk;         // Main system clock
-output        [7:0] per_addr;     // Peripheral address
-output       [15:0] per_din;      // Peripheral data input
-output        [1:0] per_wen;      // Peripheral write enable (high active)
-output              per_en;       // Peripheral enable (high active)
-output              puc;          // Main system reset
-output [`RAM_MSB:0] ram_addr;     // RAM address
-output              ram_cen;      // RAM chip enable (low active)
-output       [15:0] ram_din;      // RAM data input
-output        [1:0] ram_wen;      // RAM write enable (low active)
-output [`ROM_MSB:0] rom_addr;     // ROM address
-output              rom_cen;      // ROM chip enable (low active)
-output       [15:0] rom_din_dbg;  // ROM data input --FOR DEBUG INTERFACE--
-output        [1:0] rom_wen_dbg;  // ROM write enable (low active) --FOR DBG IF--
-output              smclk_en;     // SMCLK enable
+output               aclk_en;      // ACLK enable
+output               dbg_freeze;   // Freeze peripherals
+output               dbg_uart_txd; // Debug interface: UART TXD
+output [`DMEM_MSB:0] dmem_addr;    // Data Memory address
+output               dmem_cen;     // Data Memory chip enable (low active)
+output        [15:0] dmem_din;     // Data Memory data input
+output         [1:0] dmem_wen;     // Data Memory write enable (low active)
+output        [13:0] irq_acc;      // Interrupt request accepted (one-hot signal)
+output               mclk;         // Main system clock
+output         [7:0] per_addr;     // Peripheral address
+output        [15:0] per_din;      // Peripheral data input
+output         [1:0] per_wen;      // Peripheral write enable (high active)
+output               per_en;       // Peripheral enable (high active)
+output [`PMEM_MSB:0] pmem_addr;    // Program Memory address
+output               pmem_cen;     // Program Memory chip enable (low active)
+output        [15:0] pmem_din;     // Program Memory data input (optional)
+output         [1:0] pmem_wen;     // Program Memory write enable (low active) (optional)
+output               puc;          // Main system reset
+output               smclk_en;     // SMCLK enable
 
 
 // INPUTs
 //=========
-input               dbg_uart_rxd; // Debug interface: UART RXD
-input               dco_clk;      // Fast oscillator (fast clock)
-input 	     [13:0] irq;          // Maskable interrupts
-input               lfxt_clk;     // Low frequency oscillator (typ 32kHz)
-input 	            nmi;          // Non-maskable interrupt (asynchronous)
-input        [15:0] per_dout;     // Peripheral data output
-input        [15:0] ram_dout;     // RAM data output
-input               reset_n;      // Reset Pin (active low)
-input        [15:0] rom_dout;     // ROM data output
+input                dbg_uart_rxd; // Debug interface: UART RXD
+input                dco_clk;      // Fast oscillator (fast clock)
+input         [15:0] dmem_dout;    // Data Memory data output
+input  	      [13:0] irq;          // Maskable interrupts
+input                lfxt_clk;     // Low frequency oscillator (typ 32kHz)
+input  	             nmi;          // Non-maskable interrupt (asynchronous)
+input         [15:0] per_dout;     // Peripheral data output
+input         [15:0] pmem_dout;    // Program Memory data output
+input                reset_n;      // Reset Pin (active low)
 
 
 
@@ -214,7 +214,7 @@ frontend frontend_0 (
     .cpuoff       (cpuoff),        // Turns off the CPU
     .dbg_halt_cmd (dbg_halt_cmd),  // Halt CPU command
     .dbg_reg_sel  (dbg_mem_addr[3:0]), // Debug selected register for rd/wr access
-    .fe_rom_wait  (fe_rom_wait),   // Frontend wait for ROM
+    .fe_pmem_wait (fe_pmem_wait),  // Frontend wait for Instruction fetch
     .gie          (gie),           // General interrupt enable
     .irq          (irq),           // Maskable interrupts
     .mclk         (mclk),          // Main system clock
@@ -280,21 +280,21 @@ mem_backbone mem_backbone_0 (
 
 // OUTPUTs
     .dbg_mem_din  (dbg_mem_din),   // Debug unit Memory data input
+    .dmem_addr    (dmem_addr),     // Data Memory address
+    .dmem_cen     (dmem_cen),      // Data Memory chip enable (low active)
+    .dmem_din     (dmem_din),      // Data Memory data input
+    .dmem_wen     (dmem_wen),      // Data Memory write enable (low active)
     .eu_mdb_in    (eu_mdb_in),     // Execution Unit Memory data bus input
     .fe_mdb_in    (fe_mdb_in),     // Frontend Memory data bus input
-    .fe_rom_wait  (fe_rom_wait),   // Frontend wait for ROM
+    .fe_pmem_wait (fe_pmem_wait),  // Frontend wait for Instruction fetch
     .per_addr     (per_addr),      // Peripheral address
     .per_din      (per_din),       // Peripheral data input
     .per_wen      (per_wen),       // Peripheral write enable (high active)
     .per_en       (per_en),        // Peripheral enable (high active)
-    .ram_addr     (ram_addr),      // RAM address
-    .ram_cen      (ram_cen),       // RAM chip enable (low active)
-    .ram_din      (ram_din),       // RAM data input
-    .ram_wen      (ram_wen),       // RAM write enable (low active)
-    .rom_addr     (rom_addr),      // ROM address
-    .rom_cen      (rom_cen),       // ROM chip enable (low active)
-    .rom_din_dbg  (rom_din_dbg),   // ROM data input --FOR DEBUG INTERFACE--
-    .rom_wen_dbg  (rom_wen_dbg),   // ROM write enable (low active) --FOR DBG IF--
+    .pmem_addr    (pmem_addr),     // Program Memory address
+    .pmem_cen     (pmem_cen),      // Program Memory chip enable (low active)
+    .pmem_din     (pmem_din),      // Program Memory data input (optional)
+    .pmem_wen     (pmem_wen),      // Program Memory write enable (low active) (optional)
 			     
 // INPUTs
     .dbg_halt_st  (dbg_halt_st),   // Halt/Run status from CPU
@@ -302,6 +302,7 @@ mem_backbone mem_backbone_0 (
     .dbg_mem_dout (dbg_mem_dout),  // Debug unit data output
     .dbg_mem_en   (dbg_mem_en),    // Debug unit memory enable
     .dbg_mem_wr   (dbg_mem_wr),    // Debug unit memory write
+    .dmem_dout    (dmem_dout),     // Data Memory data output
     .eu_mab       (eu_mab[15:1]),  // Execution Unit Memory address bus
     .eu_mb_en     (eu_mb_en),      // Execution Unit Memory bus enable
     .eu_mb_wr     (eu_mb_wr),      // Execution Unit Memory bus write transfer
@@ -310,9 +311,8 @@ mem_backbone mem_backbone_0 (
     .fe_mb_en     (fe_mb_en),      // Frontend Memory bus enable
     .mclk         (mclk),          // Main system clock
     .per_dout     (per_dout_or),   // Peripheral data output
-    .puc          (puc),           // Main system reset
-    .ram_dout     (ram_dout),      // RAM data output
-    .rom_dout     (rom_dout)       // ROM data output
+    .pmem_dout    (pmem_dout),     // Program Memory data output
+    .puc          (puc)            // Main system reset
 );
 
 
@@ -437,3 +437,4 @@ assign dbg_uart_txd =  1'b0;
    
 endmodule // openMSP430
 
+`include "openMSP430_undefines.v"

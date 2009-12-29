@@ -1,6 +1,3 @@
-`ifdef OPENMSP430_DEFINES
-`else
-`define OPENMSP430_DEFINES
 //----------------------------------------------------------------------------
 // Copyright (C) 2001 Authors
 //
@@ -38,26 +35,32 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
+`include "openMSP430_undefines.v"
 
 //----------------------------------------------------------------------------
 // SYSTEM CONFIGURATION
 //----------------------------------------------------------------------------
 
-// ROM Size:
-//                    9 ->  1kB
-//                   10 ->  2kB
-//                   11 ->  4kB
-//                   12 ->  8kB
-//                   13 -> 16kB
-`define ROM_AWIDTH   10
+// Program Memory Size:
+//                    9 ->  1 kB
+//                   10 ->  2 kB
+//                   11 ->  4 kB
+//                   12 ->  8 kB
+//                   13 -> 16 kB
+//                   14 -> 32 kB
+`define PMEM_AWIDTH   10
 
-// RAM Size:
+// Data Memory Size:
 //                    6 ->  128 B
 //                    7 ->  256 B
 //                    8 ->  512 B
 //                    9 ->    1 kB
 //                   10 ->    2 kB
-`define RAM_AWIDTH    6
+//                   11 ->    4 kB
+//                   12 ->    8 kB
+//                   13 ->   16 kB
+//                   14 ->   32 kB
+`define DMEM_AWIDTH    6
 
 //----------------------------------------------------------------------------
 // REMOTE DEBUGGING INTERFACE CONFIGURATION
@@ -68,7 +71,7 @@
 
 // Debug interface selection
 //             `define DBG_UART -> Enable UART (8N1) debug interface
-//             `define DBG_JTAG -> DON'T UNCOMMENT, NOT SUPPORTED YET
+//             `define DBG_JTAG -> DON'T UNCOMMENT, NOT SUPPORTED
 //
 `define DBG_UART
 //`define DBG_JTAG
@@ -95,16 +98,16 @@
 //==========================================================================//
 //==========================================================================//
 
-// ROM and RAM sizes
-`define ROM_SIZE  (2 << `ROM_AWIDTH)
-`define RAM_SIZE  (2 << `RAM_AWIDTH)
+// Program and Data Memory sizes
+`define PMEM_SIZE  (2 << `PMEM_AWIDTH)
+`define DMEM_SIZE  (2 << `DMEM_AWIDTH)
 
-// RAM Base Adresses
-`define RAM_BASE      16'h0200  // RAM base address
+// Data Memory Base Adresses
+`define DMEM_BASE  16'h0200
 
-// ROM & RAM most significant address bit (for 16 bit words)
-`define ROM_MSB   `ROM_AWIDTH-1
-`define RAM_MSB   `RAM_AWIDTH-1
+// Program & Data Memory most significant address bit (for 16 bit words)
+`define PMEM_MSB   `PMEM_AWIDTH-1
+`define DMEM_MSB   `DMEM_AWIDTH-1
 
 
 // Instructions type
@@ -285,12 +288,9 @@ CONFIGURATION ERROR: JTAG AND UART DEBUG INTERFACE ARE BOTH ENABLED
    `endif
  `else
    `ifdef DBG_JTAG
-CONFIGURATION ERROR: JTAG INTERFACE NOT SUPPORTED YET
+CONFIGURATION ERROR: JTAG INTERFACE NOT SUPPORTED
    `else
 CONFIGURATION ERROR: JTAG OR UART DEBUG INTERFACE SHOULD BE ENABLED
    `endif
  `endif
-`endif
-
-
 `endif

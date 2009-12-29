@@ -68,7 +68,7 @@ module  frontend (
     cpuoff,                        // Turns off the CPU
     dbg_halt_cmd,                  // Halt CPU command
     dbg_reg_sel,                   // Debug selected register for rd/wr access
-    fe_rom_wait,                   // Frontend wait for ROM
+    fe_pmem_wait,                  // Frontend wait for Instruction fetch
     gie,                           // General interrupt enable
     irq,                           // Maskable interrupts
     mclk,                          // Main system clock
@@ -110,7 +110,7 @@ output       [15:0] pc_nxt;        // Next PC value (for CALL & IRQ)
 input               cpuoff;        // Turns off the CPU
 input               dbg_halt_cmd;  // Halt CPU command
 input         [3:0] dbg_reg_sel;   // Debug selected register for rd/wr access
-input               fe_rom_wait;   // Frontend wait for ROM
+input               fe_pmem_wait;  // Frontend wait for Instruction fetch
 input 	            gie;           // General interrupt enable
 input 	     [13:0] irq;           // Maskable interrupts
 input               mclk;          // Main system clock
@@ -259,14 +259,14 @@ always @(posedge mclk or posedge puc)
   else      pc <= pc_nxt;
 
 // Check if ROM has been busy in order to retry ROM access
-reg rom_busy;
+reg pmem_busy;
 always @(posedge mclk or posedge puc)
-  if (puc)  rom_busy <= 16'h0000;
-  else      rom_busy <= fe_rom_wait;
+  if (puc)  pmem_busy <= 16'h0000;
+  else      pmem_busy <= fe_pmem_wait;
    
 // Memory interface
 wire [15:0] mab      = pc_nxt;
-wire        mb_en    = fetch | pc_sw_wr | (i_state==I_IRQ_FETCH) | rom_busy | (dbg_halt_st & ~dbg_halt_cmd);
+wire        mb_en    = fetch | pc_sw_wr | (i_state==I_IRQ_FETCH) | pmem_busy | (dbg_halt_st & ~dbg_halt_cmd);
 
 
 //
@@ -754,3 +754,5 @@ always @(posedge mclk or posedge puc)
 
 
 endmodule // frontend
+
+`include "openMSP430_undefines.v"

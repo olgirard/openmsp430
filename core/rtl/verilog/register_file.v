@@ -342,6 +342,4 @@ assign reg_dest = (r0      & {16{inst_dest[0]}})  |
 
 endmodule // register_file
 
-
-
-
+`include "openMSP430_undefines.v"

@@ -40,8 +40,8 @@
 EXPECTED_ARGS=5
 if [ $# -ne $EXPECTED_ARGS ]; then
   echo "ERROR    : wrong number of arguments"
-  echo "USAGE    : asm2ihex.sh <test name> <test assembler file> <definition file>   <rom size> <ram size>"
-  echo "Example  : asm2ihex.sh c-jump_jge  ../src/c-jump_jge.s43 ../bin/template.def 2048       128"
+  echo "USAGE    : asm2ihex.sh <test name> <test assembler file> <definition file>   <prog mem size> <data mem size>"
+  echo "Example  : asm2ihex.sh c-jump_jge  ../src/c-jump_jge.s43 ../bin/template.def 2048            128"
   exit 1
 fi
 
@@ -64,14 +64,14 @@ fi
 #               Generate the linker definition file                           #
 ###############################################################################
 
-RAM_SIZE=$5
-ROM_SIZE=$4
-ROM_BASE=$((0x10000-$ROM_SIZE))
+DMEM_SIZE=$5
+PMEM_SIZE=$4
+PMEM_BASE=$((0x10000-$PMEM_SIZE))
 
-cp  $3  ./rom.def
-sed -i "s/ROM_BASE/$ROM_BASE/g" rom.def
-sed -i "s/ROM_SIZE/$ROM_SIZE/g" rom.def
-sed -i "s/RAM_SIZE/$RAM_SIZE/g" rom.def
+cp  $3  ./pmem.def
+sed -i "s/PMEM_BASE/$PMEM_BASE/g" pmem.def
+sed -i "s/PMEM_SIZE/$PMEM_SIZE/g" pmem.def
+sed -i "s/DMEM_SIZE/$DMEM_SIZE/g" pmem.def
 
 
 ###############################################################################
@@ -79,5 +79,5 @@ sed -i "s/RAM_SIZE/$RAM_SIZE/g" rom.def
 ###############################################################################
 msp430-as      -alsm         $2     -o $1.o     > $1.l43
 msp430-objdump -xdsStr       $1.o              >> $1.l43
-msp430-ld      -T ./rom.def  $1.o   -o $1.elf
+msp430-ld      -T ./pmem.def $1.o   -o $1.elf
 msp430-objcopy -O ihex       $1.elf    $1.ihex

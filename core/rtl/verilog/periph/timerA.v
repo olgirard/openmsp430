@@ -686,9 +686,4 @@ wire     irq_ta1    = (tactl[`TAIFG]     & tactl[`TAIE])     |
 
 endmodule // timerA
 
-
-
-
-
-
-
+`include "openMSP430_undefines.v"

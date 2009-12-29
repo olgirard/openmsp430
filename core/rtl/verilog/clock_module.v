@@ -244,3 +244,4 @@ wire   puc = puc_s[1];
 
 endmodule // clock_module
 
+`include "openMSP430_undefines.v"

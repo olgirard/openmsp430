@@ -364,3 +364,4 @@ assign mdb_in_val = mdb_in_buf_valid ? mdb_in_buf : mdb_in_bw;
 
 endmodule // execution_unit
 
+`include "openMSP430_undefines.v"

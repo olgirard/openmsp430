@@ -771,8 +771,4 @@ wire [15:0] per_dout  =  p1in_rd   |
 
 endmodule // gpio
 
-
-
-
-
-
+`include "openMSP430_undefines.v"

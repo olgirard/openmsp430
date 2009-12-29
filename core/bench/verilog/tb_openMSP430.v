@@ -45,110 +45,110 @@ module  tb_openMSP430;
 // Wire & Register definition
 //------------------------------
 
-// RAM interface
-wire [`RAM_MSB:0] ram_addr;
-wire              ram_cen;
-wire       [15:0] ram_din;
-wire        [1:0] ram_wen;
-wire       [15:0] ram_dout;
+// Data Memory interface
+wire [`DMEM_MSB:0] dmem_addr;
+wire               dmem_cen;
+wire        [15:0] dmem_din;
+wire         [1:0] dmem_wen;
+wire        [15:0] dmem_dout;
 
-// ROM interface
-wire [`ROM_MSB:0] rom_addr;
-wire              rom_cen;
-wire       [15:0] rom_din_dbg;
-wire        [1:0] rom_wen_dbg;
-wire       [15:0] rom_dout;
+// Program Memory interface
+wire [`PMEM_MSB:0] pmem_addr;
+wire               pmem_cen;
+wire        [15:0] pmem_din;
+wire         [1:0] pmem_wen;
+wire        [15:0] pmem_dout;
 
 // Peripherals interface
-wire        [7:0] per_addr;
-wire       [15:0] per_din;
-wire       [15:0] per_dout;
-wire        [1:0] per_wen;
-wire              per_en;
+wire         [7:0] per_addr;
+wire        [15:0] per_din;
+wire        [15:0] per_dout;
+wire         [1:0] per_wen;
+wire               per_en;
 
 // Digital I/O
-wire              irq_port1;
-wire              irq_port2;
-wire       [15:0] per_dout_dio;
-wire        [7:0] p1_dout;
-wire        [7:0] p1_dout_en;
-wire        [7:0] p1_sel;
-wire        [7:0] p2_dout;
-wire        [7:0] p2_dout_en;
-wire        [7:0] p2_sel;
-wire        [7:0] p3_dout;
-wire        [7:0] p3_dout_en;
-wire        [7:0] p3_sel;
-wire        [7:0] p4_dout;
-wire        [7:0] p4_dout_en;
-wire        [7:0] p4_sel;
-wire        [7:0] p5_dout;
-wire        [7:0] p5_dout_en;
-wire        [7:0] p5_sel;
-wire        [7:0] p6_dout;
-wire        [7:0] p6_dout_en;
-wire        [7:0] p6_sel;
-reg         [7:0] p1_din;
-reg         [7:0] p2_din;
-reg         [7:0] p3_din;
-reg         [7:0] p4_din;
-reg         [7:0] p5_din;
-reg         [7:0] p6_din;
+wire               irq_port1;
+wire               irq_port2;
+wire        [15:0] per_dout_dio;
+wire         [7:0] p1_dout;
+wire         [7:0] p1_dout_en;
+wire         [7:0] p1_sel;
+wire         [7:0] p2_dout;
+wire         [7:0] p2_dout_en;
+wire         [7:0] p2_sel;
+wire         [7:0] p3_dout;
+wire         [7:0] p3_dout_en;
+wire         [7:0] p3_sel;
+wire         [7:0] p4_dout;
+wire         [7:0] p4_dout_en;
+wire         [7:0] p4_sel;
+wire         [7:0] p5_dout;
+wire         [7:0] p5_dout_en;
+wire         [7:0] p5_sel;
+wire         [7:0] p6_dout;
+wire         [7:0] p6_dout_en;
+wire         [7:0] p6_sel;
+reg          [7:0] p1_din;
+reg          [7:0] p2_din;
+reg          [7:0] p3_din;
+reg          [7:0] p4_din;
+reg          [7:0] p5_din;
+reg          [7:0] p6_din;
 
 // Peripheral templates
-wire       [15:0] per_dout_temp_8b;
-wire       [15:0] per_dout_temp_16b;
+wire        [15:0] per_dout_temp_8b;
+wire        [15:0] per_dout_temp_16b;
 
 // Timer A
-wire              irq_ta0;
-wire              irq_ta1;
-wire       [15:0] per_dout_timerA;
-reg               inclk;
-reg               taclk;
-reg               ta_cci0a;
-reg               ta_cci0b;
-reg               ta_cci1a;
-reg               ta_cci1b;
-reg               ta_cci2a;
-reg               ta_cci2b;
-wire              ta_out0;
-wire              ta_out0_en;
-wire              ta_out1;
-wire              ta_out1_en;
-wire              ta_out2;
-wire              ta_out2_en;
+wire               irq_ta0;
+wire               irq_ta1;
+wire        [15:0] per_dout_timerA;
+reg                inclk;
+reg                taclk;
+reg                ta_cci0a;
+reg                ta_cci0b;
+reg                ta_cci1a;
+reg                ta_cci1b;
+reg                ta_cci2a;
+reg                ta_cci2b;
+wire               ta_out0;
+wire               ta_out0_en;
+wire               ta_out1;
+wire               ta_out1_en;
+wire               ta_out2;
+wire               ta_out2_en;
    
 // Clock / Reset & Interrupts
-reg               dco_clk;
-reg               lfxt_clk;
-wire              mclk;
-wire              aclk_en;
-wire              smclk_en;
-reg               reset_n;
-wire              puc;
-reg               nmi;
-reg        [13:0] irq;
-wire       [13:0] irq_acc;
-wire       [13:0] irq_in;
+reg                dco_clk;
+reg                lfxt_clk;
+wire               mclk;
+wire               aclk_en;
+wire               smclk_en;
+reg                reset_n;
+wire               puc;
+reg                nmi;
+reg         [13:0] irq;
+wire        [13:0] irq_acc;
+wire        [13:0] irq_in;
 
 // Debug interface
-wire              dbg_freeze;
-wire              dbg_uart_txd;
-reg               dbg_uart_rxd;
-reg        [15:0] dbg_uart_buf;
+wire               dbg_freeze;
+wire               dbg_uart_txd;
+reg                dbg_uart_rxd;
+reg         [15:0] dbg_uart_buf;
 
 // Core testbench debuging signals
-wire   [8*32-1:0] i_state;
-wire   [8*32-1:0] e_state;
-wire       [31:0] inst_cycle;
-wire   [8*32-1:0] inst_full;
-wire       [31:0] inst_number;
-wire       [15:0] inst_pc;
-wire   [8*32-1:0] inst_short;
+wire    [8*32-1:0] i_state;
+wire    [8*32-1:0] e_state;
+wire        [31:0] inst_cycle;
+wire    [8*32-1:0] inst_full;
+wire        [31:0] inst_number;
+wire        [15:0] inst_pc;
+wire    [8*32-1:0] inst_short;
    
 // Testbench variables
-integer           error;
-reg               stimulus_done;
+integer            error;
+reg                stimulus_done;
 
 
 //
@@ -170,7 +170,7 @@ reg               stimulus_done;
 //------------------------------
 initial
   begin
-     $readmemh("./rom.mem", rom_0.mem);
+     $readmemh("./pmem.mem", pmem_0.mem);
   end
 
 //
@@ -222,38 +222,38 @@ initial
 
    
 //
-// ROM
+// Program Memory
 //----------------------------------
 
-ram #(`ROM_MSB) rom_0 (
+ram #(`PMEM_MSB) pmem_0 (
 
 // OUTPUTs
-    .ram_dout    (rom_dout),           // ROM data output
+    .ram_dout    (pmem_dout),          // Program Memory data output
 
 // INPUTs
-    .ram_addr    (rom_addr),           // ROM address
-    .ram_cen     (rom_cen),            // ROM chip enable (low active)
-    .ram_clk     (mclk),               // ROM clock
-    .ram_din     (rom_din_dbg),        // ROM data input
-    .ram_wen     (rom_wen_dbg)         // ROM write enable (low active)
+    .ram_addr    (pmem_addr),          // Program Memory address
+    .ram_cen     (pmem_cen),           // Program Memory chip enable (low active)
+    .ram_clk     (mclk),               // Program Memory clock
+    .ram_din     (pmem_din),           // Program Memory data input
+    .ram_wen     (pmem_wen)            // Program Memory write enable (low active)
 );
 
 
 //
-// RAM
+// Data Memory
 //----------------------------------
 
-ram #(`RAM_MSB) ram_0 (
+ram #(`DMEM_MSB) dmem_0 (
 
 // OUTPUTs
-    .ram_dout    (ram_dout),           // RAM data output
+    .ram_dout    (dmem_dout),          // Data Memory data output
 
 // INPUTs
-    .ram_addr    (ram_addr),           // RAM address
-    .ram_cen     (ram_cen),            // RAM chip enable (low active)
-    .ram_clk     (mclk),               // RAM clock
-    .ram_din     (ram_din),            // RAM data input
-    .ram_wen     (ram_wen)             // RAM write enable (low active)
+    .ram_addr    (dmem_addr),          // Data Memory address
+    .ram_cen     (dmem_cen),           // Data Memory chip enable (low active)
+    .ram_clk     (mclk),               // Data Memory clock
+    .ram_din     (dmem_din),           // Data Memory data input
+    .ram_wen     (dmem_wen)            // Data Memory write enable (low active)
 );
 
 
@@ -267,33 +267,33 @@ openMSP430 dut (
     .aclk_en      (aclk_en),           // ACLK enable
     .dbg_freeze   (dbg_freeze),        // Freeze peripherals
     .dbg_uart_txd (dbg_uart_txd),      // Debug interface: UART TXD
+    .dmem_addr    (dmem_addr),         // Data Memory address
+    .dmem_cen     (dmem_cen),          // Data Memory chip enable (low active)
+    .dmem_din     (dmem_din),          // Data Memory data input
+    .dmem_wen     (dmem_wen),          // Data Memory write enable (low active)
     .irq_acc      (irq_acc),           // Interrupt request accepted (one-hot signal)
     .mclk         (mclk),              // Main system clock
     .per_addr     (per_addr),          // Peripheral address
     .per_din      (per_din),           // Peripheral data input
     .per_wen      (per_wen),           // Peripheral write enable (high active)
     .per_en       (per_en),            // Peripheral enable (high active)
+    .pmem_addr    (pmem_addr),         // Program Memory address
+    .pmem_cen     (pmem_cen),          // Program Memory chip enable (low active)
+    .pmem_din     (pmem_din),          // Program Memory data input (optional)
+    .pmem_wen     (pmem_wen),          // Program Memory write enable (low active) (optional)
     .puc          (puc),               // Main system reset
-    .ram_addr     (ram_addr),          // RAM address
-    .ram_cen      (ram_cen),           // RAM chip enable (low active)
-    .ram_din      (ram_din),           // RAM data input
-    .ram_wen      (ram_wen),           // RAM write enable (low active)
-    .rom_addr     (rom_addr),          // ROM address
-    .rom_cen      (rom_cen),           // ROM chip enable (low active)
-    .rom_din_dbg  (rom_din_dbg),       // ROM data input --FOR DEBUG INTERFACE--
-    .rom_wen_dbg  (rom_wen_dbg),       // ROM write enable (low active) --FOR DBG IF--
     .smclk_en     (smclk_en),          // SMCLK enable
 
 // INPUTs
     .dbg_uart_rxd (dbg_uart_rxd),      // Debug interface: UART RXD
     .dco_clk      (dco_clk),           // Fast oscillator (fast clock)
+    .dmem_dout    (dmem_dout),         // Data Memory data output
     .irq          (irq_in),            // Maskable interrupts
     .lfxt_clk     (lfxt_clk),          // Low frequency oscillator (typ 32kHz)
     .nmi          (nmi),               // Non-maskable interrupt (asynchronous)
     .per_dout     (per_dout),          // Peripheral data output
-    .ram_dout     (ram_dout),          // RAM data output
-    .reset_n      (reset_n),           // Reset Pin (low active)
-    .rom_dout     (rom_dout)           // ROM data output
+    .pmem_dout    (pmem_dout),         // Program Memory data output
+    .reset_n      (reset_n)            // Reset Pin (low active)
 );
 
 //

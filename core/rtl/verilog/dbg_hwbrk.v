@@ -266,10 +266,4 @@ assign brk_halt     = brk_ctl[`BRK_EN] & |brk_stat_set;
      
 endmodule // dbg_hwbrk
 
-
-
-
-
-
-
-
+`include "openMSP430_undefines.v"

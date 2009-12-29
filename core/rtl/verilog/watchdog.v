@@ -214,7 +214,4 @@ wire       wdtifg_set =  (~wdtqn_dly & wdtqn) | wdtpw_error;
 
 endmodule // watchdog
 
-
-
-
-
+`include "openMSP430_undefines.v"

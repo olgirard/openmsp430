@@ -39,8 +39,8 @@
 
 `define LONG_TIMEOUT
 
-reg  [3:0] dbg_id_rom;
-reg  [3:0] dbg_id_ram;
+reg  [3:0] dbg_id_pmem;
+reg  [3:0] dbg_id_dmem;
 reg [31:0] dbg_id;
    
 initial
@@ -56,9 +56,9 @@ initial
 
       // TEST CPU REGISTERS
       //--------------------------------------------------------
-      dbg_id_rom = `ROM_AWIDTH;
-      dbg_id_ram = `RAM_AWIDTH;
-      dbg_id     = {`DBG_ID, dbg_id_rom, dbg_id_ram};
+      dbg_id_pmem = `PMEM_AWIDTH;
+      dbg_id_dmem = `DMEM_AWIDTH;
+      dbg_id      = {`DBG_ID, dbg_id_pmem, dbg_id_dmem};
 
       dbg_uart_wr(CPU_ID_LO  ,  16'hffff);
       dbg_uart_rd(CPU_ID_LO);

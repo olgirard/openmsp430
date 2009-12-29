@@ -77,7 +77,7 @@ fi
 #                               Cleanup                                       #
 ###############################################################################
 echo "Cleanup..."
-rm -rf rom.*
+rm -rf pmem.*
 rm -rf stimulus.v
 
 
@@ -89,31 +89,31 @@ echo "| Start simulation:             $1"
 echo " ======================================================="
 
 # Create links
-ln -s $asmfile rom.s43
+ln -s $asmfile pmem.s43
 ln -s $verfile stimulus.v
 
 # Make local copy of the openMSP403 configuration file and remove comments
-cp  $incfile  ./rom.inc
-sed -i "/^\/\// s,.*,," rom.inc
+cp  $incfile  ./pmem.inc
+sed -i "/^\/\// s,.*,," pmem.inc
 
-# Get ROM size
-romsize=`grep ROM_AWIDTH rom.inc | grep -v ROM_MSB | grep -v ROM_SIZE`
-romsize=${romsize##* }
-romsize=$((2<<$romsize))
+# Get Program Memory size
+pmemsize=`grep PMEM_AWIDTH pmem.inc | grep -v PMEM_MSB | grep -v PMEM_SIZE`
+pmemsize=${pmemsize##* }
+pmemsize=$((2<<$pmemsize))
 
-# Get RAM size
-ramsize=`grep RAM_AWIDTH rom.inc | grep -v RAM_MSB | grep -v RAM_SIZE`
-ramsize=${ramsize##* }
-ramsize=$((2<<$ramsize))
+# Get Data Memory size
+dmemsize=`grep DMEM_AWIDTH pmem.inc | grep -v DMEM_MSB | grep -v DMEM_SIZE`
+dmemsize=${dmemsize##* }
+dmemsize=$((2<<$dmemsize))
 
 # Compile assembler code
-echo "Compile, link & generate IHEX file (ROM: $romsize B, RAM: $ramsize B)..."
-../bin/asm2ihex.sh  rom rom.s43 $deffile $romsize $ramsize
+echo "Compile, link & generate IHEX file (Program Memory: $pmemsize B, Data Memory: $dmemsize B)..."
+../bin/asm2ihex.sh  pmem pmem.s43 $deffile $pmemsize $dmemsize
 
-# Generate ROM memory file
+# Generate Program memory file
 echo "Convert IHEX file to Verilog MEMH format..."
-../bin/ihex2mem.tcl -ihex rom.ihex -out rom.mem -mem_size $romsize
+../bin/ihex2mem.tcl -ihex pmem.ihex -out pmem.mem -mem_size $pmemsize
 
 # Start verilog simulation
 echo "Start Verilog simulation..."
-../bin/rtlsim.sh    stimulus.v rom.mem $submitfile
+../bin/rtlsim.sh    stimulus.v pmem.mem $submitfile

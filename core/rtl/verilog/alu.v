@@ -245,4 +245,4 @@ assign  alu_stat_wr = (inst_alu[`ALU_STAT_F] & exec_cycle) ? 4'b1111 : 4'b0000;
 
 endmodule // alu
 
-
+`include "openMSP430_undefines.v"

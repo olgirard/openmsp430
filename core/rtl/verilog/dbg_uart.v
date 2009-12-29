@@ -265,9 +265,4 @@ wire        dbg_rd     = mem_burst ? (xfer_done & (uart_state==TX_DATA2)) :
    
 endmodule // dbg_uart
 
-
-
-
-
-
-
+`include "openMSP430_undefines.v"

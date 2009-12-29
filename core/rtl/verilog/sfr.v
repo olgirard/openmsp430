@@ -200,3 +200,5 @@ always @ (posedge mclk or posedge por)
 
 
 endmodule // sfr
+
+`include "openMSP430_undefines.v"
