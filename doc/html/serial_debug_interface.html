@@ -93,8 +93,8 @@ The following table summarize the complete debug register set accessible through
 <td><font size="-1"><a href="#2.2.1 CPU_ID">CPU_ID_LO</a></font></td>
 <td><font size="-1">0x00</font></td>
 <td colspan="8"><font size="-5">CPU_ID[7:0]</font></td>
-<td colspan="4"><font size="-5">ROM_AWIDTH</font></td>
-<td colspan="4"><font size="-5">RAM_AWIDTH</font></td>
+<td colspan="4"><font size="-5">PMEM_AWIDTH</font></td>
+<td colspan="4"><font size="-5">DMEM_AWIDTH</font></td>
 </tr>
 <tr align="center">
 <td><font size="-1"><a href="#2.2.1 CPU_ID">CPU_ID_HI</a></font></td>
@@ -278,7 +278,7 @@ The following table summarize the complete debug register set accessible through
 
 <a name="2.2.1 CPU_ID"></a>
 <h3>2.2.1 CPU_ID</h3>
-This 32 bit read-only register holds the ID of the implemented openMSP430 as well as the RAM and ROM size information.
+This 32 bit read-only register holds the ID of the implemented openMSP430 as well as the program and data memory size information.
 <br /><br />
 <table border="1">
 <tr align="center">
@@ -300,8 +300,8 @@ This 32 bit read-only register holds the ID of the implemented openMSP430 as wel
 <td><font size="-1">CPU_ID_LO</font></td>
 <td><font size="-1">0x00</font></td>
 <td colspan="8"><font size="-5">CPU_ID[7:0]</font></td>
-<td colspan="4"><font size="-5">ROM_AWIDTH</font></td>
-<td colspan="4"><font size="-5">RAM_AWIDTH</font></td>
+<td colspan="4"><font size="-5">PMEM_AWIDTH</font></td>
+<td colspan="4"><font size="-5">DMEM_AWIDTH</font></td>
 </tr>
 <tr align="center">
 <td><font size="-1">CPU_ID_HI</font></td>
@@ -316,12 +316,12 @@ This 32 bit read-only register holds the ID of the implemented openMSP430 as wel
    <td>: Set by default to 0x4D5350 (ascii code for "MSP")</td>
 </tr>
 <tr>
-   <td>&nbsp;</td><td valign="top"><li><b>ROM_AWIDTH</b></li></td>
-   <td>: Program memory address width for the current implementation. The ROM size is then equal to 2<sup><font size="-3">ROM_AWIDTH</font></sup></td>
+   <td>&nbsp;</td><td valign="top"><li><b>PMEM_AWIDTH</b></li></td>
+   <td>: Program memory address width for the current implementation. The ROM or RAM size is then equal to 2<sup><font size="-3">PMEM_AWIDTH</font></sup></td>
 </tr>
 <tr>
-   <td>&nbsp;</td><td valign="top"><li><b>RAM_AWIDTH</b></li></td>
-   <td>: Data memory address width for the current implementation. The RAM size is then equal to 2<sup><font size="-3">RAM_AWIDTH</font></sup></td>
+   <td>&nbsp;</td><td valign="top"><li><b>DMEM_AWIDTH</b></li></td>
+   <td>: Data memory address width for the current implementation. The RAM size is then equal to 2<sup><font size="-3">DMEM_AWIDTH</font></sup></td>
 </tr>
 </table>
 

@@ -114,17 +114,18 @@ There is fortunately a <a href="http://www.nabble.com/Useful-new-GDB-fixes-td195
 <h2>5.2 CPU selection for msp430-gcc</h2>
 
 The following table aims to help selecting the proper <b>-mmcu</b> option for the <b>msp430-gcc</b> call.<br />
-Note that only the ROM size should imperatively match the openMSP430 configuration. 
+Note that the program memory size should imperatively match the openMSP430 configuration. 
 <br /><br /> 
 <table align="center" border="1">
-<tr align="center"><td colspan="3"><b>ROM Size: 1 kB</b></td></tr>             
+<tr align="center"><td><b>-mmcu option</b></td><td><b>&nbsp;&nbsp;Program&nbsp;&nbsp;<br />Memory</b></td><td><b>Data<br />&nbsp;&nbsp;&nbsp;Memory&nbsp;&nbsp;&nbsp;</b></td></tr>
+<tr align="center"><td colspan="3"><b><i>Program Memory Size: 1 kB</i></b></td></tr>             
 <tr align="center"><td>msp430x110  </td><td> 1 kB</td><td>  128 B</td></tr>
 <tr align="center"><td>msp430x1101 </td><td> 1 kB</td><td>  128 B</td></tr> 
 <tr align="center"><td>msp430x2001 </td><td> 1 kB</td><td>  128 B</td></tr>             
 <tr align="center"><td>msp430x2002 </td><td> 1 kB</td><td>  128 B</td></tr>  
 <tr align="center"><td>msp430x2003 </td><td> 1 kB</td><td>  128 B</td></tr>             
 <tr align="center"><td>msp430x2101 </td><td> 1 kB</td><td>  128 B</td></tr>             
-<tr align="center"><td colspan="3"><b>ROM Size: 2 kB</b></td></tr>             
+<tr align="center"><td colspan="3"><b><i>Program Memory Size: 2 kB</i></b></td></tr>             
 <tr align="center"><td>msp430x1111 </td><td> 2 kB</td><td>  128 B</td></tr>             
 <tr align="center"><td>msp430x2011 </td><td> 2 kB</td><td>  128 B</td></tr>             
 <tr align="center"><td>msp430x2012 </td><td> 2 kB</td><td>  128 B</td></tr>             
@@ -132,7 +133,7 @@ Note that only the ROM size should imperatively match the openMSP430 configurati
 <tr align="center"><td>msp430x2111 </td><td> 2 kB</td><td>  128 B</td></tr>
 <tr align="center"><td>msp430x2112 </td><td> 2 kB</td><td>  128 B</td></tr>             
 <tr align="center"><td>msp430x311  </td><td> 2 kB</td><td>  128 B</td></tr>             
-<tr align="center"><td colspan="3"><b>ROM Size: 4 kB</b></td></tr>             
+<tr align="center"><td colspan="3"><b><i>Program Memory Size: 4 kB</i></b></td></tr>             
 <tr align="center"><td>msp430x112  </td><td> 4 kB</td><td>  256 B</td></tr>             
 <tr align="center"><td>msp430x1121 </td><td> 4 kB</td><td>  256 B</td></tr>             
 <tr align="center"><td>msp430x1122 </td><td> 4 kB</td><td>  256 B</td></tr>             
@@ -142,7 +143,7 @@ Note that only the ROM size should imperatively match the openMSP430 configurati
 <tr align="center"><td>msp430x2121 </td><td> 4 kB</td><td>  256 B</td></tr>             
 <tr align="center"><td>msp430x312  </td><td> 4 kB</td><td>  256 B</td></tr>             
 <tr align="center"><td>msp430x412  </td><td> 4 kB</td><td>  256 B</td></tr>             
-<tr align="center"><td colspan="3"><b>ROM Size: 8 kB</b></td></tr>             
+<tr align="center"><td colspan="3"><b><i>Program Memory Size: 8 kB</i></b></td></tr>             
 <tr align="center"><td>msp430x123  </td><td> 8 kB</td><td>  256 B</td></tr>             
 <tr align="center"><td>msp430x133  </td><td> 8 kB</td><td>  256 B</td></tr>             
 <tr align="center"><td>msp430x313  </td><td> 8 kB</td><td>  256 B</td></tr>             
@@ -161,7 +162,7 @@ Note that only the ROM size should imperatively match the openMSP430 configurati
 <tr align="center"><td>msp430x2234 </td><td> 8 kB</td><td>  512 B</td></tr>             
 <tr align="center"><td>msp430x233  </td><td> 8 kB</td><td> 1024 B</td></tr>
 <tr align="center"><td>msp430x2330 </td><td> 8 kB</td><td> 1024 B</td></tr>             
-<tr align="center"><td colspan="3"><b>ROM Size: 16 kB</b></td></tr>             
+<tr align="center"><td colspan="3"><b><i>Program Memory Size: 16 kB</i></b></td></tr>             
 <tr align="center"><td>msp430x4250 </td><td>16 kB</td><td>  256 B</td></tr>             
 <tr align="center"><td>msp430xG4250</td><td>16 kB</td><td>  256 B</td></tr>
 <tr align="center"><td>msp430x135  </td><td>16 kB</td><td>  512 B</td></tr>
@@ -180,7 +181,7 @@ Note that only the ROM size should imperatively match the openMSP430 configurati
 <tr align="center"><td>msp430x4351 </td><td>16 kB</td><td>  512 B</td></tr>
 <tr align="center"><td>msp430x235  </td><td>16 kB</td><td> 2048 B</td></tr>
 <tr align="center"><td>msp430x2350 </td><td>16 kB</td><td> 2048 B</td></tr>
-<tr align="center"><td colspan="3"><b>ROM Size: 32 kB</b></td></tr>             
+<tr align="center"><td colspan="3"><b><i>Program Memory Size: 32 kB</i></b></td></tr>             
 <tr align="center"><td>msp430x4270 </td><td>32 kB</td><td>  256 B</td></tr>
 <tr align="center"><td>msp430xG4270</td><td>32 kB</td><td>  256 B</td></tr>
 <tr align="center"><td>msp430x147  </td><td>32 kB</td><td> 1024 B</td></tr>

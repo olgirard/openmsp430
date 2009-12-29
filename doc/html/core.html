@@ -38,8 +38,8 @@ The openMSP430 is a 16-bit microcontroller core compatible with TI's MSP430 fami
 <br /><br />
 This design has been implemented to be FPGA friendly. Therefore, the core doesn't contain any clock gate and has only a single clock domain. As a consequence, the clock management block has a few limitations.
 <br /><br />
-This IP doesn't contain the program and data memory blocks internally (these are technology dependent hard macros which are connected to the IP during chip integration).
-However the core is fully configurable in regard to the supported RAM and ROM sizes.
+This IP doesn't contain the instruction and data memory blocks internally (these are technology dependent hard macros which are connected to the IP during chip integration).
+However the core is fully configurable in regard to the supported RAM and/or ROM sizes.
 <br /><br />
 In addition to the CPU core itself, several peripherals are also provided and can be easily connected to the core during integration.
 <br /><br />
@@ -55,13 +55,13 @@ In addition to the CPU core itself, several peripherals are also provided and ca
 
 The following diagram shows the openMSP430 design structure:
 <br /><br />
-<img src="getimg.php?1261910416" width="100%" height="100%" alt="CPU Structure" title="CPU Structure" />
+<img src="getimg.php?1262105776" width="100%" height="100%" alt="CPU Structure" title="CPU Structure" />
 <br />
 <ul>
 	<li><b>Frontend</b>: This module performs the instruction Fetch and Decode tasks. It also contains the execution state machine.</li>
 	<li><b>Execution unit</b>: Containing the ALU and the register file, this module executes the current decoded instruction according to the execution state.</li>
 	<li><b>Serial Debug Interface</b>: Contains all the required logic for a Nexus class 3 debugging unit (without trace). Communication with the host is done with a standard 8N1 serial interface.</li>
-   <li><b>Memory backbone</b>: This block performs a simple arbitration between the frontend and execution-unit for instruction and data memory access.</li>
+   <li><b>Memory backbone</b>: This block performs a simple arbitration between the frontend and execution-unit for program, data and peripheral memory access.</li>
    <li><b>Basic Clock Module</b>: Generates the ACLK and SMCLK enable signals.</li>
    <li><b>SFRs</b>: The <b>S</b>pecial <b>F</b>unction <b>R</b>egister<b>s</b> block contain diverse configuration registers (NMI, Watchdog, ...).</li>
    <li><b>Watchdog</b>: Although it is a peripheral, the watchdog is permanently included in the core because of its tight links with the NMI interrupts and the PUC reset generation.</li>
@@ -82,7 +82,7 @@ The known core limitations are the following:
 <h3>2.1.3 Configuration</h3>
 
 It is possible to configure the openMSP430 core through the "openMSP430_defines.v" file located in the "rtl" directory (see <a href="http://www.opencores.org/project,openmsp430,file%20and%20directory%20description">file and directory description</a>).<br />
-Two parameters can be adjusted by the user in order to define the ROM and RAM sizes:
+Two parameters can be adjusted by the user in order to define the program and data memory sizes:
 <br /><br />
 <table border="0" cellspacing="4" cellpadding="0">
 <tr>
@@ -91,27 +91,35 @@ Two parameters can be adjusted by the user in order to define the ROM and RAM si
 <td width="15"></td>
 <td>
 	<code>
-		      // ROM Size
-		<br />//                    9 ->  1kB
-		<br />//                   10 ->  2kB
-		<br />//                   11 ->  4kB
-		<br />//                   12 ->  8kB
-		<br />//                   13 -> 16kB
-		<br />`define ROM_AWIDTH   10
+		      // Program Memory Size
+		<br />//                    9 ->  1 kB
+		<br />//                   10 ->  2 kB
+		<br />//                   11 ->  4 kB
+		<br />//                   12 ->  8 kB
+		<br />//                   13 -> 16 kB
+		<br />//                   14 -> 32 kB
+		<br />`define PMEM_AWIDTH   10
 		<br />
-		<br />// RAM Size
+		<br />// Data Memory Size
 		<br />//                    6 ->  128 B
 		<br />//                    7 ->  256 B
 		<br />//                    8 ->  512 B
 		<br />//                    9 ->    1 kB
 		<br />//                   10 ->    2 kB
-		<br />`define RAM_AWIDTH    6
+		<br />//                   11 ->    4 kB
+		<br />//                   12 ->    8 kB
+		<br />//                   13 ->   16 kB
+		<br />//                   14 ->   32 kB
+		<br />`define DMEM_AWIDTH    6
 	</code>
 </td>
 </tr>
 </table>
 <br /><br />
-The following parameters define if the debug interface should be included or not and how many hardware breakpoint units should be included:
+<b>Note:</b> Program and data memories <b>SHOULD NOT</b> be both set to 32 kB
+<br /><br /><br />
+The following parameters define if the debug interface should be included or not and how many hardware breakpoint units should be included.
+
 <br /><br />
 <table border="0" cellspacing="4" cellpadding="0">
 <tr>
@@ -129,7 +137,7 @@ The following parameters define if the debug interface should be included or not
 		<br />
 		<br />// Debug interface selection
 		<br />//             `define DBG_UART -> Enable UART (8N1) debug interface
-		<br />//             `define DBG_JTAG -> DON'T UNCOMMENT, NOT SUPPORTED YET
+		<br />//             `define DBG_JTAG -> DON'T UNCOMMENT, NOT SUPPORTED
 		<br />//
 		<br />`define DBG_UART
 		<br />//`define DBG_JTAG
@@ -149,6 +157,8 @@ The following parameters define if the debug interface should be included or not
 </tr>
 </table>
 <br /><br />
+<b>Note:</b> Since the hardware breakpoint units are relatively big, it is recommended to include as many as you plan to use. These units are particularly useful if your instruction memory is a ROM (i.e. when you can't use software breakpoints) or if you want to be able to stop the CPU whenever some particular data addresses are accessed.
+<br /><br /><br />
 All remaining defines located in this file are system constants and should not be edited.
 
 <a name="2.1.4 Pinout"></a>
@@ -177,25 +187,26 @@ The full pinout of the openMSP430 core is provided in the following table:
 	<tr> <td> per_dout       </td> <td>  Input         </td> <td>      16        </td> <td> Peripheral data output                      </td> </tr>
 	<tr> <td> per_en         </td> <td>  Output        </td> <td>       1        </td> <td> Peripheral enable (high active)             </td> </tr>
 	<tr> <td> per_wen        </td> <td>  Output        </td> <td>       2        </td> <td> Peripheral write enable (high active)       </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>RAM interface</i></b>  </td></tr>
-	<tr> <td> ram_addr       </td> <td>  Output        </td> <td> `RAM_AWIDTH<sup>1</sup> </td> <td> RAM address                                 </td> </tr>
-	<tr> <td> ram_cen        </td> <td>  Output        </td> <td>       1        </td> <td> RAM chip enable (low active)                </td> </tr>
-	<tr> <td> ram_din        </td> <td>  Output        </td> <td>      16        </td> <td> RAM data input                              </td> </tr>
-	<tr> <td> ram_dout       </td> <td>  Input         </td> <td>      16        </td> <td> RAM data output                             </td> </tr>
-	<tr> <td> ram_wen        </td> <td>  Output        </td> <td>       2        </td> <td> RAM write enable (low active)               </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>ROM interface</i></b>  </td></tr>
-	<tr> <td> rom_addr       </td> <td>  Output        </td> <td> `ROM_AWIDTH<sup>1</sup> </td> <td> ROM address                                 </td> </tr>
-	<tr> <td> rom_cen        </td> <td>  Output        </td> <td>       1        </td> <td> ROM chip enable (low active)                </td> </tr>
-	<tr> <td> rom_din_dbg    </td> <td>  Output        </td> <td>      16        </td> <td> ROM data input --FOR DEBUG INTERFACE--      </td> </tr>
-	<tr> <td> rom_dout       </td> <td>  Input         </td> <td>      16        </td> <td> ROM data output                             </td> </tr>
-	<tr> <td> rom_wen_dbg    </td> <td>  Output        </td> <td>       2        </td> <td> ROM write enable (low active) --FOR DEBUG INTERFACE--</td> </tr>
+	<tr> <td colspan="4" align="center"> <b><i>Data Memory interface</i></b>  </td></tr>
+	<tr> <td> dmem_addr       </td> <td>  Output        </td> <td> `DMEM_AWIDTH<sup>1</sup> </td> <td> Data Memory address                                 </td> </tr>
+	<tr> <td> dmem_cen        </td> <td>  Output        </td> <td>       1        </td> <td> Data Memory chip enable (low active)                </td> </tr>
+	<tr> <td> dmem_din        </td> <td>  Output        </td> <td>      16        </td> <td> Data Memory data input                              </td> </tr>
+	<tr> <td> dmem_dout       </td> <td>  Input         </td> <td>      16        </td> <td> Data Memory data output                             </td> </tr>
+	<tr> <td> dmem_wen        </td> <td>  Output        </td> <td>       2        </td> <td> Data Memory write enable (low active)               </td> </tr>
+	<tr> <td colspan="4" align="center"> <b><i>Program Memory interface</i></b>  </td></tr>
+	<tr> <td> pmem_addr       </td> <td>  Output        </td> <td> `PMEM_AWIDTH<sup>1</sup> </td> <td> Program Memory address                                 </td> </tr>
+	<tr> <td> pmem_cen        </td> <td>  Output        </td> <td>       1        </td> <td> Program Memory chip enable (low active)                </td> </tr>
+	<tr> <td> pmem_din        </td> <td>  Output        </td> <td>      16        </td> <td> Program Memory data input (optional<sup>2</sup>)     </td> </tr>
+	<tr> <td> pmem_dout       </td> <td>  Input         </td> <td>      16        </td> <td> Program Memory data output                             </td> </tr>
+	<tr> <td> pmem_wen        </td> <td>  Output        </td> <td>       2        </td> <td> Program Memory write enable (low active) (optional<sup>2</sup>)</td> </tr>
 	<tr> <td colspan="4" align="center"> <b><i>Serial Debug interface</i></b>  </td></tr>
 	<tr> <td> dbg_freeze     </td> <td>  Output        </td> <td>       1        </td> <td> Freeze peripherals                          </td> </tr>
 	<tr> <td> dbg_uart_txd   </td> <td>  Output        </td> <td>       1        </td> <td> Debug interface: UART TXD                   </td> </tr>
 	<tr> <td> dbg_uart_rxd   </td> <td>  Input         </td> <td>       1        </td> <td> Debug interface: UART RXD                   </td> </tr>
       </table> 
 <br />
-<sup>1</sup>: This parameter is declared in the "openMSP430_defines.v" file and defines the RAM/ROM size.
+<sup>1</sup>: This parameter is declared in the "openMSP430_defines.v" file and defines the RAM/ROM size.<br />
+<sup>2</sup>: These two optional ports can be connected whenever the program memory is a RAM. This will allow the user to load a program through the serial debug interface and to use software breakpoints.
 <br /><br />
 
 <a name="2.1.5 Instruction Cycles and Lengths"></a>

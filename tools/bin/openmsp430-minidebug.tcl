@@ -165,7 +165,7 @@ proc loadProgram {elf_file_name} {
     # Reset & Stop CPU
     ExecutePOR_Halt
 
-    # Load ROM
+    # Load Program Memory
     set StartAddr [format "0x%04x" [expr 0x10000-$byte_size]]
     .load.fb.l configure -text "Load..." -fg yellow
     update
@@ -378,11 +378,11 @@ label  .cpu.l4         -text "B)"        -anchor w
 pack   .cpu.l4         -side right
 label  .cpu.l5         -text "--"        -anchor w
 pack   .cpu.l5         -side right
-label  .cpu.l6         -text "B; RAM size:" -anchor w
+label  .cpu.l6         -text "B; Data Memory size:" -anchor w
 pack   .cpu.l6         -side right
 label  .cpu.l7         -text "--"        -anchor w
 pack   .cpu.l7         -side right
-label  .cpu.l8         -text "(ROM size:" -anchor w
+label  .cpu.l8         -text "(Program Memory size:" -anchor w
 pack   .cpu.l8         -side right
 
 

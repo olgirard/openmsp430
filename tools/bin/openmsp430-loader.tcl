@@ -143,18 +143,18 @@ if {![GetDevice]} {
 ExecutePOR_Halt
 puts "done"
 set sizes [GetCPU_ID_SIZE]
-puts "Connected: target device has [lindex $sizes 0]B ROM and [lindex $sizes 1]B RAM"
+puts "Connected: target device has [lindex $sizes 0]B Program Memory and [lindex $sizes 1]B Data Memory"
 puts ""
 
-# Load ROM
+# Load Program Memory
 set StartAddr [format "0x%04x" [expr 0x10000-$byte_size]]
-puts -nonewline "Load ROM... "
+puts -nonewline "Load Program Memory... "
 flush stdout
 WriteMemQuick $StartAddr $DataArray
 puts "done"
 
 # Check Data
-puts -nonewline "Verify ROM... "
+puts -nonewline "Verify Program Memory... "
 flush stdout
 if {[VerifyMem $StartAddr $DataArray]} {
     puts "done"

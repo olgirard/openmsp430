@@ -160,8 +160,8 @@ if {$shell} {
     # Display info
     puts "INFO: Sucessfully connected with the openMSP430 target."
     set sizes [GetCPU_ID_SIZE]
-    puts "INFO: ROM Size - [lindex $sizes 0] B"
-    puts "INFO: RAM Size - [lindex $sizes 1] B"
+    puts "INFO: Program Memory Size - [lindex $sizes 0] B"
+    puts "INFO: Data Memory Size - [lindex $sizes 1] B"
     puts "INFO: $hw_break(num) Hardware Brea/Watch-point unit(s) detected"
     puts ""
 
