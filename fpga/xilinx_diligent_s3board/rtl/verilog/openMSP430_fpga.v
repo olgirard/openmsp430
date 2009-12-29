@@ -290,46 +290,46 @@ output    VGA_VS;
 //=============================================================================
 
 // openMSP430 output buses
-wire        [7:0] per_addr;
-wire       [15:0] per_din;
-wire        [1:0] per_wen;
-wire [`RAM_MSB:0] ram_addr;
-wire       [15:0] ram_din;
-wire        [1:0] ram_wen;
-wire [`ROM_MSB:0] rom_addr;
-wire       [15:0] rom_din_dbg;
-wire        [1:0] rom_wen_dbg;
-wire       [13:0] irq_acc;
+wire         [7:0] per_addr;
+wire        [15:0] per_din;
+wire         [1:0] per_wen;
+wire [`DMEM_MSB:0] dmem_addr;
+wire        [15:0] dmem_din;
+wire         [1:0] dmem_wen;
+wire [`PMEM_MSB:0] pmem_addr;
+wire        [15:0] pmem_din;
+wire         [1:0] pmem_wen;
+wire        [13:0] irq_acc;
 
 // openMSP430 input buses
-wire 	   [13:0] irq_bus;
-wire       [15:0] per_dout;
-wire       [15:0] ram_dout;
-wire       [15:0] rom_dout;
+wire   	    [13:0] irq_bus;
+wire        [15:0] per_dout;
+wire        [15:0] dmem_dout;
+wire        [15:0] pmem_dout;
 
 // GPIO
-wire        [7:0] p1_din;
-wire        [7:0] p1_dout;
-wire        [7:0] p1_dout_en;
-wire        [7:0] p1_sel;
-wire        [7:0] p2_din;
-wire        [7:0] p2_dout;
-wire        [7:0] p2_dout_en;
-wire        [7:0] p2_sel;
-wire        [7:0] p3_din;
-wire        [7:0] p3_dout;
-wire        [7:0] p3_dout_en;
-wire        [7:0] p3_sel;
-wire       [15:0] per_dout_dio;
+wire         [7:0] p1_din;
+wire         [7:0] p1_dout;
+wire         [7:0] p1_dout_en;
+wire         [7:0] p1_sel;
+wire         [7:0] p2_din;
+wire         [7:0] p2_dout;
+wire         [7:0] p2_dout_en;
+wire         [7:0] p2_sel;
+wire         [7:0] p3_din;
+wire         [7:0] p3_dout;
+wire         [7:0] p3_dout_en;
+wire         [7:0] p3_sel;
+wire        [15:0] per_dout_dio;
 
 // Timer A
-wire       [15:0] per_dout_tA;
+wire        [15:0] per_dout_tA;
 
 // 7 segment driver
-wire       [15:0] per_dout_7seg;
+wire        [15:0] per_dout_7seg;
 
 // Others
-wire              reset_pin;
+wire               reset_pin;
 
 
 //=============================================================================
@@ -482,33 +482,33 @@ openMSP430 openMSP430_0 (
     .aclk_en      (aclk_en),      // ACLK enable
     .dbg_freeze   (dbg_freeze),   // Freeze peripherals
     .dbg_uart_txd (dbg_uart_txd), // Debug interface: UART TXD
+    .dmem_addr    (dmem_addr),    // Data Memory address
+    .dmem_cen     (dmem_cen),     // Data Memory chip enable (low active)
+    .dmem_din     (dmem_din),     // Data Memory data input
+    .dmem_wen     (dmem_wen),     // Data Memory write enable (low active)
     .irq_acc      (irq_acc),      // Interrupt request accepted (one-hot signal)
     .mclk         (mclk),         // Main system clock
     .per_addr     (per_addr),     // Peripheral address
     .per_din      (per_din),      // Peripheral data input
     .per_wen      (per_wen),      // Peripheral write enable (high active)
     .per_en       (per_en),       // Peripheral enable (high active)
+    .pmem_addr    (pmem_addr),    // Program Memory address
+    .pmem_cen     (pmem_cen),     // Program Memory chip enable (low active)
+    .pmem_din     (pmem_din),     // Program Memory data input (optional)
+    .pmem_wen     (pmem_wen),     // Program Memory write enable (low active) (optional)
     .puc          (puc),          // Main system reset
-    .ram_addr     (ram_addr),     // RAM address
-    .ram_cen      (ram_cen),      // RAM chip enable (low active)
-    .ram_din      (ram_din),      // RAM data input
-    .ram_wen      (ram_wen),      // RAM write enable (low active)
-    .rom_addr     (rom_addr),     // ROM address
-    .rom_cen      (rom_cen),      // ROM chip enable (low active)
-    .rom_din_dbg  (rom_din_dbg),  // ROM data input --FOR DEBUG INTERFACE--
-    .rom_wen_dbg  (rom_wen_dbg),  // ROM write enable (low active) --FOR DBG IF--
     .smclk_en     (smclk_en),     // SMCLK enable
 
 // INPUTs
     .dbg_uart_rxd (dbg_uart_rxd), // Debug interface: UART RXD
     .dco_clk      (clk_sys),      // Fast oscillator (fast clock)
+    .dmem_dout    (dmem_dout),    // Data Memory data output
     .irq          (irq_bus),      // Maskable interrupts
     .lfxt_clk     (1'b0),         // Low frequency oscillator (typ 32kHz)
     .nmi          (nmi),          // Non-maskable interrupt (asynchronous)
     .per_dout     (per_dout),     // Peripheral data output
-    .ram_dout     (ram_dout),     // RAM data output
-    .reset_n      (reset_n),      // Reset Pin (low active)
-    .rom_dout     (rom_dout)      // ROM data output
+    .pmem_dout    (pmem_dout),    // Program Memory data output
+    .reset_n      (reset_n)       // Reset Pin (low active)
 );
 
 
@@ -520,12 +520,12 @@ openMSP430 openMSP430_0 (
 // Digital I/O
 //-------------------------------
 
-gpio #(.P1_EN(1),
-       .P2_EN(1),
-       .P3_EN(1),
-       .P4_EN(0),
-       .P5_EN(0),
-       .P6_EN(0)) gpio_0 (
+omsp_gpio #(.P1_EN(1),
+            .P2_EN(1),
+            .P3_EN(1),
+            .P4_EN(0),
+            .P5_EN(0),
+            .P6_EN(0)) gpio_0 (
 
 // OUTPUTs
     .irq_port1    (irq_port1),     // Port 1 interrupt
@@ -569,7 +569,7 @@ gpio #(.P1_EN(1),
 // Timer A
 //----------------------------------------------
 
-timerA timerA_0 (
+omsp_timerA timerA_0 (
 
 // OUTPUTs
     .irq_ta0      (irq_ta0),       // Timer A interrupt: TACCR0
@@ -774,45 +774,45 @@ io_mux #8 io_mux_p2 (
 
 
 //=============================================================================
-// 6)  RAM / ROM
+// 6)  PROGRAM AND DATA MEMORIES
 //=============================================================================
 
-// RAM
+// Data Memory
 ram_8x512_hi ram_8x512_hi_0 (
-    .addr         (ram_addr),
+    .addr         (dmem_addr),
     .clk          (clk_sys),
-    .din          (ram_din[15:8]),
-    .dout         (ram_dout[15:8]),
-    .en           (ram_cen),
-    .we           (ram_wen[1])
+    .din          (dmem_din[15:8]),
+    .dout         (dmem_dout[15:8]),
+    .en           (dmem_cen),
+    .we           (dmem_wen[1])
 );
 ram_8x512_lo ram_8x512_lo_0 (
-    .addr         (ram_addr),
+    .addr         (dmem_addr),
     .clk          (clk_sys),
-    .din          (ram_din[7:0]),
-    .dout         (ram_dout[7:0]),
-    .en           (ram_cen),
-    .we           (ram_wen[0])
+    .din          (dmem_din[7:0]),
+    .dout         (dmem_dout[7:0]),
+    .en           (dmem_cen),
+    .we           (dmem_wen[0])
 );
 
 
-// ROM
+// Program Memory
 rom_8x2k_hi rom_8x2k_hi_0 (
-    .addr         (rom_addr),
+    .addr         (pmem_addr),
     .clk          (clk_sys),
-    .din          (rom_din_dbg[15:8]),
-    .dout         (rom_dout[15:8]),
-    .en           (rom_cen),
-    .we           (rom_wen_dbg[1])
+    .din          (pmem_din[15:8]),
+    .dout         (pmem_dout[15:8]),
+    .en           (pmem_cen),
+    .we           (pmem_wen[1])
 );
 
 rom_8x2k_lo rom_8x2k_lo_0 (
-    .addr         (rom_addr),
+    .addr         (pmem_addr),
     .clk          (clk_sys),
-    .din          (rom_din_dbg[7:0]),
-    .dout         (rom_dout[7:0]),
-    .en           (rom_cen),
-    .we           (rom_wen_dbg[0])
+    .din          (pmem_din[7:0]),
+    .dout         (pmem_dout[7:0]),
+    .en           (pmem_cen),
+    .we           (pmem_wen[0])
 );
 
 

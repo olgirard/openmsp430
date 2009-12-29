@@ -55,7 +55,7 @@ if [ ! -e $1 ]; then
     exit 1
 fi
 if [ ! -e $2 ]; then
-    echo "ROM memory file $2 doesn't exist"
+    echo "Memory file $2 doesn't exist"
     exit 1
 fi
 if [ ! -e $3 ]; then

@@ -73,7 +73,7 @@ fi
 #                               Cleanup                                       #
 ###############################################################################
 echo "Cleanup..."
-rm -rf rom.*
+rm -rf pmem.*
 rm -rf stimulus.v
 
 
@@ -90,26 +90,26 @@ make
 cd ../../sim/rtl_sim/run/
 
 # Create links
-ln -s $elffile rom.elf
+ln -s $elffile pmem.elf
 ln -s $verfile stimulus.v
 
 # Make local copy of the openMSP403 configuration file and remove comments
-cp  $incfile  ./rom.inc
-sed -i "/^\/\// s,.*,," rom.inc
+cp  $incfile  ./pmem.inc
+sed -i "/^\/\// s,.*,," pmem.inc
 
-# Get ROM size
-romsize=`grep ROM_AWIDTH rom.inc | grep -v ROM_MSB | grep -v ROM_SIZE`
-romsize=${romsize##* }
-romsize=$((2<<$romsize))
+# Get Program memory size
+pmemsize=`grep PMEM_AWIDTH pmem.inc | grep -v PMEM_MSB | grep -v PMEM_SIZE`
+pmemsize=${pmemsize##* }
+pmemsize=$((2<<$pmemsize))
 
 # Create IHEX file from ELF
 echo "Convert ELF file to IHEX format..."
-msp430-objcopy -O ihex  rom.elf rom.ihex
+msp430-objcopy -O ihex  pmem.elf pmem.ihex
 
-# Generate ROM memory file
+# Generate Program memory file
 echo "Convert IHEX file to Verilog MEMH format..."
-../bin/ihex2mem.tcl -ihex rom.ihex -out rom.mem -mem_size $romsize
+../bin/ihex2mem.tcl -ihex pmem.ihex -out pmem.mem -mem_size $pmemsize
 
 # Start verilog simulation
 echo "Start Verilog simulation..."
-../bin/rtlsim.sh    stimulus.v rom.mem $submitfile
+../bin/rtlsim.sh    stimulus.v pmem.mem $submitfile

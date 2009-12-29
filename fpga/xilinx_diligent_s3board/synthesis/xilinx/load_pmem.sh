@@ -40,5 +40,5 @@ rm -f ./WORK/$1.bit
 cp -f $elffile ./WORK/
 
 cd ./WORK
-data2mem -bm ../memory.bmm -bd $1.elf -bt openMSP430_fpga_top.bit -o b $1.bit
+data2mem -bm ../memory.bmm -bd $1.elf -bt openMSP430_fpga.bit -o b $1.bit
 cd ../

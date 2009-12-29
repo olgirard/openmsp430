@@ -63,19 +63,19 @@
 
 +incdir+../../../rtl/verilog/openmsp430/
 ../../../rtl/verilog/openmsp430/openMSP430.v
-../../../rtl/verilog/openmsp430/frontend.v
-../../../rtl/verilog/openmsp430/execution_unit.v
-../../../rtl/verilog/openmsp430/register_file.v
-../../../rtl/verilog/openmsp430/alu.v
-../../../rtl/verilog/openmsp430/mem_backbone.v
-../../../rtl/verilog/openmsp430/clock_module.v
-../../../rtl/verilog/openmsp430/sfr.v
-../../../rtl/verilog/openmsp430/dbg.v
-../../../rtl/verilog/openmsp430/dbg_hwbrk.v
-../../../rtl/verilog/openmsp430/dbg_uart.v
-../../../rtl/verilog/openmsp430/watchdog.v
-../../../rtl/verilog/openmsp430/periph/gpio.v
-../../../rtl/verilog/openmsp430/periph/timerA.v
+../../../rtl/verilog/openmsp430/omsp_frontend.v
+../../../rtl/verilog/openmsp430/omsp_execution_unit.v
+../../../rtl/verilog/openmsp430/omsp_register_file.v
+../../../rtl/verilog/openmsp430/omsp_alu.v
+../../../rtl/verilog/openmsp430/omsp_mem_backbone.v
+../../../rtl/verilog/openmsp430/omsp_clock_module.v
+../../../rtl/verilog/openmsp430/omsp_sfr.v
+../../../rtl/verilog/openmsp430/omsp_dbg.v
+../../../rtl/verilog/openmsp430/omsp_dbg_hwbrk.v
+../../../rtl/verilog/openmsp430/omsp_dbg_uart.v
+../../../rtl/verilog/openmsp430/omsp_watchdog.v
+../../../rtl/verilog/openmsp430/periph/omsp_gpio.v
+../../../rtl/verilog/openmsp430/periph/omsp_timerA.v
 
 
 //=============================================================================

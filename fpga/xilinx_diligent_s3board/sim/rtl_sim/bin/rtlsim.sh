@@ -40,8 +40,8 @@
 EXPECTED_ARGS=3
 if [ $# -ne $EXPECTED_ARGS ]; then
   echo "ERROR    : wrong number of arguments"
-  echo "USAGE    : rtlsim.sh <verilog stimulus file> <rom file> <submit file>"
-  echo "Example  : rtlsim.sh ./stimulus.v            rom.mem    ../src/submit.f"
+  echo "USAGE    : rtlsim.sh <verilog stimulus file> <memory file> <submit file>"
+  echo "Example  : rtlsim.sh ./stimulus.v            pmem.mem    ../src/submit.f"
   exit 1
 fi
 
@@ -55,7 +55,7 @@ if [ ! -e $1 ]; then
     exit 1
 fi
 if [ ! -e $2 ]; then
-    echo "ROM memory file $2 doesn't exist"
+    echo "Memory file $2 doesn't exist"
     exit 1
 fi
 if [ ! -e $3 ]; then

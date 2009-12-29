@@ -117,19 +117,19 @@ reg               stimulus_done;
 `include "stimulus.v"
 
 //
-// Initialize ROM
+// Initialize Program Memory
 //------------------------------
 
 initial
    begin
       // Read memory file
-      $readmemh("./rom.mem", rom_mem);
+      $readmemh("./pmem.mem", pmem);
 
       // Update Xilinx memory banks
       for (i=0; i<2048; i=i+1)
 	begin
-	   dut.rom_8x2k_hi_0.inst.mem[i] = rom_mem[i][15:8];
-	   dut.rom_8x2k_lo_0.inst.mem[i] = rom_mem[i][7:0];
+	   dut.rom_8x2k_hi_0.inst.mem[i] = pmem[i][15:8];
+	   dut.rom_8x2k_lo_0.inst.mem[i] = pmem[i][7:0];
 	end
   end
 
