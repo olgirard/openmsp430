@@ -129,25 +129,25 @@ wire       [15:0] r15   = dut.openMSP430_0.execution_unit_0.register_file_0.r15;
 
 // ROM cells
 //======================
-reg   [15:0] rom_mem [2047:0];
+reg   [15:0] pmem [2047:0];
 
 // Interrupt vectors
-wire  [15:0] irq_vect_15 = rom_mem[(1<<(`ROM_MSB+1))-1];  // RESET Vector
-wire  [15:0] irq_vect_14 = rom_mem[(1<<(`ROM_MSB+1))-2];  // NMI
-wire  [15:0] irq_vect_13 = rom_mem[(1<<(`ROM_MSB+1))-3];  // IRQ 13
-wire  [15:0] irq_vect_12 = rom_mem[(1<<(`ROM_MSB+1))-4];  // IRQ 12
-wire  [15:0] irq_vect_11 = rom_mem[(1<<(`ROM_MSB+1))-5];  // IRQ 11
-wire  [15:0] irq_vect_10 = rom_mem[(1<<(`ROM_MSB+1))-6];  // IRQ 10
-wire  [15:0] irq_vect_09 = rom_mem[(1<<(`ROM_MSB+1))-7];  // IRQ  9
-wire  [15:0] irq_vect_08 = rom_mem[(1<<(`ROM_MSB+1))-8];  // IRQ  8
-wire  [15:0] irq_vect_07 = rom_mem[(1<<(`ROM_MSB+1))-9];  // IRQ  7
-wire  [15:0] irq_vect_06 = rom_mem[(1<<(`ROM_MSB+1))-10]; // IRQ  6
-wire  [15:0] irq_vect_05 = rom_mem[(1<<(`ROM_MSB+1))-11]; // IRQ  5
-wire  [15:0] irq_vect_04 = rom_mem[(1<<(`ROM_MSB+1))-12]; // IRQ  4
-wire  [15:0] irq_vect_03 = rom_mem[(1<<(`ROM_MSB+1))-13]; // IRQ  3
-wire  [15:0] irq_vect_02 = rom_mem[(1<<(`ROM_MSB+1))-14]; // IRQ  2
-wire  [15:0] irq_vect_01 = rom_mem[(1<<(`ROM_MSB+1))-15]; // IRQ  1
-wire  [15:0] irq_vect_00 = rom_mem[(1<<(`ROM_MSB+1))-16]; // IRQ  0
+wire  [15:0] irq_vect_15 = pmem[(1<<(`PMEM_MSB+1))-1];  // RESET Vector
+wire  [15:0] irq_vect_14 = pmem[(1<<(`PMEM_MSB+1))-2];  // NMI
+wire  [15:0] irq_vect_13 = pmem[(1<<(`PMEM_MSB+1))-3];  // IRQ 13
+wire  [15:0] irq_vect_12 = pmem[(1<<(`PMEM_MSB+1))-4];  // IRQ 12
+wire  [15:0] irq_vect_11 = pmem[(1<<(`PMEM_MSB+1))-5];  // IRQ 11
+wire  [15:0] irq_vect_10 = pmem[(1<<(`PMEM_MSB+1))-6];  // IRQ 10
+wire  [15:0] irq_vect_09 = pmem[(1<<(`PMEM_MSB+1))-7];  // IRQ  9
+wire  [15:0] irq_vect_08 = pmem[(1<<(`PMEM_MSB+1))-8];  // IRQ  8
+wire  [15:0] irq_vect_07 = pmem[(1<<(`PMEM_MSB+1))-9];  // IRQ  7
+wire  [15:0] irq_vect_06 = pmem[(1<<(`PMEM_MSB+1))-10]; // IRQ  6
+wire  [15:0] irq_vect_05 = pmem[(1<<(`PMEM_MSB+1))-11]; // IRQ  5
+wire  [15:0] irq_vect_04 = pmem[(1<<(`PMEM_MSB+1))-12]; // IRQ  4
+wire  [15:0] irq_vect_03 = pmem[(1<<(`PMEM_MSB+1))-13]; // IRQ  3
+wire  [15:0] irq_vect_02 = pmem[(1<<(`PMEM_MSB+1))-14]; // IRQ  2
+wire  [15:0] irq_vect_01 = pmem[(1<<(`PMEM_MSB+1))-15]; // IRQ  1
+wire  [15:0] irq_vect_00 = pmem[(1<<(`PMEM_MSB+1))-16]; // IRQ  0
 
 
 // CPU internals

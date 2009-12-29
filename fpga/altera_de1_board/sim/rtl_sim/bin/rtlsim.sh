@@ -29,9 +29,9 @@
 #             - Olivier Girard,    olgirard@gmail.com
 #
 #------------------------------------------------------------------------------
-# $Rev: 16 $
+# $Rev: 37 $
 # $LastChangedBy: olivier.girard $
-# $LastChangedDate: 2009-08-04 23:03:47 +0200 (Tue, 04 Aug 2009) $
+# $LastChangedDate: 2009-12-29 21:58:14 +0100 (Tue, 29 Dec 2009) $
 #------------------------------------------------------------------------------
 
 ###############################################################################
@@ -40,8 +40,8 @@
 EXPECTED_ARGS=3
 if [ $# -ne $EXPECTED_ARGS ]; then
   echo "ERROR    : wrong number of arguments"
-  echo "USAGE    : rtlsim.sh <verilog stimulus file> <rom file> <submit file>"
-  echo "Example  : rtlsim.sh ./stimulus.v            rom.mem    ../src/submit.f"
+  echo "USAGE    : rtlsim.sh <verilog stimulus file> <memory file> <submit file>"
+  echo "Example  : rtlsim.sh ./stimulus.v            pmem.mem    ../src/submit.f"
   exit 1
 fi
 
@@ -55,7 +55,7 @@ if [ ! -e $1 ]; then
     exit 1
 fi
 if [ ! -e $2 ]; then
-    echo "ROM memory file $2 doesn't exist"
+    echo "Memory file $2 doesn't exist"
     exit 1
 fi
 if [ ! -e $3 ]; then

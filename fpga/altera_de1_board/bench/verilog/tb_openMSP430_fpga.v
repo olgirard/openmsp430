@@ -167,13 +167,13 @@ reg               stimulus_done;
 `include "stimulus.v"
 
 //
-// Initialize ROM
+// Initialize Program Memory
 //------------------------------
 
 initial
    begin
       // Read memory file
-      $readmemh("./rom.mem", rom_mem);
+      $readmemh("./pmem.mem", pmem);
   end
 
 //

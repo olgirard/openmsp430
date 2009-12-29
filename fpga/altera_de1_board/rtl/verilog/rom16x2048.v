@@ -78,7 +78,7 @@ module rom16x2048 (
 		altsyncram_component.clock_enable_input_a = "NORMAL",
 		altsyncram_component.clock_enable_output_a = "BYPASS",
 `ifdef OPENMSP430_SIMULATION
-		altsyncram_component.init_file = "./rom.mif",
+		altsyncram_component.init_file = "./pmem.mif",
 `else
 		altsyncram_component.init_file = "../../software/memledtest/memledtest.mif",
 `endif
