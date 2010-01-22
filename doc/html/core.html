@@ -55,7 +55,7 @@ In addition to the CPU core itself, several peripherals are also provided and ca
 
 The following diagram shows the openMSP430 design structure:
 <br /><br />
-<img src="getimg.php?1262105776" width="100%" height="100%" alt="CPU Structure" title="CPU Structure" />
+<img src="getimg.php?1262105776" width="100%" alt="CPU Structure" title="CPU Structure" />
 <br />
 <ul>
 	<li><b>Frontend</b>: This module performs the instruction Fetch and Decode tasks. It also contains the execution state machine.</li>
@@ -168,42 +168,190 @@ The full pinout of the openMSP430 core is provided in the following table:
 <br /><br />
 <table border="1">
 	<tr> <td align="center"><b>Port Name</b></td> <td align="center"><b>Direction</b></td> <td align="center"><b>Width</b>    </td> <td align="center"><b>Description</b></td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Clocks</i></b>  </td></tr>
-	<tr> <td> dco_clk        </td> <td>  Input         </td> <td>       1        </td> <td> Fast oscillator (fast clock), CPU clock     </td> </tr>
-	<tr> <td> lfxt_clk       </td> <td>  Input         </td> <td>       1        </td> <td> Low frequency oscillator (typ. 32kHz)        </td> </tr>
-	<tr> <td> mclk           </td> <td>  Output        </td> <td>       1        </td> <td> Main system clock                           </td> </tr>
-	<tr> <td> aclk_en        </td> <td>  Output        </td> <td>       1        </td> <td> ACLK enable                                 </td> </tr>
-	<tr> <td> smclk_en       </td> <td>  Output        </td> <td>       1        </td> <td> SMCLK enable                                </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Resets</i></b>  </td></tr>
-	<tr> <td> puc            </td> <td>  Output        </td> <td>       1        </td> <td> Main system reset                           </td> </tr>
-	<tr> <td> reset_n        </td> <td>  Input         </td> <td>       1        </td> <td> Reset Pin (low active)                      </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Interrupts</i></b>  </td></tr>
-	<tr> <td> irq            </td> <td>  Input         </td> <td>      14        </td> <td> Maskable interrupts (one-hot signal)        </td> </tr>
-	<tr> <td> nmi            </td> <td>  Input         </td> <td>       1        </td> <td> Non-maskable interrupt (asynchronous)       </td> </tr>
-	<tr> <td> irq_acc        </td> <td>  Output        </td> <td>      14        </td> <td> Interrupt request accepted (one-hot signal) </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>External Peripherals interface</i></b>  </td></tr>
-	<tr> <td> per_addr       </td> <td>  Output        </td> <td>       8        </td> <td> Peripheral address                          </td> </tr>
-	<tr> <td> per_din        </td> <td>  Output        </td> <td>      16        </td> <td> Peripheral data input                       </td> </tr>
-	<tr> <td> per_dout       </td> <td>  Input         </td> <td>      16        </td> <td> Peripheral data output                      </td> </tr>
-	<tr> <td> per_en         </td> <td>  Output        </td> <td>       1        </td> <td> Peripheral enable (high active)             </td> </tr>
-	<tr> <td> per_wen        </td> <td>  Output        </td> <td>       2        </td> <td> Peripheral write enable (high active)       </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Data Memory interface</i></b>  </td></tr>
-	<tr> <td> dmem_addr       </td> <td>  Output        </td> <td> `DMEM_AWIDTH<sup>1</sup> </td> <td> Data Memory address                                 </td> </tr>
-	<tr> <td> dmem_cen        </td> <td>  Output        </td> <td>       1        </td> <td> Data Memory chip enable (low active)                </td> </tr>
-	<tr> <td> dmem_din        </td> <td>  Output        </td> <td>      16        </td> <td> Data Memory data input                              </td> </tr>
-	<tr> <td> dmem_dout       </td> <td>  Input         </td> <td>      16        </td> <td> Data Memory data output                             </td> </tr>
-	<tr> <td> dmem_wen        </td> <td>  Output        </td> <td>       2        </td> <td> Data Memory write enable (low active)               </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Program Memory interface</i></b>  </td></tr>
-	<tr> <td> pmem_addr       </td> <td>  Output        </td> <td> `PMEM_AWIDTH<sup>1</sup> </td> <td> Program Memory address                                 </td> </tr>
-	<tr> <td> pmem_cen        </td> <td>  Output        </td> <td>       1        </td> <td> Program Memory chip enable (low active)                </td> </tr>
-	<tr> <td> pmem_din        </td> <td>  Output        </td> <td>      16        </td> <td> Program Memory data input (optional<sup>2</sup>)     </td> </tr>
-	<tr> <td> pmem_dout       </td> <td>  Input         </td> <td>      16        </td> <td> Program Memory data output                             </td> </tr>
-	<tr> <td> pmem_wen        </td> <td>  Output        </td> <td>       2        </td> <td> Program Memory write enable (low active) (optional<sup>2</sup>)</td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Serial Debug interface</i></b>  </td></tr>
-	<tr> <td> dbg_freeze     </td> <td>  Output        </td> <td>       1        </td> <td> Freeze peripherals                          </td> </tr>
-	<tr> <td> dbg_uart_txd   </td> <td>  Output        </td> <td>       1        </td> <td> Debug interface: UART TXD                   </td> </tr>
-	<tr> <td> dbg_uart_rxd   </td> <td>  Input         </td> <td>       1        </td> <td> Debug interface: UART RXD                   </td> </tr>
-      </table> 
+	
+	<tr> <td colspan="4" align="center"> <b><i>Clocks</i></b>                         </td></tr>
+	<tr>
+	     <td> dco_clk                                                          </td>
+	     <td> Input                                                            </td>
+	     <td> 1                                                                </td>
+	     <td> Fast oscillator (fast clock), CPU clock                          </td>
+	</tr> 
+	<tr>
+	     <td> lfxt_clk                                                         </td>
+	     <td> Input                                                            </td>
+	     <td> 1                                                                </td>
+	     <td> Low frequency oscillator (typ. 32kHz)                            </td>
+   </tr>
+	<tr>
+	     <td> mclk                                                             </td>
+	     <td> Output                                                           </td>
+	     <td> 1                                                                </td>
+	     <td> Main system clock                                                </td>
+	</tr>
+	<tr>
+	     <td> aclk_en                                                          </td>
+	     <td> Output                                                           </td>
+	     <td> 1                                                                </td>
+	     <td> ACLK enable                                                      </td>
+   </tr>
+	<tr>
+	     <td> smclk_en                                                         </td>
+	     <td> Output                                                           </td>
+	     <td> 1                                                                </td>
+	     <td> SMCLK enable                                                     </td>
+   </tr>
+
+	<tr> <td colspan="4" align="center"> <b><i>Resets</i></b>                         </td></tr>
+	<tr>
+	     <td> puc                                                              </td>
+	     <td> Output                                                           </td>
+	     <td> 1                                                                </td>
+	     <td> Main system reset                                                </td>
+   </tr>
+	<tr>
+	     <td> reset_n                                                          </td>
+	     <td> Input                                                            </td>
+	     <td> 1                                                                </td>
+	     <td> Reset Pin (low active)                                           </td>
+	</tr>
+
+
+	<tr> <td colspan="4" align="center"> <b><i>Program Memory interface</i></b>       </td></tr>
+	<tr> 
+	     <td> pmem_addr                                                        </td>
+	     <td> Output                                                           </td>
+	     <td> `PMEM_AWIDTH<sup>1</sup>                                        </td>
+	     <td> Program Memory address                                           </td>
+	</tr>
+	<tr> 
+	     <td> pmem_cen                                                         </td>
+	     <td> Output                                                           </td>
+	     <td> 1                                                                </td>
+	     <td> Program Memory chip enable (low active)                          </td>
+	</tr>
+	<tr> 
+	     <td> pmem_din                                                         </td>
+	     <td> Output                                                           </td>
+	     <td> 16                                                               </td>
+	     <td> Program Memory data input (optional<sup>2</sup>)                </td>
+	</tr>
+	<tr> 
+	     <td> pmem_dout                                                        </td>
+	     <td> Input                                                            </td> 
+	     <td> 16                                                               </td>
+	     <td> Program Memory data output                                       </td>
+	</tr>
+	<tr> 
+	     <td> pmem_wen                                                         </td>
+	     <td> Output                                                           </td>
+	     <td> 2                                                                </td>
+	     <td> Program Memory write enable (low active) (optional<sup>2</sup>) </td>
+	</tr>
+
+	<tr> <td colspan="4" align="center"> <b><i>Data Memory interface</i></b>          </td></tr>
+	<tr>
+	     <td> dmem_addr                                                        </td>
+	     <td> Output                                                           </td>
+	     <td> `DMEM_AWIDTH<sup>1</sup>                                        </td>
+	     <td> Data Memory address                                              </td>
+	</tr>
+	<tr>
+	     <td> dmem_cen                                                         </td>
+	     <td> Output                                                           </td>
+	     <td> 1                                                                </td>
+	     <td> Data Memory chip enable (low active)                             </td>
+	</tr>
+	<tr>
+	     <td> dmem_din                                                         </td>
+	     <td> Output                                                           </td>
+	     <td> 16                                                               </td>
+	     <td> Data Memory data input                                           </td>
+	</tr>
+	<tr>
+	     <td> dmem_dout                                                        </td>
+	     <td> Input                                                            </td>
+	     <td> 16                                                               </td>
+	     <td> Data Memory data output                                          </td>
+	</tr>
+	<tr>
+	     <td> dmem_wen                                                         </td>
+	     <td> Output                                                           </td>
+	     <td> 2                                                                </td>
+	     <td> Data Memory write enable (low active)                            </td>
+	</tr>
+
+	<tr> <td colspan="4" align="center"> <b><i>External Peripherals interface</i></b> </td></tr>
+	<tr>
+	     <td> per_addr                                                         </td>
+	     <td> Output                                                           </td>
+	     <td> 8                                                                </td>
+	     <td> Peripheral address                                               </td>
+	</tr>
+	<tr>
+	     <td> per_din                                                          </td>
+	     <td> Output                                                           </td>
+	     <td> 16                                                               </td>
+	     <td> Peripheral data input                                            </td>
+   </tr>
+	<tr>
+	     <td> per_dout                                                         </td>
+	     <td> Input                                                            </td>
+	     <td> 16                                                               </td>
+	     <td> Peripheral data output                                           </td>
+	</tr>
+	<tr>
+	     <td> per_en                                                           </td>
+	     <td> Output                                                           </td>
+	     <td> 1                                                                </td>
+	     <td> Peripheral enable (high active)                                  </td>
+	</tr>
+	<tr>
+	     <td> per_wen                                                          </td>
+	     <td> Output                                                           </td>
+	     <td> 2                                                                </td>
+	     <td> Peripheral write enable (high active)                            </td>
+	</tr>
+
+	<tr> <td colspan="4" align="center"> <b><i>Interrupts</i></b>                     </td></tr>
+	<tr>
+		  <td> irq                                                              </td>
+		  <td> Input                                                            </td>
+		  <td> 14                                                               </td>
+		  <td> Maskable interrupts (one-hot signal)                             </td>
+   </tr>
+	<tr> 
+	     <td> nmi                                                              </td>
+	     <td> Input                                                            </td>
+	     <td> 1                                                                </td>
+	     <td> Non-maskable interrupt (asynchronous)                            </td>
+	</tr>
+	<tr>
+	     <td> irq_acc                                                          </td>
+	     <td> Output                                                           </td>
+	     <td> 14                                                               </td>
+	     <td> Interrupt request accepted (one-hot signal)                      </td>
+	</tr>
+
+	<tr> <td colspan="4" align="center"> <b><i>Serial Debug interface</i></b>         </td></tr>
+	<tr> 
+	     <td> dbg_freeze                                                       </td>
+	     <td> Output                                                           </td>
+	     <td> 1                                                                </td>
+	     <td> Freeze peripherals                                               </td>
+	</tr>
+	<tr> 
+	     <td> dbg_uart_txd                                                     </td>
+	     <td> Output                                                           </td>
+	     <td> 1                                                                </td>
+	     <td> Debug interface: UART TXD                                        </td>
+	</tr>
+	<tr> 
+	     <td> dbg_uart_rxd                                                     </td>
+	     <td> Input                                                            </td>
+	     <td> 1                                                                </td>
+	     <td> Debug interface: UART RXD                                        </td>
+	</tr>
+</table> 
 <br />
 <sup>1</sup>: This parameter is declared in the "openMSP430_defines.v" file and defines the RAM/ROM size.<br />
 <sup>2</sup>: These two optional ports can be connected whenever the program memory is a RAM. This will allow the user to load a program through the serial debug interface and to use software breakpoints.
