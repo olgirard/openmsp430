@@ -56,7 +56,7 @@ module  omsp_dbg (
     dbg_mem_din,                    // Debug unit Memory data input
     dbg_reg_din,                    // Debug unit CPU register data input
     dbg_uart_rxd,                   // Debug interface: UART RXD
-    decode,                         // Frontend decode instruction
+    decode_noirq,                   // Frontend decode instruction
     eu_mab,                         // Execution-Unit Memory address bus
     eu_mb_en,                       // Execution-Unit Memory bus enable
     eu_mb_wr,                       // Execution-Unit Memory bus write transfer
@@ -89,7 +89,7 @@ input               dbg_halt_st;    // Halt/Run status from CPU
 input        [15:0] dbg_mem_din;    // Debug unit Memory data input
 input        [15:0] dbg_reg_din;    // Debug unit CPU register data input
 input               dbg_uart_rxd;   // Debug interface: UART RXD
-input               decode;         // Frontend decode instruction
+input               decode_noirq;   // Frontend decode instruction
 input        [15:0] eu_mab;         // Execution-Unit Memory address bus
 input               eu_mb_en;       // Execution-Unit Memory bus enable
 input         [1:0] eu_mb_wr;       // Execution-Unit Memory bus write transfer
@@ -626,7 +626,7 @@ wire dbg_freeze = dbg_halt_st & cpu_ctl[`FRZ_BRK_EN];
    
 // Software break
 //--------------------------
-assign dbg_swbrk = (fe_mdb_in==`DBG_SWBRK_OP) & decode & cpu_ctl[`SW_BRK_EN];
+assign dbg_swbrk = (fe_mdb_in==`DBG_SWBRK_OP) & decode_noirq & cpu_ctl[`SW_BRK_EN];
 
 
 // Single step
