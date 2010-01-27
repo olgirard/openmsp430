@@ -42,7 +42,7 @@ module  omsp_frontend (
 
 // OUTPUTs
     dbg_halt_st,                   // Halt/Run status from CPU
-    decode,                        // Frontend decode instruction
+    decode_noirq,                  // Frontend decode instruction
     e_state,                       // Execution state
     exec_done,                     // Execution completed
     inst_ad,                       // Decoded Inst: destination addressing mode
@@ -83,7 +83,7 @@ module  omsp_frontend (
 // OUTPUTs
 //=========
 output              dbg_halt_st;   // Halt/Run status from CPU
-output              decode;        // Frontend decode instruction
+output              decode_noirq;  // Frontend decode instruction
 output        [3:0] e_state;       // Execution state
 output              exec_done;     // Execution completed
 output        [7:0] inst_ad;       // Decoded Inst: destination addressing mode
@@ -173,8 +173,9 @@ always @(posedge mclk or posedge puc)
   else     i_state  <= i_state_nxt;
 
 // Utility signals
-wire   decode      =  ((i_state==I_DEC) &  (exec_done | (e_state==`E_IDLE))) | irq_detect;
-wire   fetch       = ~((i_state==I_DEC) & ~(exec_done | (e_state==`E_IDLE))) & ~(e_state_nxt==`E_IDLE);
+wire   decode_noirq =  ((i_state==I_DEC) &  (exec_done | (e_state==`E_IDLE)));
+wire   decode       =  decode_noirq | irq_detect;
+wire   fetch        = ~((i_state==I_DEC) & ~(exec_done | (e_state==`E_IDLE))) & ~(e_state_nxt==`E_IDLE);
 
 // Debug interface cpu status
 reg    dbg_halt_st;

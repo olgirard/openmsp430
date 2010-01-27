@@ -202,7 +202,7 @@ initial
      stimulus_done = 1;
      irq           = 14'b0000;
      nmi           = 1'b0;
-     dbg_uart_rxd  = 1'b0;
+     dbg_uart_rxd  = 1'b1;
      dbg_uart_buf  = 16'h0000;
      p1_din        = 8'h00;
      p2_din        = 8'h00;

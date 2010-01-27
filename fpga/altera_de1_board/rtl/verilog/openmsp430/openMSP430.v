@@ -188,7 +188,7 @@ omsp_frontend frontend_0 (
 
 // OUTPUTs
     .dbg_halt_st  (dbg_halt_st),   // Halt/Run status from CPU
-    .decode       (decode),        // Frontend decode instruction
+    .decode_noirq (decode_noirq),  // Frontend decode instruction
     .e_state      (e_state),       // Execution state
     .exec_done    (exec_done),     // Execution completed
     .inst_ad      (inst_ad),       // Decoded Inst: destination addressing mode
@@ -407,7 +407,7 @@ omsp_dbg dbg_0 (
     .dbg_mem_din  (dbg_mem_din),   // Debug unit Memory data input
     .dbg_reg_din  (dbg_reg_din),   // Debug unit CPU register data input
     .dbg_uart_rxd (dbg_uart_rxd),  // Debug interface: UART RXD
-    .decode       (decode),        // Frontend decode instruction
+    .decode_noirq (decode_noirq),  // Frontend decode instruction
     .eu_mab       (eu_mab),        // Execution-Unit Memory address bus
     .eu_mb_en     (eu_mb_en),      // Execution-Unit Memory bus enable
     .eu_mb_wr     (eu_mb_wr),      // Execution-Unit Memory bus write transfer
