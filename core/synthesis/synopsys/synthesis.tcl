@@ -1,5 +1,4 @@
 
-
 #=============================================================================#
 #                           Read technology library                           #
 #=============================================================================#
@@ -60,9 +59,20 @@ redirect ./results/report.paths.max      {report_timing -path end  -delay max -m
 redirect ./results/report.full_paths.max {report_timing -path full -delay max -max_paths 5   -nworst 2}
 redirect ./results/report.paths.min      {report_timing -path end  -delay min -max_paths 200 -nworst 2}
 redirect ./results/report.full_paths.min {report_timing -path full -delay min -max_paths 5   -nworst 2}
-redirect ./results/report.area           {report_area}
 redirect ./results/report.refs           {report_reference}
+redirect ./results/report.area           {report_area}
 
+# Add NAND2 size equivalent report to the area report file
+if {[info exists NAND2_NAME]} {
+    set nand2_area [get_attribute [get_lib_cell $LIB_WC_NAME/$NAND2_NAME] area]
+    redirect -variable area {report_area}
+    regexp {Total cell area:\s+([^\n]+)\n} $area whole_match area
+    set nand2_eq [expr $area/$nand2_area]
+    set fp [open "./results/report.area" a]
+    puts $fp ""
+    puts $fp "NAND2 equivalent cell area: $nand2_eq"
+    close $fp
+}
 
 #=============================================================================#
 #                    Dump gate level netlist & final DDC file                 #

@@ -4,20 +4,18 @@
 #                                                                            #
 ##############################################################################
 
-#set CLOCK_PERIOD 50.0; #  20 MHz
 #set CLOCK_PERIOD 40.0; #  25 MHz
 #set CLOCK_PERIOD 30.0; #  33 MHz
-#set CLOCK_PERIOD 25.0; #  40 MHz
 set CLOCK_PERIOD 20.0; #  50 MHz
 #set CLOCK_PERIOD 15.0; #  66 MHz
 #set CLOCK_PERIOD 10.0; # 100 MHz
 #set CLOCK_PERIOD  8.0; # 125 MHz
 
 
-create_clock -name     "clock"                                \
+create_clock -name     "dco_clk"                              \
              -period   "$CLOCK_PERIOD"                        \
              -waveform "[expr $CLOCK_PERIOD/2] $CLOCK_PERIOD" \
-            [get_ports clock]
+             [get_ports dco_clk]
 
 
 ##############################################################################
@@ -27,8 +25,8 @@ create_clock -name     "clock"                                \
 ##############################################################################
 
 group_path -name REGOUT      -to   [all_outputs] 
-group_path -name REGIN       -from [remove_from_collection [all_inputs] [get_ports clock]]
-group_path -name FEEDTHROUGH -from [remove_from_collection [all_inputs] [get_ports clock]] -to [all_outputs]
+group_path -name REGIN       -from [remove_from_collection [all_inputs] [get_ports dco_clk]]
+group_path -name FEEDTHROUGH -from [remove_from_collection [all_inputs] [get_ports dco_clk]] -to [all_outputs]
 
 
 ##############################################################################
@@ -36,106 +34,149 @@ group_path -name FEEDTHROUGH -from [remove_from_collection [all_inputs] [get_por
 #                          BOUNDARY TIMINGS                                  #
 #                                                                            #
 ##############################################################################
-# NOTE: There are some path through between RAM and ROM signals.
-#       If required you might want to relax the constrains a bit.
+# NOTE: There are some path through between Program/Data memory signals
+#      which are limiting the maximum frequency achievable by the core.
+#       The memory constraints set on these interfaces are therefore quite
+#      critical regarding the achievable performance of the core.
+#       As a consequence, the constrains on the pmem_*/dmem_* signals must
+#      be set with some absolute values as they are specified by the targeted
+#      process RAM/ROM generator.
 
-#===============#
-# INPUT PORTS   #
-#===============#
+#================#
+# PROGRAM MEMORY #
+#================#
+
+set PMEM_DOUT_DLY    2.25
+
+set PMEM_ADDR_DLY    0.64
+set PMEM_CEN_DLY     0.63
+set PMEM_DIN_DLY     0.39
+set PMEM_WEN_DLY     0.44
+
+set_input_delay  $PMEM_DOUT_DLY            -max -clock "dco_clk"  [get_ports pmem_dout]
+set_input_delay  0                         -min -clock "dco_clk"  [get_ports pmem_dout]
+
+set_output_delay $PMEM_ADDR_DLY -add_delay -max -clock "dco_clk"  [get_ports pmem_addr]
+set_output_delay 0                         -min -clock "dco_clk"  [get_ports pmem_addr]
+
+set_output_delay $PMEM_CEN_DLY  -add_delay -max -clock "dco_clk"  [get_ports pmem_cen]
+set_output_delay 0                         -min -clock "dco_clk"  [get_ports pmem_cen]
+
+set_output_delay $PMEM_DIN_DLY  -add_delay -max -clock "dco_clk"  [get_ports pmem_din]
+set_output_delay 0                         -min -clock "dco_clk"  [get_ports pmem_din]
+
+set_output_delay $PMEM_WEN_DLY  -add_delay -max -clock "dco_clk"  [get_ports pmem_wen]
+set_output_delay 0                         -min -clock "dco_clk"  [get_ports pmem_wen]
+
+
+#================#
+# DATA MEMORY    #
+#================#
+
+set DMEM_DOUT_DLY    2.25
+
+set DMEM_ADDR_DLY    0.64
+set DMEM_CEN_DLY     0.63
+set DMEM_DIN_DLY     0.39
+set DMEM_WEN_DLY     0.44
+
+
+set_input_delay $DMEM_DOUT_DLY             -max -clock "dco_clk"  [get_ports dmem_dout]
+set_input_delay 0                          -min -clock "dco_clk"  [get_ports dmem_dout]
+
+set_output_delay $DMEM_ADDR_DLY -add_delay -max -clock "dco_clk"  [get_ports dmem_addr]
+set_output_delay 0                         -min -clock "dco_clk"  [get_ports dmem_addr]
+
+set_output_delay $DMEM_CEN_DLY  -add_delay -max -clock "dco_clk"  [get_ports dmem_cen]
+set_output_delay 0                         -min -clock "dco_clk"  [get_ports dmem_cen]
+
+set_output_delay $DMEM_DIN_DLY  -add_delay -max -clock "dco_clk"  [get_ports dmem_din]
+set_output_delay 0                         -min -clock "dco_clk"  [get_ports dmem_din]
+
+set_output_delay $DMEM_WEN_DLY  -add_delay -max -clock "dco_clk"  [get_ports dmem_wen]
+set_output_delay 0                         -min -clock "dco_clk"  [get_ports dmem_wen]
+
+
+#==========================#
+# REMAINING INPUT PORTS    #
+#==========================#
 
 set IRQ_DLY          [expr ($CLOCK_PERIOD/100) * 30]
-set NMI_DLY          [expr ($CLOCK_PERIOD/100) * 10]
-
 set PER_DOUT_DLY     [expr ($CLOCK_PERIOD/100) * 20]
-set RAM_DOUT_DLY     [expr ($CLOCK_PERIOD/100) * 20]
-set ROM_DOUT_DLY     [expr ($CLOCK_PERIOD/100) * 20]
-
-set RESET_N_DLY      [expr ($CLOCK_PERIOD/100) * 75]
 
 
-set_input_delay $IRQ_DLY       -max -clock "clock"             [get_ports irq]
-set_input_delay 0              -min -clock "clock"             [get_ports irq]
+set_input_delay $IRQ_DLY       -max -clock "dco_clk"  [get_ports irq]
+set_input_delay 0              -min -clock "dco_clk"  [get_ports irq]
 
-set_input_delay $NMI_DLY       -max -clock "clock"             [get_ports nmi]
-set_input_delay 0              -min -clock "clock"             [get_ports nmi]
-
-set_input_delay $PER_DOUT_DLY  -max -clock "clock"             [get_ports per_dout]
-set_input_delay 0              -min -clock "clock"             [get_ports per_dout]
-
-set_input_delay $RAM_DOUT_DLY  -max -clock "clock"             [get_ports ram_dout]
-set_input_delay 0              -min -clock "clock"             [get_ports ram_dout]
-
-set_input_delay $ROM_DOUT_DLY  -max -clock "clock"             [get_ports rom_dout]
-set_input_delay 0              -min -clock "clock"             [get_ports rom_dout]
-
-set_input_delay $RESET_N_DLY   -max -clock "clock" -clock_fall [get_ports reset_n]
-set_input_delay 0              -min -clock "clock" -clock_fall [get_ports reset_n]
+set_input_delay $PER_DOUT_DLY  -max -clock "dco_clk"  [get_ports per_dout]
+set_input_delay 0              -min -clock "dco_clk"  [get_ports per_dout]
 
 
-#===============#
-# OUTPUT PORTS  #
-#===============#
+#=========================#
+# REMAINING OUTPUT PORTS  #
+#=========================#
+
+set ACLK_EN_DLY      [expr ($CLOCK_PERIOD/100) * 85]
+set SMCLK_EN_DLY     [expr ($CLOCK_PERIOD/100) * 85]
+set DBG_FREEZE_DLY   [expr ($CLOCK_PERIOD/100) * 85]
+set IRQ_ACC_DLY      [expr ($CLOCK_PERIOD/100) * 60]
 
 set PER_ADDR_DLY     [expr ($CLOCK_PERIOD/100) * 25]
 set PER_DIN_DLY      [expr ($CLOCK_PERIOD/100) * 25]
 set PER_WEN_DLY      [expr ($CLOCK_PERIOD/100) * 25]
-set PER_8B_CEN_DLY   [expr ($CLOCK_PERIOD/100) * 25]
-set PER_16B_CEN_DLY  [expr ($CLOCK_PERIOD/100) * 25]
+set PER_EN_DLY       [expr ($CLOCK_PERIOD/100) * 25]
 
-set RAM_ADDR_DLY     [expr ($CLOCK_PERIOD/100) * 20]
-set RAM_CEN_DLY      [expr ($CLOCK_PERIOD/100) * 20]
-set RAM_DIN_DLY      [expr ($CLOCK_PERIOD/100) * 20]
-set RAM_WEN_DLY      [expr ($CLOCK_PERIOD/100) * 20]
-
-set ROM_ADDR_DLY     [expr ($CLOCK_PERIOD/100) * 20]
-set ROM_CEN_DLY      [expr ($CLOCK_PERIOD/100) * 20]
-
-set MRST_DLY         [expr ($CLOCK_PERIOD/100) * 75]
+set PUC_DLY          [expr ($CLOCK_PERIOD/100) * 75]
 
 
-set_output_delay $PER_ADDR_DLY     -add_delay -max -clock "clock"             [get_ports per_addr]
-set_output_delay 0                            -min -clock "clock"             [get_ports per_addr]
+set_output_delay $ACLK_EN_DLY    -add_delay -max -clock "dco_clk"             [get_ports aclk_en]
+set_output_delay 0                          -min -clock "dco_clk"             [get_ports aclk_en]
 
-set_output_delay $PER_DIN_DLY      -add_delay -max -clock "clock"             [get_ports per_din]
-set_output_delay 0                            -min -clock "clock"             [get_ports per_din]
+set_output_delay $SMCLK_EN_DLY   -add_delay -max -clock "dco_clk"             [get_ports smclk_en]
+set_output_delay 0                          -min -clock "dco_clk"             [get_ports smclk_en]
 
-set_output_delay $PER_WEN_DLY      -add_delay -max -clock "clock"             [get_ports per_wen]
-set_output_delay 0                            -min -clock "clock"             [get_ports per_wen]
+set_output_delay $DBG_FREEZE_DLY -add_delay -max -clock "dco_clk"             [get_ports dbg_freeze]
+set_output_delay 0                          -min -clock "dco_clk"             [get_ports dbg_freeze]
 
-set_output_delay $PER_8B_CEN_DLY   -add_delay -max -clock "clock"             [get_ports per_8b_cen]
-set_output_delay 0                            -min -clock "clock"             [get_ports per_8b_cen]
+set_output_delay $IRQ_ACC_DLY    -add_delay -max -clock "dco_clk"             [get_ports irq_acc]
+set_output_delay 0                          -min -clock "dco_clk"             [get_ports irq_acc]
 
-set_output_delay $PER_16B_CEN_DLY  -add_delay -max -clock "clock"             [get_ports per_16b_cen]
-set_output_delay 0                            -min -clock "clock"             [get_ports per_16b_cen]
 
-set_output_delay $RAM_ADDR_DLY     -add_delay -max -clock "clock"             [get_ports ram_addr]
-set_output_delay 0                            -min -clock "clock"             [get_ports ram_addr]
+set_output_delay $PER_ADDR_DLY   -add_delay -max -clock "dco_clk"             [get_ports per_addr]
+set_output_delay 0                          -min -clock "dco_clk"             [get_ports per_addr]
 
-set_output_delay $RAM_CEN_DLY      -add_delay -max -clock "clock"             [get_ports ram_cen]
-set_output_delay 0                            -min -clock "clock"             [get_ports ram_cen]
+set_output_delay $PER_DIN_DLY    -add_delay -max -clock "dco_clk"             [get_ports per_din]
+set_output_delay 0                          -min -clock "dco_clk"             [get_ports per_din]
 
-set_output_delay $RAM_DIN_DLY      -add_delay -max -clock "clock"             [get_ports ram_din]
-set_output_delay 0                            -min -clock "clock"             [get_ports ram_din]
+set_output_delay $PER_WEN_DLY    -add_delay -max -clock "dco_clk"             [get_ports per_wen]
+set_output_delay 0                          -min -clock "dco_clk"             [get_ports per_wen]
 
-set_output_delay $RAM_WEN_DLY      -add_delay -max -clock "clock"             [get_ports ram_wen]
-set_output_delay 0                            -min -clock "clock"             [get_ports ram_wen]
+set_output_delay $PER_EN_DLY     -add_delay -max -clock "dco_clk"             [get_ports per_en]
+set_output_delay 0                          -min -clock "dco_clk"             [get_ports per_en]
 
-set_output_delay $ROM_ADDR_DLY     -add_delay -max -clock "clock"             [get_ports rom_addr]
-set_output_delay 0                            -min -clock "clock"             [get_ports rom_addr]
-
-set_output_delay $ROM_CEN_DLY      -add_delay -max -clock "clock"             [get_ports rom_cen]
-set_output_delay 0                            -min -clock "clock"             [get_ports rom_cen]
-
-set_output_delay $MRST_DLY         -add_delay -max -clock "clock" -clock_fall [get_ports mrst]
-set_output_delay 0                            -min -clock "clock" -clock_fall [get_ports mrst]
+set_output_delay $PUC_DLY        -add_delay -max -clock "dco_clk" -clock_fall [get_ports puc]
+set_output_delay 0                          -min -clock "dco_clk" -clock_fall [get_ports puc]
 
 
 #========================#
 # FEEDTHROUGH EXCEPTIONS #
 #========================#
 
-#set_max_delay [expr 2.0 + $RAM_DOUT_DLY + $RAM_ADDR_DLY] \
-#              -from       [get_ports ram_dout]            \
-#              -to         [get_ports ram_addr]            \
+#set_max_delay [expr 2.0 + $DMEM_DOUT_DLY + $DMEM_ADDR_DLY] \
+#              -from       [get_ports dmem_dout]            \
+#              -to         [get_ports dmem_addr]            \
 #              -group_path FEEDTHROUGH
 
+
+#===============#
+# FALSE PATHS   #
+#===============#
+# The following signals are internaly synchronized to
+# the dco_clk domain and can be set as false path.
+
+set_false_path -from dbg_uart_rxd
+set_false_path -to   dbg_uart_txd
+
+set_false_path -from nmi
+set_false_path -from lfxt_clk
+set_false_path -from reset_n
