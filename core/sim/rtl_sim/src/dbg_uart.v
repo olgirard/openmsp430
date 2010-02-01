@@ -126,7 +126,14 @@ initial
 
       dbg_uart_wr(BRK0_CTL   ,  16'hffff);
       dbg_uart_rd(BRK0_CTL);
-      if (dbg_uart_buf !== 16'h001F)      tb_error("====== BRK0_CTL uncorrect =====");
+      if (`HWBRK_RANGE)
+	begin
+	   if (dbg_uart_buf !== 16'h001F)      tb_error("====== BRK0_CTL uncorrect =====");
+	end
+      else
+	begin
+	   if (dbg_uart_buf !== 16'h000F)      tb_error("====== BRK0_CTL uncorrect =====");
+	end
       dbg_uart_wr(BRK0_CTL   ,  16'h0000);
       dbg_uart_rd(BRK0_CTL);
       if (dbg_uart_buf !== 16'h0000)      tb_error("====== BRK0_CTL uncorrect =====");
@@ -158,7 +165,14 @@ initial
 
       dbg_uart_wr(BRK1_CTL   ,  16'hffff);
       dbg_uart_rd(BRK1_CTL);
-      if (dbg_uart_buf !== 16'h001F)      tb_error("====== BRK1_CTL uncorrect =====");
+      if (`HWBRK_RANGE)
+	begin
+	   if (dbg_uart_buf !== 16'h001F)      tb_error("====== BRK1_CTL uncorrect =====");
+	end
+      else
+	begin
+	   if (dbg_uart_buf !== 16'h000F)      tb_error("====== BRK1_CTL uncorrect =====");
+	end
       dbg_uart_wr(BRK1_CTL   ,  16'h0000);
       dbg_uart_rd(BRK1_CTL);
       if (dbg_uart_buf !== 16'h0000)      tb_error("====== BRK1_CTL uncorrect =====");
@@ -190,7 +204,14 @@ initial
 
       dbg_uart_wr(BRK2_CTL   ,  16'hffff);
       dbg_uart_rd(BRK2_CTL);
-      if (dbg_uart_buf !== 16'h001F)      tb_error("====== BRK2_CTL uncorrect =====");
+      if (`HWBRK_RANGE)
+	begin
+	   if (dbg_uart_buf !== 16'h001F)      tb_error("====== BRK2_CTL uncorrect =====");
+	end
+      else
+	begin
+	   if (dbg_uart_buf !== 16'h000F)      tb_error("====== BRK2_CTL uncorrect =====");
+	end
       dbg_uart_wr(BRK2_CTL   ,  16'h0000);
       dbg_uart_rd(BRK2_CTL);
       if (dbg_uart_buf !== 16'h0000)      tb_error("====== BRK2_CTL uncorrect =====");
@@ -222,7 +243,14 @@ initial
 
       dbg_uart_wr(BRK3_CTL   ,  16'hffff);
       dbg_uart_rd(BRK3_CTL);
-      if (dbg_uart_buf !== 16'h001F)      tb_error("====== BRK3_CTL uncorrect =====");
+      if (`HWBRK_RANGE)
+	begin
+	   if (dbg_uart_buf !== 16'h001F)      tb_error("====== BRK3_CTL uncorrect =====");
+	end
+      else
+	begin
+	   if (dbg_uart_buf !== 16'h000F)      tb_error("====== BRK3_CTL uncorrect =====");
+	end
       dbg_uart_wr(BRK3_CTL   ,  16'h0000);
       dbg_uart_rd(BRK3_CTL);
       if (dbg_uart_buf !== 16'h0000)      tb_error("====== BRK3_CTL uncorrect =====");

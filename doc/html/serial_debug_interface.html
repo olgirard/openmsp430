@@ -699,7 +699,9 @@ This 8 bit read-write register controls the hardware breakpoint unit x. After a 
 </tr>
 <tr>
    <td>&nbsp;</td><td>&nbsp;</td>
-   <td>&nbsp;&nbsp;1 - Address match on BRK_ADDR0&rarr;BRK_ADDR1 range (range mode)</td>
+   <td>&nbsp;&nbsp;1 - Address match on BRK_ADDR0&rarr;BRK_ADDR1 range (range mode)
+   <br /><font color="red"><b>Note</b>: range mode is not supported by the core unless the `HWBRK_RANGE define is set to 1'b1 in the <i>openMSP430_define.v</i> file.</font></td>
+</td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>INST_EN</b></li></td>
@@ -769,7 +771,8 @@ This 8 bit read-write register gives the status of the hardware breakpoint unit 
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>RANGE_RD</b></li></td>
-   <td>: This bit is set whenever the CPU performs a read access within the BRKx_ADDR0&rarr;BRKx_ADDR1 range (valid if RANGE_MODE=1 and ACCESS_MODE[0]=1).</td>
+   <td>: This bit is set whenever the CPU performs a read access within the BRKx_ADDR0&rarr;BRKx_ADDR1 range (valid if RANGE_MODE=1 and ACCESS_MODE[0]=1).
+   <br /><font color="red"><b>Note</b>: range mode is not supported by the core unless the `HWBRK_RANGE define is set to 1'b1 in the <i>openMSP430_define.v</i> file.</font></td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>ADDR1_WR</b></li></td>

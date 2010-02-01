@@ -109,6 +109,8 @@ initial
 
       // HARDWARE BREAKPOINTS: INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE
       //----------------------------------------------------------------------
+      if (`HWBRK_RANGE)
+	begin
      
       // RESET, BREAK & CLEAR STATUS
       dbg_uart_wr(CPU_CTL,    16'h0060);
@@ -133,7 +135,7 @@ initial
       dbg_uart_wr(BRK3_STAT, 16'h0010);
       dbg_uart_rd(CPU_STAT);
       if (dbg_uart_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE: test 5 =====");
-
+	end
       
      
       // HARDWARE BREAKPOINTS: DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ
@@ -390,6 +392,8 @@ initial
       
       // HARDWARE BREAKPOINTS: DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - READ
       //----------------------------------------------------------------------------
+      if (`HWBRK_RANGE)
+	begin
 
       // RESET, BREAK & CLEAR STATUS
       dbg_uart_wr(CPU_CTL,    16'h0060);
@@ -430,10 +434,13 @@ initial
       dbg_uart_wr(BRK3_STAT, 16'h0010);
       dbg_uart_rd(CPU_STAT);
       if (dbg_uart_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ: test 10 =====");
+	end
 
       
-      // HARDWARE BREAKPOINTS: DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - WRITE
+      // HARDWARE BREAKPOINTS: DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - WRITE
       //-----------------------------------------------------------------------------
+      if (`HWBRK_RANGE)
+	begin
 
       // RESET, BREAK & CLEAR STATUS
       dbg_uart_wr(CPU_CTL,    16'h0060);
@@ -450,79 +457,82 @@ initial
       repeat(100) @(posedge mclk);
 
       // CHECK
-      if (r0 !== 16'hf836)           tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - WRITE: test 1 =====");
-      if (mem200 !== 16'h0000)       tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - WRITE: test 2 =====");
+      if (r0 !== 16'hf836)           tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - WRITE: test 1 =====");
+      if (mem200 !== 16'h0000)       tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - WRITE: test 2 =====");
       dbg_uart_rd(CPU_STAT);
-      if (dbg_uart_buf !== 16'h0081) tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - WRITE: test 3 =====");
+      if (dbg_uart_buf !== 16'h0081) tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - WRITE: test 3 =====");
       dbg_uart_rd(BRK3_STAT);
-      if (dbg_uart_buf !== 16'h0020) tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - WRITE: test 4 =====");
+      if (dbg_uart_buf !== 16'h0020) tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - WRITE: test 4 =====");
       dbg_uart_wr(BRK3_STAT, 16'h0020);
       dbg_uart_rd(CPU_STAT);
-      if (dbg_uart_buf !== 16'h0001) tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - WRITE: test 5 =====");
+      if (dbg_uart_buf !== 16'h0001) tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - WRITE: test 5 =====");
      
       // RE-RUN
       dbg_uart_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
 
       // RE-CHECK
-      if (r0 !== 16'hf83a)           tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 6 =====");
-      if (mem200 !== 16'h0000)       tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 7 =====");
+      if (r0 !== 16'hf83a)           tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 6 =====");
+      if (mem200 !== 16'h0000)       tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 7 =====");
       dbg_uart_rd(CPU_STAT);
-      if (dbg_uart_buf !== 16'h0081) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 8 =====");
+      if (dbg_uart_buf !== 16'h0081) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 8 =====");
       dbg_uart_rd(BRK3_STAT);
-      if (dbg_uart_buf !== 16'h0020) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 9 =====");
+      if (dbg_uart_buf !== 16'h0020) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 9 =====");
       dbg_uart_wr(BRK3_STAT, 16'h0020);
       dbg_uart_rd(CPU_STAT);
-      if (dbg_uart_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 10 =====");
+      if (dbg_uart_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 10 =====");
 
       // RE-RUN
       dbg_uart_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
 
       // RE-CHECK
-      if (r0 !== 16'hf808)           tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 11 =====");
-      if (mem200 !== 16'h0000)       tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 12 =====");
+      if (r0 !== 16'hf808)           tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 11 =====");
+      if (mem200 !== 16'h0000)       tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 12 =====");
       dbg_uart_rd(CPU_STAT);
-      if (dbg_uart_buf !== 16'h0081) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 13 =====");
+      if (dbg_uart_buf !== 16'h0081) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 13 =====");
       dbg_uart_rd(BRK3_STAT);
-      if (dbg_uart_buf !== 16'h0020) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 14 =====");
+      if (dbg_uart_buf !== 16'h0020) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 14 =====");
       dbg_uart_wr(BRK3_STAT, 16'h0020);
       dbg_uart_rd(CPU_STAT);
-      if (dbg_uart_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 15 =====");
+      if (dbg_uart_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 15 =====");
 
       // RE-RUN
       dbg_uart_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
 
       // RE-CHECK
-      if (r0 !== 16'hf80C)           tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 16 =====");
-      if (mem200 !== 16'h0000)       tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 17 =====");
+      if (r0 !== 16'hf80C)           tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 16 =====");
+      if (mem200 !== 16'h0000)       tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 17 =====");
       dbg_uart_rd(CPU_STAT);
-      if (dbg_uart_buf !== 16'h0081) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 18 =====");
+      if (dbg_uart_buf !== 16'h0081) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 18 =====");
       dbg_uart_rd(BRK3_STAT);
-      if (dbg_uart_buf !== 16'h0020) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 19 =====");
+      if (dbg_uart_buf !== 16'h0020) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 19 =====");
       dbg_uart_wr(BRK3_STAT, 16'h0020);
       dbg_uart_rd(CPU_STAT);
-      if (dbg_uart_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 20 =====");
+      if (dbg_uart_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 20 =====");
 
       // RE-RUN
       dbg_uart_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
 
       // RE-CHECK
-      if (r0 !== 16'hf808)           tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 21 =====");
-      if (mem200 !== 16'h0001)       tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 22 =====");
+      if (r0 !== 16'hf808)           tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 21 =====");
+      if (mem200 !== 16'h0001)       tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 22 =====");
       dbg_uart_rd(CPU_STAT);
-      if (dbg_uart_buf !== 16'h0081) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 23 =====");
+      if (dbg_uart_buf !== 16'h0081) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 23 =====");
       dbg_uart_rd(BRK3_STAT);
-      if (dbg_uart_buf !== 16'h0020) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 24 =====");
+      if (dbg_uart_buf !== 16'h0020) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 24 =====");
       dbg_uart_wr(BRK3_STAT, 16'h0020);
       dbg_uart_rd(CPU_STAT);
-      if (dbg_uart_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 25 =====");
+      if (dbg_uart_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 25 =====");
+	end
 
- 
+      
       // HARDWARE BREAKPOINTS: DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - READ/WRITE
       //----------------------------------------------------------------------------------
+      if (`HWBRK_RANGE)
+	begin
 
       // RESET, BREAK & CLEAR STATUS
       dbg_uart_wr(CPU_CTL,    16'h0060);
@@ -624,6 +634,7 @@ initial
       dbg_uart_rd(CPU_STAT);
       if (dbg_uart_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 30 =====");
 
+	end
 
        // RE-RUN UNTIL END OF PATTERN
       dbg_uart_wr(BRK3_CTL,   16'h0000);
