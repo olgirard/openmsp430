@@ -280,6 +280,9 @@
 `define DBG_DCO_FREQ  20000000
 `define DBG_UART_CNT ((`DBG_DCO_FREQ/`DBG_UART_BAUD)-1)
 
+// Enable/Disable the hardware breakpoint RANGE mode
+`define HWBRK_RANGE 1'b0
+
 // Check configuration
 `ifdef DBG_EN
  `ifdef DBG_UART

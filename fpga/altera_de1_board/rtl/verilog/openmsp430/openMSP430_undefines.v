@@ -491,3 +491,8 @@
 `ifdef DBG_UART_CNT
 `undef DBG_UART_CNT
 `endif
+
+// Enable/Disable the hardware breakpoint RANGE mode
+`ifdef HWBRK_RANGE
+`undef HWBRK_RANGE
+`endif

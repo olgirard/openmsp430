@@ -133,7 +133,7 @@ wire        brk_ctl_wr = brk_reg_wr[BRK_CTL];
    
 always @ (posedge mclk or posedge por)
   if (por)             brk_ctl <=  5'h00;
-  else if (brk_ctl_wr) brk_ctl <=  dbg_din[4:0];
+  else if (brk_ctl_wr) brk_ctl <=  {`HWBRK_RANGE & dbg_din[4], dbg_din[3:0]};
 
 wire  [7:0] brk_ctl_full = {3'b000, brk_ctl};
 
@@ -146,7 +146,8 @@ wire  [7:0] brk_ctl_full = {3'b000, brk_ctl};
 reg   [5:0] brk_stat;
 
 wire        brk_stat_wr  = brk_reg_wr[BRK_STAT];
-wire  [5:0] brk_stat_set = {range_wr_set, range_rd_set,
+wire  [5:0] brk_stat_set = {range_wr_set & `HWBRK_RANGE,
+                            range_rd_set & `HWBRK_RANGE,
 			    addr1_wr_set, addr1_rd_set,
 			    addr0_wr_set, addr0_rd_set};
 wire  [5:0] brk_stat_clr = ~dbg_din[5:0];
@@ -208,7 +209,8 @@ wire [15:0] brk_dout = brk_ctl_rd   |
    
 wire        equ_d_addr0 = eu_mb_en & (eu_mab==brk_addr0) & ~brk_ctl[`BRK_RANGE];
 wire        equ_d_addr1 = eu_mb_en & (eu_mab==brk_addr1) & ~brk_ctl[`BRK_RANGE];
-wire        equ_d_range = eu_mb_en & ((eu_mab>=brk_addr0) & (eu_mab<=brk_addr1)) &  brk_ctl[`BRK_RANGE];
+wire        equ_d_range = eu_mb_en & ((eu_mab>=brk_addr0) & (eu_mab<=brk_addr1)) & 
+                          brk_ctl[`BRK_RANGE] & `HWBRK_RANGE;
 
 reg         fe_mb_en_buf;
 always @ (posedge mclk or posedge por)
@@ -217,7 +219,8 @@ always @ (posedge mclk or posedge por)
 
 wire        equ_i_addr0 = fe_mb_en_buf & (pc==brk_addr0) & ~brk_ctl[`BRK_RANGE];
 wire        equ_i_addr1 = fe_mb_en_buf & (pc==brk_addr1) & ~brk_ctl[`BRK_RANGE];
-wire        equ_i_range = fe_mb_en_buf & ((pc>=brk_addr0) & (pc<=brk_addr1))    &  brk_ctl[`BRK_RANGE];
+wire        equ_i_range = fe_mb_en_buf & ((pc>=brk_addr0) & (pc<=brk_addr1)) &
+                          brk_ctl[`BRK_RANGE] & `HWBRK_RANGE;
 
 
 // Detect accesses
