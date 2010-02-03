@@ -244,16 +244,11 @@ wire        nmi_acc     = irq_acc_all[14];
 // Program counter
 reg  [15:0] pc;
 
-// Detect if PC needs to be incremented
-wire        pc_inc = (~pc_sw_wr & fetch) & ~(i_state==I_IRQ_FETCH) & ~(i_state==I_IRQ_DONE);
-
-// Mux between software update and old PC
-wire [15:0] pc_sel  = pc_sw_wr               ? pc_sw    :
-                      (i_state==I_IRQ_FETCH) ? irq_addr :
-                      (i_state==I_IRQ_DONE)  ? mdb_in   :  pc;
-
 // Compute next PC value
-wire [15:0] pc_nxt  = pc_sel + {14'h0000, pc_inc, 1'b0};
+wire [15:0] pc_incr = pc + {14'h0000, fetch, 1'b0};
+wire [15:0] pc_nxt  = pc_sw_wr               ? pc_sw    :
+                      (i_state==I_IRQ_FETCH) ? irq_addr :
+                      (i_state==I_IRQ_DONE)  ? mdb_in   :  pc_incr;
 
 always @(posedge mclk or posedge puc)
   if (puc)  pc <= 16'h0000;
