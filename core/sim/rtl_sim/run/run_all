@@ -1,5 +1,9 @@
 !/bin/sh
 
+# Disable waveform dumping
+OMSP_NODUMP=1
+export OMSP_NODUMP
+
 rm -rf *.log
 
 # Two-Operand Arithmetic test patterns

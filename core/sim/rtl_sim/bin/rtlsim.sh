@@ -67,6 +67,15 @@ fi
 ###############################################################################
 #                         Start verilog simulation                            #
 ###############################################################################
+
 rm -rf simv
-iverilog -o simv -c $3
+
+NODUMP=${OMSP_NODUMP-0}
+if [ $NODUMP -eq 1 ]
+  then
+    iverilog -o simv -c $3 -D NODUMP
+  else
+    iverilog -o simv -c $3
+fi
+
 ./simv

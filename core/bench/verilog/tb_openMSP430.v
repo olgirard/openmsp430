@@ -471,12 +471,15 @@ msp_debug msp_debug_0 (
 //----------------------------------------
 initial
   begin
-   `ifdef VPD_FILE
-     $vcdplusfile("tb_openMSP430.vpd");
-     $vcdpluson();
+   `ifdef NODUMP
    `else
-     $dumpfile("tb_openMSP430.vcd");
-     $dumpvars(0, tb_openMSP430);
+     `ifdef VPD_FILE
+        $vcdplusfile("tb_openMSP430.vpd");
+        $vcdpluson();
+     `else
+        $dumpfile("tb_openMSP430.vcd");
+        $dumpvars(0, tb_openMSP430);
+     `endif
    `endif
   end
 
