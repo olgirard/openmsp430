@@ -29,7 +29,7 @@ To simplify the integration of this IP, the directory structure is based on the 
 
 <table border="1">
 	<tr><td colspan="5"><b>core</b></td>                                                                           <td><i><b>openMSP430 Core top level directory</b></i></td></tr>
-	<tr><td rowspan="72" valign="bottom"><font color="white">abcd</font></td> <td colspan="4"><b>bench</b></td>    <td><i><b>Top level testbench directory</b></i></td></tr>
+	<tr><td rowspan="80" valign="bottom"><font color="white">abcd</font></td> <td colspan="4"><b>bench</b></td>    <td><i><b>Top level testbench directory</b></i></td></tr>
 	<tr><td rowspan="6"  valign="bottom"><font color="white">abcd</font></td> <td colspan="3"><b>verilog</b></td>  <td><i></i></td></tr>
 	<tr><td rowspan="5"  valign="bottom"><font color="white">abcd</font></td> <td colspan="2">tb_openMSP430.v</td> <td><i>Testbench top level module</i></td></tr>
 	<tr><td colspan="2">ram.v</td>                                                                                 <td><i>RAM verilog model</i></td></tr>
@@ -39,8 +39,8 @@ To simplify the integration of this IP, the directory structure is based on the 
 	<tr><td colspan="4"><b>doc</b></td>                                                                            <td><i><b>Diverse documentation</b></i></td></tr>
 	<tr><td><font color="white">abcd</font></td> <td colspan="3">slau049f.pdf</td>                                 <td><i>MSP430x1xx Family User's Guide</i></td></tr>
 	<tr><td colspan="4"><b>rtl</b></td>                                                                            <td><i><b>RTL sources</b></i></td></tr>
-	<tr><td rowspan="21" valign="bottom"><font color="white">abcd</font></td><td colspan="3"><b>verilog</b></td>   <td><i></i></td></tr>
-	<tr><td rowspan="20" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">openMSP430_defines.v</td>  <td><i>openMSP430 core configuration file (Program and Data memory size definition, Debug Interface configuration)</i></td></tr>
+	<tr><td rowspan="22" valign="bottom"><font color="white">abcd</font></td><td colspan="3"><b>verilog</b></td>   <td><i></i></td></tr>
+	<tr><td rowspan="21" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">openMSP430_defines.v</td>  <td><i>openMSP430 core configuration file (Program and Data memory size definition, Debug Interface configuration)</i></td></tr>
 	<tr><td colspan="2">openMSP430_undefines.v</td>                                                                <td><i>openMSP430 Verilog `undef file</i></td></tr>
 	<tr><td colspan="2">openMSP430.v</td>                                                                          <td><i>openMSP430 top level</i></td></tr>
 	<tr><td colspan="2">omsp_frontend.v</td>                                                                       <td><i>Instruction fetch and decode</i></td></tr>
@@ -51,6 +51,7 @@ To simplify the integration of this IP, the directory structure is based on the 
 	<tr><td colspan="2">omsp_clock_module.v</td>                                                                   <td><i>Basic Clock Module</i></td></tr>
 	<tr><td colspan="2">omsp_sfr.v</td>                                                                            <td><i>Special function registers</i></td></tr>
 	<tr><td colspan="2">omsp_watchdog.v</td>                                                                       <td><i>Watchdog Timer</i></td></tr>
+	<tr><td colspan="2">omsp_multiplier.v</td>                                                                     <td><i>16x16 Hardware Multiplier</i></td></tr>
 	<tr><td colspan="2">omsp_dbg.v</td>                                                                            <td><i>Serial Debug Interface main block</i></td></tr>
 	<tr><td colspan="2">omsp_dbg_hwbrk.v</td>                                                                      <td><i>Serial Debug Interface hardware breakpoint unit</i></td></tr>
 	<tr><td colspan="2">omsp_dbg_uart.v</td>                                                                       <td><i>Serial Debug Interface UART communication block</i></td></tr>
@@ -61,8 +62,8 @@ To simplify the integration of this IP, the directory structure is based on the 
 	<tr><td colspan="1">template_periph_16b.v</td>                                                                 <td><i>Verilog template for 16 bit peripherals</i></td></tr>
 	<tr><td colspan="1">template_periph_8b.v</td>                                                                  <td><i>Verilog template for 8 bit peripherals</i></td></tr>
 	<tr><td colspan="4"><b>sim</b></td>                                                                            <td><i><b>Top level simulations directory</b></i></td></tr>
-	<tr><td rowspan="34" valign="bottom"><font color="white">abcd</font></td> <td colspan="3"><b>rtl_sim</b></td>  <td><i><b>RTL simulations</b></i></td></tr>
-	<tr><td rowspan="33" valign="bottom"><font color="white">abcd</font></td> <td colspan="2"><b>bin</b></td>      <td><i><b>RTL simulation scripts</b></i></td></tr>
+	<tr><td rowspan="36" valign="bottom"><font color="white">abcd</font></td> <td colspan="3"><b>rtl_sim</b></td>  <td><i><b>RTL simulations</b></i></td></tr>
+	<tr><td rowspan="35" valign="bottom"><font color="white">abcd</font></td> <td colspan="2"><b>bin</b></td>      <td><i><b>RTL simulation scripts</b></i></td></tr>
 	<tr><td rowspan="5"  valign="bottom"><font color="white">abcd</font></td> <td colspan="1">msp430sim</td>       <td><i>Main simulation script</i></td></tr>
 	<tr><td colspan="1">asm2ihex.sh</td>                                                                           <td><i>Assembly file compilation (Intel HEX file generation)</i></td></tr>
 	<tr><td colspan="1">ihex2mem.tcl</td>                                                                          <td><i>Verilog program memory file generation</i></td></tr>
@@ -74,7 +75,7 @@ To simplify the integration of this IP, the directory structure is based on the 
 	<tr><td colspan="1">run_disassemble</td>                                                                       <td><i>Disassemble the program memory content of the latest simulation</i></td></tr>
 	<tr><td colspan="1">load_waveform.sav</td>                                                                     <td><i>SAV file for gtkWave</i></td></tr>
 	<tr><td colspan="2"><b>src</b></td>                                                                            <td><i><b>RTL simulation vectors sources</b></i></td></tr>
-	<tr><td rowspan="21" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">submit.f</td>        <td><i>Verilog simulator command file</i></td></tr>
+	<tr><td rowspan="23" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">submit.f</td>        <td><i>Verilog simulator command file</i></td></tr>
 	<tr><td colspan="1">sing-op_*.s43</td>                                                                         <td><i>Single-operand assembler vector files</i></td></tr>
 	<tr><td colspan="1">sing-op_*.v</td>                                                                           <td><i>Single-operand verilog stimulus vector files</i></td></tr>
 	<tr><td colspan="1">two-op_*.s43</td>                                                                          <td><i>Two-operand assembler vector files</i></td></tr>
@@ -95,14 +96,19 @@ To simplify the integration of this IP, the directory structure is based on the 
 	<tr><td colspan="1">wdt_*.v</td>                                                                               <td><i>Watchdog timer verilog stimulus vector files</i></td></tr>
 	<tr><td colspan="1">tA_*.s43</td>                                                                              <td><i>Timer A assembler vector files</i></td></tr>
 	<tr><td colspan="1">tA_*.v</td>                                                                                <td><i>Timer A verilog stimulus vector files</i></td></tr>
-	<tr><td colspan="4"><b>synthesis</b></td>                                                                      <td><i><b>Top level synthesis directory</b></i></td></tr>
-	<tr><td rowspan="12" valign="bottom"><font color="white">abcd</font></td><td colspan="3"><b>synopsys</b></td>  <td><i>Synopsys (Design Compiler) directory</i></td></tr>
-	<tr><td rowspan="11" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">run_syn</td>         <td><i>Run synthesis</i></td></tr>
+	<tr><td colspan="1">mpy_*.s43</td>                                                                             <td><i>16x16 Multiplier assembler vector files</i></td></tr>
+	<tr><td colspan="1">mpy_*.v</td>                                                                               <td><i>16x16 Multiplier verilog stimulus vector files</i></td></tr>
+	<tr><td colspan="4"><b>synthesis</b></td>                                                                     <td><i><b>Top level synthesis directory</b></i></td></tr>
+	<tr><td rowspan="10" valign="bottom"><font color="white">abcd</font></td><td colspan="3"><b>synopsys</b></td><td><i>Synopsys (Design Compiler) directory</i></td></tr>
+	<tr><td rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">run_syn</td>        <td><i>Run synthesis</i></td></tr>
 	<tr><td colspan="2">synthesis.tcl</td>                                                                         <td><i>Main synthesis TCL script</i></td></tr>
 	<tr><td colspan="2">library.tcl</td>                                                                           <td><i>Load library, set operating conditions and wire load models</i></td></tr>
 	<tr><td colspan="2">read.tcl</td>                                                                              <td><i>Read RTL</i></td></tr>
 	<tr><td colspan="2">constraints.tcl</td>                                                                       <td><i>Set design constrains</i></td></tr>
-	<tr><td colspan="2"><b>results</b></td>                                                                        <td><i>Results directory</i></td></tr>
+	<tr><td colspan="2"><b>results</b></td>                                                                       <td><i>Results directory</i></td></tr>
+	<tr><td colspan="3"><b>actel</b></td>                                                                         <td><i>Actel synthesis setup for area & speed analysis</i></td></tr>
+	<tr><td colspan="3"><b>altera</b></td>                                                                        <td><i>Altera synthesis setup for area & speed analysis</i></td></tr>
+	<tr><td colspan="3"><b>xilinx</b></td>                                                                        <td><i>Xilinx synthesis setup for area & speed analysis</i></td></tr>
 </table> 
 <br />
 <a name="3. Directory structure: FGPA projects"></a>

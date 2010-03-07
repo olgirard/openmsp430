@@ -25,6 +25,7 @@
    	   <li><a href="#2.2.2 Watchdog Timer">                2.2.2 Watchdog Timer</a></li>
    	   <li><a href="#2.2.3 Digital I/O">                   2.2.3 Digital I/O</a></li>
    	   <li><a href="#2.2.4 Timer A">                       2.2.4 Timer A</a></li>
+   	   <li><a href="#2.2.5 16x16 Hardware Multiplier">     2.2.5 16x16 Hardware Multiplier</a></li>
 		</ul>
   	   </li>	
 	</ul>
@@ -55,7 +56,7 @@ In addition to the CPU core itself, several peripherals are also provided and ca
 
 The following diagram shows the openMSP430 design structure:
 <br /><br />
-<img src="getimg.php?1262105776" width="100%" alt="CPU Structure" title="CPU Structure" />
+<img src="getimg.php?1267738921" width="100%" alt="CPU Structure" title="CPU Structure" />
 <br />
 <ul>
 	<li><b>Frontend</b>: This module performs the instruction Fetch and Decode tasks. It also contains the execution state machine.</li>
@@ -158,6 +159,22 @@ The following parameters define if the debug interface should be included or not
 </table>
 <br /><br />
 <b>Note:</b> Since the hardware breakpoint units are relatively big, it is recommended to include as many as you plan to use. These units are particularly useful if your instruction memory is a ROM (i.e. when you can't use software breakpoints) or if you want to be able to stop the CPU whenever some particular data addresses are accessed.
+<br /><br /><br />
+At last, this parameter controls if the hardware multiplier is included or not.
+<br /><br />
+<table border="0" cellspacing="4" cellpadding="0">
+<tr>
+<td width="35"></td>
+<td bgcolor="#d0d0d0" width="3"></td>
+<td width="15"></td>
+<td>
+	<code>
+            // Include/Exclude Hardware Multiplier
+		<br />`define MULTIPLIER
+	</code>
+</td>
+</tr>
+</table>
 <br /><br /><br />
 All remaining defines located in this file are system constants and should not be edited.
 
@@ -506,12 +523,12 @@ The following Verilog code would implement a counter clocked with SMCLK:
 <a name="2.2.2 Watchdog Timer"></a>
 <h3>2.2.2 Watchdog Timer</h3>
 
-100% of the features advertised in the MSP430x1xx Family User's Guide (Chapter 10) have been implemented.
+100% of the features advertised in the <a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a> (Chapter 10) have been implemented.
 
 <a name="2.2.3 Digital I/O"></a>
 <h3>2.2.3 Digital I/O</h3>
 
-100% of the features advertised in the MSP430x1xx Family User's Guide (Chapter 9) have been implemented.
+100% of the features advertised in the <a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a> (Chapter 9) have been implemented.
 <br /><br />
 The following Verilog parameters will enable or disable the corresponding ports in order to save area (i.e. FPGA utilization):
 <br /><br />
@@ -604,7 +621,7 @@ The full pinout of the GPIO module is provided in the following table:
 <a name="2.2.4 Timer A"></a>
 <h3>2.2.4 Timer A</h3>
 
-100% of the features advertised in the MSP430x1xx Family User's Guide (Chapter 11) have been implemented.
+100% of the features advertised in the <a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a> (Chapter 11) have been implemented.
 <br /><br />
 The full pinout of the Timer A module is provided in the following table:
 <br /><br />
@@ -648,6 +665,29 @@ The full pinout of the Timer A module is provided in the following table:
 <b>Note</b>: for the same reason as with the Basic Clock Module, the two additional clock inputs (TACLK and INCLK) are internally synchronized with the MCLK domain.
 As a consequence, TACLK and INCLK should be at least 2 times slowlier than MCLK, and if these clock are used toghether with the Timer A output unit, some jitter might be observed on the generated output.
 If this jitter is critical for the application, ACLK and INCLK should idealy be derivated from DCO_CLK.
+<br /><br />
+<a name="2.2.5 16x16 Hardware Multiplier"></a>
+<h3>2.2.5 16x16 Hardware Multiplier</h3>
 
+100% of the features advertised in the <a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a> (Chapter 7) have been implemented.
+<br /><br />
+The following parameter in the <i>openMSP430_defines.v</i> file controls if the hardware multiplier should be included or not.
+<br /><br />
+<table border="0" cellspacing="4" cellpadding="0">
+<tr>
+<td width="35"></td>
+<td bgcolor="#d0d0d0" width="3"></td>
+<td width="15"></td>
+<td>
+	<code>
+            // Include/Exclude Hardware Multiplier
+		<br />`define MULTIPLIER
+	</code>
+</td>
+</tr>
+</table>
+<br /><br />
+
+<br /><br />
 </body>
 </html>
