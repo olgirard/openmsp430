@@ -82,6 +82,9 @@ rm -rf *.log
 ../bin/msp430sim tA_clkmux           | tee tA_clkmux.log
 
 
+# Hardware multiplier test patterns
+../bin/msp430sim mpy_basic           | tee  mpy_basic.log
+
 
 grep FAILED  *.log
 echo ""

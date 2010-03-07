@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# Enable/Disable waveform dumping
+OMSP_NODUMP=1
+export OMSP_NODUMP
+
+rm -rf *.log
+echo ""
+echo " ===================================================="
+echo "| WARNING: Complete Hardware Multiplier verification |"
+echo "|         regression might take several hours.       |"
+echo " ===================================================="
+echo ""
+
+# Hardware multiplier test patterns
+../bin/msp430sim mpy_basic   | tee  mpy_basic.log
+../bin/msp430sim mpy_mpy     | tee  mpy_mpy.log
+../bin/msp430sim mpy_mpys    | tee  mpy_mpys.log
+../bin/msp430sim mpy_mac     | tee  mpy_mac.log
+../bin/msp430sim mpy_macs    | tee  mpy_macs.log
+
+grep FAILED  *.log
+echo ""
+echo " ================================"
+echo -n "| Number of passed patterns: "
+cat *.log | grep -c PASSED
+echo -n "| Number of failed patterns: "
+cat *.log | grep -c FAILED
+echo "|--------------------------------"
+echo -n "| Number of patterns:        "
+ls -1 *.log | wc -l
+echo " ================================"
+echo " Make sure passed == total"
+echo ""
+echo ""

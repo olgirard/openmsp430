@@ -148,6 +148,7 @@ wire          [1:0] dbg_mem_wr;
 wire         [15:0] per_dout_or;
 wire         [15:0] per_dout_sfr;
 wire         [15:0] per_dout_wdog;
+wire         [15:0] per_dout_mpy;
 wire         [15:0] per_dout_clk;
 
    
@@ -375,17 +376,39 @@ omsp_watchdog watchdog_0 (
 
 
 //=============================================================================
-// 8)  PERIPHERALS' OUTPUT BUS
+// 8)  HARDWARE MULTIPLIER
+//=============================================================================
+`ifdef MULTIPLIER
+omsp_multiplier multiplier_0 (
+
+// OUTPUTs
+    .per_dout     (per_dout_mpy),  // Peripheral data output
+			     
+// INPUTs
+    .mclk         (mclk),          // Main system clock
+    .per_addr     (per_addr),      // Peripheral address
+    .per_din      (per_din),       // Peripheral data input
+    .per_en       (per_en),        // Peripheral enable (high active)
+    .per_wen      (per_wen),       // Peripheral write enable (high active)
+    .puc          (puc)            // Main system reset
+);
+`else
+assign per_dout_mpy = 16'h0000;
+`endif
+   
+//=============================================================================
+// 9)  PERIPHERALS' OUTPUT BUS
 //=============================================================================
 
 assign  per_dout_or  =  per_dout      |
                         per_dout_clk  |
                         per_dout_sfr  |
-                        per_dout_wdog;
+                        per_dout_wdog |
+                        per_dout_mpy;
 
    
 //=============================================================================
-// 9)  DEBUG INTERFACE
+// 10)  DEBUG INTERFACE
 //=============================================================================
 
 `ifdef DBG_EN

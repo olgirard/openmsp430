@@ -489,16 +489,19 @@ initial
 
 initial // Timeout
   begin
-    `ifdef LONG_TIMEOUT
-     #5000000;
-   `else     
-     #500000;
+   `ifdef NO_TIMEOUT
+   `else
+     `ifdef LONG_TIMEOUT
+       #5000000;
+     `else     
+       #500000;
+     `endif
+       $display(" ===============================================");
+       $display("|               SIMULATION FAILED               |");
+       $display("|              (simulation Timeout)             |");
+       $display(" ===============================================");
+       $finish;
    `endif
-     $display(" ===============================================");
-     $display("|               SIMULATION FAILED               |");
-     $display("|              (simulation Timeout)             |");
-     $display(" ===============================================");
-     $finish;
   end
 
 initial // Normal end of test

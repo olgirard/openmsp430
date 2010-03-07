@@ -50,6 +50,11 @@
 `undef DMEM_AWIDTH
 `endif
 
+// Include/Exclude Hardware Multiplier
+`ifdef MULTIPLIER
+`undef MULTIPLIER
+`endif
+
 //----------------------------------------------------------------------------
 // REMOTE DEBUGGING INTERFACE CONFIGURATION
 //----------------------------------------------------------------------------
@@ -495,4 +500,12 @@
 // Enable/Disable the hardware breakpoint RANGE mode
 `ifdef HWBRK_RANGE
 `undef HWBRK_RANGE
+`endif
+
+//
+// MULTIPLIER CONFIGURATION
+//======================================
+
+`ifdef MPY_16x16
+`undef MPY_16x16
 `endif
