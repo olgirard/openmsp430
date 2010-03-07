@@ -52,13 +52,14 @@ set fpgaConfigs {{"ProASIC3E"   A3PE1500   {Std -1 -2}}
 
 
 # Set the different RTL configurations to be analysed
-set rtlDefines  {PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3}
-set rtlConfigs {{    12          10          0         0            0          0            0    }
-                {    12          10          1         0            0          0            0    }
-                {    12          10          1         1            0          0            0    }
-                {    12          10          1         1            1          0            0    }
-                {    12          10          1         1            1          1            0    }
-                {    12          10          1         1            1          1            1    }}
+set rtlDefines  {PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER}
+set rtlConfigs {{    12          10          0         0            0          0            0         0}
+                {    12          10          1         0            0          0            0         0}
+                {    12          10          1         1            0          0            0         0}
+                {    12          10          1         1            1          0            0         0}
+                {    12          10          1         1            1          1            0         0}
+                {    12          10          1         1            1          1            1         0}}
+set rtlConfigs {{    12          10          0         0            0          0            0         1}}
                 
 
 # RTL configuration files
@@ -75,8 +76,9 @@ set designFiles    {../../rtl/verilog/openMSP430.v
                     ../../rtl/verilog/omsp_dbg.v
                     ../../rtl/verilog/omsp_dbg_uart.v
                     ../../rtl/verilog/omsp_dbg_hwbrk.v
-					../../rtl/verilog/openMSP430_undefines.v
-					../../rtl/verilog/timescale.v
+                    ../../rtl/verilog/omsp_multiplier.v
+                    ../../rtl/verilog/openMSP430_undefines.v
+                    ../../rtl/verilog/timescale.v
 }
 
 ###############################################################################

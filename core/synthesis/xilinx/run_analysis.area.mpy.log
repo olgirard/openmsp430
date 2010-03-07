@@ -1,0 +1,889 @@
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# spartan3 (xc3s400pq208), speedgrade: -4
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   36.357|         |         |    1.641|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 3s400pq208-4 
+
+ Number of Slices:                     1008  out of   3584    28%  
+ Number of Slice Flip Flops:            533  out of   7168     7%  
+ Number of 4 input LUTs:               1811  out of   7168    25%  
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    141    56%  
+    IOB Flip Flops:                      10
+ Number of BRAMs:                         6  out of     16    37%  
+ Number of MULT18X18s:                    1  out of     16     6%  
+ Number of GCLKs:                         1  out of      8    12%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# spartan3 (xc3s400pq208), speedgrade: -5
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   33.554|         |         |    1.468|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 3s400pq208-5 
+
+ Number of Slices:                     1008  out of   3584    28%  
+ Number of Slice Flip Flops:            533  out of   7168     7%  
+ Number of 4 input LUTs:               1811  out of   7168    25%  
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    141    56%  
+    IOB Flip Flops:                      10
+ Number of BRAMs:                         6  out of     16    37%  
+ Number of MULT18X18s:                    1  out of     16     6%  
+ Number of GCLKs:                         1  out of      8    12%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# spartan3e (xc3s500epq208), speedgrade: -4
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   35.454|         |         |    2.328|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 3s500epq208-4 
+
+ Number of Slices:                     1013  out of   4656    21%  
+ Number of Slice Flip Flops:            533  out of   9312     5%  
+ Number of 4 input LUTs:               1816  out of   9312    19%  
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    158    50%  
+    IOB Flip Flops:                      10
+ Number of BRAMs:                         6  out of     20    30%  
+ Number of MULT18X18SIOs:                 1  out of     20     5%  
+ Number of GCLKs:                         1  out of     24     4%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# spartan3e (xc3s500epq208), speedgrade: -5
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   30.742|         |         |    1.538|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 3s500epq208-5 
+
+ Number of Slices:                     1013  out of   4656    21%  
+ Number of Slice Flip Flops:            533  out of   9312     5%  
+ Number of 4 input LUTs:               1816  out of   9312    19%  
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    158    50%  
+    IOB Flip Flops:                      10
+ Number of BRAMs:                         6  out of     20    30%  
+ Number of MULT18X18SIOs:                 1  out of     20     5%  
+ Number of GCLKs:                         1  out of     24     4%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# spartan3a (xc3s700aft256), speedgrade: -4
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   39.532|         |         |    1.688|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 3s700aft256-4 
+
+ Number of Slices:                     1022  out of   5888    17%  
+ Number of Slice Flip Flops:            534  out of  11776     4%  
+ Number of 4 input LUTs:               1832  out of  11776    15%  
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    161    49%  
+    IOB Flip Flops:                      10
+ Number of BRAMs:                         5  out of     20    25%  
+ Number of MULT18X18SIOs:                 1  out of     20     5%  
+ Number of GCLKs:                         1  out of     24     4%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# spartan3a (xc3s700aft256), speedgrade: -5
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   30.273|         |         |    1.532|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 3s700aft256-5 
+
+ Number of Slices:                     1020  out of   5888    17%  
+ Number of Slice Flip Flops:            534  out of  11776     4%  
+ Number of 4 input LUTs:               1827  out of  11776    15%  
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    161    49%  
+    IOB Flip Flops:                      10
+ Number of BRAMs:                         5  out of     20    25%  
+ Number of MULT18X18SIOs:                 1  out of     20     5%  
+ Number of GCLKs:                         1  out of     24     4%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# spartan3adsp (xc3sd1800acs484), speedgrade: -4
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   36.164|         |         |    1.777|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 3sd1800acs484-4 
+
+ Number of Slices:                     1024  out of  16640     6%  
+ Number of Slice Flip Flops:            534  out of  33280     1%  
+ Number of 4 input LUTs:               1831  out of  33280     5%  
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    309    25%  
+    IOB Flip Flops:                      10
+ Number of BRAMs:                         5  out of     84     5%  
+ Number of GCLKs:                         1  out of     24     4%  
+ Number of DSP48s:                        1  out of     84     1%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# spartan3adsp (xc3sd1800acs484), speedgrade: -5
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   28.990|         |         |    1.440|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 3sd1800acs484-5 
+
+ Number of Slices:                     1022  out of  16640     6%  
+ Number of Slice Flip Flops:            534  out of  33280     1%  
+ Number of 4 input LUTs:               1826  out of  33280     5%  
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    309    25%  
+    IOB Flip Flops:                      10
+ Number of BRAMs:                         5  out of     84     5%  
+ Number of GCLKs:                         1  out of     24     4%  
+ Number of DSP48s:                        1  out of     84     1%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# spartan6 (xc6slx45tfgg484), speedgrade: -2
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   29.715|    5.512|    2.728|    2.769|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 6slx45tfgg484-2 
+
+
+Slice Logic Utilization: 
+ Number of Slice Registers:             533  out of  54576     0%  
+ Number of Slice LUTs:                 1436  out of  27288     5%  
+    Number used as Logic:              1436  out of  27288     5%  
+
+Slice Logic Distribution: 
+ Number of LUT Flip Flop pairs used:   1466
+   Number with an unused Flip Flop:     933  out of   1466    63%  
+   Number with an unused LUT:            30  out of   1466     2%  
+   Number of fully used LUT-FF pairs:   503  out of   1466    34%  
+   Number of unique control sets:        50
+
+IO Utilization: 
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    296    26%  
+    IOB Flip Flops/Latches:              10
+
+Specific Feature Utilization:
+ Number of Block RAM/FIFO:                5  out of    348     1%  
+    Number using Block RAM only:          5
+ Number of BUFG/BUFGCTRLs:                1  out of     16     6%  
+ Number of DSP48A1s:                      1  out of     58     1%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# spartan6 (xc6slx45tfgg484), speedgrade: -3
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   23.010|    5.235|    2.087|    2.062|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 6slx45tfgg484-3 
+
+
+Slice Logic Utilization: 
+ Number of Slice Registers:             533  out of  54576     0%  
+ Number of Slice LUTs:                 1425  out of  27288     5%  
+    Number used as Logic:              1425  out of  27288     5%  
+
+Slice Logic Distribution: 
+ Number of LUT Flip Flop pairs used:   1452
+   Number with an unused Flip Flop:     919  out of   1452    63%  
+   Number with an unused LUT:            27  out of   1452     1%  
+   Number of fully used LUT-FF pairs:   506  out of   1452    34%  
+   Number of unique control sets:        50
+
+IO Utilization: 
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    296    26%  
+    IOB Flip Flops/Latches:              10
+
+Specific Feature Utilization:
+ Number of Block RAM/FIFO:                5  out of    348     1%  
+    Number using Block RAM only:          5
+ Number of BUFG/BUFGCTRLs:                1  out of     16     6%  
+ Number of DSP48A1s:                      1  out of     58     1%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# spartan6 (xc6slx45tfgg484), speedgrade: -4
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   19.001|    4.893|    1.806|    1.570|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 6slx45tfgg484-4 
+
+
+Slice Logic Utilization: 
+ Number of Slice Registers:             533  out of  54576     0%  
+ Number of Slice LUTs:                 1424  out of  27288     5%  
+    Number used as Logic:              1424  out of  27288     5%  
+
+Slice Logic Distribution: 
+ Number of LUT Flip Flop pairs used:   1451
+   Number with an unused Flip Flop:     918  out of   1451    63%  
+   Number with an unused LUT:            27  out of   1451     1%  
+   Number of fully used LUT-FF pairs:   506  out of   1451    34%  
+   Number of unique control sets:        50
+
+IO Utilization: 
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    296    26%  
+    IOB Flip Flops/Latches:              10
+
+Specific Feature Utilization:
+ Number of Block RAM/FIFO:                5  out of    348     1%  
+    Number using Block RAM only:          5
+ Number of BUFG/BUFGCTRLs:                1  out of     16     6%  
+ Number of DSP48A1s:                      1  out of     58     1%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# virtex4 (xc4vlx25sf363), speedgrade: -10
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   23.262|         |         |    0.954|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 4vlx25sf363-10 
+
+ Number of Slices:                     1021  out of  10752     9%  
+ Number of Slice Flip Flops:            534  out of  21504     2%  
+ Number of 4 input LUTs:               1829  out of  21504     8%  
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    240    32%  
+    IOB Flip Flops:                      10
+ Number of FIFO16/RAMB16s:                5  out of     72     6%  
+    Number used as RAMB16s:               5
+ Number of GCLKs:                         1  out of     32     3%  
+ Number of DSP48s:                        1  out of     48     2%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# virtex4 (xc4vlx25sf363), speedgrade: -11
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   21.546|         |         |    0.850|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 4vlx25sf363-11 
+
+ Number of Slices:                     1015  out of  10752     9%  
+ Number of Slice Flip Flops:            534  out of  21504     2%  
+ Number of 4 input LUTs:               1810  out of  21504     8%  
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    240    32%  
+    IOB Flip Flops:                      10
+ Number of FIFO16/RAMB16s:                5  out of     72     6%  
+    Number used as RAMB16s:               5
+ Number of GCLKs:                         1  out of     32     3%  
+ Number of DSP48s:                        1  out of     48     2%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# virtex4 (xc4vlx25sf363), speedgrade: -12
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   18.274|         |         |    0.914|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 4vlx25sf363-12 
+
+ Number of Slices:                     1018  out of  10752     9%  
+ Number of Slice Flip Flops:            534  out of  21504     2%  
+ Number of 4 input LUTs:               1819  out of  21504     8%  
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    240    32%  
+    IOB Flip Flops:                      10
+ Number of FIFO16/RAMB16s:                5  out of     72     6%  
+    Number used as RAMB16s:               5
+ Number of GCLKs:                         1  out of     32     3%  
+ Number of DSP48s:                        1  out of     48     2%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# virtex5 (xc5vlx30ff324), speedgrade: -1
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   16.985|         |         |    0.781|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 5vlx30ff324-1 
+
+
+Slice Logic Utilization: 
+ Number of Slice Registers:             532  out of  19200     2%  
+ Number of Slice LUTs:                 1372  out of  19200     7%  
+    Number used as Logic:              1372  out of  19200     7%  
+
+Slice Logic Distribution: 
+ Number of LUT Flip Flop pairs used:   1398
+   Number with an unused Flip Flop:     866  out of   1398    61%  
+   Number with an unused LUT:            26  out of   1398     1%  
+   Number of fully used LUT-FF pairs:   506  out of   1398    36%  
+   Number of unique control sets:        48
+
+IO Utilization: 
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    220    35%  
+    IOB Flip Flops/Latches:              10
+
+Specific Feature Utilization:
+ Number of Block RAM/FIFO:                3  out of     32     9%  
+    Number using Block RAM only:          3
+ Number of BUFG/BUFGCTRLs:                1  out of     32     3%  
+ Number of DSP48Es:                       1  out of     32     3%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# virtex5 (xc5vlx30ff324), speedgrade: -2
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   14.207|         |         |    0.680|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 5vlx30ff324-2 
+
+
+Slice Logic Utilization: 
+ Number of Slice Registers:             532  out of  19200     2%  
+ Number of Slice LUTs:                 1372  out of  19200     7%  
+    Number used as Logic:              1372  out of  19200     7%  
+
+Slice Logic Distribution: 
+ Number of LUT Flip Flop pairs used:   1399
+   Number with an unused Flip Flop:     867  out of   1399    61%  
+   Number with an unused LUT:            27  out of   1399     1%  
+   Number of fully used LUT-FF pairs:   505  out of   1399    36%  
+   Number of unique control sets:        48
+
+IO Utilization: 
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    220    35%  
+    IOB Flip Flops/Latches:              10
+
+Specific Feature Utilization:
+ Number of Block RAM/FIFO:                3  out of     32     9%  
+    Number using Block RAM only:          3
+ Number of BUFG/BUFGCTRLs:                1  out of     32     3%  
+ Number of DSP48Es:                       1  out of     32     3%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# virtex5 (xc5vlx30ff324), speedgrade: -3
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   13.429|         |         |    0.601|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 5vlx30ff324-3 
+
+
+Slice Logic Utilization: 
+ Number of Slice Registers:             532  out of  19200     2%  
+ Number of Slice LUTs:                 1367  out of  19200     7%  
+    Number used as Logic:              1367  out of  19200     7%  
+
+Slice Logic Distribution: 
+ Number of LUT Flip Flop pairs used:   1395
+   Number with an unused Flip Flop:     863  out of   1395    61%  
+   Number with an unused LUT:            28  out of   1395     2%  
+   Number of fully used LUT-FF pairs:   504  out of   1395    36%  
+   Number of unique control sets:        48
+
+IO Utilization: 
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    220    35%  
+    IOB Flip Flops/Latches:              10
+
+Specific Feature Utilization:
+ Number of Block RAM/FIFO:                3  out of     32     9%  
+    Number using Block RAM only:          3
+ Number of BUFG/BUFGCTRLs:                1  out of     32     3%  
+ Number of DSP48Es:                       1  out of     32     3%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# virtex6 (xc6vlx75tff484), speedgrade: -1
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   14.414|    3.474|    1.579|    0.604|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 6vlx75tff484-1 
+
+
+Slice Logic Utilization: 
+ Number of Slice Registers:             532  out of  93120     0%  
+ Number of Slice LUTs:                 1390  out of  46560     2%  
+    Number used as Logic:              1390  out of  46560     2%  
+
+Slice Logic Distribution: 
+ Number of LUT Flip Flop pairs used:   1419
+   Number with an unused Flip Flop:     887  out of   1419    62%  
+   Number with an unused LUT:            29  out of   1419     2%  
+   Number of fully used LUT-FF pairs:   503  out of   1419    35%  
+   Number of unique control sets:        49
+
+IO Utilization: 
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    240    32%  
+    IOB Flip Flops/Latches:              10
+
+Specific Feature Utilization:
+ Number of Block RAM/FIFO:                3  out of    156     1%  
+    Number using Block RAM only:          3
+ Number of BUFG/BUFGCTRLs:                1  out of     32     3%  
+ Number of DSP48E1s:                      1  out of    288     0%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# virtex6 (xc6vlx75tff484), speedgrade: -2
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   12.694|    3.071|    1.435|    0.508|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 6vlx75tff484-2 
+
+
+Slice Logic Utilization: 
+ Number of Slice Registers:             532  out of  93120     0%  
+ Number of Slice LUTs:                 1388  out of  46560     2%  
+    Number used as Logic:              1388  out of  46560     2%  
+
+Slice Logic Distribution: 
+ Number of LUT Flip Flop pairs used:   1418
+   Number with an unused Flip Flop:     886  out of   1418    62%  
+   Number with an unused LUT:            30  out of   1418     2%  
+   Number of fully used LUT-FF pairs:   502  out of   1418    35%  
+   Number of unique control sets:        49
+
+IO Utilization: 
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    240    32%  
+    IOB Flip Flops/Latches:              10
+
+Specific Feature Utilization:
+ Number of Block RAM/FIFO:                3  out of    156     1%  
+    Number using Block RAM only:          3
+ Number of BUFG/BUFGCTRLs:                1  out of     32     3%  
+ Number of DSP48E1s:                      1  out of    288     0%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+
+#####################################################################################
+#                            START SYNTHESIS (AREA optimized)
+#====================================================================================
+# virtex6 (xc6vlx75tff484), speedgrade: -3
+#====================================================================================
+# PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER
+#     12          10          0         0            0          0            0         1
+#====================================================================================
+Clock to Setup on destination clock dco_clk
+---------------+---------+---------+---------+---------+
+               | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
+Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
+---------------+---------+---------+---------+---------+
+dco_clk        |   10.953|    3.120|    1.173|    0.463|
+---------------+---------+---------+---------+---------+
+
+====================================================================================
+Device utilization summary:
+---------------------------
+
+Selected Device : 6vlx75tff484-3 
+
+
+Slice Logic Utilization: 
+ Number of Slice Registers:             532  out of  93120     0%  
+ Number of Slice LUTs:                 1387  out of  46560     2%  
+    Number used as Logic:              1387  out of  46560     2%  
+
+Slice Logic Distribution: 
+ Number of LUT Flip Flop pairs used:   1416
+   Number with an unused Flip Flop:     884  out of   1416    62%  
+   Number with an unused LUT:            29  out of   1416     2%  
+   Number of fully used LUT-FF pairs:   503  out of   1416    35%  
+   Number of unique control sets:        49
+
+IO Utilization: 
+ Number of IOs:                          80
+ Number of bonded IOBs:                  79  out of    240    32%  
+    IOB Flip Flops/Latches:              10
+
+Specific Feature Utilization:
+ Number of Block RAM/FIFO:                3  out of    156     1%  
+    Number using Block RAM only:          3
+ Number of BUFG/BUFGCTRLs:                1  out of     32     3%  
+ Number of DSP48E1s:                      1  out of    288     0%  
+
+---------------------------
+
+====================================================================================
+#                            SYNTHESIS DONE
+#####################################################################################
+

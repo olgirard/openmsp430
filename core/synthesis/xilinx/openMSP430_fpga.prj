@@ -96,3 +96,7 @@
       `include "../../../rtl/verilog/omsp_dbg_hwbrk.v"
    `endif
 `endif
+`include "../src/openMSP430_defines.v"
+`ifdef MULTIPLIER
+   `include "../../../rtl/verilog/omsp_multiplier.v"
+`endif

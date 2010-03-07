@@ -62,6 +62,10 @@
 //                   14 ->   32 kB
 `define DMEM_AWIDTH 10
 
+// Include/Exclude Hardware Multiplier
+`define MULTIPLIER
+
+
 //----------------------------------------------------------------------------
 // REMOTE DEBUGGING INTERFACE CONFIGURATION
 //----------------------------------------------------------------------------
@@ -298,3 +302,12 @@ CONFIGURATION ERROR: JTAG OR UART DEBUG INTERFACE SHOULD BE ENABLED
  `endif
 `endif
 
+//
+// MULTIPLIER CONFIGURATION
+//======================================
+
+// If uncommented, the following define selects
+// the 16x16 multiplier (1 cycle) instead of the
+// default 16x8 multplier (2 cycles)
+//`define MPY_16x16
+  

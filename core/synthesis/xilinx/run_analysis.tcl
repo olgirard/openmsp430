@@ -51,19 +51,18 @@ set fpgaConfigs {{spartan3     xc3s400pq208    {4 5}      {30.0 34.0}}
                  {virtex4      xc4vlx25sf363   {10 11 12} {51.0 57.0 69.0}}
                  {virtex5      xc5vlx30ff324   {1 2 3}    {75.0 82.0 97.0}}
                  {virtex6      xc6vlx75tff484  {1 2 3}    {92.0 102.0 115.0}}}
-set fpgaConfigs {{spartan3     xc3s400pq208    {5}        {38.0}}}
 
 
 # Set the different RTL configurations to be analysed
-set rtlDefines  {PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3}
-set rtlConfigs {{    12          10          0         0            0          0            0    }
-                {    12          10          1         0            0          0            0    }
-                {    12          10          1         1            0          0            0    }
-                {    12          10          1         1            1          0            0    }
-                {    12          10          1         1            1          1            0    }
-                {    12          10          1         1            1          1            1    }}
+set rtlDefines  {PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER}
+set rtlConfigs {{    12          10          0         0            0          0            0         0}
+                {    12          10          1         0            0          0            0         0}
+                {    12          10          1         1            0          0            0         0}
+                {    12          10          1         1            1          0            0         0}
+                {    12          10          1         1            1          1            0         0}
+                {    12          10          1         1            1          1            1         0}}
 set clkRatios  {1.00 0.95 0.85 0.85 0.85 0.85}
-set rtlConfigs {{    12          10          0         0            0          0            0    }}
+set rtlConfigs {{    12          10          0         0            0          0            0         1}}
 set clkRatios  {1.00}
 
 

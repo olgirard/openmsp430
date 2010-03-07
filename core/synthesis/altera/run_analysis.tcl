@@ -51,18 +51,16 @@ set fpgaConfigs {{"Cyclone II"     EP2C20F484C    {6 7 8}}
                  {"Stratix"        EP1S10F484C    {5 6 7}}
                  {"Stratix II"     EP2S15F484C    {3 4 5}}
                  {"Stratix III"    EP3SE50F484C   {2 3 4}}}
-set fpgaConfigs {{"Cyclone II"     EP2C20F484C    {7}}}
-
-
+                 
 # Set the different RTL configurations to be analysed
-set rtlDefines  {PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3}
-set rtlConfigs {{    12          10          0         0            0          0            0    }
-                {    12          10          1         0            0          0            0    }
-                {    12          10          1         1            0          0            0    }
-                {    12          10          1         1            1          0            0    }
-                {    12          10          1         1            1          1            0    }
-                {    12          10          1         1            1          1            1    }}
-set rtlConfigs {{    12          10          0         0            0          0            0    }}
+set rtlDefines  {PMEM_AWIDTH DMEM_AWIDTH  DBG_EN  DBG_HWBRK_0 DBG_HWBRK_1 DBG_HWBRK_2 DBG_HWBRK_3 MULTIPLIER}
+set rtlConfigs {{    12          10          0         0            0          0            0         0}
+                {    12          10          1         0            0          0            0         0}
+                {    12          10          1         1            0          0            0         0}
+                {    12          10          1         1            1          0            0         0}
+                {    12          10          1         1            1          1            0         0}
+                {    12          10          1         1            1          1            1         0}}
+set rtlConfigs {{    12          10          0         0            0          0            0         1}}
 
 
 # RTL configuration files
