@@ -3,8 +3,7 @@ NAME            = memledtest
 OBJECTS         = main.o 7seg.o gray.o memtest.o
 CPU             = msp430x1121
 
-# there is still NO hardware multiplier in openMSP430, unlike in msp430x1121
-CFLAGS          = -mmcu=${CPU} -mdisable-hwmul -O2 -Wall -g
+CFLAGS          = -mmcu=${CPU} -mforce-hwmul -O2 -Wall -g
 
 # use custom linker script
 LDFLAGS         = -mmcu=$(CPU) -Tlink.ld

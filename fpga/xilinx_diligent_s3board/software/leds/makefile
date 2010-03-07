@@ -3,7 +3,7 @@ NAME            = leds
 OBJECTS         = main.o 7seg.o
 CPU             = msp430x1121
 
-CFLAGS          = -mmcu=${CPU} -O2 -Wall -g
+CFLAGS          = -mmcu=${CPU} -mforce-hwmul -O2 -Wall -g
 
 #switch the compiler (for the internal make rules)
 CC              = msp430-gcc

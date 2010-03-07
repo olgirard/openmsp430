@@ -35,7 +35,7 @@ ParamFile: <design>_xst.scr
 
 "-vlgincdir ../../../rtl/verilog/openmsp430/";
 
-#"-opt_mode SPEED";               # Optimization Criteria
+"-opt_mode SPEED";                # Optimization Criteria
                                   # AREA or SPEED
 #"-uc <design>.xcf";              # Constraint File name
 #"-case maintain";                # Specifies how to handle source name case

@@ -45,16 +45,48 @@ SYMBOL TABLE:
 00000000 l       *ABS*	00000000 IE1
 00000002 l       *ABS*	00000000 IFG1
 00000000 l    df *ABS*	00000000 main.c
+00000130 l       *ABS*	00000000 __MPY
+00000132 l       *ABS*	00000000 __MPYS
+00000134 l       *ABS*	00000000 __MAC
+00000136 l       *ABS*	00000000 __MACS
+00000138 l       *ABS*	00000000 __OP2
+0000013a l       *ABS*	00000000 __RESLO
+0000013c l       *ABS*	00000000 __RESHI
+0000013e l       *ABS*	00000000 __SUMEXT
 00000202 l     O .data	00000002 count.0
 00000204 l     O .data	00000001 gray.1
 00000206 l       .bss	00000000 array1.2
 000003c6 l       .bss	00000000 array2.3
 0000f14c l       .text	00000000 Letext
 00000000 l    df *ABS*	00000000 7seg.c
+00000130 l       *ABS*	00000000 __MPY
+00000132 l       *ABS*	00000000 __MPYS
+00000134 l       *ABS*	00000000 __MAC
+00000136 l       *ABS*	00000000 __MACS
+00000138 l       *ABS*	00000000 __OP2
+0000013a l       *ABS*	00000000 __RESLO
+0000013c l       *ABS*	00000000 __RESHI
+0000013e l       *ABS*	00000000 __SUMEXT
 0000f236 l       .text	00000000 Letext
 00000000 l    df *ABS*	00000000 gray.c
+00000130 l       *ABS*	00000000 __MPY
+00000132 l       *ABS*	00000000 __MPYS
+00000134 l       *ABS*	00000000 __MAC
+00000136 l       *ABS*	00000000 __MACS
+00000138 l       *ABS*	00000000 __OP2
+0000013a l       *ABS*	00000000 __RESLO
+0000013c l       *ABS*	00000000 __RESHI
+0000013e l       *ABS*	00000000 __SUMEXT
 0000f266 l       .text	00000000 Letext
 00000000 l    df *ABS*	00000000 memtest.c
+00000130 l       *ABS*	00000000 __MPY
+00000132 l       *ABS*	00000000 __MPYS
+00000134 l       *ABS*	00000000 __MAC
+00000136 l       *ABS*	00000000 __MACS
+00000138 l       *ABS*	00000000 __OP2
+0000013a l       *ABS*	00000000 __RESLO
+0000013c l       *ABS*	00000000 __RESHI
+0000013e l       *ABS*	00000000 __SUMEXT
 0000f2f4 l       .text	00000000 Letext
 00000006 g       *ABS*	00000000 __data_size
 0000f266 g     F .text	0000004c rnd_array
@@ -356,40 +388,71 @@ int main(void) {
     f1a4:	ce 00 0a b6 1e 38 00 00 00 76 00 00                 .....8...v..
 
 0000f1b0 <DispStr>:
+* ASCII to seven-segment conversion table DispASCIItoSegTbl[].
+*********************************************************************************************************
+*/
+
+void DispStr (INT8U offset, INT8U *s)
+{
     f1b0:	0b 12       	push	r11		
     f1b2:	0a 12       	push	r10		
     f1b4:	09 12       	push	r9		
     f1b6:	0d 4e       	mov	r14,	r13	
+  int dig        = 0;
     f1b8:	0c 43       	clr	r12		
     f1ba:	4b 4f       	mov.b	r15,	r11	
+  register INT8U* p;
+  register INT8U c;
+  while (dig < DIGIT_NR) {
     f1bc:	39 40 4c f1 	mov	#-3764,	r9	;#0xf14c
     f1c0:	3a 40 54 f1 	mov	#-3756,	r10	;#0xf154
+    p = DispSegTbl[dig];
     f1c4:	0f 4c       	mov	r12,	r15	
     f1c6:	0f 5f       	rla	r15		
     f1c8:	0f 59       	add	r9,	r15	
     f1ca:	2e 4f       	mov	@r15,	r14	
+    c = *(offset+s);
     f1cc:	0f 4d       	mov	r13,	r15	
     f1ce:	0f 5b       	add	r11,	r15	
+    *p = DispASCIItoSegTbl[c - 0x20];
     f1d0:	6f 4f       	mov.b	@r15,	r15	
     f1d2:	0f 5a       	add	r10,	r15	
     f1d4:	de 4f e0 ff 	mov.b	-32(r15),0(r14)	;0xffe0(r15), 0x0000(r14)
     f1d8:	00 00 
+    dig++;
     f1da:	1c 53       	inc	r12		
+    s++;
     f1dc:	1d 53       	inc	r13		
     f1de:	2c 92       	cmp	#4,	r12	;r2 As==10
     f1e0:	f1 3b       	jl	$-28     	;abs 0xf1c4
+  }
+}
     f1e2:	39 41       	pop	r9		
     f1e4:	3a 41       	pop	r10		
     f1e6:	3b 41       	pop	r11		
     f1e8:	30 41       	ret			
 
 0000f1ea <DispWord>:
+
+void DispWord(INT16U word)
+{
     f1ea:	0b 12       	push	r11		
     f1ec:	0a 12       	push	r10		
     f1ee:	0d 4f       	mov	r15,	r13	
+	unsigned char *(*p);
+
+
+	unsigned int pos, i;
+
+	p=DispSegTbl;
     f1f0:	3b 40 4c f1 	mov	#-3764,	r11	;#0xf14c
+
+
+	for(i=0;i<4;i++)
     f1f4:	0c 43       	clr	r12		
     f1f6:	3a 40 54 f1 	mov	#-3756,	r10	;#0xf154
+	{
+		pos = (word>>12)&15;
     f1fa:	0f 4d       	mov	r13,	r15	
     f1fc:	8f 10       	swpb	r15		
     f1fe:	4e 4f       	mov.b	r15,	r14	
@@ -399,57 +462,77 @@ int main(void) {
     f206:	0e 11       	rra	r14		
     f208:	0e 11       	rra	r14		
     f20a:	3e f0 0f 00 	and	#15,	r14	;#0x000f
+		word<<=4;
     f20e:	0d 5d       	rla	r13		
     f210:	0d 5d       	rla	r13		
     f212:	0d 5d       	rla	r13		
     f214:	0d 5d       	rla	r13		
+
+		if( pos>9 )
     f216:	3e 90 0a 00 	cmp	#10,	r14	;#0x000a
     f21a:	02 28       	jnc	$+6      	;abs 0xf220
+		{
+			pos = pos-10+'A'-'0';
     f21c:	3e 50 07 00 	add	#7,	r14	;#0x0007
+		}
+
+			*(*p++) = DispASCIItoSegTbl[pos + 0x10];
     f220:	3f 4b       	mov	@r11+,	r15	
     f222:	0e 5a       	add	r10,	r14	
     f224:	df 4e 10 00 	mov.b	16(r14),0(r15)	;0x0010(r14), 0x0000(r15)
     f228:	00 00 
+	unsigned int pos, i;
+
+	p=DispSegTbl;
+
+
+	for(i=0;i<4;i++)
     f22a:	1c 53       	inc	r12		
     f22c:	2c 92       	cmp	#4,	r12	;r2 As==10
     f22e:	e5 2b       	jnc	$-52     	;abs 0xf1fa
+			*(*p++) = DispASCIItoSegTbl[pos + 0x10];
+	}
+
+
+
+}
     f230:	3a 41       	pop	r10		
     f232:	3b 41       	pop	r11		
     f234:	30 41       	ret			
 
 0000f236 <bin2gray>:
-#include "hardware.h"
-#include "7seg.h"
-#include "gray.h"
-#include "memtest.h"
-
-
+/*
+*********************************************************************************************************
+*
+* Multiplexed LED Display Driver
+*
+* (c) Copyright 2004, modified by John Leung
     f236:	4e 4f       	mov.b	r15,	r14	
     f238:	12 c3       	clrc			
     f23a:	4e 10       	rrc.b	r14		
     f23c:	4e ef       	xor.b	r15,	r14	
     f23e:	4f 4e       	mov.b	r14,	r15	
-
+* Reference: Jean J. Labrosse, Embedded Systems Building Blocks
     f240:	30 41       	ret			
 
 0000f242 <gray2bin>:
-
-volatile unsigned char upd_count=1;
-
+* All Rights Reserved
+*
+* Filename : LED.C
     f242:	4e 4f       	mov.b	r15,	r14	
-wakeup interrupt (WDT_VECTOR) INT_Watchdog(void)
-{
-	static unsigned int count=0xFFFF;
+* Programmer : John Leung
+* Remarks : Modified for SaiWanHo project
+* Date : 19th Nov 2004
     f244:	12 c3       	clrc			
     f246:	4f 10       	rrc.b	r15		
     f248:	4f ee       	xor.b	r14,	r15	
-
+* Hardware : PCB 11OCT2004.001
     f24a:	4e 4f       	mov.b	r15,	r14	
     f24c:	12 c3       	clrc			
     f24e:	4e 10       	rrc.b	r14		
     f250:	4e 11       	rra.b	r14		
     f252:	4f ee       	xor.b	r14,	r15	
-	if( upd_count )
+*********************************************************************************************************
     f254:	4e 4f       	mov.b	r15,	r14	
     f256:	12 c3       	clrc			
     f258:	4e 10       	rrc.b	r14		
@@ -457,172 +540,172 @@ wakeup interrupt (WDT_VECTOR) INT_Watchdog(void)
     f25c:	4e 11       	rra.b	r14		
     f25e:	4e 11       	rra.b	r14		
     f260:	4f ee       	xor.b	r14,	r15	
-	{
-		upd_count=0;
+* DESCRIPTION
+*
     f262:	7f f3       	and.b	#-1,	r15	;r3 As==11
-		count++;
+* This module provides an interface to a multiplexed "8 segments x N digits" LED matrix.
     f264:	30 41       	ret			
 
 0000f266 <rnd_array>:
-#include "7seg.h"
-#include "gray.h"
-#include "memtest.h"
-
-
-
+*********************************************************************************************************
+*
+* Multiplexed LED Display Driver
+*
+* (c) Copyright 2004, modified by John Leung
+* Reference: Jean J. Labrosse, Embedded Systems Building Blocks
     f266:	0b 12       	push	r11		
     f268:	0a 12       	push	r10		
-wakeup interrupt (WDT_VECTOR) INT_Watchdog(void)
-{
-	static unsigned int count=0xFFFF;
-
-	if( upd_count )
-	{
+* Programmer : John Leung
+* Remarks : Modified for SaiWanHo project
+* Date : 19th Nov 2004
+* Hardware : PCB 11OCT2004.001
+*********************************************************************************************************
+* DESCRIPTION
     f26a:	0a 4f       	mov	r15,	r10	
-		upd_count=0;
+*
     f26c:	0b 4f       	mov	r15,	r11	
     f26e:	1b 53       	inc	r11		
     f270:	0c 4b       	mov	r11,	r12	
-		count++;
+* This module provides an interface to a multiplexed "8 segments x N digits" LED matrix.
     f272:	0e 4f       	mov	r15,	r14	
     f274:	3e 50 3f 00 	add	#63,	r14	;#0x003f
-
+*
     f278:	3d 40 80 01 	mov	#384,	r13	;#0x0180
-		DispWord(count);
-	}
-}
-
+* To use this driver:
+*
+* 1) You must define (LED.H):
+*
     f27c:	6f 4f       	mov.b	@r15,	r15	
     f27e:	6f 5c       	add.b	@r12,	r15	
     f280:	ce 4f 00 00 	mov.b	r15,	0(r14)	;0x0000(r14)
     f284:	1c 53       	inc	r12		
     f286:	0f 4b       	mov	r11,	r15	
     f288:	1e 53       	inc	r14		
-
+* DISP_N_DIG The total number of segments to display, inc. dp status
     f28a:	3d 53       	add	#-1,	r13	;r3 As==11
     f28c:	03 24       	jz	$+8      	;abs 0xf294
-	{
-		upd_count=0;
-		count++;
-
-		DispWord(count);
-	}
+* DESCRIPTION
+*
+* This module provides an interface to a multiplexed "8 segments x N digits" LED matrix.
+*
+* To use this driver:
+*
     f28e:	0b 4f       	mov	r15,	r11	
     f290:	1b 53       	inc	r11		
     f292:	f4 3f       	jmp	$-22     	;abs 0xf27c
-
-
-
-volatile unsigned char tctr;
-
-wakeup interrupt (TIMERA1_VECTOR) INT_Timer_overflow(void)
+*
+* DISP_N_DIG The total number of segments to display, inc. dp status
+* DISP_N_SS The total number of seven-segment digits (modules)
+* DISP_PORT1_DIG The address of the DIGITS output port
+* DISP_PORT_SEG The address of the SEGMENTS output port
+* first_dig_msk The first digit mask for selecting the most significant digit
     f294:	0e 4a       	mov	r10,	r14	
-{
+*
     f296:	0f 4a       	mov	r10,	r15	
     f298:	3f 50 80 01 	add	#384,	r15	;#0x0180
-	static unsigned char gray=0;
+* 2) You must allocate a hardware timer which will interrupt the CPU at a rate of at least:
     f29c:	3d 40 3f 00 	mov	#63,	r13	;#0x003f
-
-	tctr++;
-	if( tctr&0x40 )
-	{
+*
+* DISP_N_DIG * 60 (Hz)
+*
+* The timer interrupt must vector to DispMuxISR (defined in LED_IA.ASM). You MUST write the
     f2a0:	ee 4f 00 00 	mov.b	@r15,	0(r14)	;0x0000(r14)
     f2a4:	1f 53       	inc	r15		
     f2a6:	1e 53       	inc	r14		
-		tctr&=0x3F;
+* code to clear the interrupt source. The interrupt source must be cleared either in DispMuxISR
     f2a8:	3d 53       	add	#-1,	r13	;r3 As==11
     f2aa:	fa 23       	jnz	$-10     	;abs 0xf2a0
-
+* or in DispMuxHandler().
     f2ac:	3a 41       	pop	r10		
     f2ae:	3b 41       	pop	r11		
     f2b0:	30 41       	ret			
 
 0000f2b2 <cmp_array>:
-		P3OUT = gray;
-		gray = bin2gray( 1 + gray2bin( gray ) );
-	}
+*
+* 3) Adapt DispInitPort(), DispOutSeg() and DispOutDig() for your environment.
+*********************************************************************************************************
     f2b2:	0b 12       	push	r11		
-
-	TACTL &= ~TAIFG; // clear int flag
-}
-
-
-    f2b4:	0b 4f       	mov	r15,	r11	
-
-    f2b6:	0c 4e       	mov	r14,	r12	
-
-/**
-    f2b8:	3d 40 c0 00 	mov	#192,	r13	;#0x00c0
-Main function with some blinking leds
 */
-int main(void) {
+#include "7seg.h"
 
+/*
+*********************************************************************************************************
+    f2b4:	0b 4f       	mov	r15,	r11	
+* SEVEN-SEGMENT Digit table
+    f2b6:	0c 4e       	mov	r14,	r12	
+*********************************************************************************************************
+*/
+    f2b8:	3d 40 c0 00 	mov	#192,	r13	;#0x00c0
+
+INT8U * const DispSegTbl[] = {
+  (INT8U *) &DIGIT3,
+  (INT8U *) &DIGIT2,
     f2bc:	3e 4c       	mov	@r12+,	r14	
     f2be:	3f 4b       	mov	@r11+,	r15	
     f2c0:	0f 9e       	cmp	r14,	r15	
     f2c2:	04 20       	jnz	$+10     	;abs 0xf2cc
-
-
+  (INT8U *) &DIGIT1,
+  (INT8U *) &DIGIT0
     f2c4:	3d 53       	add	#-1,	r13	;r3 As==11
     f2c6:	fa 23       	jnz	$-10     	;abs 0xf2bc
+};
 
-	static UBYTE array1[448];
     f2c8:	1f 43       	mov	#1,	r15	;r3 As==01
     f2ca:	01 3c       	jmp	$+4      	;abs 0xf2ce
-/**
-Main function with some blinking leds
 */
-int main(void) {
 
-
+INT8U * const DispSegTbl[] = {
+  (INT8U *) &DIGIT3,
+  (INT8U *) &DIGIT2,
+  (INT8U *) &DIGIT1,
     f2cc:	0f 43       	clr	r15		
+  (INT8U *) &DIGIT0
+};
 
-
-	static UBYTE array1[448];
-	static UBYTE array2[448];
+/*
     f2ce:	3b 41       	pop	r11		
     f2d0:	30 41       	ret			
 
 0000f2d2 <init_array>:
-
-
-
-	int i;
-
-
+*********************************************************************************************************
+* ASCII to SEVEN-SEGMENT conversion table
+* a
+* ------
+* f | | b
+* | g |
     f2d2:	3e 40 c0 00 	mov	#192,	r14	;#0x00c0
-    int o = 0;
-
-    WDTCTL = WDTPW | WDTHOLD;          // Disable watchdog timer
-
+* Note: The segments are mapped as follows: ------
+* e | | c
+* a b c d e f g | d |
+* -- -- -- -- -- -- -- -- ------
     f2d6:	df d3 00 00 	bis.b	#1,	0(r15)	;r3 As==01, 0x0000(r15)
     f2da:	1f 53       	inc	r15		
-    P1OUT  = 0x00;                     // Port data output
-    P2OUT  = 0x00;
+* B7 B6 B5 B4 B3 B2 B1 B0
+*********************************************************************************************************
     f2dc:	3e 53       	add	#-1,	r14	;r3 As==11
     f2de:	fb 23       	jnz	$-8      	;abs 0xf2d6
-
+*/
     f2e0:	30 41       	ret			
 
 0000f2e2 <copy_array>:
-    P2DIR  = 0x00;
-    P3DIR  = 0xff;
-
-    P1IES  = 0x00;                     // Port interrupt enable (0=dis 1=enabled)
-    P2IES  = 0x00;
-    P1IE   = 0x00;                     // Port interrupt Edge Select (0=pos 1=neg)
+const INT8U DispASCIItoSegTbl[] = {// ASCII to SEVEN-SEGMENT conversion table
+0x00, // ' '
+0x00, // '!', No seven-segment conversion for exclamation point
+0x44, // '"', Double quote
+0x00, // '#', Pound sign
+0x00, // '$', No seven-segment conversion for dollar sign
     f2e2:	3d 40 c0 00 	mov	#192,	r13	;#0x00c0
-    P2IE   = 0x00;
-
-    WDTCTL = WDTPW | WDTTMSEL | WDTCNTCL;// | WDTIS1  | WDTIS0 ;          // Configure watchdog interrupt
-
+0x00, // '%', No seven-segment conversion for percent sign
+0x00, // '&', No seven-segment conversion for ampersand
+0x40, // ''', Single quote
+0x9C, // '(', Same as '['
     f2e6:	ee 4f 00 00 	mov.b	@r15,	0(r14)	;0x0000(r14)
     f2ea:	1f 53       	inc	r15		
     f2ec:	1e 53       	inc	r14		
-
+0xF0, // ')', Same as ']'
     f2ee:	3d 53       	add	#-1,	r13	;r3 As==11
     f2f0:	fa 23       	jnz	$-10     	;abs 0xf2e6
-
+0x00, // '*', No seven-segment conversion for asterix
     f2f2:	30 41       	ret			
 
 0000f2f4 <__stop_progExec__>:
