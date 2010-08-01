@@ -40,28 +40,46 @@
 //----------------------------------------------------------------------------
 // SYSTEM CONFIGURATION
 //----------------------------------------------------------------------------
+//
+// Note: the sum of both program and data memories should not exceed 63.5 kB
+//
 
 // Program Memory Size:
-//                    9 ->  1 kB
-//                   10 ->  2 kB
-//                   11 ->  4 kB
-//                   12 ->  8 kB
-//                   13 -> 16 kB
-//                   14 -> 32 kB
-`define PMEM_AWIDTH   10
+//                     Uncomment the required memory size
+//-------------------------------------------------------
+//`define PMEM_SIZE_59_KB
+//`define PMEM_SIZE_55_KB
+//`define PMEM_SIZE_54_KB
+//`define PMEM_SIZE_51_KB
+//`define PMEM_SIZE_48_KB
+//`define PMEM_SIZE_41_KB
+//`define PMEM_SIZE_32_KB
+//`define PMEM_SIZE_24_KB
+//`define PMEM_SIZE_16_KB
+//`define PMEM_SIZE_12_KB
+//`define PMEM_SIZE_8_KB
+//`define PMEM_SIZE_4_KB
+`define PMEM_SIZE_2_KB
+//`define PMEM_SIZE_1_KB
 
 // Data Memory Size:
-//                    6 ->  128 B
-//                    7 ->  256 B
-//                    8 ->  512 B
-//                    9 ->    1 kB
-//                   10 ->    2 kB
-//                   11 ->    4 kB
-//                   12 ->    8 kB
-//                   13 ->   16 kB
-//                   14 ->   32 kB
-`define DMEM_AWIDTH    6
+//                     Uncomment the required memory size
+//-------------------------------------------------------
+//`define DMEM_SIZE_32_KB
+//`define DMEM_SIZE_24_KB
+//`define DMEM_SIZE_16_KB
+//`define DMEM_SIZE_10_KB
+//`define DMEM_SIZE_8_KB
+//`define DMEM_SIZE_5_KB
+//`define DMEM_SIZE_4_KB
+//`define DMEM_SIZE_2p5_KB
+//`define DMEM_SIZE_2_KB
+//`define DMEM_SIZE_1_KB
+//`define DMEM_SIZE_512_B
+//`define DMEM_SIZE_256_B
+`define DMEM_SIZE_128_B
 
+  
 // Include/Exclude Hardware Multiplier
 `define MULTIPLIER
 
@@ -102,9 +120,121 @@
 //==========================================================================//
 //==========================================================================//
 
-// Program and Data Memory sizes
-`define PMEM_SIZE  (2 << `PMEM_AWIDTH)
-`define DMEM_SIZE  (2 << `DMEM_AWIDTH)
+//
+// PROGRAM & DATA MEMORY CONFIGURATION
+//======================================
+
+// Program Memory Size
+`ifdef PMEM_SIZE_59_KB
+  `define PMEM_AWIDTH      15
+  `define PMEM_SIZE     60416
+`endif
+`ifdef PMEM_SIZE_55_KB
+  `define PMEM_AWIDTH      15
+  `define PMEM_SIZE     56320
+`endif
+`ifdef PMEM_SIZE_54_KB
+  `define PMEM_AWIDTH      15
+  `define PMEM_SIZE     55296
+`endif
+`ifdef PMEM_SIZE_51_KB
+  `define PMEM_AWIDTH      15
+  `define PMEM_SIZE     52224
+`endif
+`ifdef PMEM_SIZE_48_KB
+  `define PMEM_AWIDTH      15
+  `define PMEM_SIZE     49152
+`endif
+`ifdef PMEM_SIZE_41_KB
+  `define PMEM_AWIDTH      15
+  `define PMEM_SIZE     41984
+`endif
+`ifdef PMEM_SIZE_32_KB
+  `define PMEM_AWIDTH      14
+  `define PMEM_SIZE     32768
+`endif
+`ifdef PMEM_SIZE_24_KB
+  `define PMEM_AWIDTH      14
+  `define PMEM_SIZE     24576
+`endif
+`ifdef PMEM_SIZE_16_KB
+  `define PMEM_AWIDTH      13
+  `define PMEM_SIZE     16384
+`endif
+`ifdef PMEM_SIZE_12_KB
+  `define PMEM_AWIDTH      13
+  `define PMEM_SIZE     12288
+`endif
+`ifdef PMEM_SIZE_8_KB
+  `define PMEM_AWIDTH      12
+  `define PMEM_SIZE      8192
+`endif
+`ifdef PMEM_SIZE_4_KB
+  `define PMEM_AWIDTH      11
+  `define PMEM_SIZE      4096
+`endif
+`ifdef PMEM_SIZE_2_KB
+  `define PMEM_AWIDTH      10
+  `define PMEM_SIZE      2048
+`endif
+`ifdef PMEM_SIZE_1_KB
+  `define PMEM_AWIDTH       9
+  `define PMEM_SIZE      1024
+`endif
+
+// Data Memory Size
+`ifdef DMEM_SIZE_32_KB
+  `define DMEM_AWIDTH       14
+  `define DMEM_SIZE      32768
+`endif
+`ifdef DMEM_SIZE_24_KB
+  `define DMEM_AWIDTH       14
+  `define DMEM_SIZE      24576
+`endif
+`ifdef DMEM_SIZE_16_KB
+  `define DMEM_AWIDTH       13
+  `define DMEM_SIZE      16384
+`endif
+`ifdef DMEM_SIZE_10_KB
+  `define DMEM_AWIDTH       13
+  `define DMEM_SIZE      10240
+`endif
+`ifdef DMEM_SIZE_8_KB
+  `define DMEM_AWIDTH       12
+  `define DMEM_SIZE       8192
+`endif
+`ifdef DMEM_SIZE_5_KB
+  `define DMEM_AWIDTH       12
+  `define DMEM_SIZE       5120
+`endif
+`ifdef DMEM_SIZE_4_KB
+  `define DMEM_AWIDTH       11
+  `define DMEM_SIZE       4096
+`endif
+`ifdef DMEM_SIZE_2p5_KB
+  `define DMEM_AWIDTH       11
+  `define DMEM_SIZE       2560
+`endif
+`ifdef DMEM_SIZE_2_KB
+  `define DMEM_AWIDTH       10
+  `define DMEM_SIZE       2048
+`endif
+`ifdef DMEM_SIZE_1_KB
+  `define DMEM_AWIDTH        9
+  `define DMEM_SIZE       1024
+`endif
+`ifdef DMEM_SIZE_512_B
+  `define DMEM_AWIDTH        8
+  `define DMEM_SIZE        512
+`endif
+`ifdef DMEM_SIZE_256_B
+  `define DMEM_AWIDTH        7
+  `define DMEM_SIZE        256
+`endif
+`ifdef DMEM_SIZE_128_B
+  `define DMEM_AWIDTH        6
+  `define DMEM_SIZE        128
+`endif
 
 // Data Memory Base Adresses
 `define DMEM_BASE  16'h0200
@@ -113,6 +243,9 @@
 `define PMEM_MSB   `PMEM_AWIDTH-1
 `define DMEM_MSB   `DMEM_AWIDTH-1
 
+//
+// STATES, REGISTER FIELDS, ...
+//======================================
 
 // Instructions type
 `define INST_SO  0
@@ -249,6 +382,7 @@
 `define TAOUT       2
 `define TACOV       1
 `define TACCIFG     0
+
 
 //
 // DEBUG INTERFACE EXTRA CONFIGURATION

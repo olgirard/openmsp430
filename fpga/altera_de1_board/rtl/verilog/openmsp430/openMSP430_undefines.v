@@ -98,11 +98,98 @@
 //==========================================================================//
 
 // Program and Data Memory sizes
+`ifdef PMEM_SIZE_59_KB
+`undef PMEM_SIZE_59_KB
+`endif
+`ifdef PMEM_SIZE_55_KB
+`undef PMEM_SIZE_55_KB
+`endif
+`ifdef PMEM_SIZE_54_KB
+`undef PMEM_SIZE_54_KB
+`endif
+`ifdef PMEM_SIZE_51_KB
+`undef PMEM_SIZE_51_KB
+`endif
+`ifdef PMEM_SIZE_48_KB
+`undef PMEM_SIZE_48_KB
+`endif
+`ifdef PMEM_SIZE_41_KB
+`undef PMEM_SIZE_41_KB
+`endif
+`ifdef PMEM_SIZE_32_KB
+`undef PMEM_SIZE_32_KB
+`endif
+`ifdef PMEM_SIZE_24_KB
+`undef PMEM_SIZE_24_KB
+`endif
+`ifdef PMEM_SIZE_16_KB
+`undef PMEM_SIZE_16_KB
+`endif
+`ifdef PMEM_SIZE_12_KB
+`undef PMEM_SIZE_12_KB
+`endif
+`ifdef PMEM_SIZE_8_KB
+`undef PMEM_SIZE_8_KB
+`endif
+`ifdef PMEM_SIZE_4_KB
+`undef PMEM_SIZE_4_KB
+`endif
+`ifdef PMEM_SIZE_2_KB
+`undef PMEM_SIZE_2_KB
+`endif
+`ifdef PMEM_SIZE_1_KB
+`undef PMEM_SIZE_1_KB
+`endif
+`ifdef DMEM_SIZE_32_KB
+`undef DMEM_SIZE_32_KB
+`endif
+`ifdef DMEM_SIZE_24_KB
+`undef DMEM_SIZE_24_KB
+`endif
+`ifdef DMEM_SIZE_16_KB
+`undef DMEM_SIZE_16_KB
+`endif
+`ifdef DMEM_SIZE_10_KB
+`undef DMEM_SIZE_10_KB
+`endif
+`ifdef DMEM_SIZE_8_KB
+`undef DMEM_SIZE_8_KB
+`endif
+`ifdef DMEM_SIZE_5_KB
+`undef DMEM_SIZE_5_KB
+`endif
+`ifdef DMEM_SIZE_4_KB
+`undef DMEM_SIZE_4_KB
+`endif
+`ifdef DMEM_SIZE_2p5_KB
+`undef DMEM_SIZE_2p5_KB
+`endif
+`ifdef DMEM_SIZE_2_KB
+`undef DMEM_SIZE_2_KB
+`endif
+`ifdef DMEM_SIZE_1_KB
+`undef DMEM_SIZE_1_KB
+`endif
+`ifdef DMEM_SIZE_512_B
+`undef DMEM_SIZE_512_B
+`endif
+`ifdef DMEM_SIZE_256_B
+`undef DMEM_SIZE_256_B
+`endif
+`ifdef DMEM_SIZE_128_B
+`undef DMEM_SIZE_128_B
+`endif
 `ifdef PMEM_SIZE
 `undef PMEM_SIZE
 `endif
+`ifdef PMEM_AWIDTH
+`undef PMEM_AWIDTH
+`endif
 `ifdef DMEM_SIZE
 `undef DMEM_SIZE
+`endif
+`ifdef DMEM_AWIDTH
+`undef DMEM_AWIDTH
 `endif
 
 // Data Memory Base Adresses

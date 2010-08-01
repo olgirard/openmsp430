@@ -225,7 +225,7 @@ initial
 // Program Memory
 //----------------------------------
 
-ram #(`PMEM_MSB) pmem_0 (
+ram #(`PMEM_MSB, `PMEM_SIZE) pmem_0 (
 
 // OUTPUTs
     .ram_dout    (pmem_dout),          // Program Memory data output
@@ -243,7 +243,7 @@ ram #(`PMEM_MSB) pmem_0 (
 // Data Memory
 //----------------------------------
 
-ram #(`DMEM_MSB) dmem_0 (
+ram #(`DMEM_MSB, `DMEM_SIZE) dmem_0 (
 
 // OUTPUTs
     .ram_dout    (dmem_dout),          // Data Memory data output

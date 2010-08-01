@@ -53,7 +53,8 @@ module ram (
 
 // PARAMETERs
 //============
-parameter ADDR_MSB   =  6;
+parameter ADDR_MSB   =  6;         // MSB of the address bus
+parameter MEM_SIZE   =  256;       // Memory size in bytes
 
 // OUTPUTs
 //============
@@ -71,13 +72,14 @@ input        [1:0] ram_wen;        // RAM write enable (low active)
 // RAM
 //============
 
-reg         [15:0] mem [(1<<(ADDR_MSB+1))-1:0];
+reg         [15:0] mem [(MEM_SIZE/2)-1:0];
 reg   [ADDR_MSB:0] ram_addr_reg;
 
 wire        [15:0] mem_val = mem[ram_addr];
-
+   
+  
 always @(posedge ram_clk)
-  if (~ram_cen)
+  if (~ram_cen & ram_addr<(MEM_SIZE/2))
     begin
       if      (ram_wen==2'b00) mem[ram_addr] <= ram_din;
       else if (ram_wen==2'b01) mem[ram_addr] <= {ram_din[15:8], mem_val[7:0]};

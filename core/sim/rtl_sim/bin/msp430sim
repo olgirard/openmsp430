@@ -98,14 +98,23 @@ cp  $incfile  ./pmem.inc
 sed -i "/^\/\// s,.*,," pmem.inc
 
 # Get Program Memory size
-pmemsize=`grep PMEM_AWIDTH pmem.inc | grep -v PMEM_MSB | grep -v PMEM_SIZE`
-pmemsize=${pmemsize##* }
-pmemsize=$((2<<$pmemsize))
+pmemunit=`grep PMEM_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f4`
+pmemsize=`grep PMEM_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f3`
+pmemsize=${pmemsize/p/.}
+if [ $pmemunit == "KB" ]
+  then
+    pmemsize=`echo "pmemsize=$pmemsize * 1024; pmemsize /= 1; pmemsize" | bc`
+fi
 
 # Get Data Memory size
-dmemsize=`grep DMEM_AWIDTH pmem.inc | grep -v DMEM_MSB | grep -v DMEM_SIZE`
-dmemsize=${dmemsize##* }
-dmemsize=$((2<<$dmemsize))
+dmemunit=`grep DMEM_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f4`
+dmemsize=`grep DMEM_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f3`
+dmemsize=${dmemsize/p/.}
+if [ $dmemunit == "KB" ]
+  then
+    dmemsize=`echo "dmemsize=$dmemsize * 1024; dmemsize /= 1; dmemsize" | bc`
+fi
+
 
 # Compile assembler code
 echo "Compile, link & generate IHEX file (Program Memory: $pmemsize B, Data Memory: $dmemsize B)..."

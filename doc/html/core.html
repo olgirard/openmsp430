@@ -83,7 +83,7 @@ The known core limitations are the following:
 <h3>2.1.3 Configuration</h3>
 
 It is possible to configure the openMSP430 core through the "openMSP430_defines.v" file located in the "rtl" directory (see <a href="http://www.opencores.org/project,openmsp430,file%20and%20directory%20description">file and directory description</a>).<br />
-Two parameters can be adjusted by the user in order to define the program and data memory sizes:
+Two sets of parameters can be adjusted by the user in order to define the program and data memory sizes:
 <br /><br />
 <table border="0" cellspacing="4" cellpadding="0">
 <tr>
@@ -92,32 +92,46 @@ Two parameters can be adjusted by the user in order to define the program and da
 <td width="15"></td>
 <td>
 	<code>
-		      // Program Memory Size
-		<br />//                    9 ->  1 kB
-		<br />//                   10 ->  2 kB
-		<br />//                   11 ->  4 kB
-		<br />//                   12 ->  8 kB
-		<br />//                   13 -> 16 kB
-		<br />//                   14 -> 32 kB
-		<br />`define PMEM_AWIDTH   10
+            // Program Memory Size:
+		<br />//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uncomment the required memory size
+		<br />//-------------------------------------------------------
+		<br />//`define PMEM_SIZE_59_KB
+		<br />//`define PMEM_SIZE_55_KB
+		<br />//`define PMEM_SIZE_54_KB
+		<br />//`define PMEM_SIZE_51_KB
+		<br />//`define PMEM_SIZE_48_KB
+		<br />//`define PMEM_SIZE_41_KB
+		<br />//`define PMEM_SIZE_32_KB
+		<br />//`define PMEM_SIZE_24_KB
+		<br />//`define PMEM_SIZE_16_KB
+		<br />//`define PMEM_SIZE_12_KB
+		<br />//`define PMEM_SIZE_8_KB
+		<br />//`define PMEM_SIZE_4_KB
+		<br />`define PMEM_SIZE_2_KB
+		<br />//`define PMEM_SIZE_1_KB
 		<br />
-		<br />// Data Memory Size
-		<br />//                    6 ->  128 B
-		<br />//                    7 ->  256 B
-		<br />//                    8 ->  512 B
-		<br />//                    9 ->    1 kB
-		<br />//                   10 ->    2 kB
-		<br />//                   11 ->    4 kB
-		<br />//                   12 ->    8 kB
-		<br />//                   13 ->   16 kB
-		<br />//                   14 ->   32 kB
-		<br />`define DMEM_AWIDTH    6
+		<br />// Data Memory Size:
+		<br />//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uncomment the required memory size
+		<br />//-------------------------------------------------------
+		<br />//`define DMEM_SIZE_32_KB
+		<br />//`define DMEM_SIZE_24_KB
+		<br />//`define DMEM_SIZE_16_KB
+		<br />//`define DMEM_SIZE_10_KB
+		<br />//`define DMEM_SIZE_8_KB
+		<br />//`define DMEM_SIZE_5_KB
+		<br />//`define DMEM_SIZE_4_KB
+		<br />//`define DMEM_SIZE_2p5_KB
+		<br />//`define DMEM_SIZE_2_KB
+		<br />//`define DMEM_SIZE_1_KB
+		<br />//`define DMEM_SIZE_512_B
+		<br />//`define DMEM_SIZE_256_B
+		<br />`define DMEM_SIZE_128_B
 	</code>
 </td>
 </tr>
 </table>
 <br /><br />
-<b>Note:</b> Program and data memories <b>SHOULD NOT</b> be both set to 32 kB
+<b>Note:</b> The sum of both program and data memories <b>SHOULD NOT</b> exceed 63.5 kB.
 <br /><br /><br />
 The following parameters define if the debug interface should be included or not and how many hardware breakpoint units should be included.
 
