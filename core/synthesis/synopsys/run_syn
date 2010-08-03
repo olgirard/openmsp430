@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 rm -rf ./results/*
 dc_shell-t -f synthesis.tcl | tee ./results/synthesis.log

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Enable/Disable waveform dumping
 OMSP_NODUMP=0
