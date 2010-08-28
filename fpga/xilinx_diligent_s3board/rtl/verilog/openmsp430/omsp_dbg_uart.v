@@ -182,14 +182,14 @@ assign sync_done =  (uart_state==RX_SYNC) & rxd_re & sync_busy;
 
 `ifdef DBG_UART_AUTO_SYNC
 
-reg [14:0] sync_cnt;
+reg [`DBG_UART_XFER_CNT_W+2:0] sync_cnt;
 always @ (posedge mclk or posedge por)
-  if (por)            sync_cnt <=  15'h7ff8;
-  else if (sync_busy) sync_cnt <=  sync_cnt+15'h0001;
+  if (por)            sync_cnt <=  {{`DBG_UART_XFER_CNT_W{1'b1}}, 3'b000};
+  else if (sync_busy) sync_cnt <=  sync_cnt+{{`DBG_UART_XFER_CNT_W+2{1'b0}}, 1'b1};
 
-wire [11:0] bit_cnt_max = sync_cnt[14:3];
+wire [`DBG_UART_XFER_CNT_W-1:0] bit_cnt_max = sync_cnt[`DBG_UART_XFER_CNT_W+2:3];
 `else
-wire [11:0] bit_cnt_max = `DBG_UART_CNT;
+wire [`DBG_UART_XFER_CNT_W-1:0] bit_cnt_max = `DBG_UART_CNT;
 `endif
    
    
@@ -199,12 +199,12 @@ wire [11:0] bit_cnt_max = `DBG_UART_CNT;
    
 // Transfer counter
 //------------------------
-reg  [3:0] xfer_bit;
-reg [11:0] xfer_cnt;
+reg                      [3:0] xfer_bit;
+reg [`DBG_UART_XFER_CNT_W-1:0] xfer_cnt;
 
 wire       txd_start    = dbg_rd_rdy | (xfer_done & (uart_state==TX_DATA1));
 wire       rxd_start    = (xfer_bit==4'h0) & rxd_fe & ((uart_state!=RX_SYNC));
-wire       xfer_bit_inc = (xfer_bit!=4'h0) & (xfer_cnt==12'h000);
+wire       xfer_bit_inc = (xfer_bit!=4'h0) & (xfer_cnt=={`DBG_UART_XFER_CNT_W{1'b0}});
 assign     xfer_done    = (xfer_bit==4'hb);
    
 always @ (posedge mclk or posedge por)
@@ -214,10 +214,10 @@ always @ (posedge mclk or posedge por)
   else if (xfer_bit_inc)             xfer_bit <=  xfer_bit+4'h1;
 
 always @ (posedge mclk or posedge por)
-  if (por)                           xfer_cnt <=  12'h000;
-  else if (rxd_start)                xfer_cnt <=  {1'b0, bit_cnt_max[11:1]};
+  if (por)                           xfer_cnt <=  {`DBG_UART_XFER_CNT_W{1'b0}};
+  else if (rxd_start)                xfer_cnt <=  {1'b0, bit_cnt_max[`DBG_UART_XFER_CNT_W-1:1]};
   else if (txd_start | xfer_bit_inc) xfer_cnt <=  bit_cnt_max;
-  else                               xfer_cnt <=  xfer_cnt+12'hfff;
+  else                               xfer_cnt <=  xfer_cnt+{`DBG_UART_XFER_CNT_W{1'b1}};
 
 
 // Receive/Transmit buffer

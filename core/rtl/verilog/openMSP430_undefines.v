@@ -563,11 +563,6 @@
 `undef DBG_SWBRK_OP
 `endif
 
-// Debug interface ID
-`ifdef DBG_ID
-`undef DBG_ID
-`endif
-
 // Debug UART interface auto data synchronization
 `ifdef DBG_UART_AUTO_SYNC
 `undef DBG_UART_AUTO_SYNC
@@ -587,6 +582,11 @@
 // Enable/Disable the hardware breakpoint RANGE mode
 `ifdef HWBRK_RANGE
 `undef HWBRK_RANGE
+`endif
+
+// Counter width for the debug interface UART
+`ifdef DBG_UART_XFER_CNT_W
+`undef DBG_UART_XFER_CNT_W
 `endif
 
 //

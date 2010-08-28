@@ -265,9 +265,9 @@ wire [511:0] reg_rd    = reg_dec & {64{reg_read}};
 // CPU_ID Register
 //-----------------   
 
-wire  [3:0] cpu_id_pmem = `PMEM_AWIDTH;
-wire  [3:0] cpu_id_dmem = `DMEM_AWIDTH;
-wire [31:0] cpu_id      = {`DBG_ID, cpu_id_pmem, cpu_id_dmem};
+wire [15:0] cpu_id_pmem = `PMEM_SIZE;
+wire [15:0] cpu_id_dmem = `DMEM_SIZE;
+wire [31:0] cpu_id      = {cpu_id_pmem, cpu_id_dmem};
 
 
 // CPU_CTL Register

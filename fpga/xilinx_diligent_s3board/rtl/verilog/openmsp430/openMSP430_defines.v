@@ -391,9 +391,6 @@
 // Debug interface: Software breakpoint opcode
 `define DBG_SWBRK_OP 16'h4343
 
-// Debug interface ID
-`define DBG_ID  24'h4D5350
-
 // Debug UART interface auto data synchronization
 // If the following define is commented out, then
 // the DBG_UART_BAUD and DBG_DCO_FREQ need to be properly
@@ -420,6 +417,9 @@
 
 // Enable/Disable the hardware breakpoint RANGE mode
 `define HWBRK_RANGE 1'b0
+
+// Counter width for the debug interface UART
+`define DBG_UART_XFER_CNT_W 16
 
 // Check configuration
 `ifdef DBG_EN

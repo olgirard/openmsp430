@@ -58,7 +58,7 @@
 #               - ExecutePOR_Halt ()
 #               - GetCPU_ID       ()
 #               - GetCPU_ID_SIZE  ()
-#               - VerifyCPU_ID    (CPU_ID)
+#               - VerifyCPU_ID    ()
 #               - WriteReg        (Addr,      Data)
 #               - WriteRegAll     (DataArray)
 #               - ReadReg         (Addr)
@@ -103,7 +103,7 @@ proc ExecutePOR {} {
     dbg_uart_wr CPU_CTL $cpu_ctl_org
 
     # Check CPU ID
-    if {![VerifyCPU_ID 0x4d5350]} {
+    if {![VerifyCPU_ID]} {
 	set result 0
     }
 
@@ -220,7 +220,7 @@ proc GetDevice {} {
     set hw_break(num) [InitBreakUnits]
 
     # Check CPU ID
-    if {[VerifyCPU_ID 0x4d5350]} {
+    if {[VerifyCPU_ID]} {
 	return 1
     } else {
 	return 0
@@ -377,7 +377,14 @@ proc VerifyMem {StartAddr DataArray} {
 
     set mem_val [dbg_uart_rx 0 [expr [llength $DataArray]*2]]
 
-    return [string equal $DataArray $mem_val]
+    set    return_val [string equal $DataArray $mem_val]
+
+    #if {$return_val==0} {
+    #	puts $DataArray
+    #	puts $mem_val
+    #}
+
+    return $return_val
 }
 
 #=============================================================================#
@@ -399,7 +406,7 @@ proc ExecutePOR_Halt {} {
     dbg_uart_wr CPU_CTL $cpu_ctl_org
 
     # Check CPU ID
-    if {![VerifyCPU_ID 0x4d5350]} {
+    if {![VerifyCPU_ID]} {
 	set result 0
     }
 
@@ -438,33 +445,32 @@ proc GetCPU_ID { } {
 # Arguments  : None.                                                          #
 # Result     : Return "ROM_SIZE RAM_SIZE" in byte.                            #
 #=============================================================================#
-proc GetCPU_ID_SIZE { } {
+proc GetCPU_ID_SIZE {} {
 
     set cpu_id_full [GetCPU_ID]
-    regexp {(.)(.)$} $cpu_id_full match rom_width ram_width
+    regexp {(....)(....)$} $cpu_id_full match rom_width ram_width
 
-    set rom_size [expr (1<<0x$rom_width)*2]
-    set ram_size [expr (1<<0x$ram_width)*2]
+    set rom_size [expr 0x$rom_width]
+    set ram_size [expr 0x$ram_width]
 
     return "$rom_size $ram_size"
 }
 
 #=============================================================================#
-# VerifyCPU_ID (uint32 CPU_ID)                                                #
+# VerifyCPU_ID ()                                                             #
 #-----------------------------------------------------------------------------#
 # Description: Read and check the CPU_ID from the target device.              #
 # Arguments  : None.                                                          #
 # Result     : 0 if error, 1 otherwise.                                       #
 #=============================================================================#
-proc VerifyCPU_ID {cpu_id} {
+proc VerifyCPU_ID {} {
 
     set cpu_id_full [GetCPU_ID]
-    regsub {..$} $cpu_id_full {} cpu_id_hi
 
-    if {[string eq $cpu_id $cpu_id_hi]} {
-	set result 1
-    } else {
+    if {[string eq "0x00000000" $cpu_id_full]} {
 	set result 0
+    } else {
+	set result 1
     }
     return $result
 }
