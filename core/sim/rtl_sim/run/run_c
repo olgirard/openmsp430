@@ -1,0 +1,4 @@
+#!/bin/csh -f
+
+../bin/msp430sim_c sandbox
+
