@@ -136,7 +136,23 @@ proc loadProgram {elf_file_name} {
 
     # Generate binary file
     set bin_file "[clock clicks].bin"
-    catch {exec msp430-objcopy -O binary $elf_file_name $bin_file}
+    if {[catch {exec msp430-objcopy -O binary $elf_file_name $bin_file} errMsg]} {
+	.load.fb.l configure -text "$errMsg" -fg red
+	return 0
+    }
+ 
+    # Wait until bin file is present on the filesystem
+    set timeout 100
+    for {set i 0} {$i <= $timeout} {incr i} {
+	after 500
+	if {[file exists $bin_file]} {
+	    break
+	}
+    }
+    if {$i>=$timeout} {
+	.load.fb.l configure -text "Timeout: ELF to BIN file conversion problem with \"msp430-objcopy\" executable" -fg red
+	return 0
+    }
 
     # Read file
     set fp [open $bin_file r]
@@ -151,6 +167,13 @@ proc loadProgram {elf_file_name} {
     set hex_size  [string length $hex_data]
     set byte_size [expr $hex_size/2]
     set word_size [expr $byte_size/2]
+
+    # Make sure ELF program size is the same as the available program memory
+    set sizes [GetCPU_ID_SIZE]
+    if {[lindex $sizes 0] != [expr $hex_size/2]} {
+	.load.fb.l configure -text "ERROR: ELF program size ([expr $hex_size/2] B) is different than the available program memory ([lindex $sizes 0] B)" -fg red
+	return 0
+    }
 
     # Format data
     for {set i 0} {$i < $hex_size} {set i [expr $i+4]} {
@@ -174,7 +197,7 @@ proc loadProgram {elf_file_name} {
     # Check Data
     .load.fb.l configure -text "Verify..." -fg yellow
     update
-    if {[VerifyMem $StartAddr $DataArray]} {
+    if {[VerifyMem $StartAddr $DataArray 1]} {
 	.load.fb.l configure -text "Done" -fg green
     } else {
 	.load.fb.l configure -text "ERROR" -fg red

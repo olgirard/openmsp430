@@ -369,7 +369,7 @@ proc ReadMemQuick {StartAddr Length} {
 #              DataArray - List of reference data (in hexadecimal).           #
 # Result     : 0 if error, 1 if verification was successful.                  #
 #=============================================================================#
-proc VerifyMem {StartAddr DataArray} {
+proc VerifyMem {StartAddr DataArray {DumpOnError 0}} {
 
     dbg_uart_wr MEM_CNT  [expr [llength $DataArray]-1]
     dbg_uart_wr MEM_ADDR $StartAddr
@@ -379,10 +379,20 @@ proc VerifyMem {StartAddr DataArray} {
 
     set    return_val [string equal $DataArray $mem_val]
 
-    #if {$return_val==0} {
-    #	puts $DataArray
-    #	puts $mem_val
-    #}
+    if {($return_val==0) && ($DumpOnError==1)} {
+	file delete -force openmsp430-verifymem-debug-original.mem
+	file delete -force openmsp430-verifymem-debug-dumped.mem
+	set fileId [open openmsp430-verifymem-debug-original.mem "w"]
+	foreach hexCode $DataArray {
+	    puts $fileId $hexCode
+	}
+	close $fileId
+	set fileId [open openmsp430-verifymem-debug-dumped.mem "w"]
+	foreach hexCode $mem_val {
+	    puts $fileId $hexCode
+	}
+	close $fileId
+    }
 
     return $return_val
 }

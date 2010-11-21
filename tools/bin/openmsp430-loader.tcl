@@ -100,7 +100,24 @@ source $lib_path/dbg_functions.tcl
 ###############################################################################
 
 # Generate binary file
-catch {exec msp430-objcopy -O binary $elf_file $bin_file}
+if {[catch {exec msp430-objcopy -O binary $elf_file $bin_file} errMsg]} {
+    puts $errMsg
+    exit 1
+}
+
+# Wait until bin file is present on the filesystem
+set timeout 100
+for {set i 0} {$i <= $timeout} {incr i} {
+    after 500
+    if {[file exists $bin_file]} {
+	break
+    }
+}
+if {$i>=$timeout} {
+    puts "Timeout: ELF to BIN file conversion problem with \"msp430-objcopy\" executable"
+    puts "$errMsg"
+    exit 1
+}
 
 # Read file
 set fp [open $bin_file r]
@@ -146,6 +163,12 @@ set sizes [GetCPU_ID_SIZE]
 puts "Connected: target device has [lindex $sizes 0]B Program Memory and [lindex $sizes 1]B Data Memory"
 puts ""
 
+# Make sure ELF program size is the same as the available program memory
+if {[lindex $sizes 0] != [expr $hex_size/2]} {
+    puts "ERROR: ELF program size ($byte_size B) is different than the available program memory ([lindex $sizes 0] B)"
+    exit 1
+}
+
 # Load Program Memory
 set StartAddr [format "0x%04x" [expr 0x10000-$byte_size]]
 puts -nonewline "Load Program Memory... "
@@ -156,7 +179,7 @@ puts "done"
 # Check Data
 puts -nonewline "Verify Program Memory... "
 flush stdout
-if {[VerifyMem $StartAddr $DataArray]} {
+if {[VerifyMem $StartAddr $DataArray 1]} {
     puts "done"
 } else {
     puts "ERROR"
