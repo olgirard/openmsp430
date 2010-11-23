@@ -290,6 +290,7 @@ main:
         /* -------------- PORT 1: TEST I/O FUNCTIONALITY --------------- */
 
 	mov     #0x0200, r15        ;# Test Input path
+	nop
 p1_din_loop:
 	mov.b &P1IN,  0(r15)
 	inc      r15
@@ -332,6 +333,7 @@ p1_sel_loop:
         /* -------------- PORT 2: TEST I/O FUNCTIONALITY --------------- */
 
 	mov     #0x0210, r15        ;# Test Input path
+	nop
 p2_din_loop:
 	mov.b &P2IN,  0(r15)
 	inc      r15
@@ -374,6 +376,7 @@ p2_sel_loop:
         /* -------------- PORT 3: TEST I/O FUNCTIONALITY --------------- */
 
 	mov     #0x0220, r15        ;# Test Input path
+	nop
 p3_din_loop:
 	mov.b &P3IN,  0(r15)
 	inc      r15
@@ -416,6 +419,7 @@ p3_sel_loop:
         /* -------------- PORT 4: TEST I/O FUNCTIONALITY --------------- */
 
 	mov     #0x0230, r15        ;# Test Input path
+	nop
 p4_din_loop:
 	mov.b &P4IN,  0(r15)
 	inc      r15
@@ -458,6 +462,7 @@ p4_sel_loop:
         /* -------------- PORT 5: TEST I/O FUNCTIONALITY --------------- */
 
 	mov     #0x0240, r15        ;# Test Input path
+	nop
 p5_din_loop:
 	mov.b &P5IN,  0(r15)
 	inc      r15
@@ -500,6 +505,7 @@ p5_sel_loop:
         /* -------------- PORT 6: TEST I/O FUNCTIONALITY --------------- */
 
 	mov     #0x0250, r15        ;# Test Input path
+	nop
 p6_din_loop:
 	mov.b &P6IN,  0(r15)
 	inc      r15

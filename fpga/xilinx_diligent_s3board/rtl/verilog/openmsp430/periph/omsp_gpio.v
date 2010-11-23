@@ -264,11 +264,20 @@ wire [255:0] reg_rd       = reg_dec & {256{reg_read}};
 
 // P1IN Register
 //---------------
+reg  [7:0] p1in_s;
 reg  [7:0] p1in;
 
 always @ (posedge mclk or posedge puc)
-  if (puc)  p1in <=  8'h00;
-  else      p1in <=  p1_din & P1_EN_MSK;    
+  if (puc)
+    begin
+       p1in_s <=  8'h00;
+       p1in   <=  8'h00;
+    end
+  else
+    begin
+       p1in_s <=  p1_din & P1_EN_MSK;
+       p1in   <=  p1in_s & P1_EN_MSK;
+    end
 
 
 // P1OUT Register
@@ -352,11 +361,20 @@ assign p1_sel = p1sel;
    
 // P2IN Register
 //---------------
+reg  [7:0] p2in_s;
 reg  [7:0] p2in;
 
 always @ (posedge mclk or posedge puc)
-  if (puc)      p2in <=  8'h00;
-  else          p2in <=  p2_din & P2_EN_MSK;    
+  if (puc)
+    begin
+       p2in_s <=  8'h00;
+       p2in   <=  8'h00;
+    end
+  else
+    begin
+       p2in_s <=  p2_din & P2_EN_MSK;
+       p2in   <=  p2in_s & P2_EN_MSK;
+    end
 
 
 // P2OUT Register
@@ -441,11 +459,20 @@ assign p2_sel = p2sel;
    
 // P3IN Register
 //---------------
+reg  [7:0] p3in_s;
 reg  [7:0] p3in;
 
 always @ (posedge mclk or posedge puc)
-  if (puc)      p3in <=  8'h00;
-  else          p3in <=  p3_din & P3_EN_MSK;    
+  if (puc)
+    begin
+       p3in_s <=  8'h00;
+       p3in   <=  8'h00;
+    end
+  else
+    begin
+       p3in_s <=  p3_din & P3_EN_MSK;
+       p3in   <=  p3in_s & P3_EN_MSK;
+    end
 
 
 // P3OUT Register
@@ -492,11 +519,20 @@ assign p3_sel = p3sel;
    
 // P4IN Register
 //---------------
+reg  [7:0] p4in_s;
 reg  [7:0] p4in;
 
 always @ (posedge mclk or posedge puc)
-  if (puc)      p4in <=  8'h00;
-  else          p4in <=  p4_din & P4_EN_MSK;    
+  if (puc)
+    begin
+       p4in_s <=  8'h00;
+       p4in   <=  8'h00;
+    end
+  else
+    begin
+       p4in_s <=  p4_din & P4_EN_MSK;
+       p4in   <=  p4in_s & P4_EN_MSK;
+    end
 
 
 // P4OUT Register
@@ -543,11 +579,20 @@ assign p4_sel = p4sel;
    
 // P5IN Register
 //---------------
+reg  [7:0] p5in_s;
 reg  [7:0] p5in;
 
 always @ (posedge mclk or posedge puc)
-  if (puc)      p5in <=  8'h00;
-  else          p5in <=  p5_din & P5_EN_MSK;    
+  if (puc)
+    begin
+       p5in_s <=  8'h00;
+       p5in   <=  8'h00;
+    end
+  else
+    begin
+       p5in_s <=  p5_din & P5_EN_MSK;
+       p5in   <=  p5in_s & P5_EN_MSK;
+    end
 
 
 // P5OUT Register
@@ -594,11 +639,20 @@ assign p5_sel = p5sel;
    
 // P6IN Register
 //---------------
+reg  [7:0] p6in_s;
 reg  [7:0] p6in;
 
 always @ (posedge mclk or posedge puc)
-  if (puc)      p6in <=  8'h00;
-  else          p6in <=  p6_din & P6_EN_MSK;    
+  if (puc)
+    begin
+       p6in_s <=  8'h00;
+       p6in   <=  8'h00;
+    end
+  else
+    begin
+       p6in_s <=  p6_din & P6_EN_MSK;
+       p6in   <=  p6in_s & P6_EN_MSK;
+    end
 
 
 // P6OUT Register
