@@ -14,8 +14,7 @@ input RESET;
     
     VCC VCC_1_net(.Y(VCC));
     GND GND_1_net(.Y(GND));
-    RAM4K9 #( .MEMORYFILE() )  
-        pmem_2kB_R0C0(.ADDRA11(GND), .ADDRA10(WADDR[10]), 
+    RAM4K9 pmem_2kB_R0C0(.ADDRA11(GND), .ADDRA10(WADDR[10]), 
         .ADDRA9(WADDR[9]), .ADDRA8(WADDR[8]), .ADDRA7(WADDR[7]), 
         .ADDRA6(WADDR[6]), .ADDRA5(WADDR[5]), .ADDRA4(WADDR[4]), 
         .ADDRA3(WADDR[3]), .ADDRA2(WADDR[2]), .ADDRA1(WADDR[1]), 
@@ -36,8 +35,7 @@ input RESET;
         .DOUTA0(), .DOUTB8(), .DOUTB7(), .DOUTB6(), .DOUTB5(), 
         .DOUTB4(), .DOUTB3(), .DOUTB2(), .DOUTB1(RD[1]), .DOUTB0(
         RD[0]));
-    RAM4K9 #( .MEMORYFILE() )  
-        pmem_2kB_R0C1(.ADDRA11(GND), .ADDRA10(WADDR[10]), 
+    RAM4K9 pmem_2kB_R0C1(.ADDRA11(GND), .ADDRA10(WADDR[10]), 
         .ADDRA9(WADDR[9]), .ADDRA8(WADDR[8]), .ADDRA7(WADDR[7]), 
         .ADDRA6(WADDR[6]), .ADDRA5(WADDR[5]), .ADDRA4(WADDR[4]), 
         .ADDRA3(WADDR[3]), .ADDRA2(WADDR[2]), .ADDRA1(WADDR[1]), 
@@ -58,8 +56,7 @@ input RESET;
         .DOUTA0(), .DOUTB8(), .DOUTB7(), .DOUTB6(), .DOUTB5(), 
         .DOUTB4(), .DOUTB3(), .DOUTB2(), .DOUTB1(RD[3]), .DOUTB0(
         RD[2]));
-    RAM4K9 #( .MEMORYFILE() )  
-        pmem_2kB_R0C3(.ADDRA11(GND), .ADDRA10(WADDR[10]), 
+    RAM4K9 pmem_2kB_R0C3(.ADDRA11(GND), .ADDRA10(WADDR[10]), 
         .ADDRA9(WADDR[9]), .ADDRA8(WADDR[8]), .ADDRA7(WADDR[7]), 
         .ADDRA6(WADDR[6]), .ADDRA5(WADDR[5]), .ADDRA4(WADDR[4]), 
         .ADDRA3(WADDR[3]), .ADDRA2(WADDR[2]), .ADDRA1(WADDR[1]), 
@@ -80,8 +77,7 @@ input RESET;
         .DOUTA0(), .DOUTB8(), .DOUTB7(), .DOUTB6(), .DOUTB5(), 
         .DOUTB4(), .DOUTB3(), .DOUTB2(), .DOUTB1(RD[7]), .DOUTB0(
         RD[6]));
-    RAM4K9 #( .MEMORYFILE() )  
-        pmem_2kB_R0C2(.ADDRA11(GND), .ADDRA10(WADDR[10]), 
+    RAM4K9 pmem_2kB_R0C2(.ADDRA11(GND), .ADDRA10(WADDR[10]), 
         .ADDRA9(WADDR[9]), .ADDRA8(WADDR[8]), .ADDRA7(WADDR[7]), 
         .ADDRA6(WADDR[6]), .ADDRA5(WADDR[5]), .ADDRA4(WADDR[4]), 
         .ADDRA3(WADDR[3]), .ADDRA2(WADDR[2]), .ADDRA1(WADDR[1]), 

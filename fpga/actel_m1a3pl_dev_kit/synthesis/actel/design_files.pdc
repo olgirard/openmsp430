@@ -8,19 +8,19 @@
 
 # CLOCK & RESET
 #------------------------------------------------
-set_io clk_osc             -pinname E4
+set_io oscclk              -pinname E4
 set_io porst_n             -pinname V7
 set_io pbrst_n             -pinname T9
 
 
 # GPIOA
 #------------------------------------------------
-set_io gpioa\[0\]          -pinname D5     ;# GPIOA_0
-set_io gpioa\[1\]          -pinname D6     ;# GPIOA_1
-set_io gpioa\[2\]          -pinname D10    ;# GPIOA_2
-set_io gpioa\[3\]          -pinname G10    ;# GPIOA_3
-set_io gpioa\[4\]          -pinname G11    ;# GPIOA_4
-set_io gpioa\[4\]          -pinname E11    ;# GPIOA_5
+set_io din_x               -pinname D5     ;# GPIOA_0
+set_io sclk_x              -pinname D6     ;# GPIOA_1
+set_io sync_n_x            -pinname D10    ;# GPIOA_2
+set_io din_y               -pinname G10    ;# GPIOA_3
+set_io sclk_y              -pinname G11    ;# GPIOA_4
+set_io sync_n_y            -pinname E11    ;# GPIOA_5
 
 
 # UART INTERFACE

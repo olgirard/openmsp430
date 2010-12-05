@@ -134,16 +134,16 @@ PLLINT clk_in0 (.A(oscclk), .Y(oscclk_buf));
 
 
 parameter  FCLKA  = 48.0;
-parameter  M      = 7'd8;
-parameter  N      = 7'd3;
-parameter  U      = 5'd8;
+parameter  M      = 7'd6;
+parameter  N      = 7'd9;
+parameter  U      = 5'd2;
 parameter  V      = 5'd1;
 parameter  W      = 5'd1;
 
-parameter  FVCO   = FCLKA*M/N;  // 128 MHz
+parameter  FVCO   = FCLKA*M/N;  //  32 MHz
 parameter  FGLA   = FVCO/U;     //  16 MHz
-parameter  FGLB   = FVCO/V;     // 128 MHz
-parameter  FGLC   = FVCO/W;     // 128 MHz
+parameter  FGLB   = FVCO/V;     //  32 MHz
+parameter  FGLC   = FVCO/W;     //  32 MHz
 
 wire [4:0] oadiv  = U-5'h01;
 wire [4:0] obdiv  = V-5'h01;
@@ -257,10 +257,34 @@ PLL #(.VCOFREQUENCY(FVCO))  pll_0 (
 
     .XDLYSEL      (1'b0),         // System Delay Select (0: no dly; 1:inserts system dly)
 
-    .VCOSEL0      (1'b1),         // VCO gear control
-    .VCOSEL1      (1'b1),
-    .VCOSEL2      (1'b1)
+    .VCOSEL0      (1'b1),         // PLL lock acquisition time (0: Fast with high tracking jitter; 1: Slow with low tracking jitter)
+
+    .VCOSEL1      (1'b1),         // VCO gear control (see table below)
+    .VCOSEL2      (1'b0)
 );
+
+//-------------+--------------------------------------------------------------+
+//             |                           VCOSEL[2:1]                        |
+//             |---------------+---------------+--------------+---------------|
+//             |       00      |       01      |       10     |       11      |
+//  VOLTAGE    |---------------+---------------+--------------+---------------|
+//             |   Min.  Max.  |   Min.  Max.  |   Min.  Max. |   Min.  Max.  |
+//             |  (MHz) (MHz)  |  (MHz) (MHz)  |  (MHz) (MHz) |  (MHz) (MHz)  |
+//-------------+---------------+---------------+--------------+---------------|
+// IGLOO and IGLOO PLUS                                                       |
+//-------------+---------------+---------------+--------------+---------------|
+// 1.2 V ± 5%  |   24    35    |   30     70   |   60    140  |   135   160   |
+// 1.5 V ± 5%  |   24    43.75 |   30     87.5 |   60    175  |   135   250   |
+//-------------+---------------+---------------+--------------+---------------|
+// ProASIC3L, RT ProASIC3, and Military ProASIC3/L                            |
+//-------------+---------------+---------------+--------------+---------------|
+// 1.2 V ± 5%  |   24    35    |    30    70   |   60    140  |   135   250   |
+// 1.5 V ± 5%  |   24    43.75 |    30    70   |   60    175  |   135   350   |
+//-------------+---------------+---------------+--------------+---------------|
+// ProASIC3 and Fusion                                                        |
+//-------------+---------------+---------------+--------------+---------------|
+// 1.5 V ± 5%  |   24    43.75 |    33.75 87.5 |  67.5   175  |   135   350   |
+//-------------+---------------+---------------+--------------+---------------+
 
    
 //=============================================================================

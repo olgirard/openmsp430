@@ -40,7 +40,7 @@ package require Tclx
 ###############################################################################
 
 # Set tools
-set SYNPLICITY      "C:\\\\Actel\\\\Libero_v8.5\\\\Synplify\\\\synplify_96A\\\\bin\\\\synplify.exe"
+set SYNPLICITY      "C:\\\\Actel\\\\Libero_v8.5\\\\Synplify\\\\synplify_96A\\\\bin\\\\synplify_pro.exe"
 set LIBERO_DESIGNER "C:\\\\Actel\\\\Libero_v8.5\\\\Designer\\\\bin\\\\designer.exe"
 
 # Set the FPGA:  architecture,    model,   package_syn  package_libero, speed-grade
@@ -49,6 +49,10 @@ set fpgaConfig {  ProASIC3L     A3P1000L     FBGA484     "484 FBGA"        Std}
 # RTL Top Level module
 set designTop "openMSP430_fpga"
 
+# RTL include files
+set rtlIncludeFiles "../../../rtl/verilog/openmsp430/timescale.v              \
+                     ../../../rtl/verilog/openmsp430/openMSP430_defines.v     \
+                     ../../../rtl/verilog/openmsp430/openMSP430_undefines.v"
 
 ###############################################################################
 #                                 CLEANUP                                     #
@@ -64,9 +68,13 @@ file delete -force ./WORK
 file mkdir ./WORK
 cd ./WORK
 
-
+# Copy RTL include files
+foreach rtlFile $rtlIncludeFiles {
+	file copy $rtlFile .
+}
+	
 ###############################################################################
-#                              PERFORM SYNTHESIS                              #
+#                         GENERATE SYNTHESIS SCRIPT                           #
 ###############################################################################
 
 # Copy Synplify tcl command files
@@ -88,39 +96,8 @@ set f_synplify_tcl [open "synplify.tcl" w]
 puts $f_synplify_tcl $synplify_tcl
 close $f_synplify_tcl
 
-# Start synthesis
-puts "START SYNTHESIS..."
-flush stdout
-set synplify_done 0
-while {[string eq $synplify_done 0]} {
-
-    sleep 10
-    eval exec $SYNPLICITY synplify.tcl
-    sleep 30
-
-    # Wait until EDIF file is generated
-    set synplify_timeout 0
-    while {!([file exists "./rev_1/design_files.edn"] | ($synplify_timeout==100))} {
-	set synplify_timeout [expr $synplify_timeout+1]
-    }
-    if ($synplify_timeout<100) {
-	set synplify_done 1
-    }
-
-    # Kill the Synplify task with taskkill since it can't be properly closed with the synplify.tcl script
-    sleep 10
-    eval exec taskkill /IM synplify.exe
-    sleep 20
-    if {[string eq $synplify_done 0]} {
-	sleep 180
-    }
-}
-puts "SYNTHESIS DONE..."
-flush stdout
-
-
 ###############################################################################
-#                           PERFORM PLACE & ROUTE                             #
+#                      GENERATE PLACE & ROUTE SCRIPT                          #
 ###############################################################################
 
 # Copy Libero Designer tcl command files
@@ -139,7 +116,34 @@ regsub -all {<SPEED_GRADE>}    $libero_designer_tcl "[lindex $fpgaConfig 4]" lib
 set f_libero_designer_tcl [open "libero_designer.tcl" w]
 puts $f_libero_designer_tcl $libero_designer_tcl
 close $f_libero_designer_tcl
-				
+
+###############################################################################
+#                               RUN SYNTHESIS                                 #
+###############################################################################
+
+# Start synthesis
+puts "START SYNTHESIS..."
+flush stdout
+sleep 10
+eval exec $SYNPLICITY synplify.tcl
+sleep 30
+
+# Wait until EDIF file is generated
+while {!([file exists "./rev_1/design_files.edn"])} {
+	sleep 10
+}
+
+# Kill the Synplify task with taskkill since it can't be properly closed with the synplify.tcl script
+sleep 10
+eval exec taskkill /IM synplify.exe
+sleep 20
+
+puts "SYNTHESIS DONE..."
+flush stdout
+
+###############################################################################
+#                             RUN PLACE & ROUTE                               #
+###############################################################################
 
 # Run place & route
 puts "START PLACE & ROUTE..."
@@ -147,7 +151,6 @@ flush stdout
 eval exec $LIBERO_DESIGNER script:libero_designer.tcl logfile:libero_designer.log
 puts "PLACE & ROUTE DONE..."
 flush stdout
-
 
 ###############################################################################
 #                             REPORT SUMMARY                                  #
@@ -175,7 +178,7 @@ regexp {(Compile report:.*?)Total:} $areaFile whole_match area1
 regexp {(Core Information:.*?)I/O Function:} $areaFile whole_match area2
 puts $area1
 puts $area2
-puts $f_logFile "===================================================================================="
+puts "===================================================================================="
 
 cd ../
 sleep 3
