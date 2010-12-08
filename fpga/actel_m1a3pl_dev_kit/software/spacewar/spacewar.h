@@ -17,17 +17,17 @@
 #define time_tick 1         // 10 ms timer tick for system time
 
 #define MY_DAC_X_      0x0190
-sfrb (MY_DAC_X,MY_DAC_X_);
+sfrw (MY_DAC_X,MY_DAC_X_);
 #define MY_DAC_X_STAT_ 0x0192
-sfrb (MY_DAC_X_STAT,MY_DAC_X_STAT_);
+sfrw (MY_DAC_X_STAT,MY_DAC_X_STAT_);
 #define MY_CNTRL1_     0x0194
-sfrb (MY_CNTRL1,MY_CNTRL1_);
+sfrw (MY_CNTRL1,MY_CNTRL1_);
 #define MY_CNTRL2_     0x0196
-sfrb (MY_CNTRL2,MY_CNTRL2_);
+sfrw (MY_CNTRL2,MY_CNTRL2_);
 #define MY_DAC_Y_      0x01A0
-sfrb (MY_DAC_Y,MY_DAC_Y_);
+sfrw (MY_DAC_Y,MY_DAC_Y_);
 #define MY_DAC_Y_STAT_ 0x01A2
-sfrb (MY_DAC_Y_STAT,MY_DAC_Y_STAT_);
+sfrw (MY_DAC_Y_STAT,MY_DAC_Y_STAT_);
 
 /* Description:
 The structure contain all the data for each rocket.  Two of these structures

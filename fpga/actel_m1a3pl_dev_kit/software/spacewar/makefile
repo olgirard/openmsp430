@@ -4,6 +4,7 @@ OBJECTS         = bzsin.o  cline.o  compar.o  explode.o  hardware.o  main.o  poi
 CPU             = msp430x2122
 
 CFLAGS          = -mmcu=${CPU} -O2 -Wall -g
+#CFLAGS          = -mmcu=${CPU} -mforce-hwmul -O2 -Wall -g
 
 #switch the compiler (for the internal make rules)
 CC              = msp430-gcc
