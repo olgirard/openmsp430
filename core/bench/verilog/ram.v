@@ -72,7 +72,7 @@ input        [1:0] ram_wen;        // RAM write enable (low active)
 // RAM
 //============
 
-reg         [15:0] mem [(MEM_SIZE/2)-1:0];
+reg         [15:0] mem [0:(MEM_SIZE/2)-1];
 reg   [ADDR_MSB:0] ram_addr_reg;
 
 wire        [15:0] mem_val = mem[ram_addr];

@@ -202,7 +202,14 @@ parameter           BRK3_ADDR0_D = (64'h1 << BRK3_ADDR0);
 parameter           BRK3_ADDR1_D = (64'h1 << BRK3_ADDR1);
 `endif
 
-   
+// PUC is localy used as a data.
+reg  [1:0] puc_sync;
+always @ (posedge mclk or posedge por)
+  if (por) puc_sync <=  2'b11;
+  else     puc_sync <=  {puc_sync[0] , puc};
+wire       puc_s     =  puc_sync[1];
+
+
 //============================================================================
 // 2)  REGISTER DECODER
 //============================================================================
@@ -298,7 +305,7 @@ wire        istep    = cpu_ctl_wr & dbg_din[`ISTEP] &  dbg_halt_st;
 reg   [3:2] cpu_stat;
 
 wire        cpu_stat_wr  = reg_wr[CPU_STAT];
-wire  [3:2] cpu_stat_set = {dbg_swbrk, puc};
+wire  [3:2] cpu_stat_set = {dbg_swbrk, puc_s};
 wire  [3:2] cpu_stat_clr = ~dbg_din[3:2];
 
 always @ (posedge mclk or posedge por)
@@ -616,7 +623,7 @@ wire dbg_reset  = cpu_ctl[`CPU_RST];
    
 // Break after reset
 //--------------------------
-wire halt_rst = cpu_ctl[`RST_BRK_EN] & puc;
+wire halt_rst = cpu_ctl[`RST_BRK_EN] & puc_s;
 
    
 // Freeze peripherals

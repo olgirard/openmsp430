@@ -35,9 +35,12 @@ void init_all(rkt_data *rkt1, rkt_data *rkt2)
   P1DIR |= 0x01+0x04;                   // P1.0=LED, P1.2=TLV5618A_cs
   P1SEL = 0x08;                         // P1.3 = VREF
 
+  //BCSCTL2 = 0x00;                       // SMCLK divider = 1
+  //BCSCTL2 = 0x02;                       // SMCLK divider = 2
+  //BCSCTL2 = 0x04;                       // SMCLK divider = 4
+  BCSCTL2 = 0x06;                       // SMCLK divider = 8
   CCTL0 = CCIE;                         // CCR0 interrupt enabled
   CCR0 = 23500;
-  //CCR0 = 500;
   TACTL = TASSEL_2 + MC_1;              // SMCLK, upmode
   _BIS_SR(GIE);                         // enable interrupts
   

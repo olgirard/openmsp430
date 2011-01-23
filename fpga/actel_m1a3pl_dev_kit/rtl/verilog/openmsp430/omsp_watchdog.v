@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 37 $
+// $Rev: 34 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2009-12-29 21:58:14 +0100 (Tue, 29 Dec 2009) $
+// $LastChangedDate: 2009-12-29 20:10:34 +0100 (Tue, 29 Dec 2009) $
 //----------------------------------------------------------------------------
 `include "timescale.v"
 `include "openMSP430_defines.v"
@@ -160,8 +160,8 @@ always @ (posedge mclk or posedge puc)
   else      nmi_sync <= {nmi_sync[1:0], nmi};
 
 // Edge detection
-wire        nmi_re    = ~nmi_sync[2] &  nmi_sync[0] & nmie;
-wire        nmi_fe    =  nmi_sync[2] & ~nmi_sync[0] & nmie;
+wire        nmi_re    = ~nmi_sync[2] &  nmi_sync[1] & nmie;
+wire        nmi_fe    =  nmi_sync[2] & ~nmi_sync[1] & nmie;
 
 // NMI event
 wire        nmi_evt   = wdtctl[6] ? nmi_fe : nmi_re;

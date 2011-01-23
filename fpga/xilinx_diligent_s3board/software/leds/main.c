@@ -5,7 +5,7 @@
 Delay function.
 */
 void delay(unsigned int c, unsigned int d) {
-  int i, j;
+  volatile int i, j;
   for (i = 0; i<c; i++) {
     for (j = 0; j<d; j++) {
       nop();
@@ -19,7 +19,7 @@ This one is executed onece a second. it counts seconds, minues, hours - hey
 it shoule be a clock ;-)
 it does not count days, but i think you'll get the idea.
 */
-int irq_counter, offset;
+volatile int irq_counter, offset;
 
 wakeup interrupt (WDT_VECTOR) INT_Watchdog(void) {
 

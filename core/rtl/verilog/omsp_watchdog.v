@@ -160,8 +160,8 @@ always @ (posedge mclk or posedge puc)
   else      nmi_sync <= {nmi_sync[1:0], nmi};
 
 // Edge detection
-wire        nmi_re    = ~nmi_sync[2] &  nmi_sync[0] & nmie;
-wire        nmi_fe    =  nmi_sync[2] & ~nmi_sync[0] & nmie;
+wire        nmi_re    = ~nmi_sync[2] &  nmi_sync[1] & nmie;
+wire        nmi_fe    =  nmi_sync[2] & ~nmi_sync[1] & nmie;
 
 // NMI event
 wire        nmi_evt   = wdtctl[6] ? nmi_fe : nmi_re;
