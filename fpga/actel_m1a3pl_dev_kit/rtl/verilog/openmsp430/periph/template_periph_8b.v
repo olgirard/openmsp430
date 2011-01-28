@@ -173,10 +173,10 @@ always @ (posedge mclk or posedge puc)
 //============================================================================
 
 // Data output mux
-wire [15:0] cntrl1_rd   = (cntrl1  & {8{reg_rd[CNTRL1/2]}})  << (8 & {4{CNTRL1[0]}});
-wire [15:0] cntrl2_rd   = (cntrl2  & {8{reg_rd[CNTRL2/2]}})  << (8 & {4{CNTRL2[0]}});
-wire [15:0] cntrl3_rd   = (cntrl3  & {8{reg_rd[CNTRL3/2]}})  << (8 & {4{CNTRL3[0]}});
-wire [15:0] cntrl4_rd   = (cntrl4  & {8{reg_rd[CNTRL4/2]}})  << (8 & {4{CNTRL4[0]}});
+wire [15:0] cntrl1_rd   = {8'h00, (cntrl1  & {8{reg_rd[CNTRL1/2]}})}  << (8 & {4{CNTRL1[0]}});
+wire [15:0] cntrl2_rd   = {8'h00, (cntrl2  & {8{reg_rd[CNTRL2/2]}})}  << (8 & {4{CNTRL2[0]}});
+wire [15:0] cntrl3_rd   = {8'h00, (cntrl3  & {8{reg_rd[CNTRL3/2]}})}  << (8 & {4{CNTRL3[0]}});
+wire [15:0] cntrl4_rd   = {8'h00, (cntrl4  & {8{reg_rd[CNTRL4/2]}})}  << (8 & {4{CNTRL4[0]}});
 
 wire [15:0] per_dout  =  cntrl1_rd  |
                          cntrl2_rd  |

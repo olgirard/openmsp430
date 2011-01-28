@@ -174,8 +174,8 @@ assign  ifg1 = {3'b000, nmiifg, 3'b000, wdtifg};
 //============================================================================
 
 // Data output mux
-wire [15:0] ie1_rd   = (ie1  & {8{reg_rd[IE1/2]}})  << (8 & {4{IE1[0]}});
-wire [15:0] ifg1_rd  = (ifg1 & {8{reg_rd[IFG1/2]}}) << (8 & {4{IFG1[0]}});
+wire [15:0] ie1_rd   = {8'h00, (ie1  & {8{reg_rd[IE1/2]}})}  << (8 & {4{IE1[0]}});
+wire [15:0] ifg1_rd  = {8'h00, (ifg1 & {8{reg_rd[IFG1/2]}})} << (8 & {4{IFG1[0]}});
 
 wire [15:0] per_dout =  ie1_rd   |
                         ifg1_rd;

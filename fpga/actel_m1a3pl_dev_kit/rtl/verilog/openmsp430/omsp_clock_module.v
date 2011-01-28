@@ -158,8 +158,8 @@ always @ (posedge mclk or posedge puc)
 //============================================================================
 
 // Data output mux
-wire [15:0] bcsctl1_rd   = (bcsctl1  & {8{reg_rd[BCSCTL1/2]}})  << (8 & {4{BCSCTL1[0]}});
-wire [15:0] bcsctl2_rd   = (bcsctl2  & {8{reg_rd[BCSCTL2/2]}})  << (8 & {4{BCSCTL2[0]}});
+wire [15:0] bcsctl1_rd   = {8'h00, (bcsctl1  & {8{reg_rd[BCSCTL1/2]}})}  << (8 & {4{BCSCTL1[0]}});
+wire [15:0] bcsctl2_rd   = {8'h00, (bcsctl2  & {8{reg_rd[BCSCTL2/2]}})}  << (8 & {4{BCSCTL2[0]}});
 
 wire [15:0] per_dout =  bcsctl1_rd   |
                         bcsctl2_rd;
@@ -190,30 +190,40 @@ wire  mclk_n = !dco_clk;
 // Generate ACLK
 //----------------------------
 
+reg       aclk_en;
 reg [2:0] aclk_div;
 
-wire      aclk_en = lfxt_clk_en & ((bcsctl1[`DIVAx]==2'b00) ?  1'b1          :
-                                   (bcsctl1[`DIVAx]==2'b01) ?  aclk_div[0]   :
-                                   (bcsctl1[`DIVAx]==2'b10) ? &aclk_div[1:0] :
-                                                              &aclk_div[2:0]);
-   
+wire      aclk_en_nxt = lfxt_clk_en & ((bcsctl1[`DIVAx]==2'b00) ?  1'b1          :
+                                       (bcsctl1[`DIVAx]==2'b01) ?  aclk_div[0]   :
+                                       (bcsctl1[`DIVAx]==2'b10) ? &aclk_div[1:0] :
+                                                                  &aclk_div[2:0]);
+
+always @ (posedge mclk or posedge puc)
+  if (puc)  aclk_en <=  1'b0;
+  else      aclk_en <=  aclk_en_nxt;
+
 always @ (posedge mclk or posedge puc)
   if (puc)                                         aclk_div <=  3'h0;
   else if ((bcsctl1[`DIVAx]!=2'b00) & lfxt_clk_en) aclk_div <=  aclk_div+3'h1;
-   
+
 
 // Generate SMCLK
 //----------------------------
 
+reg       smclk_en;
 reg [2:0] smclk_div;
 
-wire      smclk_in = ~scg1 & (bcsctl2[`SELS] ? lfxt_clk_en : 1'b1);
+wire      smclk_in     = ~scg1 & (bcsctl2[`SELS] ? lfxt_clk_en : 1'b1);
 
-wire      smclk_en = smclk_in & ((bcsctl2[`DIVSx]==2'b00) ?  1'b1           :
-                                 (bcsctl2[`DIVSx]==2'b01) ?  smclk_div[0]   :
-                                 (bcsctl2[`DIVSx]==2'b10) ? &smclk_div[1:0] :
-                                                            &smclk_div[2:0]);
+wire      smclk_en_nxt = smclk_in & ((bcsctl2[`DIVSx]==2'b00) ?  1'b1           :
+                                     (bcsctl2[`DIVSx]==2'b01) ?  smclk_div[0]   :
+                                     (bcsctl2[`DIVSx]==2'b10) ? &smclk_div[1:0] :
+                                                                &smclk_div[2:0]);
    
+always @ (posedge mclk or posedge puc)
+  if (puc)  smclk_en <=  1'b0;
+  else      smclk_en <=  smclk_en_nxt;
+
 always @ (posedge mclk or posedge puc)
   if (puc)                                      smclk_div <=  3'h0;
   else if ((bcsctl2[`DIVSx]!=2'b00) & smclk_in) smclk_div <=  smclk_div+3'h1;

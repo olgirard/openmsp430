@@ -261,8 +261,8 @@ wire         reg_write =  dbg_wr;
 wire         reg_read  =  1'b1;
 
 // Read/Write vectors
-wire [511:0] reg_wr    = reg_dec & {64{reg_write}};
-wire [511:0] reg_rd    = reg_dec & {64{reg_read}};
+wire  [63:0] reg_wr    = reg_dec & {64{reg_write}};
+wire  [63:0] reg_rd    = reg_dec & {64{reg_read}};
 
 
 //=============================================================================

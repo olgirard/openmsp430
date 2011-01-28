@@ -123,6 +123,29 @@ input               wdt_irq;       // Watchdog-timer interrupt
 
 
 //=============================================================================
+// 0)  UTILITY FUNCTIONS
+//=============================================================================
+
+// 16 bits one-hot decoder
+function [15:0] one_hot16;
+   input  [3:0] binary;
+   begin
+      one_hot16         = 16'h0000;
+      one_hot16[binary] =  1'b1;
+   end
+endfunction
+   
+// 8 bits one-hot decoder
+function [7:0] one_hot8;
+   input  [2:0] binary;
+   begin
+      one_hot8         = 8'h00;
+      one_hot8[binary] = 1'b1;
+   end
+endfunction
+   
+
+//=============================================================================
 // 1)  FRONTEND STATE MACHINE
 //=============================================================================
 
@@ -228,7 +251,7 @@ always @(posedge mclk or posedge puc)
 wire [15:0] irq_addr    = {11'h7ff, irq_num, 1'b0};
 
 // Interrupt request accepted
-wire [15:0] irq_acc_all = (16'h0001 << irq_num) & {16{(i_state==I_IRQ_FETCH)}};
+wire [15:0] irq_acc_all = one_hot16(irq_num) & {16{(i_state==I_IRQ_FETCH)}};
 wire [13:0] irq_acc     = irq_acc_all[13:0];
 wire        nmi_acc     = irq_acc_all[14];
 
@@ -257,7 +280,7 @@ always @(posedge mclk or posedge puc)
 // Check if ROM has been busy in order to retry ROM access
 reg pmem_busy;
 always @(posedge mclk or posedge puc)
-  if (puc)  pmem_busy <= 16'h0000;
+  if (puc)  pmem_busy <= 1'b0;
   else      pmem_busy <= fe_pmem_wait;
    
 // Memory interface
@@ -347,7 +370,7 @@ always @(posedge mclk or posedge puc)
 // 8'b10000000: IRQ
 
 reg   [7:0] inst_so;
-wire  [7:0] inst_so_nxt = irq_detect ? 8'h80 : ((8'h01<<ir[9:7]) & {8{inst_type_nxt[`INST_SO]}});
+wire  [7:0] inst_so_nxt = irq_detect ? 8'h80 : (one_hot8(ir[9:7]) & {8{inst_type_nxt[`INST_SO]}});
 
 always @(posedge mclk or posedge puc)
   if (puc)         inst_so <= 8'h00;
@@ -372,7 +395,7 @@ always @(posedge mclk or posedge puc)
   if (puc)         inst_jmp_bin <= 3'h0;
   else if (decode) inst_jmp_bin <= ir[12:10];
 
-wire [7:0] inst_jmp = (8'h01<<inst_jmp_bin) & {8{inst_type[`INST_JMP]}};
+wire [7:0] inst_jmp = one_hot8(inst_jmp_bin) & {8{inst_type[`INST_JMP]}};
 
 
 //
@@ -393,7 +416,7 @@ wire [7:0] inst_jmp = (8'h01<<inst_jmp_bin) & {8{inst_type[`INST_JMP]}};
 // 12'b010000000000: XOR
 // 12'b100000000000: AND
 
-wire [15:0] inst_to_1hot = (16'h0001<<ir[15:12]) & {16{inst_type_nxt[`INST_TO]}};
+wire [15:0] inst_to_1hot = one_hot16(ir[15:12]) & {16{inst_type_nxt[`INST_TO]}};
 wire [11:0] inst_to_nxt  = inst_to_1hot[15:4];
 
 
@@ -407,12 +430,12 @@ always @(posedge mclk or posedge puc)
   if (puc)         inst_dest_bin <= 4'h0;
   else if (decode) inst_dest_bin <= ir[3:0];
 
-wire  [15:0] inst_dest = dbg_halt_st          ? (16'h0001 << dbg_reg_sel) :
-                         inst_type[`INST_JMP] ? 16'h0001                  :
+wire  [15:0] inst_dest = dbg_halt_st          ? one_hot16(dbg_reg_sel) :
+                         inst_type[`INST_JMP] ? 16'h0001               :
                          inst_so[`IRQ]  |
                          inst_so[`PUSH] |
-                         inst_so[`CALL]       ? 16'h0002                  :
-                                                (16'h0001 << inst_dest_bin);
+                         inst_so[`CALL]       ? 16'h0002               :
+                                                one_hot16(inst_dest_bin);
 
 
 // Source register
@@ -421,10 +444,10 @@ always @(posedge mclk or posedge puc)
   if (puc)         inst_src_bin <= 4'h0;
   else if (decode) inst_src_bin <= ir[11:8];
 
-wire  [15:0] inst_src = inst_type[`INST_TO] ? (16'h0001 << inst_src_bin)  :
-                        inst_so[`RETI]      ? 16'h0002                    :
-                        inst_so[`IRQ]       ? 16'h0001                    :
-                        inst_type[`INST_SO] ? (16'h0001 << inst_dest_bin) : 16'h0000;
+wire  [15:0] inst_src = inst_type[`INST_TO] ? one_hot16(inst_src_bin)  :
+                        inst_so[`RETI]      ? 16'h0002                 :
+                        inst_so[`IRQ]       ? 16'h0001                 :
+                        inst_type[`INST_SO] ? one_hot16(inst_dest_bin) : 16'h0000;
 
 
 //

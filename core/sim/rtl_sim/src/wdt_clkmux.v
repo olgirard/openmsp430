@@ -75,8 +75,8 @@ initial
       @(negedge mclk);
       mclk_counter = 0;
       r5_counter   = 0;
-      repeat(7813) @(negedge mclk);
-      if (mclk_counter !== 7813) tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK =====");
+      repeat(7815) @(negedge mclk);
+      if (mclk_counter !== 7815) tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK =====");
       if (r5_counter   !== 4)    tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK =====");
 
       

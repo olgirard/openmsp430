@@ -225,7 +225,7 @@ always @ (posedge mclk or posedge por)
 wire [19:0] xfer_buf_nxt =  {rxd_s, xfer_buf[19:1]};
 
 always @ (posedge mclk or posedge por)
-  if (por)               xfer_buf <=  18'h00000;
+  if (por)               xfer_buf <=  20'h00000;
   else if (dbg_rd_rdy)   xfer_buf <=  {1'b1, dbg_dout[15:8], 2'b01, dbg_dout[7:0], 1'b0};
   else if (xfer_bit_inc) xfer_buf <=  xfer_buf_nxt;
 

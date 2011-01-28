@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 74 $
+// $Rev: 84 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2010-08-28 21:53:08 +0200 (Sat, 28 Aug 2010) $
+// $LastChangedDate: 2011-01-23 21:00:36 +0100 (Sun, 23 Jan 2011) $
 //----------------------------------------------------------------------------
 `include "timescale.v"
 `include "openMSP430_defines.v"
@@ -261,8 +261,8 @@ wire         reg_write =  dbg_wr;
 wire         reg_read  =  1'b1;
 
 // Read/Write vectors
-wire [511:0] reg_wr    = reg_dec & {64{reg_write}};
-wire [511:0] reg_rd    = reg_dec & {64{reg_read}};
+wire  [63:0] reg_wr    = reg_dec & {64{reg_write}};
+wire  [63:0] reg_rd    = reg_dec & {64{reg_read}};
 
 
 //=============================================================================
