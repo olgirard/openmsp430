@@ -139,6 +139,10 @@ wire          [7:0] inst_jmp;
 wire         [15:0] pc;
 wire         [15:0] pc_nxt;
 
+wire                dbg_halt_cmd;
+wire                dbg_mem_en;
+wire                dbg_reg_wr;
+wire                dbg_reset;
 wire         [15:0] dbg_mem_addr;
 wire         [15:0] dbg_mem_dout;
 wire         [15:0] dbg_mem_din;

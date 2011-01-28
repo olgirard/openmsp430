@@ -134,11 +134,11 @@ initial
       //--------------------------------------------------------
 
       // READ ROM
-      dbg_uart_wr(MEM_ADDR, 16'hf82e);  // select memory address
+      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h2e));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0001);  // read memory
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h5ab7)  tb_error("====== ROM (16b): Read @0xf82e =====");
-      dbg_uart_wr(MEM_ADDR, 16'hf830);  // select memory address
+      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h30));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0001);  // read memory
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h6bc8)  tb_error("====== ROM (16b): Read @0xf830 =====");
@@ -160,11 +160,11 @@ initial
       //--------------------------------------------------------
 
       // READ ROM
-      dbg_uart_wr(MEM_ADDR, 16'hf82e);  // select memory address
+      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h2e));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0009);  // read memory
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h00b7)  tb_error("====== ROM (8b): Read @0xf82e =====");
-      dbg_uart_wr(MEM_ADDR, 16'hf82f);  // select memory address
+      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h2f));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0009);  // read memory
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h005a)  tb_error("====== ROM (8b): Read @0xf82f =====");

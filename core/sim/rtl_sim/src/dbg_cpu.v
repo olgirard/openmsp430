@@ -150,13 +150,13 @@ initial
       dbg_uart_wr(CPU_CTL,  16'h0008);  // RELEASE RESET
       dbg_uart_rd(CPU_STAT);            // READ STATUS
       if (dbg_uart_buf !== 16'h000D)      tb_error("====== SOFTWARE BREAKPOINT: test 1 =====");
-      if (r0           !== 16'hf812)      tb_error("====== SOFTWARE BREAKPOINT: test 2 =====");
+      if (r0           !== ('h10000-`PMEM_SIZE+'h12))      tb_error("====== SOFTWARE BREAKPOINT: test 2 =====");
       dbg_uart_wr(CPU_STAT,  16'h000C); // CLEAR STATUS
       dbg_uart_rd(CPU_STAT);            // READ STATUS
       if (dbg_uart_buf !== 16'h0001)      tb_error("====== SOFTWARE BREAKPOINT: test 3 =====");
 
       // Replace software breakpoint with a mov #2, r15 (opcode=0x432f)
-      dbg_uart_wr(MEM_ADDR, 16'hf812);
+      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h12));
       dbg_uart_wr(MEM_DATA, 16'h432f);
       dbg_uart_wr(MEM_CTL,  16'h0003);
 
@@ -172,14 +172,14 @@ initial
  
       dbg_uart_rd(CPU_STAT);            // READ STATUS
       if (dbg_uart_buf !== 16'h0009)      tb_error("====== SOFTWARE BREAKPOINT: test 5 =====");
-      if (r0           !== 16'hf816)      tb_error("====== SOFTWARE BREAKPOINT: test 6 =====");
+      if (r0           !== ('h10000-`PMEM_SIZE+'h16))      tb_error("====== SOFTWARE BREAKPOINT: test 6 =====");
       dbg_uart_wr(CPU_STAT,  16'h0008); // CLEAR STATUS
       dbg_uart_rd(CPU_STAT);            // READ STATUS
       if (dbg_uart_buf !== 16'h0001)      tb_error("====== SOFTWARE BREAKPOINT: test 7 =====");
 
       
       // Replace software breakpoint with a mov #4, r15 (opcode=0x422f)
-      dbg_uart_wr(MEM_ADDR, 16'hf816);
+      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h16));
       dbg_uart_wr(MEM_DATA, 16'h422f);
       dbg_uart_wr(MEM_CTL,  16'h0003);
 
