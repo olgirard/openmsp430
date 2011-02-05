@@ -43,10 +43,10 @@ global serial_device
 
 proc help {} {
     puts ""
-    puts "USAGE   : openmsp430-loader.tcl \[-device <communication device>\] \[-baudrate <communication speed>\] <elf-file>"
+    puts "USAGE   : openmsp430-loader.tcl \[-device <communication device>\] \[-baudrate <communication speed>\] <elf/ihex-file>"
     puts ""
     puts "Examples: openmsp430-loader.tcl -device /dev/ttyUSB0 -baudrate  9600  leds.elf"
-    puts "          openmsp430-loader.tcl -device COM2:        -baudrate 38400  ta_uart.elf"
+    puts "          openmsp430-loader.tcl -device COM2:        -baudrate 38400  ta_uart.ihex"
     puts ""
 }
 
@@ -67,14 +67,14 @@ for {set i 0} {$i < $argc} {incr i} {
 
 # Make sure arugments were specified
 if {[string eq $elf_file -1]} {
-    puts "ERROR: ELF file isn't specified"
+    puts "ERROR: ELF/IHEX file isn't specified"
     help
     exit 1   
 }
 
 # Make sure the elf file exists
 if {![file exists $elf_file]} {
-    puts "ERROR: Specified ELF file doesn't exist"
+    puts "ERROR: Specified ELF/IHEX file doesn't exist"
     help
     exit 1   
 }
@@ -99,8 +99,23 @@ source $lib_path/dbg_functions.tcl
 #                  CREATE AND READ BINARY EXECUTABLE FILE                     #
 ###############################################################################
 
+# Detect the file format depending on the fil extention
+set fileType [file extension $elf_file]
+set fileType [string tolower $fileType]
+regsub {\.} $fileType {} fileType
+if {![string eq $fileType "ihex"] & ![string eq $fileType "hex"] & ![string eq $fileType "elf"]} {
+    puts "ERROR: [string toupper $fileType] file format not supported"
+    return 0
+}
+if {[string eq $fileType "hex"]} {
+    set fileType "ihex"
+}
+if {[string eq $fileType "elf"]} {
+    set fileType "elf32-msp430"
+}
+
 # Generate binary file
-if {[catch {exec msp430-objcopy -O binary $elf_file $bin_file} errMsg]} {
+if {[catch {exec msp430-objcopy -I $fileType -O binary $elf_file $bin_file} errMsg]} {
     puts $errMsg
     exit 1
 }
