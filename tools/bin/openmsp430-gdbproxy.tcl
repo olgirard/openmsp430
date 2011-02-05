@@ -200,6 +200,10 @@ pack   .serial -side top -padx 10 -pady 10 -fill x
 frame  .server
 pack   .server -side top -padx 10 -pady 10 -fill x
 
+# Create the TCL script field
+frame  .tclscript
+pack   .tclscript -side top -padx 10 -pady 10 -fill x
+
 
 ####################################
 #  CREATE THE REST                 #
@@ -249,7 +253,7 @@ set server(log) [text   .server.t.log -width 80 -height 10 -borderwidth 2  \
                           -setgrid true -yscrollcommand {.server.t.scroll set}]
 pack   .server.t.log -side left  -fill both -expand true
 scrollbar .server.t.scroll -command {.server.t.log yview}
-pack   .server.t.scroll -side right -fill both -expand true
+pack   .server.t.scroll -side right -fill both
 
 
 # Log commands
@@ -259,3 +263,19 @@ button .server.cmd.clear -text "Clear log" -command {$server(log) delete 1.0 end
 pack   .server.cmd.clear -side left -padx 10
 checkbutton .server.cmd.verbose -text "Verbose" -variable verbose
 pack   .server.cmd.verbose -side right -padx 10
+
+
+# Load TCL script fields
+frame  .tclscript.ft
+pack   .tclscript.ft        -side top -fill x
+label  .tclscript.ft.l      -text "TCL script:" -state disabled
+pack   .tclscript.ft.l      -side left -padx "0 10"
+entry  .tclscript.ft.file   -width 58 -relief sunken -textvariable tcl_file_name -state disabled
+pack   .tclscript.ft.file   -side left -padx 10
+button .tclscript.ft.browse -text "Browse" -state disabled -command {set tcl_file_name [tk_getOpenFile -filetypes {{{TCL Files} {.tcl}} {{All Files} *}}]}
+pack   .tclscript.ft.browse -side left -padx 5 
+frame  .tclscript.fb
+pack   .tclscript.fb        -side top -fill x
+button .tclscript.fb.read   -text "Source TCL script !" -state disabled -command {if {[file exists $tcl_file_name]} {source $tcl_file_name}}
+pack   .tclscript.fb.read   -side left -padx 5 -fill x
+

@@ -220,11 +220,7 @@ proc GetDevice {} {
     set hw_break(num) [InitBreakUnits]
 
     # Check CPU ID
-    if {[VerifyCPU_ID]} {
-	return 1
-    } else {
-	return 0
-    }
+    return [VerifyCPU_ID]
 }
 
 #=============================================================================#
@@ -458,10 +454,18 @@ proc GetCPU_ID { } {
 proc GetCPU_ID_SIZE {} {
 
     set cpu_id_full [GetCPU_ID]
-    regexp {(....)(....)$} $cpu_id_full match rom_width ram_width
+    regexp {(....)(....)$} $cpu_id_full match rom_size ram_size
 
-    set rom_size [expr 0x$rom_width]
-    set ram_size [expr 0x$ram_width]
+    if {[info exists rom_size]} {
+	set rom_size [expr 0x$rom_size]
+    } else {
+        set rom_size -1
+    }
+    if {[info exists ram_size]} {
+	set ram_size [expr 0x$ram_size]
+    } else {
+        set ram_size -1
+    }
 
     return "$rom_size $ram_size"
 }
@@ -477,7 +481,7 @@ proc VerifyCPU_ID {} {
 
     set cpu_id_full [GetCPU_ID]
 
-    if {[string eq "0x00000000" $cpu_id_full]} {
+    if {[string eq "0x00000000" $cpu_id_full] | [string eq "0x" $cpu_id_full]} {
 	set result 0
     } else {
 	set result 1
@@ -648,14 +652,17 @@ proc EraseRAM {} {
 
     set ram_size [lindex [GetCPU_ID_SIZE] 1]
 
-    set DataArray ""
-    for {set i 0} {$i<$ram_size} {incr i} {
-	lappend DataArray 0x00
+    if {$ram_size!=-1} {
+	set DataArray ""
+	for {set i 0} {$i<$ram_size} {incr i} {
+	    lappend DataArray 0x00
+	}
+
+	WriteMemQuick8 $0x0200 $DataArray
+
+	return 1
     }
-
-    WriteMemQuick8 $0x0200 $DataArray
-
-    return 1
+    return 0
 }
 
 #=============================================================================#
@@ -670,14 +677,17 @@ proc EraseROM {} {
     set rom_size  [lindex [GetCPU_ID_SIZE] 0]
     set rom_start [expr 0x10000-$rom_size]
 
-    set DataArray ""
-    for {set i 0} {$i<$rom_size} {incr i} {
-	lappend DataArray 0x00
+    if {$ram_size!=-1} {   
+	set DataArray ""
+	for {set i 0} {$i<$rom_size} {incr i} {
+	    lappend DataArray 0x00
+	}
+
+	WriteMemQuick8 $rom_start $DataArray
+
+	return 1
     }
-
-    WriteMemQuick8 $rom_start $DataArray
-
-    return 1
+    return 0
 }
 
 #=============================================================================#

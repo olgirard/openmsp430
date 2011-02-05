@@ -27,7 +27,7 @@
 #
 # ... and many others over the years.
 
-package require Tk 8.0
+package require Tk 8.3
 package provide combobox 2.3
 
 namespace eval ::combobox {

@@ -110,6 +110,12 @@ proc startServerGUI { } {
     putsLog "INFO: $hw_break(num) Hardware Break/Watch-point unit(s) detected"
     putsLog " "
 
+    # Activate Load TCL script section
+    .tclscript.ft.l          configure -state normal
+    .tclscript.ft.file       configure -state normal
+    .tclscript.ft.browse     configure -state normal
+    .tclscript.fb.read       configure -state normal
+
     # Reset & Stop CPU
     ExecutePOR_Halt
 
