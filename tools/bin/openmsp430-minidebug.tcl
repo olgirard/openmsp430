@@ -106,8 +106,8 @@ proc connect_openMSP430 {} {
 	    .ctrl.serial.p2               configure -state disabled
 	    .ctrl.serial.connect          configure -state disabled
 	    .ctrl.mem_sz.l3               configure -text "Connected" -fg green
-	    .ctrl.mem_sz.l8               configure -text [lindex $sizes 0]
-	    .ctrl.mem_sz.l5               configure -text [lindex $sizes 1]
+	    .ctrl.mem_sz.l8               configure -text [lindex $sizes 1]
+	    .ctrl.mem_sz.l5               configure -text [lindex $sizes 0]
 
 	    # Activate ELF file section
 	    .ctrl.load.ft.l               configure -state normal
