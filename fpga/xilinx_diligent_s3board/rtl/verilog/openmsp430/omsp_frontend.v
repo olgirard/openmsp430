@@ -226,7 +226,7 @@ always @(posedge mclk or posedge puc)
   else if (exec_done)           inst_irq_rst <= 1'b0;
 
 //  Detect other interrupts
-assign  irq_detect = (inst_nmi | ((|irq | wdt_irq) & gie)) & ~dbg_halt_cmd & (exec_done | (i_state==I_IDLE));
+assign  irq_detect = (inst_nmi | ((|irq | wdt_irq) & gie)) & ~dbg_halt_cmd & ~dbg_halt_st & (exec_done | (i_state==I_IDLE));
 
 // Select interrupt vector
 reg  [3:0] irq_num;

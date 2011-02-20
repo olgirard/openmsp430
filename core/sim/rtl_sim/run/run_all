@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 # Disable waveform dumping
 OMSP_NODUMP=1
@@ -60,6 +60,7 @@ rm -rf *.log
 ../bin/msp430sim dbg_hwbrk1          | tee dbg_hwbrk1.log
 ../bin/msp430sim dbg_hwbrk2          | tee dbg_hwbrk2.log
 ../bin/msp430sim dbg_hwbrk3          | tee dbg_hwbrk3.log
+../bin/msp430sim dbg_halt_irq        | tee dbg_halt_irq.log
 
 # Watchdog test patterns
 ../bin/msp430sim wdt_interval        | tee wdt_interval.log

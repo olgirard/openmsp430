@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 61 $
+// $Rev: 85 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2010-02-03 23:14:03 +0100 (Wed, 03 Feb 2010) $
+// $LastChangedDate: 2011-01-28 22:05:37 +0100 (Fri, 28 Jan 2011) $
 //----------------------------------------------------------------------------
 `include "timescale.v"
 `include "openMSP430_defines.v"
@@ -226,7 +226,7 @@ always @(posedge mclk or posedge puc)
   else if (exec_done)           inst_irq_rst <= 1'b0;
 
 //  Detect other interrupts
-assign  irq_detect = (inst_nmi | ((|irq | wdt_irq) & gie)) & ~dbg_halt_cmd & (exec_done | (i_state==I_IDLE));
+assign  irq_detect = (inst_nmi | ((|irq | wdt_irq) & gie)) & ~dbg_halt_cmd & ~dbg_halt_st & (exec_done | (i_state==I_IDLE));
 
 // Select interrupt vector
 reg  [3:0] irq_num;
