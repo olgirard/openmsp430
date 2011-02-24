@@ -92,7 +92,7 @@ wire       [11:0] vout_y;
 initial
    begin
       // Read memory file
-      $readmemh("./pmem.mem", pmem);
+      #10 $readmemh("./pmem.mem", pmem);
 
       // Update Actel memory banks
       for (i=0; i<512; i=i+1)

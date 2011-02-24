@@ -146,3 +146,7 @@ wire       [15:0] irq_vect_03 = pmem_0.mem[(1<<(`PMEM_MSB+1))-13]; // IRQ  3
 wire       [15:0] irq_vect_02 = pmem_0.mem[(1<<(`PMEM_MSB+1))-14]; // IRQ  2
 wire       [15:0] irq_vect_01 = pmem_0.mem[(1<<(`PMEM_MSB+1))-15]; // IRQ  1
 wire       [15:0] irq_vect_00 = pmem_0.mem[(1<<(`PMEM_MSB+1))-16]; // IRQ  0
+
+// Interrupt detection
+wire              nmi_detect  = dut.frontend_0.inst_nmi;
+wire              irq_detect  = dut.frontend_0.irq_detect;

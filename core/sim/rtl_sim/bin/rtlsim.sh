@@ -27,6 +27,7 @@
 # 
 # Author(s):
 #             - Olivier Girard,    olgirard@gmail.com
+#             - Mihai M.,	   mmihai@delajii.net
 #
 #------------------------------------------------------------------------------
 # $Rev$
@@ -42,6 +43,7 @@ if [ $# -ne $EXPECTED_ARGS ]; then
   echo "ERROR    : wrong number of arguments"
   echo "USAGE    : rtlsim.sh <verilog stimulus file> <memory file> <submit file>"
   echo "Example  : rtlsim.sh ./stimulus.v            pmem.mem      ../src/submit.f"
+  echo "MYVLOG env keeps simulator name iverilog/cver/verilog/ncverilog"
   exit 1
 fi
 
@@ -68,14 +70,42 @@ fi
 #                         Start verilog simulation                            #
 ###############################################################################
 
-rm -rf simv
+if [ "${MYVLOG:-iverilog}" = iverilog ]; then
 
-NODUMP=${OMSP_NODUMP-0}
-if [ $NODUMP -eq 1 ]
-  then
-    iverilog -o simv -c $3 -D NODUMP
-  else
-    iverilog -o simv -c $3
+    rm -rf simv
+    
+    NODUMP=${OMSP_NODUMP-0}
+    if [ $NODUMP -eq 1 ]
+      then
+        iverilog -o simv -c $3 -D NODUMP
+      else
+        iverilog -o simv -c $3
+    fi
+    
+    ./simv
+else
+
+    NODUMP=${OMSP_NODUMP-0}
+    if [ $NODUMP -eq 1 ] ; then
+       vargs="+define+NODUMP"
+    else
+       vargs=""
+    fi
+
+   case $MYVLOG in 
+    cver* ) 
+       vargs="$vargs +define+VXL" ;;
+    verilog* )
+       vargs="$vargs +define+VXL" ;;
+    ncverilog* )
+       vargs="$vargs +access+r" ;;
+    vsim )
+       # Modelsim
+       if [ -d work ]; then  vdel -all; fi
+       vlib work
+       exec vlog +acc=prn -f $3 $vargs -R -c -do "run -all"
+   esac
+   
+   echo "Running: $MYVLOG -f $3 $vargs"
+   exec $MYVLOG -f $3 $vargs
 fi
-
-./simv

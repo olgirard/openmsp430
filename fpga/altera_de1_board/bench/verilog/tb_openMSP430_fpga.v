@@ -173,7 +173,7 @@ reg               stimulus_done;
 initial
    begin
       // Read memory file
-      $readmemh("./pmem.mem", pmem);
+      #10 $readmemh("./pmem.mem", pmem);
   end
 
 //

@@ -123,7 +123,7 @@ reg               stimulus_done;
 initial
    begin
       // Read memory file
-      $readmemh("./pmem.mem", pmem);
+      #10 $readmemh("./pmem.mem", pmem);
 
       // Update Xilinx memory banks
       for (i=0; i<2048; i=i+1)

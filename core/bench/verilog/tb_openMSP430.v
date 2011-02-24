@@ -170,7 +170,7 @@ reg                stimulus_done;
 //------------------------------
 initial
   begin
-     $readmemh("./pmem.mem", pmem_0.mem);
+     #10 $readmemh("./pmem.mem", pmem_0.mem);
   end
 
 //
@@ -506,7 +506,9 @@ initial // Timeout
 
 initial // Normal end of test
   begin
-     @(inst_pc===16'hffff)
+     @(negedge stimulus_done);
+     wait(inst_pc=='hffff);
+     
      $display(" ===============================================");
      if (error!=0)
        begin

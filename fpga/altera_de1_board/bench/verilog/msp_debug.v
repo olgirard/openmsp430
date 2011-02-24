@@ -86,6 +86,8 @@ function [64*8-1:0] myFormat;
   integer i,j;      
   begin
      myFormat = 0;
+`ifdef VXL			// no +:
+`else
      j        = 0;
      for ( i=0; i < 32; i=i+1)                      // Copy string2
        begin
@@ -99,7 +101,7 @@ function [64*8-1:0] myFormat;
      
      for ( i=0; i < 32; i=i+1)                      // Copy string1
        myFormat[8*(j+i) +: 8] = string1[8*i +: 8];
-     
+`endif    
   end
 endfunction
 
@@ -108,14 +110,14 @@ endfunction
 // 2) CONNECTIONS TO MSP430 CORE INTERNALS
 //=============================================================================
 
-wire  [2:0] i_state_bin = dut.openMSP430_0.frontend_0.i_state;
-wire  [3:0] e_state_bin = dut.openMSP430_0.frontend_0.e_state;
+wire  [2:0] i_state_bin = tb_openMSP430_fpga.dut.openMSP430_0.frontend_0.i_state;
+wire  [3:0] e_state_bin = tb_openMSP430_fpga.dut.openMSP430_0.frontend_0.e_state;
 
-wire        decode      = dut.openMSP430_0.frontend_0.decode;
-wire [15:0] ir          = dut.openMSP430_0.frontend_0.ir;
-wire        irq_detect  = dut.openMSP430_0.frontend_0.irq_detect;
-wire  [3:0] irq_num     = dut.openMSP430_0.frontend_0.irq_num;
-wire [15:0] pc          = dut.openMSP430_0.frontend_0.pc;
+wire        decode      = tb_openMSP430_fpga.dut.openMSP430_0.frontend_0.decode;
+wire [15:0] ir          = tb_openMSP430_fpga.dut.openMSP430_0.frontend_0.ir;
+wire        irq_detect  = tb_openMSP430_fpga.dut.openMSP430_0.frontend_0.irq_detect;
+wire  [3:0] irq_num     = tb_openMSP430_fpga.dut.openMSP430_0.frontend_0.irq_num;
+wire [15:0] pc          = tb_openMSP430_fpga.dut.openMSP430_0.frontend_0.pc;
 
    
 //=============================================================================
@@ -412,9 +414,9 @@ always @(opcode or inst_type or inst_dst)
 // Currently executed instruction
 //================================
 
-wire [32*8-1:0] inst_short = inst_name;
+wire [8*32-1:0] inst_short = inst_name;
 
-reg  [32*8-1:0] inst_full;
+reg  [8*32-1:0] inst_full;
 always @(inst_type or inst_name or inst_bw or inst_as or inst_ad)
   begin
      inst_full   = myFormat(inst_name, inst_bw, 0);
