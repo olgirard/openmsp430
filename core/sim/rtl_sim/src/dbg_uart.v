@@ -285,19 +285,19 @@ initial
  
       dbg_uart_wr(MEM_CTL,  16'h0003); // Start burst to 16 bit memory write
       dbg_uart_tx16(16'h1234);         // write 1st data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (mem200 !== 16'h1234)      tb_error("====== 16B WRITE BURSTS (MEMORY) WR ERROR: 1st DATA =====");
       dbg_uart_tx16(16'h5678);         // write 2nd data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (mem202 !== 16'h5678)      tb_error("====== 16B WRITE BURSTS (MEMORY) WR ERROR: 2nd DATA =====");
       dbg_uart_tx16(16'h9abc);         // write 3rd data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (mem204 !== 16'h9abc)      tb_error("====== 16B WRITE BURSTS (MEMORY) WR ERROR: 3rd DATA =====");
       dbg_uart_tx16(16'hdef0);         // write 4th data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (mem206 !== 16'hdef0)      tb_error("====== 16B WRITE BURSTS (MEMORY) WR ERROR: 4th DATA =====");
       dbg_uart_tx16(16'h0fed);         // write 5th data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (mem208 !== 16'h0fed)      tb_error("====== 16B WRITE BURSTS (MEMORY) WR ERROR: 5th DATA =====");
       
       dbg_uart_wr(MEM_ADDR, 16'h0200); // select @0x0200
@@ -324,19 +324,19 @@ initial
  
       dbg_uart_wr(MEM_CTL,  16'h0007); // Start burst to 16 bit cpu register write
       dbg_uart_tx16(16'hcba9);         // write 1st data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (r5 !== 16'hcba9)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) WR ERROR: 1st DATA =====");
       dbg_uart_tx16(16'h8765);         // write 2nd data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (r6 !== 16'h8765)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) WR ERROR: 2nd DATA =====");
       dbg_uart_tx16(16'h4321);         // write 3rd data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (r7 !== 16'h4321)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) WR ERROR: 3rd DATA =====");
       dbg_uart_tx16(16'h0123);         // write 4th data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (r8 !== 16'h0123)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) WR ERROR: 4th DATA =====");
       dbg_uart_tx16(16'h4567);         // write 5th data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (r9 !== 16'h4567)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) WR ERROR: 5th DATA =====");
       
       dbg_uart_wr(MEM_ADDR, 16'h0005); // select @0x0200
@@ -363,19 +363,19 @@ initial
  
       dbg_uart_wr(MEM_CTL,  16'h000b); // Start burst to 8 bit memory write
       dbg_uart_tx(8'h91);         // write 1st data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (mem200 !== 16'h1291)      tb_error("====== 8B WRITE BURSTS (MEMORY) WR ERROR: 1st DATA =====");
       dbg_uart_tx(8'h82);         // write 2nd data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (mem200 !== 16'h8291)      tb_error("====== 8B WRITE BURSTS (MEMORY) WR ERROR: 2nd DATA =====");
       dbg_uart_tx(8'h73);         // write 3rd data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (mem202 !== 16'h5673)      tb_error("====== 8B WRITE BURSTS (MEMORY) WR ERROR: 3rd DATA =====");
       dbg_uart_tx(8'h64);         // write 4th data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (mem202 !== 16'h6473)      tb_error("====== 8B WRITE BURSTS (MEMORY) WR ERROR: 4th DATA =====");
       dbg_uart_tx(8'h55);         // write 5th data
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (mem204 !== 16'h9a55)      tb_error("====== 8B WRITE BURSTS (MEMORY) WR ERROR: 5th DATA =====");
       
       dbg_uart_wr(MEM_ADDR, 16'h0200); // select @0x0200

@@ -76,15 +76,15 @@ initial
       test_var = r14;
       dbg_uart_wr(CPU_CTL,  16'h0004); // ISTEP
       dbg_uart_wr(CPU_CTL,  16'h0004); // ISTEP
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (test_var !== (r14+1))           tb_error("====== STOP, FREEZE, ISTEP, RUN: ISTEP test 1 =====");
       dbg_uart_wr(CPU_CTL,  16'h0004); // ISTEP
       dbg_uart_wr(CPU_CTL,  16'h0004); // ISTEP
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (test_var !== (r14+2))           tb_error("====== STOP, FREEZE, ISTEP, RUN: ISTEP test 2 =====");
       dbg_uart_wr(CPU_CTL,  16'h0004); // ISTEP
       dbg_uart_wr(CPU_CTL,  16'h0004); // ISTEP
-      repeat(10) @(posedge mclk);
+      repeat(12) @(posedge mclk);
       if (test_var !== (r14+3))           tb_error("====== STOP, FREEZE, ISTEP, RUN: ISTEP test 3 =====");
 
       

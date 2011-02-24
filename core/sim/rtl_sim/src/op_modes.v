@@ -146,7 +146,7 @@ initial
       @(negedge mclk);
       inst_cnt  = 0;
       repeat (80) @(negedge mclk);
-      if (inst_cnt  !== 16'h0034) tb_error("====== CPUOFF TEST 1: CPU IS NOT RUNNING =====");
+      if (inst_cnt  <= 16'h0030) tb_error("====== CPUOFF TEST 1: CPU IS NOT RUNNING =====");
 
       @(r15==16'h3002);
       repeat (3) @(negedge mclk);
@@ -161,7 +161,7 @@ initial
       @(negedge mclk);
       inst_cnt  = 0;
       repeat (80) @(negedge mclk);
-      if (inst_cnt !== 16'h0030) tb_error("====== CPUOFF TEST 3: CPU IS NOT RUNNING DURING IRQ (PORT 1) =====");
+      if (inst_cnt <= 16'h0025) tb_error("====== CPUOFF TEST 3: CPU IS NOT RUNNING DURING IRQ (PORT 1) =====");
       
       @(r1==16'h0250);
       repeat (3) @(negedge mclk);
@@ -176,13 +176,13 @@ initial
       @(negedge mclk);
       inst_cnt  = 0;
       repeat (80) @(negedge mclk);
-      if (inst_cnt !== 16'h0030) tb_error("====== CPUOFF TEST 5: CPU IS NOT RUNNING DURING IRQ (PORT 2) =====");
+      if (inst_cnt <= 16'h0025) tb_error("====== CPUOFF TEST 5: CPU IS NOT RUNNING DURING IRQ (PORT 2) =====");
 
       @(r15==16'h3003);
       @(negedge mclk);
       inst_cnt  = 0;
       repeat (80) @(negedge mclk);
-      if (inst_cnt  !== 16'h0034) tb_error("====== CPUOFF TEST 6: CPU IS NOT RUNNING =====");
+      if (inst_cnt  <= 16'h0030) tb_error("====== CPUOFF TEST 6: CPU IS NOT RUNNING =====");
 
     
       stimulus_done = 1;

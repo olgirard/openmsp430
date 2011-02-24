@@ -297,12 +297,14 @@ initial
       // Test interruption NMI:	 rising edge
       //--------------------------------------
       @(r15==16'hf200);
-      repeat(2) @(posedge mclk);
-      irq[13:0] = {14{1'b1}};
+      repeat(2) @(negedge mclk);
       nmi       = 1'b1;
-      repeat(15) @(posedge mclk);
-      irq[13:0] = 1'b0;
+      @(posedge nmi_detect);
+      irq[13:0] = {14{1'b1}};
+      repeat(8) @(posedge mclk);
       nmi       = 1'b0;
+      repeat(2) @(posedge mclk);
+      irq[13:0] = 1'b0;
 
       @(r15==16'hf201);
       if (r1    !==16'h0252) tb_error("====== NMI: SP value      =====");
