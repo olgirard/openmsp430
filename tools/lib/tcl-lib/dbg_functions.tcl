@@ -677,7 +677,7 @@ proc EraseROM {} {
     set rom_size  [lindex [GetCPU_ID_SIZE] 0]
     set rom_start [expr 0x10000-$rom_size]
 
-    if {$ram_size!=-1} {   
+    if {$rom_size!=-1} {   
 	set DataArray ""
 	for {set i 0} {$i<$rom_size} {incr i} {
 	    lappend DataArray 0x00
