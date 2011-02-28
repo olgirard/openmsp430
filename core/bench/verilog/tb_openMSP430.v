@@ -300,12 +300,21 @@ openMSP430 dut (
 // Digital I/O
 //----------------------------------
 
+`ifdef CVER
+omsp_gpio #(1,
+            1,
+            1,
+            1,
+            1,
+            1)         gpio_0 (
+`else
 omsp_gpio #(.P1_EN(1),
             .P2_EN(1),
             .P3_EN(1),
             .P4_EN(1),
             .P5_EN(1),
             .P6_EN(1)) gpio_0 (
+`endif
 
 // OUTPUTs
     .irq_port1    (irq_port1),         // Port 1 interrupt

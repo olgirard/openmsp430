@@ -94,7 +94,7 @@ else
 
    case $MYVLOG in 
     cver* ) 
-       vargs="$vargs +define+VXL" ;;
+       vargs="$vargs +define+VXL +define+CVER" ;;
     verilog* )
        vargs="$vargs +define+VXL" ;;
     ncverilog* )
