@@ -477,8 +477,13 @@ initial
         $vcdplusfile("tb_openMSP430.vpd");
         $vcdpluson();
      `else
-        $dumpfile("tb_openMSP430.vcd");
-        $dumpvars(0, tb_openMSP430);
+       `ifdef TRN_FILE
+          $recordfile ("tb_openMSP430.trn");
+          $recordvars;
+       `else
+          $dumpfile("tb_openMSP430.vcd");
+          $dumpvars(0, tb_openMSP430);
+       `endif
      `endif
    `endif
   end

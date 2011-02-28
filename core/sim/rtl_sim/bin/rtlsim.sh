@@ -43,7 +43,7 @@ if [ $# -ne $EXPECTED_ARGS ]; then
   echo "ERROR    : wrong number of arguments"
   echo "USAGE    : rtlsim.sh <verilog stimulus file> <memory file> <submit file>"
   echo "Example  : rtlsim.sh ./stimulus.v            pmem.mem      ../src/submit.f"
-  echo "MYVLOG env keeps simulator name iverilog/cver/verilog/ncverilog"
+  echo "MYVLOG env keeps simulator name iverilog/cver/verilog/ncverilog/vsim/vcs"
   exit 1
 fi
 
@@ -98,7 +98,11 @@ else
     verilog* )
        vargs="$vargs +define+VXL" ;;
     ncverilog* )
-       vargs="$vargs +access+r" ;;
+       rm -rf INCA_libs
+       vargs="$vargs +access+r +define+TRN_FILE" ;;
+    vcs* )
+       rm -rf csrc simv*
+       vargs="$vargs -R -debug_pp +vcs+lic+wait +v2k +define+VPD_FILE" ;;
     vsim )
        # Modelsim
        if [ -d work ]; then  vdel -all; fi

@@ -338,8 +338,13 @@ initial
      $vcdplusfile("tb_openMSP430_fpga.vpd");
      $vcdpluson();
    `else
-     $dumpfile("tb_openMSP430_fpga.vcd");
-     $dumpvars(0, tb_openMSP430_fpga);
+     `ifdef TRN_FILE
+        $recordfile ("tb_openMSP430_fpga.trn");
+        $recordvars;
+     `else
+        $dumpfile("tb_openMSP430_fpga.vcd");
+        $dumpvars(0, tb_openMSP430_fpga);
+     `endif
    `endif
   end
 
