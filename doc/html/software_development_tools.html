@@ -35,7 +35,7 @@ using <a href="http://freewrap.sourceforge.net/">freeWrap</a>.
 <a name="2. openmsp430-loader"></a>
 <h1>2. openmsp430-loader</h1>
 This simple program allows the user to load the openMSP430 program
-memory with an executable file (ELF format) provided as argument.<br>
+memory with an executable file (ELF or Intel-HEX format) provided as argument.<br>
 It is typically used in conjunction with '<b><i>make</i></b>' in order to automatically load the program after the compile step (see '<b><i>Makefile</i></b>' from software examples provided with the project's FPGA implementation).<br>
 The program can be called with the following syntax:
 <br><br>
@@ -48,10 +48,10 @@ The program can be called with the following syntax:
 <td width="15"><br>
 </td>
 <td>
-	<code>openmsp430-loader.tcl [-device &lt;communication device&gt;] [-baudrate &lt;communication speed&gt;] &lt;elf-file&gt;
+	<code>openmsp430-loader.tcl [-device &lt;communication device&gt;] [-baudrate &lt;communication speed&gt;] &lt;elf/ihex-file&gt;
 <br><br>
 Examples: openmsp430-loader.tcl -device /dev/ttyUSB0 -baudrate  9600  leds.elf<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;openmsp430-loader.tcl
--device COM2: -baudrate 38400 ta_uart.elf </code>
+-device COM2: -baudrate 38400 ta_uart.ihex </code>
 </td>
 </tr>
 </tbody></table>
@@ -66,15 +66,19 @@ These screenshots show the script in action under Linux and Windows:
 <h1>3. openmsp430-minidebug</h1>
 This small program provides a minimalistic graphical interface enabling simple interaction with the openMSP430:
 <br><br>
-<img src="getimg.php?1248897416" alt="openmsp430-minidebug" title="openmsp430-minidebug" width="65%">
+<img src="usercontent,img,1297506385" alt="openmsp430-minidebug" title="openmsp430-minidebug" width="75%">
 <br><br>
 As you can see from the screenshot, it allows the following actions:
 <ul>
-	<li><b><font color="#ff0000">(1)</font></b>&nbsp;&nbsp;Load the program memory with an ELF file</li>
-	<li><b><font color="#ff0000">(2)</font></b>&nbsp;&nbsp;Reset the CPU</li>
-	<li><b><font color="#ff0000">(3)</font></b>&nbsp;&nbsp;Stop/Start the program execution</li>
-	<li><b><font color="#ff0000">(4)</font></b>&nbsp;&nbsp;Read/Write access of the CPU registers</li>
-	<li><b><font color="#ff0000">(5)</font></b>&nbsp;&nbsp;Read/Write access of the whole memory range (program, data, peripherals)</li>
+	<li><b><font color="#ff0000">(1)</font></b>&nbsp;&nbsp;Connect to the openMSP430 Serial Debug Interface</li>
+	<li><b><font color="#ff0000">(2)</font></b>&nbsp;&nbsp;Load the program memory with an ELF or Intel-HEX file</li>
+	<li><b><font color="#ff0000">(3)</font></b>&nbsp;&nbsp;Control the CPU: Reset, Stop, Start and Single-Step</li>
+	<li><b><font color="#ff0000">(4)</font></b>&nbsp;&nbsp;Read/Write individual status bits</li>
+	<li><b><font color="#ff0000">(5)</font></b>&nbsp;&nbsp;Read/Write access of the CPU registers</li>
+	<li><b><font color="#ff0000">(6)</font></b>&nbsp;&nbsp;Read/Write access of the whole memory range (program, data, peripherals)</li>
+	<li><b><font color="#ff0000">(7)</font></b>&nbsp;&nbsp;Source a custom external TCL script</li>
+	<li><b><font color="#ff0000">(8)</font></b>&nbsp;&nbsp;Basic disassembled view of the loaded program (current PC location is highlighted in yellow)</li>
+	<li><b><font color="#ff0000">(9)</font></b>&nbsp;&nbsp;Choose the disassembled view type</li>
 </ul>
 
 <a name="4. openmsp430-gdbproxy"></a>
