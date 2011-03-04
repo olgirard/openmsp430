@@ -140,6 +140,17 @@ main:
 	mov     #0x4004, r15
 
 
+	/* mmihai cmp.b  bug */
+
+	mov     #0x0210, r5
+	clr.b	0(r5)
+	mov	#0x1, r4
+	cmp.b   r4, 0(r5)
+	jz	end_of_test	   ;# should not happen
+
+	mov     #0x4100, r15
+        
+
         /* ----------------------         END OF TEST        --------------- */
 	mov      #0x5000, r15
 end_of_test:
