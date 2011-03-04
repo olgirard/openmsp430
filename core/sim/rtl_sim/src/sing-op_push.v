@@ -399,7 +399,155 @@ initial
       if (mem232 !==16'h0000) tb_error("====== PUSH.B (#N mode): @0x0232 value =====");
       if (mem230 !==16'h0000) tb_error("====== PUSH.B (#N mode): @0x0230 value =====");
 
+      /* -------------- TEST INSTRUCTION WITH SR AS ARGUMENT ------------------- */
 
+      // Addressing mode: SR
+      @(r15==16'hF100);
+      if (r1     !==16'h0232) tb_error("====== PUSH SR : SP value      =====");
+      if (mem250 !==16'h75e2) tb_error("====== PUSH SR : @0x0250 value =====");
+      if (mem24E !==16'h1cc4) tb_error("====== PUSH SR : @0x024E value =====");
+      if (mem24C !==16'h12a6) tb_error("====== PUSH SR : @0x024c value =====");
+      if (mem24A !==16'h5679) tb_error("====== PUSH SR : @0x024a value =====");
+      if (mem248 !==16'h9a6a) tb_error("====== PUSH SR : @0x0248 value =====");
+      if (mem246 !==16'hde97) tb_error("====== PUSH SR : @0x0246 value =====");
+      if (mem244 !==16'h0f4c) tb_error("====== PUSH SR : @0x0244 value =====");
+      if (mem242 !==16'hcbc3) tb_error("====== PUSH SR : @0x0242 value =====");
+      if (mem240 !==16'h870e) tb_error("====== PUSH SR : @0x0240 value =====");
+      if (mem23E !==16'h43fe) tb_error("====== PUSH SR : @0x023e value =====");
+      if (mem23C !==16'h1fc2) tb_error("====== PUSH SR : @0x023c value =====");
+      if (mem23A !==16'h3d3b) tb_error("====== PUSH SR : @0x023a value =====");
+      if (mem238 !==16'h71d9) tb_error("====== PUSH SR : @0x0238 value =====");
+      if (mem236 !==16'h178d) tb_error("====== PUSH SR : @0x0236 value =====");
+      if (mem234 !==16'h0234) tb_error("====== PUSH SR : @0x0234 value =====");
+      if (mem232 !==16'h0232) tb_error("====== PUSH SR : @0x0232 value =====");
+      if (mem230 !==16'h0000) tb_error("====== PUSH SR : @0x0230 value =====");
+
+      // Addressing mode: @SR
+      @(r15==16'hF200);
+      if (r1     !==16'h022E) tb_error("====== PUSH @SR : SP value      =====");
+      if (mem250 !==16'h75e2) tb_error("====== PUSH @SR : @0x0250 value =====");
+      if (mem24E !==16'h1cc4) tb_error("====== PUSH @SR : @0x024E value =====");
+      if (mem24C !==16'h12a6) tb_error("====== PUSH @SR : @0x024c value =====");
+      if (mem24A !==16'h5679) tb_error("====== PUSH @SR : @0x024a value =====");
+      if (mem248 !==16'h9a6a) tb_error("====== PUSH @SR : @0x0248 value =====");
+      if (mem246 !==16'hde97) tb_error("====== PUSH @SR : @0x0246 value =====");
+      if (mem244 !==16'h0f4c) tb_error("====== PUSH @SR : @0x0244 value =====");
+      if (mem242 !==16'hcbc3) tb_error("====== PUSH @SR : @0x0242 value =====");
+      if (mem240 !==16'h870e) tb_error("====== PUSH @SR : @0x0240 value =====");
+      if (mem23E !==16'h43fe) tb_error("====== PUSH @SR : @0x023e value =====");
+      if (mem23C !==16'h1fc2) tb_error("====== PUSH @SR : @0x023c value =====");
+      if (mem23A !==16'h3d3b) tb_error("====== PUSH @SR : @0x023a value =====");
+      if (mem238 !==16'h71d9) tb_error("====== PUSH @SR : @0x0238 value =====");
+      if (mem236 !==16'h178d) tb_error("====== PUSH @SR : @0x0236 value =====");
+      if (mem234 !==16'h0234) tb_error("====== PUSH @SR : @0x0234 value =====");
+      if (mem232 !==16'h0232) tb_error("====== PUSH @SR : @0x0232 value =====");
+      if (mem230 !==16'h0000) tb_error("====== PUSH @SR : @0x0230 value =====");
+      if (mem22E !==16'h1234) tb_error("====== PUSH @SR : @0x022E value =====");
+      if (mem22C !==16'h5678) tb_error("====== PUSH @SR : @0x022C value =====");
+
+      // Addressing mode: @SR+
+      @(r15==16'hF300);
+      if (r1     !==16'h022E) tb_error("====== PUSH @SR : SP value      =====");
+      if (mem250 !==16'h75e2) tb_error("====== PUSH @SR : @0x0250 value =====");
+      if (mem24E !==16'h1cc4) tb_error("====== PUSH @SR : @0x024E value =====");
+      if (mem24C !==16'h12a6) tb_error("====== PUSH @SR : @0x024c value =====");
+      if (mem24A !==16'h5679) tb_error("====== PUSH @SR : @0x024a value =====");
+      if (mem248 !==16'h9a6a) tb_error("====== PUSH @SR : @0x0248 value =====");
+      if (mem246 !==16'hde97) tb_error("====== PUSH @SR : @0x0246 value =====");
+      if (mem244 !==16'h0f4c) tb_error("====== PUSH @SR : @0x0244 value =====");
+      if (mem242 !==16'hcbc3) tb_error("====== PUSH @SR : @0x0242 value =====");
+      if (mem240 !==16'h870e) tb_error("====== PUSH @SR : @0x0240 value =====");
+      if (mem23E !==16'h43fe) tb_error("====== PUSH @SR : @0x023e value =====");
+      if (mem23C !==16'h1fc2) tb_error("====== PUSH @SR : @0x023c value =====");
+      if (mem23A !==16'h3d3b) tb_error("====== PUSH @SR : @0x023a value =====");
+      if (mem238 !==16'h71d9) tb_error("====== PUSH @SR : @0x0238 value =====");
+      if (mem236 !==16'h178d) tb_error("====== PUSH @SR : @0x0236 value =====");
+      if (mem234 !==16'h0234) tb_error("====== PUSH @SR : @0x0234 value =====");
+      if (mem232 !==16'h0232) tb_error("====== PUSH @SR : @0x0232 value =====");
+      if (mem230 !==16'h0000) tb_error("====== PUSH @SR : @0x0230 value =====");
+      if (mem22E !==16'h1234) tb_error("====== PUSH @SR : @0x022E value =====");
+      if (mem22C !==16'h5678) tb_error("====== PUSH @SR : @0x022C value =====");
+      if (mem22A !==16'h0000) tb_error("====== PUSH @SR : @0x022A value =====");
+      if (mem228 !==16'h0000) tb_error("====== PUSH @SR : @0x0228 value =====");
+
+      // Addressing mode: x(SR)
+      @(r15==16'hF400);
+      if (r1     !==16'h022A) tb_error("====== PUSH @SR : SP value      =====");
+      if (mem250 !==16'h75e2) tb_error("====== PUSH @SR : @0x0250 value =====");
+      if (mem24E !==16'h1cc4) tb_error("====== PUSH @SR : @0x024E value =====");
+      if (mem24C !==16'h12a6) tb_error("====== PUSH @SR : @0x024c value =====");
+      if (mem24A !==16'h5679) tb_error("====== PUSH @SR : @0x024a value =====");
+      if (mem248 !==16'h9a6a) tb_error("====== PUSH @SR : @0x0248 value =====");
+      if (mem246 !==16'hde97) tb_error("====== PUSH @SR : @0x0246 value =====");
+      if (mem244 !==16'h0f4c) tb_error("====== PUSH @SR : @0x0244 value =====");
+      if (mem242 !==16'hcbc3) tb_error("====== PUSH @SR : @0x0242 value =====");
+      if (mem240 !==16'h870e) tb_error("====== PUSH @SR : @0x0240 value =====");
+      if (mem23E !==16'h43fe) tb_error("====== PUSH @SR : @0x023e value =====");
+      if (mem23C !==16'h1fc2) tb_error("====== PUSH @SR : @0x023c value =====");
+      if (mem23A !==16'h3d3b) tb_error("====== PUSH @SR : @0x023a value =====");
+      if (mem238 !==16'h71d9) tb_error("====== PUSH @SR : @0x0238 value =====");
+      if (mem236 !==16'h178d) tb_error("====== PUSH @SR : @0x0236 value =====");
+      if (mem234 !==16'h0234) tb_error("====== PUSH @SR : @0x0234 value =====");
+      if (mem232 !==16'h0232) tb_error("====== PUSH @SR : @0x0232 value =====");
+      if (mem230 !==16'h0000) tb_error("====== PUSH @SR : @0x0230 value =====");
+      if (mem22E !==16'h1234) tb_error("====== PUSH @SR : @0x022E value =====");
+      if (mem22C !==16'h71d9) tb_error("====== PUSH @SR : @0x022C value =====");
+      if (mem22A !==16'h178d) tb_error("====== PUSH @SR : @0x022A value =====");
+      if (mem228 !==16'h0000) tb_error("====== PUSH @SR : @0x0228 value =====");
+
+      
+      /* -------------- TEST POP INSTRUCTION WITH SR AS ARGUMENT ------------------- */
+
+      // Addressing mode: x(SR)
+      @(r15==16'hF500);
+      if (r1     !==16'h022E) tb_error("====== PUSH @SR : SP value      =====");
+      if (mem250 !==16'h75e2) tb_error("====== PUSH @SR : @0x0250 value =====");
+      if (mem24E !==16'h1cc4) tb_error("====== PUSH @SR : @0x024E value =====");
+      if (mem24C !==16'h12a6) tb_error("====== PUSH @SR : @0x024c value =====");
+      if (mem24A !==16'h5679) tb_error("====== PUSH @SR : @0x024a value =====");
+      if (mem248 !==16'h9a6a) tb_error("====== PUSH @SR : @0x0248 value =====");
+      if (mem246 !==16'hde97) tb_error("====== PUSH @SR : @0x0246 value =====");
+      if (mem244 !==16'h0f4c) tb_error("====== PUSH @SR : @0x0244 value =====");
+      if (mem242 !==16'hcbc3) tb_error("====== PUSH @SR : @0x0242 value =====");
+      if (mem240 !==16'h870e) tb_error("====== PUSH @SR : @0x0240 value =====");
+      if (mem23E !==16'h43fe) tb_error("====== PUSH @SR : @0x023e value =====");
+      if (mem23C !==16'h1fc2) tb_error("====== PUSH @SR : @0x023c value =====");
+      if (mem23A !==16'h3d3b) tb_error("====== PUSH @SR : @0x023a value =====");
+      if (mem238 !==16'h71d9) tb_error("====== PUSH @SR : @0x0238 value =====");
+      if (mem236 !==16'h178d) tb_error("====== PUSH @SR : @0x0236 value =====");
+      if (mem234 !==16'h71d9) tb_error("====== PUSH @SR : @0x0234 value =====");
+      if (mem232 !==16'h178d) tb_error("====== PUSH @SR : @0x0232 value =====");
+      if (mem230 !==16'h0000) tb_error("====== PUSH @SR : @0x0230 value =====");
+      if (mem22E !==16'h1234) tb_error("====== PUSH @SR : @0x022E value =====");
+      if (mem22C !==16'h71d9) tb_error("====== PUSH @SR : @0x022C value =====");
+      if (mem22A !==16'h178d) tb_error("====== PUSH @SR : @0x022A value =====");
+      if (mem228 !==16'h0000) tb_error("====== PUSH @SR : @0x0228 value =====");
+
+      // Addressing mode: SR
+      @(r15==16'hF600);
+      if (r1     !==16'h1234) tb_error("====== PUSH @SR : SP value      =====");
+      if (mem250 !==16'h75e2) tb_error("====== PUSH @SR : @0x0250 value =====");
+      if (mem24E !==16'h1cc4) tb_error("====== PUSH @SR : @0x024E value =====");
+      if (mem24C !==16'h12a6) tb_error("====== PUSH @SR : @0x024c value =====");
+      if (mem24A !==16'h5679) tb_error("====== PUSH @SR : @0x024a value =====");
+      if (mem248 !==16'h9a6a) tb_error("====== PUSH @SR : @0x0248 value =====");
+      if (mem246 !==16'hde97) tb_error("====== PUSH @SR : @0x0246 value =====");
+      if (mem244 !==16'h0f4c) tb_error("====== PUSH @SR : @0x0244 value =====");
+      if (mem242 !==16'hcbc3) tb_error("====== PUSH @SR : @0x0242 value =====");
+      if (mem240 !==16'h870e) tb_error("====== PUSH @SR : @0x0240 value =====");
+      if (mem23E !==16'h43fe) tb_error("====== PUSH @SR : @0x023e value =====");
+      if (mem23C !==16'h1fc2) tb_error("====== PUSH @SR : @0x023c value =====");
+      if (mem23A !==16'h3d3b) tb_error("====== PUSH @SR : @0x023a value =====");
+      if (mem238 !==16'h71d9) tb_error("====== PUSH @SR : @0x0238 value =====");
+      if (mem236 !==16'h178d) tb_error("====== PUSH @SR : @0x0236 value =====");
+      if (mem234 !==16'h71d9) tb_error("====== PUSH @SR : @0x0234 value =====");
+      if (mem232 !==16'h178d) tb_error("====== PUSH @SR : @0x0232 value =====");
+      if (mem230 !==16'h0000) tb_error("====== PUSH @SR : @0x0230 value =====");
+      if (mem22E !==16'h1234) tb_error("====== PUSH @SR : @0x022E value =====");
+      if (mem22C !==16'h71d9) tb_error("====== PUSH @SR : @0x022C value =====");
+      if (mem22A !==16'h178d) tb_error("====== PUSH @SR : @0x022A value =====");
+      if (mem228 !==16'h0000) tb_error("====== PUSH @SR : @0x0228 value =====");
+    
       stimulus_done = 1;
    end
 

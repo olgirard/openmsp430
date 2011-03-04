@@ -278,7 +278,78 @@ clear_mem_loop:
 
 	mov     #0xF000, r15
 
+        /* -------------- TEST INSTRUCTION WITH SR AS ARGUMENT ------------------- */
+ 
+        # Addressing mode: SR
+        #------------------------
 
+	nop
+        push    r1                 ;# PUSH (r1=0x0234  =>  @=0x0234)
+        push    r1                 ;# PUSH (r1=0x0232  =>  @=0x0232)
+	nop
+
+        mov     #0xF100, r15
+
+
+        # Addressing mode: @SR
+        #------------------------
+
+        mov     #0x1234, &0x022E
+        mov     #0x5678, &0x022C
+	nop
+        push    @r1                ;# PUSH (r1=0x0230  =>  @=0x0230) -> do nothing
+        push    @r1                ;# PUSH (r1=0x022E  =>  @=0x022E) -> do nothing
+	nop
+
+        mov     #0xF200, r15
+
+
+        # Addressing mode: @SR+
+        #------------------------
+
+        mov     #0x0000, &0x022A
+        mov     #0x0000, &0x0228
+	nop
+        push    @r1+               ;# PUSH (r1=0x022C  =>  @=0x022C) -> do nothing
+        push    @r1+               ;# PUSH (r1=0x022C  =>  @=0x022C) -> do nothing
+	nop
+
+        mov     #0xF300, r15
+
+
+        # Addressing mode: x(SR)
+        #------------------------
+			
+	nop
+	push    12(r1)              ;# PUSH (r1=0x022C+12  =>  @=0x022C)
+	push    12(r1)              ;# PUSH (r1=0x022A+12  =>  @=0x022A)
+	nop
+	
+	mov     #0xF400, r15
+
+        /* -------------- TEST POP INSTRUCTION WITH SR AS ARGUMENT ------------------- */
+ 
+        # Addressing mode: x(SR)
+        #------------------------
+
+	nop
+        pop     8(r1)              ;# POP (r1=0x022A  =>  @=0x022A+8)
+        pop     8(r1)              ;# POP (r1=0x022C  =>  @=0x022C+8)
+	nop
+
+        mov     #0xF500, r15
+
+
+        # Addressing mode: SR
+        #------------------------
+
+	nop
+        pop     r1                 ;# POP (r1=@0x022E)
+	nop
+
+        mov     #0xF600, r15
+
+			
         /* ----------------------         END OF TEST        --------------- */
 end_of_test:
 	nop
