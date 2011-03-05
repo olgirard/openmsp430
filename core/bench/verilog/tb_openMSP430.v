@@ -36,8 +36,10 @@
 // $LastChangedDate$
 //----------------------------------------------------------------------------
 `include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
-
+`endif
 
 module  tb_openMSP430;
 

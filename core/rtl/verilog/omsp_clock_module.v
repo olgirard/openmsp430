@@ -39,8 +39,10 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  omsp_clock_module (
 
@@ -254,4 +256,7 @@ wire   puc = puc_s[1];
 
 endmodule // omsp_clock_module
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

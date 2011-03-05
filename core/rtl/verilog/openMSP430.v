@@ -35,8 +35,10 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  openMSP430 (
 
@@ -464,4 +466,7 @@ assign dbg_uart_txd =  1'b0;
    
 endmodule // openMSP430
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

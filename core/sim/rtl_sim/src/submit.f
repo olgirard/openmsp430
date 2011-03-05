@@ -36,8 +36,8 @@
 //=============================================================================
 // Module specific modules
 //=============================================================================
-
 +incdir+../../../rtl/verilog/
+../../../rtl/verilog/openMSP430_defines.v
 ../../../rtl/verilog/openMSP430.v
 ../../../rtl/verilog/omsp_frontend.v
 ../../../rtl/verilog/omsp_execution_unit.v

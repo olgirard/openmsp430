@@ -35,8 +35,10 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  omsp_execution_unit (
 
@@ -371,4 +373,7 @@ assign mdb_in_val = mdb_in_buf_valid ? mdb_in_buf : mdb_in_bw;
 
 endmodule // omsp_execution_unit
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

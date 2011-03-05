@@ -35,8 +35,6 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
-`include "openMSP430_defines.v"
 
 module ram (
 

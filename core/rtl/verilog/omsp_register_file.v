@@ -35,8 +35,10 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  omsp_register_file (
 
@@ -342,4 +344,7 @@ assign reg_dest = (r0      & {16{inst_dest[0]}})  |
 
 endmodule // omsp_register_file
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

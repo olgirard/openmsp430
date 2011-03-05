@@ -35,8 +35,10 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  omsp_alu (
 
@@ -245,4 +247,7 @@ assign  alu_stat_wr = (inst_alu[`ALU_STAT_F] & exec_cycle) ? 4'b1111 : 4'b0000;
 
 endmodule // omsp_alu
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

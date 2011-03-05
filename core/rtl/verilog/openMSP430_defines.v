@@ -35,7 +35,11 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
+//`define OMSP_NO_INCLUDE
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif
 
 //----------------------------------------------------------------------------
 // SYSTEM CONFIGURATION
