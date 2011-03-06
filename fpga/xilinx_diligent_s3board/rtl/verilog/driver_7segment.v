@@ -35,7 +35,6 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
 
 module  driver_7segment (
 

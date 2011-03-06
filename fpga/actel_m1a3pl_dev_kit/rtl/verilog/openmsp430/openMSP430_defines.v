@@ -31,11 +31,15 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 74 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2010-08-28 21:53:08 +0200 (Sat, 28 Aug 2010) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
+//`define OMSP_NO_INCLUDE
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif
 
 //----------------------------------------------------------------------------
 // SYSTEM CONFIGURATION

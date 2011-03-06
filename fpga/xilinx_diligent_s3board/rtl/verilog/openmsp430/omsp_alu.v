@@ -35,8 +35,10 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  omsp_alu (
 
@@ -147,8 +149,8 @@ wire [15:0] op_src_inv     = {16{op_src_inv_cmd}} ^ op_src;
 
 // Mask the bit 8 for the Byte instructions for correct flags generation
 wire        op_bit8_msk     = ~exec_cycle | ~inst_bw;
-wire [16:0] op_src_in       = {1'b0, op_src_inv[15:9], op_src_inv[8] & op_bit8_msk, op_src_inv[7:0]};
-wire [16:0] op_dst_in       = {1'b0, op_dst[15:9],     op_dst[8]     & op_bit8_msk, op_dst[7:0]};
+wire [16:0] op_src_in       = {1'b0, {op_src_inv[15:8] & {8{op_bit8_msk}}}, op_src_inv[7:0]};
+wire [16:0] op_dst_in       = {1'b0, {op_dst[15:8]     & {8{op_bit8_msk}}}, op_dst[7:0]};
 
 // Clear the source operand (= jump offset) for conditional jumps
 wire        jmp_not_taken  = (inst_jmp[`JL]  & ~(status[3]^status[2])) |
@@ -245,4 +247,7 @@ assign  alu_stat_wr = (inst_alu[`ALU_STAT_F] & exec_cycle) ? 4'b1111 : 4'b0000;
 
 endmodule // omsp_alu
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

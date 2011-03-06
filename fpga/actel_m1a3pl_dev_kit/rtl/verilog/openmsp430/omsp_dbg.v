@@ -31,12 +31,14 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 84 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-01-23 21:00:36 +0100 (Sun, 23 Jan 2011) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  omsp_dbg (
 
@@ -796,4 +798,7 @@ JTAG INTERFACE IS NOT SUPPORTED YET
 
 endmodule // dbg
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

@@ -40,7 +40,6 @@
 // $LastChangedBy: olivier.girard $
 // $LastChangedDate: 2010-03-07 09:09:38 +0100 (Sun, 07 Mar 2010) $
 //----------------------------------------------------------------------------
-`include "timescale.v"
  
 module  dac_spi_if (
  

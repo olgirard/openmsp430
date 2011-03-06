@@ -31,12 +31,14 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 74 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2010-08-28 21:53:08 +0200 (Sat, 28 Aug 2010) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  omsp_dbg_uart (
 
@@ -265,4 +267,7 @@ wire        dbg_rd     = mem_burst ? (xfer_done & (uart_state==TX_DATA2)) :
    
 endmodule // omsp_dbg_uart
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

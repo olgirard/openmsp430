@@ -35,8 +35,10 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  omsp_timerA (
 
@@ -686,4 +688,7 @@ wire     irq_ta1    = (tactl[`TAIFG]     & tactl[`TAIE])     |
 
 endmodule // omsp_timerA
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

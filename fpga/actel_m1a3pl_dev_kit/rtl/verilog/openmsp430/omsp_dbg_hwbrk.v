@@ -31,12 +31,14 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 59 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2010-02-02 00:12:28 +0100 (Tue, 02 Feb 2010) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  omsp_dbg_hwbrk (
 
@@ -269,4 +271,7 @@ assign brk_halt     = brk_ctl[`BRK_EN] & |brk_stat_set;
      
 endmodule // omsp_dbg_hwbrk
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

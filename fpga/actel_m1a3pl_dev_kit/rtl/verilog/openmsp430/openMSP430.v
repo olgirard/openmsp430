@@ -31,12 +31,14 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 71 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2010-03-07 21:14:33 +0100 (Sun, 07 Mar 2010) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  openMSP430 (
 
@@ -464,4 +466,7 @@ assign dbg_uart_txd =  1'b0;
    
 endmodule // openMSP430
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

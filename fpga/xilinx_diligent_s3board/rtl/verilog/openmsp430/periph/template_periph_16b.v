@@ -40,8 +40,10 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  template_periph_16b (
 
@@ -179,4 +181,7 @@ wire [15:0] per_dout   =  cntrl1_rd  |
 
 endmodule // template_periph_16b
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

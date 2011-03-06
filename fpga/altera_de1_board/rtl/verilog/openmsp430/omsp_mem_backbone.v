@@ -35,8 +35,10 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  omsp_mem_backbone (
 
@@ -241,4 +243,7 @@ assign      dbg_mem_din  = dbg_mem_din_sel[1] ? pmem_dout    :
    
 endmodule // omsp_mem_backbone
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

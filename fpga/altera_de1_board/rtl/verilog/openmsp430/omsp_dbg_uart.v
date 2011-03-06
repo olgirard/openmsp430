@@ -35,8 +35,10 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  omsp_dbg_uart (
 
@@ -265,4 +267,7 @@ wire        dbg_rd     = mem_burst ? (xfer_done & (uart_state==TX_DATA2)) :
    
 endmodule // omsp_dbg_uart
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

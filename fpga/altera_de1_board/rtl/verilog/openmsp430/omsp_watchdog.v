@@ -35,8 +35,10 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`include "timescale.v"
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_defines.v"
+`endif
 
 module  omsp_watchdog (
 
@@ -214,4 +216,7 @@ wire       wdtifg_set =  (~wdtqn_dly & wdtqn) | wdtpw_error;
 
 endmodule // omsp_watchdog
 
+`ifdef OMSP_NO_INCLUDE
+`else
 `include "openMSP430_undefines.v"
+`endif

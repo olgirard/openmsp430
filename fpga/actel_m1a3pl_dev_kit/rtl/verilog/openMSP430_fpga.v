@@ -36,7 +36,6 @@
 // $LastChangedBy: olivier.girard $
 // $LastChangedDate: 2009-12-29 21:58:14 +0100 (Tue, 29 Dec 2009) $
 //----------------------------------------------------------------------------
-`include "timescale.v"
 `include "openMSP430_defines.v"
   
 module openMSP430_fpga (
