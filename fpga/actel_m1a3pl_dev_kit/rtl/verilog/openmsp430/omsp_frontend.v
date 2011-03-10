@@ -55,6 +55,7 @@ module  omsp_frontend (
     inst_dext,                     // Decoded Inst: destination extended instruction word
     inst_irq_rst,                  // Decoded Inst: Reset interrupt
     inst_jmp,                      // Decoded Inst: Conditional jump
+    inst_mov,                      // Decoded Inst: mov instruction
     inst_sext,                     // Decoded Inst: source extended instruction word
     inst_so,                       // Decoded Inst: Single-operand arithmetic
     inst_src,                      // Decoded Inst: source (one hot)
@@ -96,6 +97,7 @@ output       [15:0] inst_dest;     // Decoded Inst: destination (one hot)
 output       [15:0] inst_dext;     // Decoded Inst: destination extended instruction word
 output              inst_irq_rst;  // Decoded Inst: Reset interrupt
 output        [7:0] inst_jmp;      // Decoded Inst: Conditional jump
+output              inst_mov;      // Decoded Inst: mov instruction
 output       [15:0] inst_sext;     // Decoded Inst: source extended instruction word
 output        [7:0] inst_so;       // Decoded Inst: Single-operand arithmetic
 output       [15:0] inst_src;      // Decoded Inst: source (one hot)
@@ -420,6 +422,11 @@ wire [7:0] inst_jmp = one_hot8(inst_jmp_bin) & {8{inst_type[`INST_JMP]}};
 
 wire [15:0] inst_to_1hot = one_hot16(ir[15:12]) & {16{inst_type_nxt[`INST_TO]}};
 wire [11:0] inst_to_nxt  = inst_to_1hot[15:4];
+
+reg         inst_mov;
+always @(posedge mclk or posedge puc)
+  if (puc)         inst_mov <= 1'b0;
+  else if (decode) inst_mov <= inst_to_nxt[`MOV];
 
 
 //

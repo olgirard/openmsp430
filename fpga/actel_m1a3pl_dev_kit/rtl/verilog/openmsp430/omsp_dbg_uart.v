@@ -92,7 +92,7 @@ input               por;            // Power on reset
 //--------------------------------
 reg  [3:0] rxd_sync;
 always @ (posedge mclk or posedge por)
-  if (por) rxd_sync <=  4'h0;
+  if (por) rxd_sync <=  4'hf;
   else     rxd_sync <=  {rxd_sync[2:0], dbg_uart_rxd};
 
 // Majority decision

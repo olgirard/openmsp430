@@ -36,6 +36,15 @@
 +define+OPENMSP430_SIMULATION
 
 //=============================================================================
+// Testbench related
+//=============================================================================
+
++incdir+../../../bench/verilog/
+../../../bench/verilog/tb_openMSP430_fpga.v
+../../../bench/verilog/msp_debug.v
+
+
+//=============================================================================
 // Altera library
 //=============================================================================
 +libext+.v
@@ -75,13 +84,3 @@
 ../../../rtl/verilog/openmsp430/omsp_multiplier.v
 ../../../rtl/verilog/openmsp430/periph/omsp_gpio.v
 ../../../rtl/verilog/openmsp430/periph/omsp_timerA.v
-
-
-//=============================================================================
-// Testbench related
-//=============================================================================
-
-+incdir+../../../bench/verilog/
-../../../bench/verilog/tb_openMSP430_fpga.v
-../../../bench/verilog/msp_debug.v
-

@@ -69,6 +69,7 @@ module  omsp_execution_unit (
     inst_dext,                     // Decoded Inst: destination extended instruction word
     inst_irq_rst,                  // Decoded Inst: reset interrupt
     inst_jmp,                      // Decoded Inst: Conditional jump
+    inst_mov,                      // Decoded Inst: mov instruction
     inst_sext,                     // Decoded Inst: source extended instruction word
     inst_so,                       // Decoded Inst: Single-operand arithmetic
     inst_src,                      // Decoded Inst: source (one hot)
@@ -109,6 +110,7 @@ input        [15:0] inst_dest;     // Decoded Inst: destination (one hot)
 input        [15:0] inst_dext;     // Decoded Inst: destination extended instruction word
 input               inst_irq_rst;  // Decoded Inst: reset interrupt
 input         [7:0] inst_jmp;      // Decoded Inst: Conditional jump
+input               inst_mov;      // Decoded Inst: mov instruction
 input        [15:0] inst_sext;     // Decoded Inst: source extended instruction word
 input         [7:0] inst_so;       // Decoded Inst: Single-operand arithmetic
 input        [15:0] inst_src;      // Decoded Inst: source (one hot)
@@ -313,12 +315,13 @@ omsp_alu alu_0 (
 //=============================================================================
 
 // Detect memory read/write access
-assign      mb_en     = ((e_state==`E_IRQ_1)  & ~inst_irq_rst)      |
-                        ((e_state==`E_IRQ_3)  & ~inst_irq_rst)      |
-                        ((e_state==`E_SRC_RD) & ~inst_as[`IMM])     |
-                         (e_state==`E_SRC_WR)                       |
-                        ((e_state==`E_EXEC)   & inst_so[`RETI])     |
-                         (e_state==`E_DST_RD)                       |
+assign      mb_en     = ((e_state==`E_IRQ_1)  & ~inst_irq_rst)        |
+                        ((e_state==`E_IRQ_3)  & ~inst_irq_rst)        |
+                        ((e_state==`E_SRC_RD) & ~inst_as[`IMM])       |
+                         (e_state==`E_SRC_WR)                         |
+                        ((e_state==`E_EXEC)   &  inst_so[`RETI])      |
+                        ((e_state==`E_DST_RD) & ~inst_type[`INST_SO]
+                                              & ~inst_mov)            |
                          (e_state==`E_DST_WR);
 
 wire  [1:0] mb_wr_msk =  inst_alu[`EXEC_NO_WR]  ? 2'b00 :

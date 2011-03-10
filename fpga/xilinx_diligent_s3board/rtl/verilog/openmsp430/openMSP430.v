@@ -206,6 +206,7 @@ omsp_frontend frontend_0 (
     .inst_dext    (inst_dext),     // Decoded Inst: destination extended instruction word
     .inst_irq_rst (inst_irq_rst),  // Decoded Inst: Reset interrupt
     .inst_jmp     (inst_jmp),      // Decoded Inst: Conditional jump
+    .inst_mov     (inst_mov),      // Decoded Inst: mov instruction
     .inst_sext    (inst_sext),     // Decoded Inst: source extended instruction word
     .inst_so      (inst_so),       // Decoded Inst: Single-operand arithmetic
     .inst_src     (inst_src),      // Decoded Inst: source (one hot)
@@ -267,6 +268,7 @@ omsp_execution_unit execution_unit_0 (
     .inst_dext    (inst_dext),     // Decoded Inst: destination extended instruction word
     .inst_irq_rst (inst_irq_rst),  // Decoded Inst: reset interrupt
     .inst_jmp     (inst_jmp),      // Decoded Inst: Conditional jump
+    .inst_mov     (inst_mov),      // Decoded Inst: mov instruction
     .inst_sext    (inst_sext),     // Decoded Inst: source extended instruction word
     .inst_so      (inst_so),       // Decoded Inst: Single-operand arithmetic
     .inst_src     (inst_src),      // Decoded Inst: source (one hot)
