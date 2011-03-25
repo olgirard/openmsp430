@@ -55,7 +55,7 @@ module  omsp_sfr (
     per_addr,                     // Peripheral address
     per_din,                      // Peripheral data input
     per_en,                       // Peripheral enable (high active)
-    per_wen,                      // Peripheral write enable (high active)
+    per_we,                       // Peripheral write enable (high active)
     por,                          // Power-on reset
     puc,                          // Main system reset
     wdtifg_clr,                   // Clear Watchdog-timer interrupt flag
@@ -79,7 +79,7 @@ input               nmi_acc;      // Non-Maskable interrupt request accepted
 input         [7:0] per_addr;     // Peripheral address
 input        [15:0] per_din;      // Peripheral data input
 input               per_en;       // Peripheral enable (high active)
-input         [1:0] per_wen;      // Peripheral write enable (high active)
+input         [1:0] per_we;       // Peripheral write enable (high active)
 input               por;          // Power-on reset
 input               puc;          // Main system reset
 input               wdtifg_clr;   // Clear Watchdog-timer interrupt flag
@@ -115,9 +115,9 @@ always @(per_addr)
   endcase
 
 // Read/Write probes
-wire         reg_lo_write =  per_wen[0] & per_en;
-wire         reg_hi_write =  per_wen[1] & per_en;
-wire         reg_read     = ~|per_wen   & per_en;
+wire         reg_lo_write =  per_we[0] & per_en;
+wire         reg_hi_write =  per_we[1] & per_en;
+wire         reg_read     = ~|per_we   & per_en;
 
 // Read/Write vectors
 wire [255:0] reg_hi_wr    = reg_dec & {256{reg_hi_write}};

@@ -35,9 +35,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
+// $Rev: 106 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -48,6 +48,10 @@ module  omsp_clock_module (
 
 // OUTPUTs
     aclk_en,                      // ACLK enable
+    cpu_en_s,                     // Enable CPU code execution (synchronous)
+    dbg_clk,                      // Debug unit clock
+    dbg_en_s,                     // Debug interface enable (synchronous)
+    dbg_rst,                      // Debug unit reset
     mclk,                         // Main system clock
     per_dout,                     // Peripheral data output
     por,                          // Power-on reset
@@ -55,15 +59,17 @@ module  omsp_clock_module (
     smclk_en,                     // SMCLK enable
 	     
 // INPUTs
-    dbg_reset,                    // Reset CPU from debug interface
+    cpu_en,                       // Enable CPU code execution (asynchronous)
+    dbg_cpu_reset,                // Reset CPU from debug interface
+    dbg_en,                       // Debug interface enable (asynchronous)
     dco_clk,                      // Fast oscillator (fast clock)
     lfxt_clk,                     // Low frequency oscillator (typ 32kHz)
     oscoff,                       // Turns off LFXT1 clock input
     per_addr,                     // Peripheral address
     per_din,                      // Peripheral data input
     per_en,                       // Peripheral enable (high active)
-    per_wen,                      // Peripheral write enable (high active)
-    reset_n,                      // Reset Pin (low active)
+    per_we,                       // Peripheral write enable (high active)
+    reset_n,                      // Reset Pin (low active, asynchronous)
     scg1,                         // System clock generator 1. Turns off the SMCLK
     wdt_reset                     // Watchdog-timer reset
 );
@@ -71,6 +77,10 @@ module  omsp_clock_module (
 // OUTPUTs
 //=========
 output              aclk_en;      // ACLK enable
+output              cpu_en_s;     // Enable CPU code execution (synchronous)
+output              dbg_clk;      // Debug unit clock
+output              dbg_en_s;     // Debug unit enable (synchronous)
+output              dbg_rst;      // Debug unit reset
 output              mclk;         // Main system clock
 output       [15:0] per_dout;     // Peripheral data output
 output              por;          // Power-on reset
@@ -79,15 +89,17 @@ output              smclk_en;     // SMCLK enable
 
 // INPUTs
 //=========
-input               dbg_reset;    // Reset CPU from debug interface
+input               cpu_en;       // Enable CPU code execution (asynchronous)
+input               dbg_cpu_reset;// Reset CPU from debug interface
+input               dbg_en;       // Debug interface enable (asynchronous)
 input               dco_clk;      // Fast oscillator (fast clock)
 input               lfxt_clk;     // Low frequency oscillator (typ 32kHz)
 input               oscoff;       // Turns off LFXT1 clock input
 input         [7:0] per_addr;     // Peripheral address
 input        [15:0] per_din;      // Peripheral data input
 input               per_en;       // Peripheral enable (high active)
-input         [1:0] per_wen;      // Peripheral write enable (high active)
-input               reset_n;      // Reset Pin (low active)
+input         [1:0] per_we;       // Peripheral write enable (high active)
+input               reset_n;      // Reset Pin (low active, asynchronous)
 input               scg1;         // System clock generator 1. Turns off the SMCLK
 input               wdt_reset;    // Watchdog-timer reset
 
@@ -119,9 +131,9 @@ always @(per_addr)
   endcase
 
 // Read/Write probes
-wire         reg_lo_write =  per_wen[0] & per_en;
-wire         reg_hi_write =  per_wen[1] & per_en;
-wire         reg_read     = ~|per_wen   & per_en;
+wire         reg_lo_write =  per_we[0] & per_en;
+wire         reg_hi_write =  per_we[1] & per_en;
+wire         reg_read     = ~|per_we   & per_en;
 
 // Read/Write vectors
 wire [255:0] reg_hi_wr    = reg_dec & {256{reg_hi_write}};
@@ -171,12 +183,22 @@ wire [15:0] per_dout =  bcsctl1_rd   |
 // 5)  CLOCK GENERATION
 //=============================================================================
 
+// Synchronize CPU_EN signal
+//---------------------------------------
+reg  [1:0] cpu_en_sync;
+always @ (posedge mclk or posedge por)
+  if (por) cpu_en_sync <=  2'b00;
+  else     cpu_en_sync <=  {cpu_en_sync[0], cpu_en};    
+
+assign     cpu_en_s     =   cpu_en_sync[1];
+   
+
 // Synchronize LFXT_CLK & edge detection
 //---------------------------------------
 reg  [2:0] lfxt_clk_s;
    
-always @ (posedge mclk or posedge puc)
-  if (puc) lfxt_clk_s <=  3'b000;
+always @ (posedge mclk or posedge por)
+  if (por) lfxt_clk_s <=  3'b000;
   else     lfxt_clk_s <=  {lfxt_clk_s[1:0], lfxt_clk};    
 
 wire lfxt_clk_en = (lfxt_clk_s[1] & ~lfxt_clk_s[2]) & ~(oscoff & ~bcsctl2[`SELS]);
@@ -202,7 +224,7 @@ wire      aclk_en_nxt = lfxt_clk_en & ((bcsctl1[`DIVAx]==2'b00) ?  1'b1         
 
 always @ (posedge mclk or posedge puc)
   if (puc)  aclk_en <=  1'b0;
-  else      aclk_en <=  aclk_en_nxt;
+  else      aclk_en <=  aclk_en_nxt & cpu_en_s;
 
 always @ (posedge mclk or posedge puc)
   if (puc)                                         aclk_div <=  3'h0;
@@ -224,11 +246,17 @@ wire      smclk_en_nxt = smclk_in & ((bcsctl2[`DIVSx]==2'b00) ?  1'b1           
    
 always @ (posedge mclk or posedge puc)
   if (puc)  smclk_en <=  1'b0;
-  else      smclk_en <=  smclk_en_nxt;
+  else      smclk_en <=  smclk_en_nxt & cpu_en_s;
 
 always @ (posedge mclk or posedge puc)
   if (puc)                                      smclk_div <=  3'h0;
   else if ((bcsctl2[`DIVSx]!=2'b00) & smclk_in) smclk_div <=  smclk_div+3'h1;
+
+
+// Generate DBG_CLK
+//----------------------------
+
+assign  dbg_clk = mclk;
 
 
 //=============================================================================
@@ -236,22 +264,38 @@ always @ (posedge mclk or posedge puc)
 //=============================================================================
 
 // Generate synchronized POR
-wire      por_reset  =  !reset_n;
+wire      por_reset_a  =  !reset_n;
 
 reg [1:0] por_s;
-always @(posedge mclk_n or posedge por_reset)
-  if (por_reset) por_s  <=  2'b11;
-  else           por_s  <=  {por_s[0], 1'b0};
+always @(posedge mclk or posedge por_reset_a)
+  if (por_reset_a) por_s  <=  2'b11;
+  else             por_s  <=  {por_s[0], 1'b0};
 wire   por = por_s[1];
 
+
 // Generate main system reset
-wire      puc_reset  = por_reset | wdt_reset | dbg_reset;
+wire      puc_reset  = por | wdt_reset | dbg_cpu_reset;
 
 reg [1:0] puc_s;
-always @(posedge mclk_n or posedge puc_reset)
+always @(posedge mclk or posedge puc_reset)
   if (puc_reset) puc_s  <=  2'b11;
   else           puc_s  <=  {puc_s[0], 1'b0};
 wire   puc = puc_s[1];
+
+
+// Generate debug unit reset
+`ifdef DBG_EN   
+reg [1:0] dbg_rst_s;
+always @(posedge mclk or posedge por)
+  if (por) dbg_rst_s  <=  2'b11;
+  else     dbg_rst_s  <=  {dbg_rst_s[0], ~dbg_en};
+
+`else
+wire [1:0] dbg_rst_s   = 2'b11;
+`endif
+
+wire   dbg_en_s = ~dbg_rst_s[1];
+wire   dbg_rst  =  dbg_rst_s[1];
 
 
 endmodule // omsp_clock_module

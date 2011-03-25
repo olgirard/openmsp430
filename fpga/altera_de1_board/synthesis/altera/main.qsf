@@ -503,4 +503,4 @@ set_global_assignment -name LL_ROOT_REGION ON -section_id "Root Region"
 set_global_assignment -name LL_MEMBER_STATE LOCKED -section_id "Root Region"
 set_global_assignment -name VERILOG_FILE openMSP430_fpga_top.v
 set_global_assignment -name CDF_FILE Chain1.cdf
-set_global_assignment -name SEARCH_PATH ..\\..\\rtl\\verilog\\openmsp430/
+set_global_assignment -name SEARCH_PATH "..\\..\\rtl\\verilog\\openmsp430/ ..\\..\\rtl\\verilog\\openmsp430\\periph/"

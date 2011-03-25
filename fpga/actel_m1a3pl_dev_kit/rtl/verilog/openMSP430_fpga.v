@@ -97,7 +97,7 @@ wire         [15:0] pmem_dout;
 wire          [7:0] per_addr;
 wire         [15:0] per_din;
 wire                per_en;
-wire          [1:0] per_wen;
+wire          [1:0] per_we;
 wire         [15:0] per_dout;
 
 wire         [13:0] irq_acc;
@@ -315,7 +315,7 @@ openMSP430 openMSP430_0 (
     .mclk         (mclk),         // Main system clock
     .per_addr     (per_addr),     // Peripheral address
     .per_din      (per_din),      // Peripheral data input
-    .per_wen      (per_wen),      // Peripheral write enable (high active)
+    .per_we       (per_we),       // Peripheral write enable (high active)
     .per_en       (per_en),       // Peripheral enable (high active)
     .pmem_addr    (pmem_addr),    // Program Memory address
     .pmem_cen     (pmem_cen),     // Program Memory chip enable (low active)
@@ -325,6 +325,8 @@ openMSP430 openMSP430_0 (
     .smclk_en     (smclk_en),     // SMCLK enable
 
 // INPUTs
+    .cpu_en       (1'b1),         // Enable CPU code execution (asynchronous)
+    .dbg_en       (1'b1),         // Debug interface enable (asynchronous)
     .dbg_uart_rxd (uart_rx),      // Debug interface: UART RXD
     .dco_clk      (dco_clk),      // Fast oscillator (fast clock)
     .dmem_dout    (dmem_dout),    // Data Memory data output
@@ -360,7 +362,7 @@ dac_spi_if #(1, 9'h190) dac_spi_if_x (
     .per_addr     (per_addr),       // Peripheral address
     .per_din      (per_din),        // Peripheral data input
     .per_en       (per_en),         // Peripheral enable (high active)
-    .per_wen      (per_wen),        // Peripheral write enable (high active)
+    .per_we       (per_we),         // Peripheral write enable (high active)
     .puc          (puc)             // Main system reset
 );
 
@@ -379,7 +381,7 @@ dac_spi_if #(1, 9'h1A0) dac_spi_if_y (
     .per_addr     (per_addr),       // Peripheral address
     .per_din      (per_din),        // Peripheral data input
     .per_en       (per_en),         // Peripheral enable (high active)
-    .per_wen      (per_wen),        // Peripheral write enable (high active)
+    .per_we       (per_we),         // Peripheral write enable (high active)
     .puc          (puc)             // Main system reset
 );
 
@@ -428,7 +430,7 @@ omsp_gpio #(.P1_EN(1),
     .per_addr     (per_addr),      // Peripheral address
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
-    .per_wen      (per_wen),       // Peripheral write enable (high active)
+    .per_we       (per_we),        // Peripheral write enable (high active)
     .puc          (puc)            // Main system reset
 );
 
@@ -458,7 +460,7 @@ omsp_timerA timerA_0 (
     .per_addr     (per_addr),      // Peripheral address
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
-    .per_wen      (per_wen),       // Peripheral write enable (high active)
+    .per_we       (per_we),        // Peripheral write enable (high active)
     .puc          (puc),           // Main system reset
     .smclk_en     (smclk_en),      // SMCLK enable (from CPU)
     .ta_cci0a     (1'b0),          // Timer A capture 0 input A

@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
+// $Rev: 106 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -53,7 +53,7 @@ module  omsp_mem_backbone (
     fe_pmem_wait,                   // Frontend wait for Instruction fetch
     per_addr,                       // Peripheral address
     per_din,                        // Peripheral data input
-    per_wen,                        // Peripheral write enable (high active)
+    per_we,                         // Peripheral write enable (high active)
     per_en,                         // Peripheral enable (high active)
     pmem_addr,                      // Program Memory address
     pmem_cen,                       // Program Memory chip enable (low active)
@@ -91,7 +91,7 @@ output        [15:0] fe_mdb_in;     // Frontend Memory data bus input
 output               fe_pmem_wait;  // Frontend wait for Instruction fetch
 output         [7:0] per_addr;      // Peripheral address
 output        [15:0] per_din;       // Peripheral data input
-output         [1:0] per_wen;       // Peripheral write enable (high active)
+output         [1:0] per_we;        // Peripheral write enable (high active)
 output               per_en;        // Peripheral enable (high active)
 output [`PMEM_MSB:0] pmem_addr;     // Program Memory address
 output               pmem_cen;      // Program Memory chip enable (low active)
@@ -177,7 +177,7 @@ wire         eu_per_en     =  eu_mb_en   & (eu_mab[14:8]==7'h00);
 
 wire   [7:0] per_addr      =  dbg_mem_en ? dbg_mem_addr[8:1] : eu_mab[7:0];
 wire  [15:0] per_din       =  dbg_mem_en ? dbg_mem_dout      : eu_mdb_out;
-wire   [1:0] per_wen       =  dbg_mem_en ? dbg_mem_wr        : eu_mb_wr;
+wire   [1:0] per_we        =  dbg_mem_en ? dbg_mem_wr        : eu_mb_wr;
 wire         per_en        =  dbg_mem_en ? dbg_per_en        : eu_per_en;
 
 reg   [15:0] per_dout_val;
@@ -231,11 +231,16 @@ assign      eu_mdb_in      = eu_mdb_in_sel[1] ? pmem_dout    :
 //---------------------------------
 
 // Select between peripherals, RAM and ROM
-reg [1:0] dbg_mem_din_sel;
+`ifdef DBG_EN
+reg   [1:0] dbg_mem_din_sel;
 always @(posedge mclk or posedge puc)
   if (puc)  dbg_mem_din_sel <= 2'b00;
   else      dbg_mem_din_sel <= {~dbg_pmem_cen, dbg_per_en};
 
+`else
+wire  [1:0] dbg_mem_din_sel  = 2'b00;
+`endif
+       
 // Mux
 assign      dbg_mem_din  = dbg_mem_din_sel[1] ? pmem_dout    :
                            dbg_mem_din_sel[0] ? per_dout_val : dmem_dout;

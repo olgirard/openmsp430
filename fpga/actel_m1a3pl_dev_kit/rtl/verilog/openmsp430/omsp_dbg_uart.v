@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
+// $Rev: 106 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -50,16 +50,16 @@ module  omsp_dbg_uart (
     dbg_wr,                         // Debug register data write
 			     
 // INPUTs
+    dbg_clk,                        // Debug unit clock
     dbg_dout,                       // Debug register data output
     dbg_rd_rdy,                     // Debug register data is ready for read
+    dbg_rst,                        // Debug unit reset
     dbg_uart_rxd,                   // Debug interface: UART RXD
-    mclk,                           // Main system clock
     mem_burst,                      // Burst on going
     mem_burst_end,                  // End TX/RX burst
     mem_burst_rd,                   // Start TX burst
     mem_burst_wr,                   // Start RX burst
-    mem_bw,                         // Burst byte width
-    por                             // Power on reset
+    mem_bw                          // Burst byte width
 );
 
 // OUTPUTs
@@ -72,16 +72,16 @@ output              dbg_wr;         // Debug register data write
 
 // INPUTs
 //=========
+input               dbg_clk;        // Debug unit clock
 input        [15:0] dbg_dout;       // Debug register data output
 input               dbg_rd_rdy;     // Debug register data is ready for read
+input               dbg_rst;        // Debug unit reset
 input               dbg_uart_rxd;   // Debug interface: UART RXD
-input               mclk;           // Main system clock
 input               mem_burst;      // Burst on going
 input               mem_burst_end;  // End TX/RX burst
 input               mem_burst_rd;   // Start TX burst
 input               mem_burst_wr;   // Start RX burst
 input               mem_bw;         // Burst byte width
-input               por;            // Power on reset
 
 
 //=============================================================================
@@ -91,9 +91,9 @@ input               por;            // Power on reset
 // Synchronize RXD input & buffer
 //--------------------------------
 reg  [3:0] rxd_sync;
-always @ (posedge mclk or posedge por)
-  if (por) rxd_sync <=  4'hf;
-  else     rxd_sync <=  {rxd_sync[2:0], dbg_uart_rxd};
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst) rxd_sync <=  4'hf;
+  else         rxd_sync <=  {rxd_sync[2:0], dbg_uart_rxd};
 
 // Majority decision
 //------------------------
@@ -104,9 +104,9 @@ wire [1:0] rxd_maj_cnt = {1'b0, rxd_sync[1]} +
                          {1'b0, rxd_sync[3]};
 wire       rxd_maj_nxt = (rxd_maj_cnt>=2'b10);
    
-always @ (posedge mclk or posedge por)
-  if (por) rxd_maj <=  1'b0;
-  else     rxd_maj <=  rxd_maj_nxt;
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst) rxd_maj <=  1'b0;
+  else         rxd_maj <=  rxd_maj_nxt;
 
 wire rxd_s  =  rxd_maj;
 wire rxd_fe =  rxd_maj & ~rxd_maj_nxt;
@@ -157,8 +157,8 @@ always @(uart_state or xfer_buf or mem_burst or mem_burst_wr or mem_burst_rd or 
   endcase
    
 // State machine
-always @(posedge mclk or posedge por)
-  if (por)                              uart_state <= RX_SYNC;
+always @(posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)                          uart_state <= RX_SYNC;
   else if (xfer_done    | sync_done |
            mem_burst_wr | mem_burst_rd) uart_state <= uart_state_nxt;
 
@@ -170,13 +170,13 @@ wire tx_active = (uart_state==TX_DATA1) | (uart_state==TX_DATA2);
 //=============================================================================
 // 3)  UART SYNCHRONIZATION
 //=============================================================================
-// After POR, the host needs to fist send a synchronization character (0x80)
+// After DBG_RST, the host needs to fist send a synchronization character (0x80)
 // If this feature doesn't work properly, it is possible to disable it by
 // commenting the DBG_UART_AUTO_SYNC define in the openMSP430.inc file.
 
 reg        sync_busy;
-always @ (posedge mclk or posedge por)
-  if (por)                                 sync_busy <=  1'b0;
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)                             sync_busy <=  1'b0;
   else if ((uart_state==RX_SYNC) & rxd_fe) sync_busy <=  1'b1;
   else if ((uart_state==RX_SYNC) & rxd_re) sync_busy <=  1'b0;
 
@@ -185,8 +185,8 @@ assign sync_done =  (uart_state==RX_SYNC) & rxd_re & sync_busy;
 `ifdef DBG_UART_AUTO_SYNC
 
 reg [`DBG_UART_XFER_CNT_W+2:0] sync_cnt;
-always @ (posedge mclk or posedge por)
-  if (por)            sync_cnt <=  {{`DBG_UART_XFER_CNT_W{1'b1}}, 3'b000};
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)        sync_cnt <=  {{`DBG_UART_XFER_CNT_W{1'b1}}, 3'b000};
   else if (sync_busy) sync_cnt <=  sync_cnt+{{`DBG_UART_XFER_CNT_W+2{1'b0}}, 1'b1};
 
 wire [`DBG_UART_XFER_CNT_W-1:0] bit_cnt_max = sync_cnt[`DBG_UART_XFER_CNT_W+2:3];
@@ -209,14 +209,14 @@ wire       rxd_start    = (xfer_bit==4'h0) & rxd_fe & ((uart_state!=RX_SYNC));
 wire       xfer_bit_inc = (xfer_bit!=4'h0) & (xfer_cnt=={`DBG_UART_XFER_CNT_W{1'b0}});
 assign     xfer_done    = (xfer_bit==4'hb);
    
-always @ (posedge mclk or posedge por)
-  if (por)                           xfer_bit <=  4'h0;
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)                       xfer_bit <=  4'h0;
   else if (txd_start | rxd_start)    xfer_bit <=  4'h1;
   else if (xfer_done)                xfer_bit <=  4'h0;
   else if (xfer_bit_inc)             xfer_bit <=  xfer_bit+4'h1;
 
-always @ (posedge mclk or posedge por)
-  if (por)                           xfer_cnt <=  {`DBG_UART_XFER_CNT_W{1'b0}};
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)                       xfer_cnt <=  {`DBG_UART_XFER_CNT_W{1'b0}};
   else if (rxd_start)                xfer_cnt <=  {1'b0, bit_cnt_max[`DBG_UART_XFER_CNT_W-1:1]};
   else if (txd_start | xfer_bit_inc) xfer_cnt <=  bit_cnt_max;
   else                               xfer_cnt <=  xfer_cnt+{`DBG_UART_XFER_CNT_W{1'b1}};
@@ -226,8 +226,8 @@ always @ (posedge mclk or posedge por)
 //-------------------------
 wire [19:0] xfer_buf_nxt =  {rxd_s, xfer_buf[19:1]};
 
-always @ (posedge mclk or posedge por)
-  if (por)               xfer_buf <=  20'h00000;
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)           xfer_buf <=  20'h00000;
   else if (dbg_rd_rdy)   xfer_buf <=  {1'b1, dbg_dout[15:8], 2'b01, dbg_dout[7:0], 1'b0};
   else if (xfer_bit_inc) xfer_buf <=  xfer_buf_nxt;
 
@@ -236,8 +236,8 @@ always @ (posedge mclk or posedge por)
 //------------------------
 reg dbg_uart_txd;
    
-always @ (posedge mclk or posedge por)
-  if (por)                           dbg_uart_txd <=  1'b1;
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)                       dbg_uart_txd <=  1'b1;
   else if (xfer_bit_inc & tx_active) dbg_uart_txd <=  xfer_buf[0];
 
  
@@ -246,13 +246,13 @@ always @ (posedge mclk or posedge por)
 //=============================================================================
 
 reg [5:0] dbg_addr;
- always @ (posedge mclk or posedge por)
-  if (por)            dbg_addr <=  6'h00;
+ always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)        dbg_addr <=  6'h00;
   else if (cmd_valid) dbg_addr <=  xfer_buf[`DBG_UART_ADDR];
 
 reg       dbg_bw;
-always @ (posedge mclk or posedge por)
-  if (por)            dbg_bw   <=  1'b0;
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)        dbg_bw   <=  1'b0;
   else if (cmd_valid) dbg_bw   <=  xfer_buf[`DBG_UART_BW];
 
 wire        dbg_din_bw =  mem_burst  ? mem_bw : dbg_bw;

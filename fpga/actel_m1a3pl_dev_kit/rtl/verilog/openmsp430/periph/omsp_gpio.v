@@ -31,14 +31,10 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
+// $Rev: 106 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
 //----------------------------------------------------------------------------
-`ifdef OMSP_NO_INCLUDE
-`else
-`include "openMSP430_defines.v"
-`endif
 
 module  omsp_gpio (
 
@@ -76,7 +72,7 @@ module  omsp_gpio (
     per_addr,                       // Peripheral address
     per_din,                        // Peripheral data input
     per_en,                         // Peripheral enable (high active)
-    per_wen,                        // Peripheral write enable (high active)
+    per_we,                         // Peripheral write enable (high active)
     puc                             // Main system reset
 );
 
@@ -126,7 +122,7 @@ input         [7:0] p6_din;         // Port 6 data input
 input         [7:0] per_addr;       // Peripheral address
 input        [15:0] per_din;        // Peripheral data input
 input               per_en;         // Peripheral enable (high active)
-input         [1:0] per_wen;        // Peripheral write enable (high active)
+input         [1:0] per_we;         // Peripheral write enable (high active)
 input               puc;            // Main system reset
 
 
@@ -250,9 +246,9 @@ always @(per_addr)
   endcase
 
 // Read/Write probes
-wire         reg_lo_write =  per_wen[0] & per_en;
-wire         reg_hi_write =  per_wen[1] & per_en;
-wire         reg_read     = ~|per_wen   & per_en;
+wire         reg_lo_write =  per_we[0] & per_en;
+wire         reg_hi_write =  per_we[1] & per_en;
+wire         reg_read     = ~|per_we   & per_en;
 
 // Read/Write vectors
 wire [255:0] reg_hi_wr    = reg_dec & {256{reg_hi_write}};
@@ -826,8 +822,3 @@ wire [15:0] per_dout  =  p1in_rd   |
                          p6sel_rd;
 
 endmodule // omsp_gpio
-
-`ifdef OMSP_NO_INCLUDE
-`else
-`include "openMSP430_undefines.v"
-`endif

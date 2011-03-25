@@ -59,8 +59,9 @@ reg         [9:0] switch;
 wire        [9:0] led;
 
 // UART
-reg               uart_rx;
-wire              uart_tx;
+reg               dbg_uart_rxd;
+wire              dbg_uart_txd;
+reg        [15:0] dbg_uart_buf;
 
 // Core debug signals
 wire   [8*32-1:0] i_state;
@@ -84,6 +85,9 @@ wire       [11:0] vout_y;
 
 // CPU & Memory registers
 `include "registers.v"
+
+// Debug interface tasks
+`include "dbg_uart_tasks.v"
 
 // Verilog stimulus
 `include "stimulus.v"
@@ -144,7 +148,7 @@ initial
      error         = 0;
      stimulus_done = 1;
      switch        = 10'h000;
-     uart_rx       = 1'b0;
+     dbg_uart_rxd  = 1'b1;
   end
 
 //
@@ -161,13 +165,13 @@ openMSP430_fpga dut (
     .sclk_y       (sclk_y),         // SPI Serial Clock
     .sync_n_x     (sync_n_x),       // SPI Frame synchronization signal (low active)
     .sync_n_y     (sync_n_y),       // SPI Frame synchronization signal (low active)
-    .uart_tx      (uart_tx),        // Board UART TX pin
+    .uart_tx      (dbg_uart_txd),   // Board UART TX pin
 
 // INPUTs
     .oscclk       (oscclk),         // Board Oscillator (?? MHz)
     .porst_n      (porst_n),        // Board Power-On reset (active low)
     .pbrst_n      (pbrst_n),        // Board Push-Button reset (active low)
-    .uart_rx      (uart_rx),        // Board UART RX pin
+    .uart_rx      (dbg_uart_rxd),   // Board UART RX pin
     .switch       (switch)          // Board Switches
 );
 

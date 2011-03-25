@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
+// $Rev: 106 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -68,6 +68,7 @@ module  omsp_frontend (
     pc_nxt,                        // Next PC value (for CALL & IRQ)
 
 // INPUTs
+    cpu_en_s,                      // Enable CPU code execution (synchronous)
     cpuoff,                        // Turns off the CPU
     dbg_halt_cmd,                  // Halt CPU command
     dbg_reg_sel,                   // Debug selected register for rd/wr access
@@ -111,6 +112,7 @@ output       [15:0] pc_nxt;        // Next PC value (for CALL & IRQ)
 
 // INPUTs
 //=========
+input               cpu_en_s;      // Enable CPU code execution (synchronous)
 input               cpuoff;        // Turns off the CPU
 input               dbg_halt_cmd;  // Halt CPU command
 input         [3:0] dbg_reg_sel;   // Debug selected register for rd/wr access
@@ -173,17 +175,20 @@ parameter I_EXT1      = 3'h3; // 1st Extension word
 parameter I_EXT2      = 3'h4; // 2nd Extension word
 parameter I_IDLE      = 3'h5; // CPU is in IDLE mode
 
+// CPU on/off through the debug interface or cpu_en port
+wire   cpu_halt_cmd = dbg_halt_cmd | ~cpu_en_s;
+   
 // States Transitions
 always @(i_state   or inst_sz    or inst_sz_nxt or pc_sw_wr     or exec_done or
-         exec_done or irq_detect or cpuoff      or dbg_halt_cmd or e_state)
+         exec_done or irq_detect or cpuoff      or cpu_halt_cmd or e_state)
     case(i_state)
-      I_IDLE     : i_state_nxt = (irq_detect & ~dbg_halt_cmd) ? I_IRQ_FETCH :
-                                 (~cpuoff    & ~dbg_halt_cmd) ? I_DEC       : I_IDLE;
+      I_IDLE     : i_state_nxt = (irq_detect & ~cpu_halt_cmd) ? I_IRQ_FETCH :
+                                 (~cpuoff    & ~cpu_halt_cmd) ? I_DEC       : I_IDLE;
       I_IRQ_FETCH: i_state_nxt =  I_IRQ_DONE;
       I_IRQ_DONE : i_state_nxt =  I_DEC;
       I_DEC      : i_state_nxt =  irq_detect                  ? I_IRQ_FETCH :
-                          (cpuoff | dbg_halt_cmd) & exec_done ? I_IDLE      :
-                            dbg_halt_cmd & (e_state==`E_IDLE) ? I_IDLE      :
+                          (cpuoff | cpu_halt_cmd) & exec_done ? I_IDLE      :
+                            cpu_halt_cmd & (e_state==`E_IDLE) ? I_IDLE      :
                                   pc_sw_wr                    ? I_DEC       :
 		             ~exec_done & ~(e_state==`E_IDLE) ? I_DEC       :        // Wait in decode state
                                   (inst_sz_nxt!=2'b00)        ? I_EXT1      : I_DEC; // until execution is completed
@@ -208,7 +213,7 @@ wire   fetch        = ~((i_state==I_DEC) & ~(exec_done | (e_state==`E_IDLE))) & 
 reg    dbg_halt_st;
 always @(posedge mclk or posedge puc)
   if (puc)  dbg_halt_st <= 1'b0;
-  else      dbg_halt_st <= dbg_halt_cmd & (i_state_nxt==I_IDLE);
+  else      dbg_halt_st <= cpu_halt_cmd & (i_state_nxt==I_IDLE);
 
 
 //=============================================================================
@@ -230,7 +235,7 @@ always @(posedge mclk or posedge puc)
   else if (exec_done)           inst_irq_rst <= 1'b0;
 
 //  Detect other interrupts
-assign  irq_detect = (inst_nmi | ((|irq | wdt_irq) & gie)) & ~dbg_halt_cmd & ~dbg_halt_st & (exec_done | (i_state==I_IDLE));
+assign  irq_detect = (inst_nmi | ((|irq | wdt_irq) & gie)) & ~cpu_halt_cmd & ~dbg_halt_st & (exec_done | (i_state==I_IDLE));
 
 // Select interrupt vector
 reg  [3:0] irq_num;
@@ -289,7 +294,7 @@ always @(posedge mclk or posedge puc)
    
 // Memory interface
 wire [15:0] mab      = pc_nxt;
-wire        mb_en    = fetch | pc_sw_wr | (i_state==I_IRQ_FETCH) | pmem_busy | (dbg_halt_st & ~dbg_halt_cmd);
+wire        mb_en    = fetch | pc_sw_wr | (i_state==I_IRQ_FETCH) | pmem_busy | (dbg_halt_st & ~cpu_halt_cmd);
 
 
 //
@@ -566,12 +571,12 @@ always @(dest_reg or ir or inst_type_nxt)
        endcase
      else if (dest_reg==4'h0)   // Addressing mode using R0
        case (ir[7])
-	 2'b1   : inst_ad_nxt =  8'b00010000;
+	 1'b1   : inst_ad_nxt =  8'b00010000;
 	 default: inst_ad_nxt =  8'b00000001;
        endcase
      else                       // General Addressing mode
        case (ir[7])
-	 2'b1   : inst_ad_nxt =  8'b00000010;
+	 1'b1   : inst_ad_nxt =  8'b00000010;
 	 default: inst_ad_nxt =  8'b00000001;
        endcase
   end
@@ -590,7 +595,7 @@ always @(posedge mclk or posedge puc)
 reg       inst_bw;
 always @(posedge mclk or posedge puc)
   if (puc)         inst_bw     <= 1'b0;
-  else if (decode) inst_bw     <= ir[6] & ~inst_type_nxt[`INST_JMP] & ~irq_detect & ~dbg_halt_cmd;
+  else if (decode) inst_bw     <= ir[6] & ~inst_type_nxt[`INST_JMP] & ~irq_detect & ~cpu_halt_cmd;
 
 // Extended instruction size
 assign    inst_sz_nxt = {1'b0,  (inst_as_nxt[`IDX] | inst_as_nxt[`SYMB] | inst_as_nxt[`ABS] | inst_as_nxt[`IMM])} +
@@ -645,9 +650,8 @@ always @(posedge mclk or posedge puc)
   else if (inst_dext_rdy)      exec_dext_rdy <= 1'b1;
 
 // Execution first state
-//wire [3:0] e_first_state = dbg_halt_cmd        ? `E_IDLE   :
 wire [3:0] e_first_state = ~dbg_halt_st  & inst_so_nxt[`IRQ] ? `E_IRQ_0  :
-                            dbg_halt_cmd | (i_state==I_IDLE) ? `E_IDLE   :
+                            cpu_halt_cmd | (i_state==I_IDLE) ? `E_IDLE   :
                             cpuoff                           ? `E_IDLE   :
                             src_acalc_pre                    ? `E_SRC_AD :
                             src_rd_pre                       ? `E_SRC_RD :

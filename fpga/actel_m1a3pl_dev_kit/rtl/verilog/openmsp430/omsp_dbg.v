@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
+// $Rev: 106 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -50,14 +50,18 @@ module  omsp_dbg (
     dbg_mem_en,                     // Debug unit memory enable
     dbg_mem_wr,                     // Debug unit memory write
     dbg_reg_wr,                     // Debug unit CPU register write
-    dbg_reset,                      // Reset CPU from debug interface
+    dbg_cpu_reset,                  // Reset CPU from debug interface
     dbg_uart_txd,                   // Debug interface: UART TXD
 			     
 // INPUTs
+    cpu_en_s,                       // Enable CPU code execution (synchronous)
+    dbg_clk,                        // Debug unit clock
+    dbg_en_s,                       // Debug interface enable (synchronous)
     dbg_halt_st,                    // Halt/Run status from CPU
     dbg_mem_din,                    // Debug unit Memory data input
     dbg_reg_din,                    // Debug unit CPU register data input
-    dbg_uart_rxd,                   // Debug interface: UART RXD
+    dbg_rst,                        // Debug unit reset
+    dbg_uart_rxd,                   // Debug interface: UART RXD (asynchronous)
     decode_noirq,                   // Frontend decode instruction
     eu_mab,                         // Execution-Unit Memory address bus
     eu_mb_en,                       // Execution-Unit Memory bus enable
@@ -67,9 +71,7 @@ module  omsp_dbg (
     exec_done,                      // Execution completed
     fe_mb_en,                       // Frontend Memory bus enable
     fe_mdb_in,                      // Frontend Memory data bus input
-    mclk,                           // Main system clock
     pc,                             // Program counter
-    por,                            // Power on reset
     puc                             // Main system reset
 );
 
@@ -82,15 +84,19 @@ output       [15:0] dbg_mem_dout;   // Debug unit data output
 output              dbg_mem_en;     // Debug unit memory enable
 output        [1:0] dbg_mem_wr;     // Debug unit memory write
 output              dbg_reg_wr;     // Debug unit CPU register write
-output              dbg_reset;      // Reset CPU from debug interface
+output              dbg_cpu_reset;  // Reset CPU from debug interface
 output              dbg_uart_txd;   // Debug interface: UART TXD
 
 // INPUTs
 //=========
+input               cpu_en_s;       // Enable CPU code execution (synchronous)
+input               dbg_clk;        // Debug unit clock
+input               dbg_en_s;       // Debug interface enable (synchronous)
 input               dbg_halt_st;    // Halt/Run status from CPU
 input        [15:0] dbg_mem_din;    // Debug unit Memory data input
 input        [15:0] dbg_reg_din;    // Debug unit CPU register data input
-input               dbg_uart_rxd;   // Debug interface: UART RXD
+input               dbg_rst;        // Debug unit reset
+input               dbg_uart_rxd;   // Debug interface: UART RXD (asynchronous)
 input               decode_noirq;   // Frontend decode instruction
 input        [15:0] eu_mab;         // Execution-Unit Memory address bus
 input               eu_mb_en;       // Execution-Unit Memory bus enable
@@ -100,9 +106,7 @@ input        [15:0] eu_mdb_out;     // Memory data bus output
 input               exec_done;      // Execution completed
 input               fe_mb_en;       // Frontend Memory bus enable
 input        [15:0] fe_mdb_in;      // Frontend Memory data bus input
-input               mclk;           // Main system clock
 input        [15:0] pc;             // Program counter
-input               por;            // Power on reset
 input               puc;            // Main system reset
 
 
@@ -206,10 +210,10 @@ parameter           BRK3_ADDR1_D = (64'h1 << BRK3_ADDR1);
 
 // PUC is localy used as a data.
 reg  [1:0] puc_sync;
-always @ (posedge mclk or posedge por)
-  if (por) puc_sync <=  2'b11;
-  else     puc_sync <=  {puc_sync[0] , puc};
-wire       puc_s     =  puc_sync[1];
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst) puc_sync <=  2'b11;
+  else         puc_sync <=  {puc_sync[0] , puc};
+wire           puc_s     =  puc_sync[1];
 
 
 //============================================================================
@@ -288,8 +292,12 @@ reg   [6:3] cpu_ctl;
 
 wire        cpu_ctl_wr = reg_wr[CPU_CTL];
    
-always @ (posedge mclk or posedge por)
-  if (por)             cpu_ctl <=  4'h0;
+always @ (posedge dbg_clk or posedge dbg_rst)
+`ifdef DBG_RST_BRK_EN
+  if (dbg_rst)         cpu_ctl <=  4'h4;
+`else
+  if (dbg_rst)         cpu_ctl <=  4'h0;
+`endif
   else if (cpu_ctl_wr) cpu_ctl <=  dbg_din[6:3];
 
 wire  [7:0] cpu_ctl_full = {1'b0, cpu_ctl, 3'b000};
@@ -310,8 +318,8 @@ wire        cpu_stat_wr  = reg_wr[CPU_STAT];
 wire  [3:2] cpu_stat_set = {dbg_swbrk, puc_s};
 wire  [3:2] cpu_stat_clr = ~dbg_din[3:2];
 
-always @ (posedge mclk or posedge por)
-  if (por)              cpu_stat <=  2'b00;
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)          cpu_stat <=  2'b00;
   else if (cpu_stat_wr) cpu_stat <= ((cpu_stat & cpu_stat_clr) | cpu_stat_set);
   else                  cpu_stat <=  (cpu_stat                 | cpu_stat_set);
 
@@ -345,16 +353,16 @@ reg   [3:1] mem_ctl;
 
 wire        mem_ctl_wr = reg_wr[MEM_CTL];
    
-always @ (posedge mclk or posedge por)
-  if (por)             mem_ctl <=  3'h0;
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)         mem_ctl <=  3'h0;
   else if (mem_ctl_wr) mem_ctl <=  dbg_din[3:1];
 
 wire  [7:0] mem_ctl_full  = {4'b0000, mem_ctl, 1'b0};
 
 reg         mem_start;
-always @ (posedge mclk or posedge por)
-  if (por)  mem_start <=  1'b0;
-  else      mem_start <=  mem_ctl_wr & dbg_din[0];
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)  mem_start <=  1'b0;
+  else          mem_start <=  mem_ctl_wr & dbg_din[0];
 
 wire        mem_bw    = mem_ctl[3];
    
@@ -370,8 +378,8 @@ wire [15:0] dbg_mem_din_bw = ~mem_bw      ? dbg_mem_din                :
 	                      mem_addr[0] ? {8'h00, dbg_mem_din[15:8]} :
 	                                    {8'h00, dbg_mem_din[7:0]};
    
-always @ (posedge mclk or posedge por)
-  if (por)                 mem_data <=  16'h0000;
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)             mem_data <=  16'h0000;
   else if (mem_data_wr)    mem_data <=  dbg_din;
   else if (dbg_reg_rd)     mem_data <=  dbg_reg_din;
   else if (dbg_mem_rd_dly) mem_data <=  dbg_mem_din_bw;
@@ -389,8 +397,8 @@ wire [15:0] mem_addr_inc = (mem_cnt==16'h0000)         ? 16'h0000 :
                            (dbg_mem_acc & ~mem_bw)     ? 16'h0002 :
                            (dbg_mem_acc | dbg_reg_acc) ? 16'h0001 : 16'h0000;
    
-always @ (posedge mclk or posedge por)
-  if (por)              mem_addr <=  16'h0000;
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)          mem_addr <=  16'h0000;
   else if (mem_addr_wr) mem_addr <=  dbg_din;
   else                  mem_addr <=  mem_addr + mem_addr_inc;
    
@@ -402,8 +410,8 @@ wire        mem_cnt_wr  = reg_wr[MEM_CNT];
 wire [15:0] mem_cnt_dec = (mem_cnt==16'h0000)         ? 16'h0000 :
                           (dbg_mem_acc | dbg_reg_acc) ? 16'hffff : 16'h0000;
    
-always @ (posedge mclk or posedge por)
-  if (por)             mem_cnt <=  16'h0000;
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)         mem_cnt <=  16'h0000;
   else if (mem_cnt_wr) mem_cnt <=  dbg_din;
   else                 mem_cnt <=  mem_cnt + mem_cnt_dec;
 
@@ -435,7 +443,9 @@ omsp_dbg_hwbrk dbg_hwbr_0 (
 // INPUTs
     .brk_reg_rd (brk0_reg_rd), // Hardware break/watch-point register read select
     .brk_reg_wr (brk0_reg_wr), // Hardware break/watch-point register write select
+    .dbg_clk    (dbg_clk),     // Debug unit clock
     .dbg_din    (dbg_din),     // Debug register data input
+    .dbg_rst    (dbg_rst),     // Debug unit reset
     .eu_mab     (eu_mab),      // Execution-Unit Memory address bus
     .eu_mb_en   (eu_mb_en),    // Execution-Unit Memory bus enable
     .eu_mb_wr   (eu_mb_wr),    // Execution-Unit Memory bus write transfer
@@ -443,9 +453,7 @@ omsp_dbg_hwbrk dbg_hwbr_0 (
     .eu_mdb_out (eu_mdb_out),  // Memory data bus output
     .exec_done  (exec_done),   // Execution completed
     .fe_mb_en   (fe_mb_en),    // Frontend Memory bus enable
-    .mclk       (mclk),        // Main system clock
-    .pc         (pc),          // Program counter
-    .por        (por)          // Power on reset
+    .pc         (pc)           // Program counter
 );
 
 `else
@@ -477,7 +485,9 @@ omsp_dbg_hwbrk dbg_hwbr_1 (
 // INPUTs
     .brk_reg_rd (brk1_reg_rd), // Hardware break/watch-point register read select
     .brk_reg_wr (brk1_reg_wr), // Hardware break/watch-point register write select
+    .dbg_clk    (dbg_clk),     // Debug unit clock
     .dbg_din    (dbg_din),     // Debug register data input
+    .dbg_rst    (dbg_rst),     // Debug unit reset
     .eu_mab     (eu_mab),      // Execution-Unit Memory address bus
     .eu_mb_en   (eu_mb_en),    // Execution-Unit Memory bus enable
     .eu_mb_wr   (eu_mb_wr),    // Execution-Unit Memory bus write transfer
@@ -485,9 +495,7 @@ omsp_dbg_hwbrk dbg_hwbr_1 (
     .eu_mdb_out (eu_mdb_out),  // Memory data bus output
     .exec_done  (exec_done),   // Execution completed
     .fe_mb_en   (fe_mb_en),    // Frontend Memory bus enable
-    .mclk       (mclk),        // Main system clock
-    .pc         (pc),          // Program counter
-    .por        (por)          // Power on reset
+    .pc         (pc)           // Program counter
 );
 
 `else
@@ -519,7 +527,9 @@ omsp_dbg_hwbrk dbg_hwbr_2 (
 // INPUTs
     .brk_reg_rd (brk2_reg_rd), // Hardware break/watch-point register read select
     .brk_reg_wr (brk2_reg_wr), // Hardware break/watch-point register write select
+    .dbg_clk    (dbg_clk),     // Debug unit clock
     .dbg_din    (dbg_din),     // Debug register data input
+    .dbg_rst    (dbg_rst),     // Debug unit reset
     .eu_mab     (eu_mab),      // Execution-Unit Memory address bus
     .eu_mb_en   (eu_mb_en),    // Execution-Unit Memory bus enable
     .eu_mb_wr   (eu_mb_wr),    // Execution-Unit Memory bus write transfer
@@ -527,9 +537,7 @@ omsp_dbg_hwbrk dbg_hwbr_2 (
     .eu_mdb_out (eu_mdb_out),  // Memory data bus output
     .exec_done  (exec_done),   // Execution completed
     .fe_mb_en   (fe_mb_en),    // Frontend Memory bus enable
-    .mclk       (mclk),        // Main system clock
-    .pc         (pc),          // Program counter
-    .por        (por)          // Power on reset
+    .pc         (pc)           // Program counter
 );
 
 `else
@@ -561,7 +569,9 @@ omsp_dbg_hwbrk dbg_hwbr_3 (
 // INPUTs
     .brk_reg_rd (brk3_reg_rd), // Hardware break/watch-point register read select
     .brk_reg_wr (brk3_reg_wr), // Hardware break/watch-point register write select
+    .dbg_clk    (dbg_clk),     // Debug unit clock
     .dbg_din    (dbg_din),     // Debug register data input
+    .dbg_rst    (dbg_rst),     // Debug unit reset
     .eu_mab     (eu_mab),      // Execution-Unit Memory address bus
     .eu_mb_en   (eu_mb_en),    // Execution-Unit Memory bus enable
     .eu_mb_wr   (eu_mb_wr),    // Execution-Unit Memory bus write transfer
@@ -569,9 +579,7 @@ omsp_dbg_hwbrk dbg_hwbr_3 (
     .eu_mdb_out (eu_mdb_out),  // Memory data bus output
     .exec_done  (exec_done),   // Execution completed
     .fe_mb_en   (fe_mb_en),    // Frontend Memory bus enable
-    .mclk       (mclk),        // Main system clock
-    .pc         (pc),          // Program counter
-    .por        (por)          // Power on reset
+    .pc         (pc)           // Program counter
 );
 
 `else
@@ -608,8 +616,8 @@ wire [15:0] dbg_dout = cpu_id_lo_rd |
                        brk3_dout;
 
 // Tell UART/JTAG interface that the data is ready to be read
-always @ (posedge mclk or posedge por)
-  if (por)                           dbg_rd_rdy  <=  1'b0;
+always @ (posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)                       dbg_rd_rdy  <=  1'b0;
   else if (mem_burst | mem_burst_rd) dbg_rd_rdy  <= (dbg_reg_rd | dbg_mem_rd_dly);
   else                               dbg_rd_rdy  <=  dbg_rd;
 
@@ -620,19 +628,19 @@ always @ (posedge mclk or posedge por)
 
 // Reset CPU
 //--------------------------
-wire dbg_reset  = cpu_ctl[`CPU_RST];
+wire dbg_cpu_reset  = cpu_ctl[`CPU_RST];
 
    
 // Break after reset
 //--------------------------
-wire halt_rst = cpu_ctl[`RST_BRK_EN] & puc_s;
+wire halt_rst = cpu_ctl[`RST_BRK_EN] & dbg_en_s & puc_s;
 
    
 // Freeze peripherals
 //--------------------------
-wire dbg_freeze = dbg_halt_st & cpu_ctl[`FRZ_BRK_EN];
+wire dbg_freeze = dbg_halt_st & (cpu_ctl[`FRZ_BRK_EN] | ~cpu_en_s);
 
-   
+
 // Software break
 //--------------------------
 assign dbg_swbrk = (fe_mdb_in==`DBG_SWBRK_OP) & decode_noirq & cpu_ctl[`SW_BRK_EN];
@@ -641,8 +649,8 @@ assign dbg_swbrk = (fe_mdb_in==`DBG_SWBRK_OP) & decode_noirq & cpu_ctl[`SW_BRK_E
 // Single step
 //--------------------------
 reg [1:0] inc_step;
-always @(posedge mclk or posedge por)
-  if (por)        inc_step <= 2'b00;
+always @(posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)    inc_step <= 2'b00;
   else if (istep) inc_step <= 2'b11;
   else            inc_step <= {inc_step[0], 1'b0};
 
@@ -658,8 +666,8 @@ wire  halt_flag_clr = run_cpu   | mem_run_cpu;
 wire  halt_flag_set = halt_cpu  | halt_rst  | dbg_swbrk | mem_halt_cpu |
                       brk0_halt | brk1_halt | brk2_halt | brk3_halt;
 
-always @(posedge mclk or posedge por)
-  if (por)                halt_flag <= 1'b0;
+always @(posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)            halt_flag <= 1'b0;
   else if (halt_flag_clr) halt_flag <= 1'b0;
   else if (halt_flag_set) halt_flag <= 1'b1;
 
@@ -677,8 +685,8 @@ wire mem_burst_start = (mem_start             &  |mem_cnt);
 wire mem_burst_end   = ((dbg_wr | dbg_rd_rdy) & ~|mem_cnt);
 
 // Detect when burst is on going
-always @(posedge mclk or posedge por)
-  if (por)                  mem_burst <= 1'b0;
+always @(posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst)              mem_burst <= 1'b0;
   else if (mem_burst_start) mem_burst <= 1'b1;
   else if (mem_burst_end)   mem_burst <= 1'b0;
 
@@ -688,9 +696,9 @@ assign mem_burst_wr = (mem_burst_start &  mem_ctl[1]);
 
 // Trigger CPU Register or memory access during a burst
 reg        mem_startb;   
-always @(posedge mclk or posedge por)
-  if (por) mem_startb <= 1'b0;
-  else     mem_startb <= (mem_burst & (dbg_wr | dbg_rd)) | mem_burst_rd;
+always @(posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst) mem_startb <= 1'b0;
+  else         mem_startb <= (mem_burst & (dbg_wr | dbg_rd)) | mem_burst_rd;
 
 // Combine single and burst memory start of sequence
 wire       mem_seq_start = ((mem_start & ~|mem_cnt) | mem_startb);
@@ -719,9 +727,9 @@ always @(mem_state or mem_seq_start or dbg_halt_st)
   endcase
 
 // State machine
-always @(posedge mclk or posedge por)
-  if (por) mem_state <= M_IDLE;
-  else     mem_state <= mem_state_nxt;
+always @(posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst) mem_state <= M_IDLE;
+  else         mem_state <= mem_state_nxt;
 
 // Utility signals
 assign mem_halt_cpu = (mem_state==M_IDLE)       & (mem_state_nxt==M_SET_BRK);
@@ -748,9 +756,9 @@ assign      dbg_mem_wr     = {2{dbg_mem_en & mem_ctl[1]}} & dbg_mem_wr_msk;
 
 
 // It takes one additional cycle to read from Memory as from registers
-always @(posedge mclk or posedge por)
-  if (por) dbg_mem_rd_dly <= 1'b0;
-  else     dbg_mem_rd_dly <= dbg_mem_rd;
+always @(posedge dbg_clk or posedge dbg_rst)
+  if (dbg_rst) dbg_mem_rd_dly <= 1'b0;
+  else         dbg_mem_rd_dly <= dbg_mem_rd;
 
       
 //=============================================================================
@@ -767,16 +775,16 @@ omsp_dbg_uart dbg_uart_0 (
     .dbg_wr       (dbg_wr),        // Debug register data write
 			     
 // INPUTs
+    .dbg_clk      (dbg_clk),       // Debug unit clock
     .dbg_dout     (dbg_dout),      // Debug register data output
     .dbg_rd_rdy   (dbg_rd_rdy),    // Debug register data is ready for read
+    .dbg_rst      (dbg_rst),       // Debug unit reset
     .dbg_uart_rxd (dbg_uart_rxd),  // Debug interface: UART RXD
-    .mclk         (mclk),          // Main system clock
     .mem_burst    (mem_burst),     // Burst on going
     .mem_burst_end(mem_burst_end), // End TX/RX burst
     .mem_burst_rd (mem_burst_rd),  // Start TX burst
     .mem_burst_wr (mem_burst_wr),  // Start RX burst
-    .mem_bw       (mem_bw),        // Burst byte width
-    .por          (por)            // Power on reset
+    .mem_bw       (mem_bw)         // Burst byte width
 );
 
 `else

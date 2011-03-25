@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
+// $Rev: 106 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -58,7 +58,7 @@ module  omsp_watchdog (
     per_addr,                       // Peripheral address
     per_din,                        // Peripheral data input
     per_en,                         // Peripheral enable (high active)
-    per_wen,                        // Peripheral write enable (high active)
+    per_we,                         // Peripheral write enable (high active)
     puc,                            // Main system reset
     smclk_en,                       // SMCLK enable
     wdtie                           // Watchdog timer interrupt enable
@@ -82,7 +82,7 @@ input               nmie;           // Non-maskable interrupt enable
 input         [7:0] per_addr;       // Peripheral address
 input        [15:0] per_din;        // Peripheral data input
 input               per_en;         // Peripheral enable (high active)
-input         [1:0] per_wen;        // Peripheral write enable (high active)
+input         [1:0] per_we;         // Peripheral write enable (high active)
 input               puc;            // Main system reset
 input               smclk_en;       // SMCLK enable
 input               wdtie;          // Watchdog timer interrupt enable
@@ -113,8 +113,8 @@ always @(per_addr)
   endcase
 
 // Read/Write probes
-wire reg_write =  |per_wen   & per_en;
-wire reg_read  = ~|per_wen   & per_en;
+wire reg_write =  |per_we & per_en;
+wire reg_read  = ~|per_we & per_en;
 
 // Read/Write vectors
 wire [511:0] reg_wr    = reg_dec & {512{reg_write}};
