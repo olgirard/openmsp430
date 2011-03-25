@@ -49,7 +49,8 @@ integer smclk_counter;
 always @ (negedge mclk)
   if (smclk_en) smclk_counter <=  smclk_counter+1;
 
-
+reg [15:0] reg_val;
+   
 initial
    begin
       $display(" ===============================================");
@@ -185,7 +186,34 @@ initial
       if (mclk_counter !== 600)  tb_error("====== CLOCK GENERATOR: SMCLK - DCO_CLK INPUT (DIV /8) =====");
       if (smclk_counter !== 75)  tb_error("====== CLOCK GENERATOR: SMCLK - DCO_CLK INPUT (DIV /8) =====");
  
-     
+
+      // SMCLK GENERATION - DCO_CLK INPUT
+      //--------------------------------------------------------
+
+      @(r15 === 16'h3000);
+      repeat(50) @(posedge mclk);
+      if (dbg_freeze    == 1'b1) tb_error("====== DBG_FREEZE signal is active (test 1) =====");
+      cpu_en        = 1'b0;
+      repeat(3)   @(posedge mclk);
+      reg_val       = r14;           // Read R14 register & initialize aclk/smclk counters
+      aclk_counter  = 0;
+      smclk_counter = 0;
+      if (dbg_freeze    !== 1'b1) tb_error("====== DBG_FREEZE signal is not active (test 2) =====");
+
+      repeat(500) @(posedge mclk);   // Make sure that the CPU is stopped
+      if (reg_val       !== r14)  tb_error("====== CPU is not stopped (test 3) =====");
+      if (aclk_counter  !== 0)    tb_error("====== ACLK is not stopped (test 4) =====");
+      if (smclk_counter !== 0)    tb_error("====== SMCLK is not stopped (test 5) =====");
+      if (dbg_freeze    !== 1'b1) tb_error("====== DBG_FREEZE signal is not active (test 6) =====");
+      cpu_en = 1'b1;
+
+      repeat(500) @(posedge mclk);  // Make sure that the CPU runs again
+      if (reg_val       == r14)  tb_error("====== CPU is not running (test 7) =====");
+      if (aclk_counter  == 0)    tb_error("====== ACLK is not running (test 8) =====");
+      if (smclk_counter == 0)    tb_error("====== SMCLK is not running (test 9) =====");
+      if (dbg_freeze    == 1'b1) tb_error("====== DBG_FREEZE signal is active (test 10) =====");
+
+   
       stimulus_done = 1;
    end
 

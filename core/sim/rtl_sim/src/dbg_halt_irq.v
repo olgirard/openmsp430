@@ -42,14 +42,22 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
-      repeat(5) @(posedge mclk);
+      #1 dbg_en = 1;
+      repeat(30) @(posedge mclk);
       stimulus_done = 0;
-
-      // Wait until software initialization is done
-      @(r15==16'h0200);
 
       // Initialize the debug interface and send the CPU in halt mode
       dbg_uart_tx(DBG_SYNC);
+
+`ifdef DBG_RST_BRK_EN
+      dbg_uart_wr(CPU_CTL,  16'h0002);  // RUN
+`endif
+
+      // Wait until software initialization is done
+      if (r15!==16'h0200)
+	@(r15==16'h0200);
+
+
       dbg_uart_wr(CPU_CTL,  16'h0001);  // HALT
       repeat(150) @(posedge mclk);
       r13_bkup = r13;

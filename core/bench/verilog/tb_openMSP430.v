@@ -65,7 +65,7 @@ wire        [15:0] pmem_dout;
 wire         [7:0] per_addr;
 wire        [15:0] per_din;
 wire        [15:0] per_dout;
-wire         [1:0] per_wen;
+wire         [1:0] per_we;
 wire               per_en;
 
 // Digital I/O
@@ -132,8 +132,10 @@ reg                nmi;
 reg         [13:0] irq;
 wire        [13:0] irq_acc;
 wire        [13:0] irq_in;
-
+reg                cpu_en;
+   
 // Debug interface
+reg                dbg_en;
 wire               dbg_freeze;
 wire               dbg_uart_txd;
 reg                dbg_uart_rxd;
@@ -192,9 +194,9 @@ initial
 initial
   begin
      reset_n       = 1'b1;
-     #100;
+     #93;
      reset_n       = 1'b0;
-     #600;
+     #593;
      reset_n       = 1'b1;
   end
 
@@ -204,6 +206,8 @@ initial
      stimulus_done = 1;
      irq           = 14'b0000;
      nmi           = 1'b0;
+     cpu_en        = 1'b1;
+     dbg_en        = 1'b0;
      dbg_uart_rxd  = 1'b1;
      dbg_uart_buf  = 16'h0000;
      p1_din        = 8'h00;
@@ -277,7 +281,7 @@ openMSP430 dut (
     .mclk         (mclk),              // Main system clock
     .per_addr     (per_addr),          // Peripheral address
     .per_din      (per_din),           // Peripheral data input
-    .per_wen      (per_wen),           // Peripheral write enable (high active)
+    .per_we       (per_we),            // Peripheral write enable (high active)
     .per_en       (per_en),            // Peripheral enable (high active)
     .pmem_addr    (pmem_addr),         // Program Memory address
     .pmem_cen     (pmem_cen),          // Program Memory chip enable (low active)
@@ -287,6 +291,8 @@ openMSP430 dut (
     .smclk_en     (smclk_en),          // SMCLK enable
 
 // INPUTs
+    .cpu_en       (cpu_en),            // Enable CPU code execution
+    .dbg_en       (dbg_en),            // Debug interface enable
     .dbg_uart_rxd (dbg_uart_rxd),      // Debug interface: UART RXD
     .dco_clk      (dco_clk),           // Fast oscillator (fast clock)
     .dmem_dout    (dmem_dout),         // Data Memory data output
@@ -352,7 +358,7 @@ omsp_gpio #(.P1_EN(1),
     .per_addr     (per_addr),          // Peripheral address
     .per_din      (per_din),           // Peripheral data input
     .per_en       (per_en),            // Peripheral enable (high active)
-    .per_wen      (per_wen),           // Peripheral write enable (high active)
+    .per_we       (per_we),            // Peripheral write enable (high active)
     .puc          (puc)                // Main system reset
 );
 
@@ -382,7 +388,7 @@ omsp_timerA timerA_0 (
     .per_addr     (per_addr),          // Peripheral address
     .per_din      (per_din),           // Peripheral data input
     .per_en       (per_en),            // Peripheral enable (high active)
-    .per_wen      (per_wen),           // Peripheral write enable (high active)
+    .per_we       (per_we),            // Peripheral write enable (high active)
     .puc          (puc),               // Main system reset
     .smclk_en     (smclk_en),          // SMCLK enable (from CPU)
     .ta_cci0a     (ta_cci0a),          // Timer A compare 0 input A
@@ -408,7 +414,7 @@ template_periph_8b template_periph_8b_0 (
     .per_addr     (per_addr),          // Peripheral address
     .per_din      (per_din),           // Peripheral data input
     .per_en       (per_en),            // Peripheral enable (high active)
-    .per_wen      (per_wen),           // Peripheral write enable (high active)
+    .per_we       (per_we),            // Peripheral write enable (high active)
     .puc          (puc)                // Main system reset
 );
 
@@ -422,7 +428,7 @@ template_periph_16b template_periph_16b_0 (
     .per_addr     (per_addr),          // Peripheral address
     .per_din      (per_din),           // Peripheral data input
     .per_en       (per_en),            // Peripheral enable (high active)
-    .per_wen      (per_wen),           // Peripheral write enable (high active)
+    .per_we       (per_we),            // Peripheral write enable (high active)
     .puc          (puc)                // Main system reset
 );
 

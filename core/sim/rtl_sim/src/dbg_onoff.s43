@@ -21,130 +21,55 @@
 /* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA        */
 /*                                                                           */
 /*===========================================================================*/
-/*                               CLOCK MODULE                                */
+/*                            DEBUG INTERFACE                                */
 /*---------------------------------------------------------------------------*/
-/* Test the clock module:                                                    */
-/*                        - Check the ACLK and SMCLK clock generation.       */
+/* Test the debug interface:                                                 */
+/*                           - CPU Control features.                         */
 /*                                                                           */
 /* Author(s):                                                                */
 /*             - Olivier Girard,    olgirard@gmail.com                       */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
-/* $Rev$                                                                */
-/* $LastChangedBy$                                          */
-/* $LastChangedDate$          */
+/* $Rev: 19 $                                                                */
+/* $LastChangedBy: olivier.girard $                                          */
+/* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
 .global main
 
-.set   BCSCTL1, 0x0057
-.set   BCSCTL2, 0x0058
-
-	
-WAIT_FUNC:
-	dec r14
-	jnz WAIT_FUNC
-	ret
 	
 main:
- 	mov  #0x0250, r1 	; # Initialize stack pointer
-	mov  #0x0000, &0x0200
-	mov  #0x0000, r15
-
-       /* --------------                ACLK GENERATION             ----------------- */
-
-	mov.b  #0x00, &BCSCTL1  ; # Div /1
-	mov    #0x0001, r15
-	mov    #0x0130, r14
-        call   #WAIT_FUNC
-
-	mov.b  #0x10, &BCSCTL1  ; # Div /2
-	mov    #0x0002, r15
-	mov    #0x0130, r14
-        call   #WAIT_FUNC
-
-	mov.b  #0x20, &BCSCTL1  ; # Div /4
-	mov    #0x0003, r15
-	mov    #0x0130, r14
-        call   #WAIT_FUNC
-
-	mov.b  #0x30, &BCSCTL1  ; # Div /8
-	mov    #0x0004, r15
-	mov    #0x0130, r14
-        call   #WAIT_FUNC
+	mov  #0x0250, r1     ; Initialize stack
+ 	mov  #0x0000, r15
+ 	mov  #0x0000, r14
+	mov  #0x0000, r13
+	nop
+	eint
+	
+test_loop:
+	add  #0x0001, r14
+	cmp  #0xffff, r13
+	jne  test_loop
 
 	mov  #0x1000, r15
 
-	
-       /* --------------      SMCLK GENERATION - LFXT_CLK INPUT    ----------------- */
-	
- 	mov.b  #0x08, &BCSCTL2  ; # Div /1
-	mov    #0x1001, r15
- 	mov    #0x0130, r14
-        call   #WAIT_FUNC
 
- 	mov.b  #0x0A, &BCSCTL2  ; # Div /2
-	mov    #0x1002, r15
- 	mov    #0x0130, r14
-        call   #WAIT_FUNC
-
- 	mov.b  #0x0C, &BCSCTL2  ; # Div /4
-	mov    #0x1003, r15
- 	mov    #0x0130, r14
-        call   #WAIT_FUNC
-
- 	mov.b  #0x0E, &BCSCTL2  ; # Div /8
-	mov    #0x1004, r15
- 	mov    #0x0130, r14
-        call   #WAIT_FUNC
-
-	mov  #0x2000, r15
-
-	
-       /* --------------      SMCLK GENERATION - DCO_CLK INPUT     ----------------- */
-
- 	mov.b  #0x00, &BCSCTL2  ; # Div /1
-	mov    #0x2001, r15
- 	mov    #0x0130, r14
-        call   #WAIT_FUNC
-
- 	mov.b  #0x02, &BCSCTL2  ; # Div /2
-	mov    #0x2002, r15
- 	mov    #0x0130, r14
-        call   #WAIT_FUNC
-
- 	mov.b  #0x04, &BCSCTL2  ; # Div /4
-	mov    #0x2003, r15
- 	mov    #0x0130, r14
-        call   #WAIT_FUNC
-
- 	mov.b  #0x06, &BCSCTL2  ; # Div /8
-	mov    #0x2004, r15
- 	mov    #0x0130, r14
-        call   #WAIT_FUNC
-
-	mov  #0x3000, r15
-
-
-        /* --------------      CPU ENABLE - CPU_EN INPUT     ----------------- */
-
- 	mov    #0x0800, r14
-        call   #WAIT_FUNC
-
-	mov  #0x4000, r15
-	
 		
         /* ----------------------         END OF TEST        --------------- */
 end_of_test:
 	nop
 	br #0xffff
 
-
+isr_1:
+	mov #0xffff, r13
+	reti
+	
+	
         /* ----------------------         INTERRUPT VECTORS  --------------- */
 
 .section .vectors, "a"
 .word end_of_test        ; Interrupt  0 (lowest priority)    <unused>
-.word end_of_test        ; Interrupt  1                      <unused>
+.word isr_1              ; Interrupt  1                      <unused>
 .word end_of_test        ; Interrupt  2                      <unused>
 .word end_of_test        ; Interrupt  3                      <unused>
 .word end_of_test        ; Interrupt  4                      <unused>

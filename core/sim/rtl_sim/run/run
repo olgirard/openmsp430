@@ -4,4 +4,4 @@
 OMSP_NODUMP=0
 export OMSP_NODUMP
 
-../bin/msp430sim mpy_basic
+../bin/msp430sim dbg_onoff

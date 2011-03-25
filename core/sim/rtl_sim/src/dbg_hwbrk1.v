@@ -42,11 +42,16 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
+      #1 dbg_en = 1;
       repeat(30) @(posedge mclk);
       stimulus_done = 0;
 
       // SEND UART SYNCHRONIZATION FRAME
       dbg_uart_tx(DBG_SYNC);
+
+   `ifdef DBG_RST_BRK_EN
+      dbg_uart_wr(CPU_CTL,  16'h0002);  // RUN
+   `endif
 
       
       // HARDWARE BREAKPOINTS: INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES
