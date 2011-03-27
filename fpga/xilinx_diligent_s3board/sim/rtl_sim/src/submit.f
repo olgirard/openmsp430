@@ -72,6 +72,7 @@
 //=============================================================================
 
 +incdir+../../../rtl/verilog/openmsp430/
++incdir+../../../rtl/verilog/openmsp430/periph/
 ../../../rtl/verilog/openmsp430/openMSP430.v
 ../../../rtl/verilog/openmsp430/omsp_frontend.v
 ../../../rtl/verilog/openmsp430/omsp_execution_unit.v

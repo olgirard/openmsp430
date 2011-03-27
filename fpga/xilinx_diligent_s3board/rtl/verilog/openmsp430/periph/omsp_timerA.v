@@ -35,9 +35,9 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`ifdef OMSP_NO_INCLUDE
+`ifdef OMSP_TA_NO_INCLUDE
 `else
-`include "openMSP430_defines.v"
+`include "omsp_timerA_defines.v"
 `endif
 
 module  omsp_timerA (
@@ -62,7 +62,7 @@ module  omsp_timerA (
     per_addr,                       // Peripheral address
     per_din,                        // Peripheral data input
     per_en,                         // Peripheral enable (high active)
-    per_wen,                        // Peripheral write enable (high active)
+    per_we,                         // Peripheral write enable (high active)
     puc,                            // Main system reset
     smclk_en,                       // SMCLK enable (from CPU)
     ta_cci0a,                       // Timer A capture 0 input A
@@ -96,7 +96,7 @@ input               mclk;           // Main system clock
 input         [7:0] per_addr;       // Peripheral address
 input        [15:0] per_din;        // Peripheral data input
 input               per_en;         // Peripheral enable (high active)
-input         [1:0] per_wen;        // Peripheral write enable (high active)
+input         [1:0] per_we;         // Peripheral write enable (high active)
 input               puc;            // Main system reset
 input               smclk_en;       // SMCLK enable (from CPU)
 input               ta_cci0a;       // Timer A capture 0 input A
@@ -157,8 +157,8 @@ always @(per_addr)
   endcase
 
 // Read/Write probes
-wire         reg_write =  |per_wen   & per_en;
-wire         reg_read  = ~|per_wen   & per_en;
+wire         reg_write =  |per_we & per_en;
+wire         reg_read  = ~|per_we & per_en;
 
 // Read/Write vectors
 wire [511:0] reg_wr    = reg_dec & {512{reg_write}};
@@ -688,7 +688,7 @@ wire     irq_ta1    = (tactl[`TAIFG]     & tactl[`TAIE])     |
 
 endmodule // omsp_timerA
 
-`ifdef OMSP_NO_INCLUDE
+`ifdef OMSP_TA_NO_INCLUDE
 `else
-`include "openMSP430_undefines.v"
+`include "omsp_timerA_undefines.v"
 `endif

@@ -19,6 +19,10 @@ ln -s ../../../rtl/verilog/coregen/rom_8x2k_lo.ngc  .
 # Create link to the Xilinx constraints file
 ln -s ../openMSP430_fpga.ucf                        .
 
+# Create link to the TimerA include file
+ln -s ../../../rtl/verilog/openmsp430/periph/omsp_timerA_defines.v    .
+ln -s ../../../rtl/verilog/openmsp430/periph/omsp_timerA_undefines.v  .
+
 
 # XFLOW
 #---------------

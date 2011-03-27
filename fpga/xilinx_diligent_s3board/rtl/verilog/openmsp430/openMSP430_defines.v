@@ -114,6 +114,15 @@
 //`define  DBG_HWBRK_3
 
 
+// Defines the debugger CPU_CTL.RST_BRK_EN reset value (CPU break on PUC reset)
+//
+// When defined, this concretely bring the CPU to break after a PUC
+// occurrence by default. This is typically usefull when the program
+// memory can only be initialized through the serial debug interface.
+//
+//`define DBG_RST_BRK_EN
+
+
 //==========================================================================//
 //==========================================================================//
 //==========================================================================//
@@ -365,27 +374,6 @@
 // Basic clock module: BCSCTL2 Control Register
 `define SELS        3
 `define DIVSx       2:1
-
-// Timer A: TACTL Control Register
-`define TASSELx     9:8
-`define TAIDx       7:6
-`define TAMCx       5:4
-`define TACLR       2
-`define TAIE        1
-`define TAIFG       0
-
-// Timer A: TACCTLx Capture/Compare Control Register
-`define TACMx      15:14
-`define TACCISx    13:12
-`define TASCS      11
-`define TASCCI     10
-`define TACAP       8
-`define TAOUTMODx   7:5
-`define TACCIE      4
-`define TACCI       3
-`define TAOUT       2
-`define TACOV       1
-`define TACCIFG     0
 
 
 //

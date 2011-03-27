@@ -54,7 +54,7 @@ module  openMSP430 (
     mclk,                          // Main system clock
     per_addr,                      // Peripheral address
     per_din,                       // Peripheral data input
-    per_wen,                       // Peripheral write enable (high active)
+    per_we,                        // Peripheral write enable (high active)
     per_en,                        // Peripheral enable (high active)
     pmem_addr,                     // Program Memory address
     pmem_cen,                      // Program Memory chip enable (low active)
@@ -64,7 +64,9 @@ module  openMSP430 (
     smclk_en,                      // SMCLK enable
 
 // INPUTs
-    dbg_uart_rxd,                  // Debug interface: UART RXD
+    cpu_en,                        // Enable CPU code execution (asynchronous)
+    dbg_en,                        // Debug interface enable (asynchronous)
+    dbg_uart_rxd,                  // Debug interface: UART RXD (asynchronous)
     dco_clk,                       // Fast oscillator (fast clock)
     dmem_dout,                     // Data Memory data output
     irq,                           // Maskable interrupts
@@ -72,7 +74,7 @@ module  openMSP430 (
     nmi,                           // Non-maskable interrupt (asynchronous)
     per_dout,                      // Peripheral data output
     pmem_dout,                     // Program Memory data output
-    reset_n                        // Reset Pin (low active)
+    reset_n                        // Reset Pin (low active, asynchronous)
 );
 
 // OUTPUTs
@@ -88,7 +90,7 @@ output        [13:0] irq_acc;      // Interrupt request accepted (one-hot signal
 output               mclk;         // Main system clock
 output         [7:0] per_addr;     // Peripheral address
 output        [15:0] per_din;      // Peripheral data input
-output         [1:0] per_wen;      // Peripheral write enable (high active)
+output         [1:0] per_we;       // Peripheral write enable (high active)
 output               per_en;       // Peripheral enable (high active)
 output [`PMEM_MSB:0] pmem_addr;    // Program Memory address
 output               pmem_cen;     // Program Memory chip enable (low active)
@@ -100,7 +102,9 @@ output               smclk_en;     // SMCLK enable
 
 // INPUTs
 //=========
-input                dbg_uart_rxd; // Debug interface: UART RXD
+input                cpu_en;       // Enable CPU code execution (asynchronous)
+input                dbg_en;       // Debug interface enable (asynchronous)
+input                dbg_uart_rxd; // Debug interface: UART RXD (asynchronous)
 input                dco_clk;      // Fast oscillator (fast clock)
 input         [15:0] dmem_dout;    // Data Memory data output
 input  	      [13:0] irq;          // Maskable interrupts
@@ -108,7 +112,7 @@ input                lfxt_clk;     // Low frequency oscillator (typ 32kHz)
 input  	             nmi;          // Non-maskable interrupt (asynchronous)
 input         [15:0] per_dout;     // Peripheral data output
 input         [15:0] pmem_dout;    // Program Memory data output
-input                reset_n;      // Reset Pin (active low)
+input                reset_n;      // Reset Pin (active low, asynchronous)
 
 
 
@@ -144,7 +148,7 @@ wire         [15:0] pc_nxt;
 wire                dbg_halt_cmd;
 wire                dbg_mem_en;
 wire                dbg_reg_wr;
-wire                dbg_reset;
+wire                dbg_cpu_reset;
 wire         [15:0] dbg_mem_addr;
 wire         [15:0] dbg_mem_dout;
 wire         [15:0] dbg_mem_din;
@@ -166,6 +170,10 @@ omsp_clock_module clock_module_0 (
 
 // OUTPUTs
     .aclk_en      (aclk_en),       // ACLK enablex
+    .cpu_en_s     (cpu_en_s),      // Enable CPU code execution (synchronous)
+    .dbg_clk      (dbg_clk),       // Debug unit clock
+    .dbg_en_s     (dbg_en_s),      // Debug interface enable (synchronous)
+    .dbg_rst      (dbg_rst),       // Debug unit reset
     .mclk         (mclk),          // Main system clock
     .per_dout     (per_dout_clk),  // Peripheral data output
     .por          (por),           // Power-on reset
@@ -173,15 +181,17 @@ omsp_clock_module clock_module_0 (
     .smclk_en     (smclk_en),      // SMCLK enable
 	     
 // INPUTs
-    .dbg_reset    (dbg_reset),     // Reset CPU from debug interface
+    .cpu_en       (cpu_en),        // Enable CPU code execution (asynchronous)
+    .dbg_cpu_reset(dbg_cpu_reset), // Reset CPU from debug interface
+    .dbg_en       (dbg_en),        // Debug interface enable (asynchronous)
     .dco_clk      (dco_clk),       // Fast oscillator (fast clock)
     .lfxt_clk     (lfxt_clk),      // Low frequency oscillator (typ 32kHz)
     .oscoff       (oscoff),        // Turns off LFXT1 clock input
     .per_addr     (per_addr),      // Peripheral address
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
-    .per_wen      (per_wen),       // Peripheral write enable (high active)
-    .reset_n      (reset_n),       // Reset Pin (low active)
+    .per_we       (per_we),        // Peripheral write enable (high active)
+    .reset_n      (reset_n),       // Reset Pin (low active, asynchronous)
     .scg1         (scg1),          // System clock generator 1. Turns off the SMCLK
     .wdt_reset    (wdt_reset)      // Watchdog-timer reset
 );
@@ -219,6 +229,7 @@ omsp_frontend frontend_0 (
     .pc_nxt       (pc_nxt),        // Next PC value (for CALL & IRQ)
 			     
 // INPUTs
+    .cpu_en_s     (cpu_en_s),      // Enable CPU code execution (synchronous)
     .cpuoff       (cpuoff),        // Turns off the CPU
     .dbg_halt_cmd (dbg_halt_cmd),  // Halt CPU command
     .dbg_reg_sel  (dbg_mem_addr[3:0]), // Debug selected register for rd/wr access
@@ -298,7 +309,7 @@ omsp_mem_backbone mem_backbone_0 (
     .fe_pmem_wait (fe_pmem_wait),  // Frontend wait for Instruction fetch
     .per_addr     (per_addr),      // Peripheral address
     .per_din      (per_din),       // Peripheral data input
-    .per_wen      (per_wen),       // Peripheral write enable (high active)
+    .per_we       (per_we),        // Peripheral write enable (high active)
     .per_en       (per_en),        // Peripheral enable (high active)
     .pmem_addr    (pmem_addr),     // Program Memory address
     .pmem_cen     (pmem_cen),      // Program Memory chip enable (low active)
@@ -344,7 +355,7 @@ omsp_sfr sfr_0 (
     .per_addr     (per_addr),      // Peripheral address
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
-    .per_wen      (per_wen),       // Peripheral write enable (high active)
+    .per_we       (per_we),        // Peripheral write enable (high active)
     .por          (por),           // Power-on reset
     .puc          (puc),           // Main system reset
     .wdtifg_clr   (irq_acc[10]),   // Clear Watchdog-timer interrupt flag
@@ -376,7 +387,7 @@ omsp_watchdog watchdog_0 (
     .per_addr     (per_addr),      // Peripheral address
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
-    .per_wen      (per_wen),       // Peripheral write enable (high active)
+    .per_we       (per_we),        // Peripheral write enable (high active)
     .puc          (puc),           // Main system reset
     .smclk_en     (smclk_en),      // SMCLK enable
     .wdtie        (wdtie)          // Watchdog-timer interrupt enable
@@ -397,7 +408,7 @@ omsp_multiplier multiplier_0 (
     .per_addr     (per_addr),      // Peripheral address
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
-    .per_wen      (per_wen),       // Peripheral write enable (high active)
+    .per_we       (per_we),        // Peripheral write enable (high active)
     .puc          (puc)            // Main system reset
 );
 `else
@@ -430,14 +441,18 @@ omsp_dbg dbg_0 (
     .dbg_mem_en   (dbg_mem_en),    // Debug unit memory enable
     .dbg_mem_wr   (dbg_mem_wr),    // Debug unit memory write
     .dbg_reg_wr   (dbg_reg_wr),    // Debug unit CPU register write
-    .dbg_reset    (dbg_reset),     // Reset CPU from debug interface
+    .dbg_cpu_reset(dbg_cpu_reset), // Reset CPU from debug interface
     .dbg_uart_txd (dbg_uart_txd),  // Debug interface: UART TXD
 			     
 // INPUTs
+    .cpu_en_s     (cpu_en_s),      // Enable CPU code execution (synchronous)
+    .dbg_clk      (dbg_clk),       // Debug unit clock
+    .dbg_en_s     (dbg_en_s),      // Debug interface enable (synchronous)
     .dbg_halt_st  (dbg_halt_st),   // Halt/Run status from CPU
     .dbg_mem_din  (dbg_mem_din),   // Debug unit Memory data input
     .dbg_reg_din  (dbg_reg_din),   // Debug unit CPU register data input
-    .dbg_uart_rxd (dbg_uart_rxd),  // Debug interface: UART RXD
+    .dbg_rst      (dbg_rst),       // Debug unit reset
+    .dbg_uart_rxd (dbg_uart_rxd),  // Debug interface: UART RXD (asynchronous)
     .decode_noirq (decode_noirq),  // Frontend decode instruction
     .eu_mab       (eu_mab),        // Execution-Unit Memory address bus
     .eu_mb_en     (eu_mb_en),      // Execution-Unit Memory bus enable
@@ -447,22 +462,20 @@ omsp_dbg dbg_0 (
     .exec_done    (exec_done),     // Execution completed
     .fe_mb_en     (fe_mb_en),      // Frontend Memory bus enable
     .fe_mdb_in    (fe_mdb_in),     // Frontend Memory data bus input
-    .mclk         (mclk),          // Main system clock
     .pc           (pc),            // Program counter
-    .por          (por),           // Power on reset
     .puc          (puc)            // Main system reset
 );
 
 `else
-assign dbg_freeze   =  1'b0;
-assign dbg_halt_cmd =  1'b0;
-assign dbg_mem_addr = 16'h0000;
-assign dbg_mem_dout = 16'h0000;
-assign dbg_mem_en   =  1'b0;
-assign dbg_mem_wr   =  2'b00;
-assign dbg_reg_wr   =  1'b0;
-assign dbg_reset    =  1'b0;
-assign dbg_uart_txd =  1'b0;
+assign dbg_freeze    =  ~cpu_en_s;
+assign dbg_halt_cmd  =  1'b0;
+assign dbg_mem_addr  = 16'h0000;
+assign dbg_mem_dout  = 16'h0000;
+assign dbg_mem_en    =  1'b0;
+assign dbg_mem_wr    =  2'b00;
+assign dbg_reg_wr    =  1'b0;
+assign dbg_cpu_reset =  1'b0;
+assign dbg_uart_txd  =  1'b0;
 `endif
 
    
