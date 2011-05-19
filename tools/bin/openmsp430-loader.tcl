@@ -36,6 +36,7 @@
 
 global serial_baudrate
 global serial_device
+global omsp_info
 
 ###############################################################################
 #                            PARAMETER CHECK                                  #
@@ -175,6 +176,10 @@ if {![GetDevice]} {
 ExecutePOR_Halt
 puts "done"
 set sizes [GetCPU_ID_SIZE]
+
+if {$omsp_info(alias)!=""} {
+    puts "Connected: target device identified as $omsp_info(alias)."
+}
 puts "Connected: target device has [lindex $sizes 0]B Program Memory and [lindex $sizes 1]B Data Memory"
 puts ""
 

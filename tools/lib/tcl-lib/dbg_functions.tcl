@@ -73,14 +73,20 @@
 #               - ClearHWBreak    (Type, Addr)
 #               - IsHalted        ()
 #               - ClrStatus       ()
+#               - GetChipAlias    ()
 # 
 #------------------------------------------------------------------------------
 
 # GLOBAL VARIABLES
 global hw_break
+global omsp_info
+set    omsp_info(connected) 0
 
 # SOURCE REQUIRED LIBRARIES
-source [file dirname [info script]]/dbg_uart.tcl
+set     scriptDir [file dirname [info script]]
+source $scriptDir/dbg_uart.tcl
+source $scriptDir/xml.tcl
+
 
 #=============================================================================#
 # ExecutePOR ()                                                               #
@@ -91,8 +97,6 @@ source [file dirname [info script]]/dbg_uart.tcl
 #=============================================================================#
 proc ExecutePOR {} {
   
-    set result 1
-
     # Set PUC
     set cpu_ctl_org [dbg_uart_rd CPU_CTL]
     set cpu_ctl_new [expr 0x40 | $cpu_ctl_org]
@@ -104,20 +108,20 @@ proc ExecutePOR {} {
 
     # Check CPU ID
     if {![VerifyCPU_ID]} {
-	set result 0
+	return 0
     }
 
     # Check status: make sure a PUC occured
     set cpu_stat_val [dbg_uart_rd CPU_STAT]
     set puc_pnd      [expr 0x04 & $cpu_stat_val]
     if {![string eq $puc_pnd 4]} {
-	set result 0
+	return 0
     }
 
     # Clear PUC pending flag
     dbg_uart_wr CPU_STAT 0x04
 
-    return $result
+    return 1
 }
 
 #=============================================================================#
@@ -199,6 +203,7 @@ proc ReleaseCPU {} {
 proc GetDevice {} {
     
     global hw_break
+    global omsp_info
 
     # Set UART global variables
     if {![info exists ::serial_baudrate]} {
@@ -213,14 +218,24 @@ proc GetDevice {} {
 	return 0
     }
 
-    # Enable auto-freeze & software breakpoints
-    dbg_uart_wr CPU_CTL 0x0018
+    if {[VerifyCPU_ID]} {
 
-    # Get number of hardware breakpoints
-    set hw_break(num) [InitBreakUnits]
+	# Enable auto-freeze & software breakpoints
+	dbg_uart_wr CPU_CTL 0x0018
 
-    # Check CPU ID
-    return [VerifyCPU_ID]
+	# Initialize the omsp_info global variable
+	GetCPU_ID
+	set omsp_info(connected) 1
+
+	# Get number of hardware breakpoints
+	set hw_break(num)       [InitBreakUnits]
+	set omsp_info(hw_break) $hw_break(num)
+	
+
+	return 1
+    } else {
+	return 0
+    }
 }
 
 #=============================================================================#
@@ -432,42 +447,71 @@ proc ExecutePOR_Halt {} {
 #=============================================================================#
 # GetCPU_ID ()                                                                #
 #-----------------------------------------------------------------------------#
-# Description: This function reads the CPU_ID from the target device.         #
+# Description: This function reads the CPU_ID from the target device, update  #
+#              the omsp_info global variable and return the raw CPU_ID value. #
 # Arguments  : None.                                                          #
 # Result     : Return CPU_ID.                                                 #
 #=============================================================================#
 proc GetCPU_ID { } {
 
+    global omsp_info
+
+    # Retreive CPU_ID values
     regsub {0x} [dbg_uart_rd CPU_ID_LO] {} cpu_id_lo
     regsub {0x} [dbg_uart_rd CPU_ID_HI] {} cpu_id_hi
 
-    return "0x$cpu_id_hi$cpu_id_lo"
+    set cpu_id    "0x$cpu_id_hi$cpu_id_lo"
+    set cpu_id_lo "0x$cpu_id_lo"
+    set cpu_id_hi "0x$cpu_id_hi"
+
+
+    # Extract the omsp info depending on the CPU version
+    set omsp_info(cpu_ver) [expr ($cpu_id_lo & 0x0007)+1]
+    if {$omsp_info(cpu_ver)==1} {
+	set omsp_info(asic)         0
+	set omsp_info(user_ver)    --
+	set omsp_info(per_size)   512
+	set omsp_info(mpy)         --
+	set omsp_info(dmem_size)  [expr $cpu_id_lo]
+	set omsp_info(pmem_size)  [expr $cpu_id_hi]
+    } else {
+	set omsp_info(asic)       [expr  ($cpu_id_lo & 0x0008)/8]
+	set omsp_info(user_ver)   [expr  ($cpu_id_lo & 0x01f0)/9]
+	set omsp_info(per_size)   [expr (($cpu_id_lo & 0xfe00)/512)  * 512]
+	set omsp_info(mpy)        [expr  ($cpu_id_hi & 0x0001)/1]
+	set omsp_info(dmem_size)  [expr (($cpu_id_hi & 0x03fe)/2)    * 128]
+	set omsp_info(pmem_size)  [expr (($cpu_id_hi & 0xfc00)/1024) * 1024]
+    }
+
+    set omsp_info(alias) [GetChipAlias]
+
+    return $cpu_id
 }
 
 #=============================================================================#
 # GetCPU_ID_SIZE ()                                                           #
 #-----------------------------------------------------------------------------#
-# Description: Returns the ROM and RAM sizes of the connected device.         #
+# Description: Returns the Data and Program memory sizes of the connected     #
+#              device.                                                        #
 # Arguments  : None.                                                          #
-# Result     : Return "ROM_SIZE RAM_SIZE" in byte.                            #
+# Result     : Return "PMEM_SIZE DMEM_SIZE" in byte.                          #
 #=============================================================================#
 proc GetCPU_ID_SIZE {} {
 
-    set cpu_id_full [GetCPU_ID]
-    regexp {(....)(....)$} $cpu_id_full match rom_size ram_size
+    global omsp_info
 
-    if {[info exists rom_size]} {
-	set rom_size [expr 0x$rom_size]
+    if {[info exists omsp_info(pmem_size)]} {
+	set pmem_size $omsp_info(pmem_size)
     } else {
-        set rom_size -1
+        set pmem_size -1
     }
-    if {[info exists ram_size]} {
-	set ram_size [expr 0x$ram_size]
+    if {[info exists omsp_info(dmem_size)]} {
+	set dmem_size $omsp_info(dmem_size)
     } else {
-        set ram_size -1
+        set dmem_size -1
     }
 
-    return "$rom_size $ram_size"
+    return "$pmem_size $dmem_size"
 }
 
 #=============================================================================#
@@ -481,7 +525,8 @@ proc VerifyCPU_ID {} {
 
     set cpu_id_full [GetCPU_ID]
 
-    if {[string eq "0x00000000" $cpu_id_full] | [string eq "0x" $cpu_id_full]} {
+    if {[string eq "0x00000000" $cpu_id_full] |
+	([string length $cpu_id_full]!=10)} {
 	set result 0
     } else {
 	set result 1
@@ -831,4 +876,137 @@ proc ClrStatus {} {
     dbg_uart_wr BRK3_STAT 0xff
 
     return 1
+}
+
+#=============================================================================#
+# GetChipAlias ()                                                             #
+#-----------------------------------------------------------------------------#
+# Description: Parse the chip alias XML file an return the alias name.        #
+# Arguments  : None.                                                          #
+# Result     : Chip Alias.                                                    #
+#=============================================================================#
+proc GetChipAlias {} {
+
+    global omsp_info
+
+    # Set XML file name
+    if {[info exists  ::env(OMSP_XML_FILE)]} {
+	set xmlFile $::env(OMSP_XML_FILE)
+    } else {
+	set xmlFile [file normalize "$::scriptDir/../../omsp_alias.xml"]
+    }
+
+    # Read XML file
+    if {[file exists $xmlFile]} {
+	set fp [open $xmlFile r]
+	set xmlData [read $fp]
+	close $fp
+    } else {
+	puts "WARNING: the XML alias file was not found - $xmlFile"
+	return ""
+    }
+
+    # Analyze XML file
+    ::XML::Init $xmlData
+    set wellFormed [::XML::IsWellFormed]
+    if {$wellFormed ne ""} {
+	puts "WARNING: the XML alias file is not well-formed - $xmlFile \n $wellFormed"
+	return ""
+    }
+
+    #========================================================================#
+    # Create list from XML file                                              #
+    #========================================================================#
+    set aliasList    ""
+    set currentALIAS ""
+    set currentTYPE  ""
+    set currentTAG   ""
+    while {1} {
+	foreach {type val attr etype} [::XML::NextToken] break
+	if {$type == "EOF"} break
+
+	# Detect the start of a new alias description
+	if {($type == "XML") & ($val == "omsp:alias") & ($etype == "START")} {
+	    set aliasName ""
+	    regexp {val=\"(.*)\"} $attr whole_match aliasName
+	    lappend aliasList $aliasName
+	    set currentALIAS $aliasName
+	}
+
+	# Detect start and end of the configuration field
+	if {($type == "XML") & ($val == "omsp:configuration")} {
+
+	    if {($etype == "START")} {
+		set currentTYPE  "config"
+
+	    } elseif {($etype == "END")} {
+		set currentTYPE  ""
+	    }
+	}
+
+	# Detect start and end of the extra_info field
+	if {($type == "XML") & ($val == "omsp:extra_info")} {
+
+	    if {($etype == "START")} {
+		set currentTYPE  "extra_info"
+		set idx 0
+
+	    } elseif {($etype == "END")} {
+		set currentTYPE  ""
+	    }
+	}
+
+	# Detect the current TAG
+	if {($type == "XML") & ($etype == "START")} {
+	    regsub {omsp:} $val {} val
+	    set currentTAG $val
+	}
+
+	if {($type == "TXT")} {
+	    if {$currentTYPE=="extra_info"} {
+		set alias($currentALIAS,$currentTYPE,$idx,$currentTAG) $val
+		incr idx
+	    } else {
+		set alias($currentALIAS,$currentTYPE,$currentTAG) $val
+	    }
+	}
+    }
+
+    #========================================================================#
+    # Check if the current OMSP_INFO has an alias match                      #
+    #========================================================================#
+    foreach currentALIAS $aliasList {
+	set aliasCONFIG [array names alias -glob "$currentALIAS,config,*"]
+	set aliasEXTRA  [lsort -increasing [array names alias -glob "$currentALIAS,extra_info,*"]]
+
+	#----------------------------------#
+	# Is current alias matching ?      #
+	#----------------------------------#
+	set match       1
+	set description ""
+	foreach currentCONFIG $aliasCONFIG {
+
+	    regsub "$currentALIAS,config," $currentCONFIG {} configName
+
+	    if {![string eq $omsp_info($configName) $alias($currentCONFIG)]} {
+		set match 0
+	    }
+	}
+
+	#----------------------------------#
+	# If matching, get the extra infos #
+	#----------------------------------#
+	if {$match} {
+
+	    set idx 0
+	    foreach currentEXTRA $aliasEXTRA {
+		regsub "$currentALIAS,extra_info," $currentEXTRA {} extraName
+		set omsp_info(extra,$idx,$extraName) $alias($currentEXTRA)
+		incr idx
+	    }
+	    return $currentALIAS
+	}
+    }
+
+    return ""
 }

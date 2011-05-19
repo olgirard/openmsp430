@@ -42,6 +42,7 @@ global clients
 global server
 global verbose
 global shell
+global omsp_info
 
 # Initializations
 set serial_status 0
@@ -158,10 +159,28 @@ if {$shell} {
     }
 
     # Display info
-    puts "INFO: Sucessfully connected with the openMSP430 target."
+    if {$omsp_info(alias)==""} {
+	puts "INFO: Sucessfully connected with the openMSP430 target."
+    } else {
+	puts "INFO: Sucessfully connected with the openMSP430 target ($omsp_info(alias))."
+    }
     set sizes [GetCPU_ID_SIZE]
-    puts "INFO: Program Memory Size - [lindex $sizes 0] B"
-    puts "INFO: Data Memory Size - [lindex $sizes 1] B"
+    if {$omsp_info(asic)} {
+	puts "INFO: CPU Version              - $omsp_info(cpu_ver) / ASIC"
+    } else {
+	puts "INFO: CPU Version              - $omsp_info(cpu_ver) / FPGA"
+    }
+    puts "INFO: User Version             - $omsp_info(user_ver)"
+    if {$omsp_info(cpu_ver)==1} {
+	puts "INFO: Hardware Multiplier      - --"
+    } elseif {$omsp_info(mpy)} {
+	puts "INFO: Hardware Multiplier      - Yes"
+    } else {
+	puts "INFO: Hardware Multiplier      - No"
+    }
+    puts "INFO: Program Memory Size      - $omsp_info(pmem_size) B"
+    puts "INFO: Data Memory Size         - $omsp_info(dmem_size) B"
+    puts "INFO: Peripheral Address Space - $omsp_info(per_size) B"
     puts "INFO: $hw_break(num) Hardware Brea/Watch-point unit(s) detected"
     puts ""
 
@@ -188,20 +207,24 @@ if {$shell} {
 wm title    . "openMSP430 GDB Proxy"
 wm iconname . "openMSP430 GDB Proxy"
 
-# Create the Main Menu budget
+# Create the Main Menu frame
 frame  .menu
 pack   .menu   -side top -padx 10 -pady 10 -fill x
 
-# Create the Serial port Menu budget
-frame  .serial
-pack   .serial -side top -padx 10 -pady 10 -fill x
+# Create the Connection frame
+frame  .connect -bd 2 -relief ridge    ;# solid
+pack   .connect -side top -padx 10 -pady {5 0} -fill x
 
-# Create the Server Menu budget
-frame  .server
-pack   .server -side top -padx 10 -pady 10 -fill x
+# Create the Info frame
+frame  .info    -bd 2 -relief ridge    ;# solid
+pack   .info    -side top -padx 10 -pady {10 0} -fill x
+
+# Create the Server frame
+frame  .server -bd 2 -relief ridge    ;# solid
+pack   .server -side top -padx 10 -pady {10 0} -fill x
 
 # Create the TCL script field
-frame  .tclscript
+frame  .tclscript -bd 2 -relief ridge    ;# solid
 pack   .tclscript -side top -padx 10 -pady 10 -fill x
 
 
@@ -213,43 +236,76 @@ pack   .tclscript -side top -padx 10 -pady 10 -fill x
 button .menu.exit -text "Exit" -command {stopServer; exit 0}
 pack   .menu.exit -side left
 
+# openMSP430 label
+label  .menu.omsp      -text "openMSP430 GDB proxy" -anchor center -fg "\#6a5acd" -font {-weight bold -size 14}
+pack   .menu.omsp      -side right -padx 20 
+
+# Create the Configuration, Start & Info frames
+frame  .connect.config
+pack   .connect.config -side left   -padx 10 -pady 0 -fill x -expand true
+frame  .connect.start
+pack   .connect.start  -side right  -padx 10 -pady 0 -fill x -expand true
 
 # Serial Port fields
-label  .serial.l1      -text "Serial Port:"  -anchor w
-pack   .serial.l1      -side left
 set serial_device      [lindex [dbg_list_uart] end]
-combobox .serial.p1    -textvariable serial_device -editable true
-eval     .serial.p1    list insert end [dbg_list_uart]
-pack   .serial.p1      -side left -padx 5
-label  .serial.l2      -text "  Baudrate:" -anchor w
-pack   .serial.l2      -side left
-set serial_baudrate    115200
-combobox .serial.p2    -textvariable serial_baudrate -editable true
-eval     .serial.p2    list insert end [list    9600   19200  38400  57600 115200 \
-                                              230400  460800 500000 576000 921600 \
-                                             1000000 1152000]
-pack   .serial.p2      -side left -padx 5
-label  .serial.l3      -text "Disconnected" -anchor w -fg Red
-pack   .serial.l3      -side left -padx 10
+frame    .connect.config.serial_port
+pack     .connect.config.serial_port     -side top   -padx 5 -pady {10 0} -fill x
+label    .connect.config.serial_port.l1  -text "Serial Port:"  -anchor w
+pack     .connect.config.serial_port.l1  -side left  -padx 5
+combobox .connect.config.serial_port.p1  -textvariable serial_device -editable true -width 20
+eval     .connect.config.serial_port.p1  list insert end [dbg_list_uart]
+pack     .connect.config.serial_port.p1  -side right -padx 20
 
+# Serial Baudrate fields
+set serial_baudrate    115200
+frame    .connect.config.serial_baudrate
+pack     .connect.config.serial_baudrate     -side top  -padx 5 -pady {5 0} -fill x
+label    .connect.config.serial_baudrate.l2  -text "  Baudrate:" -anchor w
+pack     .connect.config.serial_baudrate.l2  -side left
+combobox .connect.config.serial_baudrate.p2  -textvariable serial_baudrate -editable true -width 20
+eval     .connect.config.serial_baudrate.p2  list insert end [list    9600   19200  38400  57600 115200 \
+                                                                    230400  460800 500000 576000 921600 \
+                                                                   1000000 1152000]
+pack     .connect.config.serial_baudrate.p2  -side right -padx 20
 
 # Server Port field
-frame  .server.port
-pack   .server.port    -side top -fill x
-label  .server.port.l1 -text "Proxy Server Port:" -anchor w
-pack   .server.port.l1 -side left
-entry  .server.port.p  -textvariable server(port) -relief sunken
-pack   .server.port.p  -side left -padx 5
-label  .server.port.l2 -text "Not running" -anchor w -fg Red
-pack   .server.port.l2 -side left -padx 10
-button .server.port.start -text "Start Proxy Server" -command {startServerGUI}
-pack   .server.port.start -side right
+frame    .connect.config.server_port
+pack     .connect.config.server_port    -side top   -padx 10 -pady {15 10} -fill x
+label    .connect.config.server_port.l1 -text "Proxy Server Port:" -anchor w
+pack     .connect.config.server_port.l1 -side left
+entry    .connect.config.server_port.p  -textvariable server(port) -relief sunken -width 20
+pack     .connect.config.server_port.p  -side right -padx 5 -padx 20
+
+
+# Connect to CPU & start proxy server
+button .connect.start.but -text "Connect to CPU\n and \nStart Proxy Server" -command {startServerGUI}
+pack   .connect.start.but -side right -padx 30
+
+
+# CPU Info
+frame  .info.cpu
+pack   .info.cpu      -side top   -padx 10 -pady {5 0} -fill x
+label  .info.cpu.l    -text "CPU Info:"       -anchor w
+pack   .info.cpu.l    -side left -padx {10 10}
+label  .info.cpu.con  -text "Disconnected"    -anchor w -fg Red
+pack   .info.cpu.con  -side left
+button .info.cpu.more -text "More..."         -width 9 -command {displayMore} -state disabled
+pack   .info.cpu.more -side right -padx {0 30}
+
+
+# Server Info
+frame  .info.server
+pack   .info.server     -side top   -padx 10 -pady {0 10} -fill x
+label  .info.server.l   -text "Server Info:"       -anchor w
+pack   .info.server.l   -side left -padx {10 10}
+label  .info.server.con -text "Not running"    -anchor w -fg Red
+pack   .info.server.con -side left
 
 
 # Create the text widget to log received messages
 frame  .server.t
 pack   .server.t     -side top -padx 10 -pady 10 -fill x
-set server(log) [text   .server.t.log -width 80 -height 10 -borderwidth 2  \
+set server(log) [text   .server.t.log -width 80 -height 15 -borderwidth 2  \
                           -setgrid true -yscrollcommand {.server.t.scroll set}]
 pack   .server.t.log -side left  -fill both -expand true
 scrollbar .server.t.scroll -command {.server.t.log yview}
@@ -258,7 +314,7 @@ pack   .server.t.scroll -side right -fill both
 
 # Log commands
 frame  .server.cmd
-pack   .server.cmd   -side top -fill x
+pack   .server.cmd   -side top  -pady {0 10} -fill x
 button .server.cmd.clear -text "Clear log" -command {$server(log) delete 1.0 end}
 pack   .server.cmd.clear -side left -padx 10
 checkbutton .server.cmd.verbose -text "Verbose" -variable verbose
@@ -267,7 +323,7 @@ pack   .server.cmd.verbose -side right -padx 10
 
 # Load TCL script fields
 frame  .tclscript.ft
-pack   .tclscript.ft        -side top -fill x
+pack   .tclscript.ft        -side top  -padx 10  -pady 10 -fill x
 label  .tclscript.ft.l      -text "TCL script:" -state disabled
 pack   .tclscript.ft.l      -side left -padx "0 10"
 entry  .tclscript.ft.file   -width 58 -relief sunken -textvariable tcl_file_name -state disabled
@@ -277,5 +333,6 @@ pack   .tclscript.ft.browse -side left -padx 5
 frame  .tclscript.fb
 pack   .tclscript.fb        -side top -fill x
 button .tclscript.fb.read   -text "Source TCL script !" -state disabled -command {if {[file exists $tcl_file_name]} {source $tcl_file_name}}
-pack   .tclscript.fb.read   -side left -padx 5 -fill x
+pack   .tclscript.fb.read   -side left -padx 20  -pady {0 10} -fill x
 
+wm resizable . 0 0

@@ -43,17 +43,35 @@
 global serial_baudrate
 global serial_device
 global serial_status
+global omsp_info
 global cpu_status
 global reg
 global mem
+global mem_sizes
 global sr
 global codeSelect
 global binFileType
+global brkpt
+global color
+
+# Color definitions
+set color(PC)             "\#c1ffc1"
+set color(Brk0_active)    "\#ba55d3"
+set color(Brk0_disabled)  "\#dda0dd"
+set color(Brk1_active)    "\#ff7256"
+set color(Brk1_disabled)  "\#ffc1c1"
+set color(Brk2_active)    "\#ffff30"
+set color(Brk2_disabled)  "\#ffffe0"
 
 # Initializations
 set codeSelect    2
 set serial_status 0
 set cpu_status    1
+for {set i 0} {$i<3} {incr i} {
+    set brkpt(addr_$i)  0x0000
+    set brkpt(data_$i)  0x0000
+    set brkpt(en_$i)    0
+}
 for {set i 0} {$i<16} {incr i} {
     set reg($i)         0x0000
     set mem(address_$i) [format "0x%04x" [expr 0x0200+$i*2]]
@@ -90,24 +108,31 @@ proc connect_openMSP430 {} {
     global serial_status
     global reg
     global mem
+    global brkpt
+    global mem_sizes
+    global color
+    global omsp_info
 
     set serial_status [GetDevice]
 
     if {$serial_status} {
-	set sizes [GetCPU_ID_SIZE]
+	set mem_sizes [GetCPU_ID_SIZE]
 
-	if {[lindex $sizes 0]==-1 | [lindex $sizes 1]==-1} {
-	    .ctrl.mem_sz.l3               configure -text "Connection problem" -fg red
+	if {[lindex $mem_sizes 0]==-1 | [lindex $mem_sizes 1]==-1} {
+	    .ctrl.connect.info.l1.con     configure -text "Connection problem" -fg red
 
 	} else {
 
 	    # Disable connection section
-	    .ctrl.serial.p1               configure -state disabled	
-	    .ctrl.serial.p2               configure -state disabled
-	    .ctrl.serial.connect          configure -state disabled
-	    .ctrl.mem_sz.l3               configure -text "Connected" -fg green
-	    .ctrl.mem_sz.l8               configure -text [lindex $sizes 1]
-	    .ctrl.mem_sz.l5               configure -text [lindex $sizes 0]
+	    .ctrl.connect.serial.p1       configure -state disabled	
+	    .ctrl.connect.serial.p2       configure -state disabled
+	    .ctrl.connect.serial.connect  configure -state disabled
+	    if {$omsp_info(alias)==""} {
+		.ctrl.connect.info.l1.con configure -text "Connected" -fg "\#00ae00"
+	    } else {
+		.ctrl.connect.info.l1.con configure -text "Connected to $omsp_info(alias)" -fg "\#00ae00"
+	    }
+	    .ctrl.connect.info.l1.more    configure -state normal
 
 	    # Activate ELF file section
 	    .ctrl.load.ft.l               configure -state normal
@@ -117,46 +142,57 @@ proc connect_openMSP430 {} {
 	    .ctrl.load.fb.l               configure -state normal
 
 	    # Activate CPU control section
-	    .ctrl.cpu.l1                  configure -state normal
-	    .ctrl.cpu.reset               configure -state normal
-	    .ctrl.cpu.run                 configure -state normal
-	    .ctrl.cpu.l2                  configure -state normal
-	    .ctrl.cpu.l3                  configure -state normal
+	    .ctrl.cpu.cpu.l1              configure -state normal
+	    .ctrl.cpu.cpu.reset           configure -state normal
+	    .ctrl.cpu.cpu.run             configure -state normal
+	    .ctrl.cpu.cpu.l2              configure -state normal
+	    .ctrl.cpu.cpu.l3              configure -state normal
 	    if {[IsHalted]} {
-		.ctrl.cpu.step  configure -state normal
-		.ctrl.cpu.run   configure -text "Run"
-		.ctrl.cpu.l3    configure -text "Stopped" -fg yellow
+		.ctrl.cpu.cpu.step        configure -state normal
+		.ctrl.cpu.cpu.run         configure -text "Run"
+		.ctrl.cpu.cpu.l3          configure -text "Stopped" -fg "\#cdad00"
 		set cpu_status 0
 	    } else {
-		.ctrl.cpu.step  configure -state disabled
-		.ctrl.cpu.run   configure -text "Stop"
-		.ctrl.cpu.l3    configure -text "Running" -fg green
+		.ctrl.cpu.cpu.step        configure -state disabled
+		.ctrl.cpu.cpu.run         configure -text "Stop"
+		.ctrl.cpu.cpu.l3          configure -text "Running" -fg "\#00ae00"
 		set cpu_status 1
 	    }
 
+	    # Activate CPU Breakpoints section
+     	    .ctrl.cpu.brkpt.l1                configure -state normal
+	    for {set i 0} {$i<3} {incr i} {
+		set brkpt(addr_$i)  [format "0x%04x" [expr 0x10000-[lindex $mem_sizes 0]]]
+		.ctrl.cpu.brkpt.addr$i        configure -state normal
+		.ctrl.cpu.brkpt.addr$i        configure -bg $color(Brk$i\_disabled)
+		.ctrl.cpu.brkpt.addr$i        configure -readonlybackground $color(Brk$i\_active)
+		.ctrl.cpu.brkpt.chk$i         configure -state normal
+	    }
+
 	    # Activate CPU status register section
-	    .ctrl.reg_stat.l1             configure -state normal
-	    .ctrl.reg_stat.v              configure -state normal
-	    .ctrl.reg_stat.scg1           configure -state normal
-	    .ctrl.reg_stat.oscoff         configure -state normal
-	    .ctrl.reg_stat.cpuoff         configure -state normal
-	    .ctrl.reg_stat.gie            configure -state normal
-	    .ctrl.reg_stat.n              configure -state normal
-	    .ctrl.reg_stat.z              configure -state normal
-	    .ctrl.reg_stat.c              configure -state normal
+	    .ctrl.cpu.reg_stat.l1             configure -state normal
+	    .ctrl.cpu.reg_stat.v              configure -state normal
+	    .ctrl.cpu.reg_stat.scg1           configure -state normal
+	    .ctrl.cpu.reg_stat.oscoff         configure -state normal
+	    .ctrl.cpu.reg_stat.cpuoff         configure -state normal
+	    .ctrl.cpu.reg_stat.gie            configure -state normal
+	    .ctrl.cpu.reg_stat.n              configure -state normal
+	    .ctrl.cpu.reg_stat.z              configure -state normal
+	    .ctrl.cpu.reg_stat.c              configure -state normal
 
 	    # Activate CPU registers and memory section
-	    .ctrl.reg_mem.reg.title.e     configure -state normal
-	    .ctrl.reg_mem.mem.title.l     configure -state normal
-	    .ctrl.reg_mem.mem.title.e     configure -state normal
-	    .ctrl.reg_mem.reg.refresh     configure -state normal
-	    .ctrl.reg_mem.mem.refresh     configure -state normal
+	    .ctrl.cpu.reg_mem.reg.title.e     configure -state normal
+	    .ctrl.cpu.reg_mem.mem.title.l     configure -state normal
+	    .ctrl.cpu.reg_mem.mem.title.e     configure -state normal
+	    .ctrl.cpu.reg_mem.reg.refresh     configure -state normal
+	    .ctrl.cpu.reg_mem.mem.refresh     configure -state normal
 	    for {set i 0} {$i<16} {incr i} {
-		.ctrl.reg_mem.reg.f$i.l$i        configure -state normal
-		.ctrl.reg_mem.reg.f$i.e$i        configure -state normal
-		.ctrl.reg_mem.mem.f$i.addr_e$i   configure -state normal
-		.ctrl.reg_mem.mem.f$i.data_e$i   configure -state normal
+		.ctrl.cpu.reg_mem.reg.f$i.l$i        configure -state normal
+		.ctrl.cpu.reg_mem.reg.f$i.e$i        configure -state normal
+		.ctrl.cpu.reg_mem.mem.f$i.addr_e$i   configure -state normal
+		.ctrl.cpu.reg_mem.mem.f$i.data_e$i   configure -state normal
 	    }
+	    .ctrl.cpu.reg_mem.reg.f0.e0              configure -bg $color(PC)
 	    refreshReg
 	    refreshMem
 
@@ -174,27 +210,158 @@ proc connect_openMSP430 {} {
 	}
 
     } else {
-	.ctrl.mem_sz.l3               configure -text "Connection problem" -fg red
+	.ctrl.connect.info.l1.con         configure -text "Connection problem" -fg red
     }
 }
 
-proc highlightLine { line } { 
-    .code.text tag remove highlight 1.0     end
-    .code.text tag add    highlight $line.0 [expr $line+1].0
-    .code.text see        $line.0
+proc displayMore  { } {
 
+    global omsp_info
+
+    # Destroy windows if already existing
+    if {[lsearch -exact [winfo children .] .omsp_extra_info]!=-1} {
+	destroy .omsp_extra_info
+    }
+
+    # Create master window
+    toplevel    .omsp_extra_info
+    wm title    .omsp_extra_info "openMSP430 extra info"
+    wm geometry .omsp_extra_info +380+200
+    wm resizable .omsp_extra_info 0 0
+
+    # Title
+    set title "openMSP430"
+    if {$omsp_info(alias)!=""} {
+	set title $omsp_info(alias)
+    }
+    label  .omsp_extra_info.title  -text "$title"   -anchor center -fg "\#00ae00" -font {-weight bold -size 16}
+    pack   .omsp_extra_info.title  -side top -padx {20 20} -pady {20 10}
+
+    # Add extra info
+    frame     .omsp_extra_info.extra
+    pack      .omsp_extra_info.extra         -side top  -padx 10  -pady {10 10}
+    scrollbar .omsp_extra_info.extra.yscroll -orient vertical   -command {.omsp_extra_info.extra.text yview}
+    pack      .omsp_extra_info.extra.yscroll -side right -fill both
+    text      .omsp_extra_info.extra.text    -wrap word -height 20 -font TkFixedFont -yscrollcommand {.omsp_extra_info.extra.yscroll set}
+    pack      .omsp_extra_info.extra.text    -side right 
+
+    # Create OK button
+    button .omsp_extra_info.okay -text "OK" -font {-weight bold}  -command {destroy .omsp_extra_info}
+    pack   .omsp_extra_info.okay -side bottom -expand true -fill x -padx 5 -pady {0 10}
+    
+
+    # Fill the text widget will configuration info
+    .omsp_extra_info.extra.text tag configure bold -font {-family TkFixedFont -weight bold}
+    .omsp_extra_info.extra.text insert end         "Configuration\n\n" bold
+    .omsp_extra_info.extra.text insert end [format "CPU Version                : %5s\n" $omsp_info(cpu_ver)]
+    .omsp_extra_info.extra.text insert end [format "User Version               : %5s\n" $omsp_info(user_ver)]
+    if {$omsp_info(cpu_ver)==1} {
+    .omsp_extra_info.extra.text insert end [format "Implementation             : %5s\n" --]
+    } elseif {$omsp_info(asic)==0} {
+    .omsp_extra_info.extra.text insert end [format "Implementation             : %5s\n" FPGA]
+    } elseif {$omsp_info(asic)==1} {
+    .omsp_extra_info.extra.text insert end [format "Implementation             : %5s\n" ASIC]
+    }
+    if {$omsp_info(mpy)==1} {
+    .omsp_extra_info.extra.text insert end [format "Hardware Multiplier support: %5s\n" Yes]
+    } elseif {$omsp_info(mpy)==0} {
+    .omsp_extra_info.extra.text insert end [format "Hardware Multiplier support: %5s\n" No]
+    } else {
+    .omsp_extra_info.extra.text insert end [format "Hardware Multiplier support: %5s\n" --]
+    }
+    .omsp_extra_info.extra.text insert end [format "Program memory size        : %5s B\n" $omsp_info(pmem_size)]
+    .omsp_extra_info.extra.text insert end [format "Data memory size           : %5s B\n" $omsp_info(dmem_size)]
+    .omsp_extra_info.extra.text insert end [format "Peripheral address space   : %5s B\n" $omsp_info(per_size)]
+    if {$omsp_info(alias)==""} {
+    .omsp_extra_info.extra.text insert end [format "Alias                      : %5s\n\n\n" None]
+    } else {
+    .omsp_extra_info.extra.text insert end [format "Alias                      : %5s\n\n\n" $omsp_info(alias)]
+    }
+
+    .omsp_extra_info.extra.text insert end         "Extra Info\n\n" bold
+
+    if {$omsp_info(alias)!=""} {
+
+	set aliasEXTRA  [lsort -increasing [array names omsp_info -glob "extra,*"]]
+	if {[llength $aliasEXTRA]} {
+
+	    foreach currentEXTRA $aliasEXTRA {
+		regexp {^.+,.+,(.+)$} $currentEXTRA whole_match extraATTR
+		.omsp_extra_info.extra.text insert end     [format "%-15s: %s\n" $extraATTR  $omsp_info($currentEXTRA)]
+	    }
+	    .omsp_extra_info.extra.text insert end         "\n\n"
+	}
+    } else {
+	.omsp_extra_info.extra.text insert end  "No alias found in 'omsp_alias.xml' file"
+    }
 }
 
-proc highlightPC   { pc_val } {
+proc highlightLine { line tagNameNew tagNameOld type } { 
+    .code.text tag remove $tagNameOld 1.0     end
+    .code.text tag remove $tagNameNew 1.0     end
+
+    switch -exact -- $type {
+	"0"     {.code.text tag add    $tagNameNew $line.0 $line.4}
+	"1"     {.code.text tag add    $tagNameNew $line.2 $line.4}
+	"2"     {.code.text tag add    $tagNameNew $line.3 $line.4}
+	default {.code.text tag add    $tagNameNew $line.4 [expr $line+1].0}
+    }
+}
+
+proc highlightCode   { } {
     global codeSelect
+    global reg
+    global brkpt
+    global color
 
     if {$codeSelect!=1} {
-
-	regsub {0x} $pc_val {} pc_val
+	
+	# Update PC
+	regsub {0x} $reg(0) {} pc_val
 	set code_match [.code.text search "$pc_val:" 1.0 end]
 	set code_line 1
 	regexp {(\d+).(\d+)} $code_match whole_match code_line code_column
-	highlightLine $code_line
+	highlightLine $code_line highlightPC highlightPC 3
+	.code.text see    $code_line.0
+
+	# Some pre-processing
+	set brkType(0) 0
+	if {$brkpt(addr_0)==$brkpt(addr_1)} {
+	    set brkType(1) 1
+	} else {
+	    set brkType(1) 0
+	}
+	if {$brkType(1)==1} {
+	    if {$brkpt(addr_1)==$brkpt(addr_2)} {
+		set brkType(2) 2
+	    } else {
+		set brkType(2) 0
+	    }
+	} else {
+	    if {$brkpt(addr_0)==$brkpt(addr_2)} {
+		set brkType(2) 1
+	    } else {
+		if {$brkpt(addr_1)==$brkpt(addr_2)} {
+		    set brkType(2) 1
+		} else {
+		    set brkType(2) 0
+		}
+	    }
+	}
+
+	# Update Breakpoints if required
+	for {set i 0} {$i<3} {incr i} {
+	    regsub {0x} $brkpt(addr_$i) {} brkpt_val
+	    set code_match [.code.text search "$brkpt_val:" 1.0 end]
+	    set code_line 1
+	    regexp {(\d+).(\d+)} $code_match whole_match code_line code_column
+	    if {$brkpt(en_$i)==1} {
+		highlightLine $code_line "highlightBRK${i}_ACT" "highlightBRK${i}_DIS" $brkType($i)
+	    } else {
+		highlightLine $code_line "highlightBRK${i}_DIS" "highlightBRK${i}_ACT" $brkType($i)
+	    }
+	}
+
      }
 }
 
@@ -202,6 +369,7 @@ proc updateCodeView { bin_file_name } {
     global codeSelect
     global reg
     global binFileType
+    global brkpt
 
     set temp_elf_file "[clock clicks].elf"
     if {[catch {exec msp430-objcopy -I $binFileType -O elf32-msp430 $bin_file_name $temp_elf_file} debug_info]} {
@@ -216,6 +384,11 @@ proc updateCodeView { bin_file_name } {
 
     if {$codeSelect==1} {
 	set debug_info ""
+	clearBreakpoints
+	for {set i 0} {$i<3} {incr i} {
+	    set brkpt(en_$i) 0
+	    updateBreakpoint $i
+	}
 
     } elseif {$codeSelect==2} {
 	if {[catch {exec msp430-objdump $dumpOpt $temp_elf_file} debug_info]} {
@@ -233,7 +406,7 @@ proc updateCodeView { bin_file_name } {
     .code.text configure -state normal
     .code.text delete 1.0 end
     .code.text insert end $debug_info
-    highlightPC $reg(0)
+    highlightCode
     .code.text configure -state disabled
     return 1
 }
@@ -242,7 +415,9 @@ proc loadProgram {bin_file_name} {
     global cpu_status
     global reg
     global mem
+    global mem_sizes
     global binFileType
+    global brkpt
 
     # Detect the file format depending on the fil extention
     #--------------------------------------------------------
@@ -312,9 +487,8 @@ proc loadProgram {bin_file_name} {
     set word_size [expr $byte_size/2]
 
     # Make sure ELF program size is the same as the available program memory
-    set sizes [GetCPU_ID_SIZE]
-    if {[lindex $sizes 0] != [expr $hex_size/2]} {
-	.ctrl.load.fb.l configure -text "ERROR: ELF program size ([expr $hex_size/2] B) is different than the available program memory ([lindex $sizes 0] B)" -fg red
+    if {[lindex $mem_sizes 0] != [expr $hex_size/2]} {
+	.ctrl.load.fb.l configure -text "ERROR: ELF program size ([expr $hex_size/2] B) is different than the available program memory ([lindex $mem_sizes 0] B)" -fg red
 	return 0
     }
 
@@ -333,25 +507,31 @@ proc loadProgram {bin_file_name} {
 
     # Load Program Memory
     set StartAddr [format "0x%04x" [expr 0x10000-$byte_size]]
-    .ctrl.load.fb.l configure -text "Load..." -fg yellow
+    .ctrl.load.fb.l configure -text "Load..." -fg "\#cdad00"
     update
     WriteMemQuick $StartAddr $DataArray
 
     # Check Data
-    .ctrl.load.fb.l configure -text "Verify..." -fg yellow
+    .ctrl.load.fb.l configure -text "Verify..." -fg "\#cdad00"
     update
     if {[VerifyMem $StartAddr $DataArray 1]} {
-	.ctrl.load.fb.l configure -text "Done" -fg green
+	.ctrl.load.fb.l configure -text "Done" -fg "\#00ae00"
     } else {
 	.ctrl.load.fb.l configure -text "ERROR" -fg red
     }
     update
 
+    # Re-initialize breakpoints
+    for {set i 0} {$i<3} {incr i} {
+	.ctrl.cpu.brkpt.addr$i  configure -state normal
+	set brkpt(en_$i)    0
+    }
+
     # Reset & Stop CPU
     ExecutePOR_Halt
-    .ctrl.cpu.step  configure -state normal
-    .ctrl.cpu.run   configure -text "Run"
-    .ctrl.cpu.l3    configure -text "Stopped" -fg yellow
+    .ctrl.cpu.cpu.step  configure -state normal
+    .ctrl.cpu.cpu.run   configure -text "Run"
+    .ctrl.cpu.cpu.l3    configure -text "Stopped" -fg "\#cdad00"
     set cpu_status 0
     refreshReg
     refreshMem
@@ -364,15 +544,18 @@ proc runCPU {} {
 
     if {$cpu_status} {
 	HaltCPU
-	.ctrl.cpu.step  configure -state normal
-	.ctrl.cpu.run   configure -text "Run"
-	.ctrl.cpu.l3    configure -text "Stopped" -fg yellow
+	.ctrl.cpu.cpu.step  configure -state normal
+	.ctrl.cpu.cpu.run   configure -text "Run"
+	.ctrl.cpu.cpu.l3    configure -text "Stopped" -fg "\#cdad00"
 	set cpu_status 0
     } else {
+	clearBreakpoints
+	StepCPU
+	setBreakpoints
 	ReleaseCPU
-	.ctrl.cpu.step  configure -state disabled
-	.ctrl.cpu.run   configure -text "Stop"
-	.ctrl.cpu.l3    configure -text "Running" -fg green
+	.ctrl.cpu.cpu.step  configure -state disabled
+	.ctrl.cpu.cpu.run   configure -text "Stop"
+	.ctrl.cpu.cpu.l3    configure -text "Running" -fg "\#00ae00"
 	set cpu_status 1
     }
     refreshReg
@@ -399,7 +582,9 @@ proc singleStepCPU {} {
     global mem
 
     if {$cpu_status==0} {
+	clearBreakpoints
 	StepCPU
+	setBreakpoints
     }
     refreshReg
     refreshMem
@@ -446,7 +631,7 @@ proc refreshReg {} {
     set sr(v)      [expr $reg(2) & 0x0100]
 
     # Update highlighted line in the code view
-    highlightPC $reg(0)
+    highlightCode
 }
 
 proc write2Reg {reg_num} {
@@ -491,6 +676,67 @@ proc write2Mem {mem_num} {
     refreshMem
 }
 
+proc updateBreakpoint {brkpt_num} {
+    global brkpt
+    global mem_sizes
+
+    # Set the breakpoint
+    if {$brkpt(en_$brkpt_num)==1} {
+	    
+	# Make sure the specified address is an opcode
+	regsub {0x} $brkpt(addr_$brkpt_num) {} brkpt_val
+	set code_match [.code.text search "$brkpt_val:" 1.0 end]
+	if {![string length $code_match]} {
+	    .ctrl.cpu.brkpt.addr$brkpt_num    configure -state normal
+	    set brkpt(en_$brkpt_num) 0
+
+	} else {
+	    set brkpt(data_$brkpt_num) [ReadMem 0 $brkpt(addr_$brkpt_num)]
+	    
+	    # Only set a breakpoint if there is not already one there :-P
+	    if {$brkpt(data_$brkpt_num)=="0x4343"} {
+		.ctrl.cpu.brkpt.addr$brkpt_num    configure -state normal
+		set brkpt(en_$brkpt_num) 0
+	    } else {
+		.ctrl.cpu.brkpt.addr$brkpt_num    configure -state readonly
+		WriteMem 0 $brkpt(addr_$brkpt_num) 0x4343
+	    }
+	}
+
+    # Clear the breakpoint
+    } else {
+	.ctrl.cpu.brkpt.addr$brkpt_num    configure -state normal
+	WriteMem 0 $brkpt(addr_$brkpt_num) $brkpt(data_$brkpt_num)
+    }
+
+    highlightCode
+}
+
+proc clearBreakpoints {} {
+    global brkpt
+    global mem_sizes
+
+    for {set i 0} {$i<3} {incr i} {
+	if {$brkpt(en_$i)==1} {
+	    WriteMem 0 $brkpt(addr_$i) $brkpt(data_$i)
+	}
+    }
+}
+
+proc setBreakpoints {} {
+    global brkpt
+    global mem_sizes
+
+    for {set i 0} {$i<3} {incr i} {
+	if {$brkpt(en_$i)==1} {
+	    set brkpt(data_$i) [ReadMem 0 $brkpt(addr_$i)]
+	    WriteMem 0 $brkpt(addr_$i) 0x4343
+	}
+    }
+}
+
+
+
 ###############################################################################
 #                                                                             #
 #                           CREATE GRAPHICAL INTERFACE                        #
@@ -508,47 +754,59 @@ wm iconname . "openMSP430 mini debugger"
 frame  .menu
 pack   .menu              -side top    -padx 10      -pady 10      -fill x
 
-# Create the CPU Contorl field
+# Create the CPU Control field
 frame  .ctrl
-pack   .ctrl              -side left   -padx 10      -pady 10      -fill x
+pack   .ctrl              -side left   -padx {5 0}   -pady 10      -fill both
 
 # Create the Code text field
 frame  .code
-pack   .code              -side right  -padx 10      -pady 10      -fill both -expand true
+pack   .code              -side right  -padx 5       -pady 10      -fill both -expand true
 frame  .code.rb
 pack   .code.rb           -side bottom -padx 10      -pady 10      -fill both
 
+# Create the connection frame
+frame  .ctrl.connect        -bd 2 -relief ridge    ;# solid
+pack   .ctrl.connect        -side top  -padx 10      -pady 0  -fill x
+
 # Create the Serial Menu
-frame  .ctrl.serial
-pack   .ctrl.serial       -side top    -padx 10      -pady {10 0}  -fill x
+frame  .ctrl.connect.serial
+pack   .ctrl.connect.serial -side top  -padx 10      -pady {10 0}  -fill x
 
 # Create the memory size
-frame  .ctrl.mem_sz
-pack   .ctrl.mem_sz       -side top    -padx 10      -pady {10 20} -fill x
+frame  .ctrl.connect.info
+pack   .ctrl.connect.info   -side top  -padx 10      -pady {10 10} -fill x
 
 # Create the Load executable field
-frame  .ctrl.load
-pack   .ctrl.load         -side top    -padx 10      -pady {10 20} -fill x
+frame  .ctrl.load         -bd 2 -relief ridge    ;# solid
+pack   .ctrl.load         -side top    -padx 10      -pady {10 10} -fill x
+
+# Create the cpu field
+frame  .ctrl.cpu          -bd 2 -relief ridge    ;# solid
+pack   .ctrl.cpu          -side top    -padx 10      -pady {0 10} -fill x
 
 # Create the cpu control field
-frame  .ctrl.cpu
-pack   .ctrl.cpu          -side top    -padx 10      -pady {10 20} -fill x
+frame  .ctrl.cpu.cpu
+pack   .ctrl.cpu.cpu      -side top    -padx 10      -pady {20 10} -fill x
+
+# Create the breakpoint control field
+frame  .ctrl.cpu.brkpt
+pack   .ctrl.cpu.brkpt        -side top    -padx 10      -pady {10 20} -fill x
 
 # Create the cpu status field
-frame  .ctrl.reg_stat
-pack   .ctrl.reg_stat     -side top    -padx 10      -pady {10 10} -fill x
+frame  .ctrl.cpu.reg_stat
+pack   .ctrl.cpu.reg_stat     -side top    -padx 10      -pady {10 10} -fill x
 
 # Create the cpu registers/memory fields
-frame  .ctrl.reg_mem
-pack   .ctrl.reg_mem      -side top    -padx 10      -pady {5 20}  -fill x
-frame  .ctrl.reg_mem.reg
-pack   .ctrl.reg_mem.reg  -side left   -padx {10 30}               -fill x
-frame  .ctrl.reg_mem.mem
-pack   .ctrl.reg_mem.mem  -side left   -padx {30 10}               -fill x
+frame  .ctrl.cpu.reg_mem
+pack   .ctrl.cpu.reg_mem      -side top    -padx 10      -pady {5 10}  -fill x
+frame  .ctrl.cpu.reg_mem.reg
+pack   .ctrl.cpu.reg_mem.reg  -side left   -padx {10 30}               -fill x
+frame  .ctrl.cpu.reg_mem.mem
+pack   .ctrl.cpu.reg_mem.mem  -side left   -padx {30 10}               -fill x
 
 # Create the TCL script field
-frame  .ctrl.tclscript
-pack   .ctrl.tclscript    -side top    -padx 10      -pady {10 20} -fill x
+frame  .ctrl.tclscript        -bd 2 -relief ridge    ;# solid
+pack   .ctrl.tclscript        -side top    -padx 10      -pady {0 20} -fill x
 
 
 ####################################
@@ -559,102 +817,119 @@ pack   .ctrl.tclscript    -side top    -padx 10      -pady {10 20} -fill x
 button .menu.exit      -text "Exit" -command {exit 0}
 pack   .menu.exit      -side left
 
+# openMSP430 label
+label  .menu.omsp      -text "openMSP430 mini debugger" -anchor center -fg "\#6a5acd" -font {-weight bold -size 16}
+pack   .menu.omsp      -side right -padx 20 
 
 # Serial Port fields
-label    .ctrl.serial.l1    -text "Serial Port:"  -anchor w
-pack     .ctrl.serial.l1    -side left
+label    .ctrl.connect.serial.l1    -text "Serial Port:"  -anchor w
+pack     .ctrl.connect.serial.l1    -side left
 set serial_device      [lindex [dbg_list_uart] end]
-combobox .ctrl.serial.p1    -textvariable serial_device -editable true
-eval     .ctrl.serial.p1    list insert end [dbg_list_uart]
-pack     .ctrl.serial.p1    -side left -padx 5
+combobox .ctrl.connect.serial.p1    -textvariable serial_device -editable true
+eval     .ctrl.connect.serial.p1    list insert end [dbg_list_uart]
+pack     .ctrl.connect.serial.p1    -side left -padx 5
 
-label    .ctrl.serial.l2    -text "  Baudrate:" -anchor w
-pack     .ctrl.serial.l2    -side left
+label    .ctrl.connect.serial.l2    -text "  Baudrate:" -anchor w
+pack     .ctrl.connect.serial.l2    -side left
 set serial_baudrate    115200
-combobox .ctrl.serial.p2    -textvariable serial_baudrate -editable true
-eval     .ctrl.serial.p2    list insert end [list     9600    19200  38400  57600 115200 \
-                                                    230400   460800 500000 576000 921600 \
-                                                    1000000 1152000]
-pack     .ctrl.serial.p2      -side left -padx 5
+combobox .ctrl.connect.serial.p2    -textvariable serial_baudrate -editable true
+eval     .ctrl.connect.serial.p2    list insert end [list     9600    19200   38400  57600 115200 \
+                                                    230400   460800  500000 576000 921600 \
+                                                    1000000 1152000 2000000]
+pack     .ctrl.connect.serial.p2    -side left -padx 5
 
-button   .ctrl.serial.connect -text "Connect" -command {connect_openMSP430}
-pack     .ctrl.serial.connect -side left -padx 10
+button   .ctrl.connect.serial.connect -text "Connect" -width 9 -command {connect_openMSP430}
+pack     .ctrl.connect.serial.connect -side right -padx 5
 
-# Memory size status
-label  .ctrl.mem_sz.l2    -text "CPU Info:"             -anchor w
-pack   .ctrl.mem_sz.l2    -side left -padx "0 10"
-label  .ctrl.mem_sz.l3    -text "Disconnected"          -anchor w -fg Red
-pack   .ctrl.mem_sz.l3    -side left -padx "0 30"
-label  .ctrl.mem_sz.l4    -text "Program Memory size:"  -anchor w
-pack   .ctrl.mem_sz.l4    -side left
-label  .ctrl.mem_sz.l5    -text "--"                    -anchor w
-pack   .ctrl.mem_sz.l5    -side left
-label  .ctrl.mem_sz.l6    -text "B"                     -anchor w
-pack   .ctrl.mem_sz.l6    -side left -padx "0 30"
-label  .ctrl.mem_sz.l7    -text "Data Memory size:"     -anchor w
-pack   .ctrl.mem_sz.l7    -side left
-label  .ctrl.mem_sz.l8    -text "--"                    -anchor w
-pack   .ctrl.mem_sz.l8    -side left
-label  .ctrl.mem_sz.l9    -text "B"                     -anchor w
-pack   .ctrl.mem_sz.l9    -side left
+# CPU status & info
+frame  .ctrl.connect.info.l1
+pack   .ctrl.connect.info.l1      -side top    -padx 0      -pady {0 0} -fill x
+
+label  .ctrl.connect.info.l1.cpu  -text "CPU Info:"       -anchor w
+pack   .ctrl.connect.info.l1.cpu  -side left -padx "0 10"
+label  .ctrl.connect.info.l1.con  -text "Disconnected"    -anchor w -fg Red
+pack   .ctrl.connect.info.l1.con  -side left
+button .ctrl.connect.info.l1.more -text "More..."         -width 9 -command {displayMore} -state disabled
+pack   .ctrl.connect.info.l1.more -side right -padx 5
+
 
 # Load ELF file fields
 frame  .ctrl.load.ft
-pack   .ctrl.load.ft        -side top -fill x
+pack   .ctrl.load.ft        -side top -fill x -padx "10 0" -pady "10 0"
 label  .ctrl.load.ft.l      -text "ELF file:"  -state disabled
 pack   .ctrl.load.ft.l      -side left -padx "0 10"
 entry  .ctrl.load.ft.file   -width 58 -relief sunken -textvariable bin_file_name -state disabled
 pack   .ctrl.load.ft.file   -side left -padx 10
-button .ctrl.load.ft.browse -text "Browse" -state disabled -command {set bin_file_name [tk_getOpenFile -filetypes {{{ELF/Intel-Hex Files} {.elf .ihex .hex}} {{All Files} *}}]}
-pack   .ctrl.load.ft.browse -side left -padx 5 
+button .ctrl.load.ft.browse -text "Browse" -width 9 -state disabled -command {set bin_file_name [tk_getOpenFile -filetypes {{{ELF/Intel-Hex Files} {.elf .ihex .hex}} {{All Files} *}}]}
+pack   .ctrl.load.ft.browse -side right -padx {5 15}
 frame  .ctrl.load.fb
-pack   .ctrl.load.fb        -side top -fill x
+pack   .ctrl.load.fb        -side top -fill x -padx "10 0" -pady "5 10"
 button .ctrl.load.fb.read   -text "Load ELF File !" -state disabled -command {loadProgram $bin_file_name}
 pack   .ctrl.load.fb.read   -side left -padx 5 -fill x
 label  .ctrl.load.fb.l      -text "Not loaded" -anchor w -fg Red  -state disabled
 pack   .ctrl.load.fb.l      -side left
 
 # CPU Control
-label  .ctrl.cpu.l1         -text "CPU Control:" -anchor w  -state disabled
-pack   .ctrl.cpu.l1         -side left
-button .ctrl.cpu.reset      -text "Reset" -state disabled -command {resetCPU}
-pack   .ctrl.cpu.reset      -side left -padx 5 -fill x
-button .ctrl.cpu.run        -text "Stop"  -state disabled -command {runCPU}
-pack   .ctrl.cpu.run        -side left -padx 5 -fill x
-button .ctrl.cpu.step       -text "Step"  -state disabled -command {singleStepCPU}
-pack   .ctrl.cpu.step       -side left -padx 5 -fill x
-label  .ctrl.cpu.l2         -text "CPU Status:" -anchor w  -state disabled
-pack   .ctrl.cpu.l2         -side left -padx "40 0"
-label  .ctrl.cpu.l3         -text "--" -anchor w  -state disabled
-pack   .ctrl.cpu.l3         -side left
+label  .ctrl.cpu.cpu.l1     -text "CPU Control:" -anchor w  -state disabled
+pack   .ctrl.cpu.cpu.l1     -side left
+button .ctrl.cpu.cpu.reset  -text "Reset" -state disabled -command {resetCPU}
+pack   .ctrl.cpu.cpu.reset  -side left -padx 5 -fill x
+button .ctrl.cpu.cpu.run    -text "Stop"  -state disabled -command {runCPU}
+pack   .ctrl.cpu.cpu.run    -side left -padx 5 -fill x
+button .ctrl.cpu.cpu.step   -text "Step"  -state disabled -command {singleStepCPU}
+pack   .ctrl.cpu.cpu.step   -side left -padx 5 -fill x
+label  .ctrl.cpu.cpu.l2     -text "CPU Status:" -anchor w  -state disabled
+pack   .ctrl.cpu.cpu.l2     -side left -padx "40 0"
+label  .ctrl.cpu.cpu.l3     -text "--" -anchor w  -state disabled
+pack   .ctrl.cpu.cpu.l3     -side left
+
+# Breakpoints
+label       .ctrl.cpu.brkpt.l1       -text "CPU Breakpoints:"    -anchor w  -state disabled
+pack        .ctrl.cpu.brkpt.l1       -side left
+entry       .ctrl.cpu.brkpt.addr0    -textvariable brkpt(addr_0) -relief sunken -state disabled  -width 10
+pack        .ctrl.cpu.brkpt.addr0    -side left -padx "20 0"
+bind        .ctrl.cpu.brkpt.addr0    <Return> "highlightCode"
+checkbutton .ctrl.cpu.brkpt.chk0     -variable brkpt(en_0)       -state disabled -command "updateBreakpoint 0" -text "Enable"
+pack        .ctrl.cpu.brkpt.chk0     -side left -padx "0"
+entry       .ctrl.cpu.brkpt.addr1    -textvariable brkpt(addr_1) -relief sunken -state disabled  -width 10
+pack        .ctrl.cpu.brkpt.addr1    -side left -padx "20 0"
+bind        .ctrl.cpu.brkpt.addr1    <Return> "highlightCode"
+checkbutton .ctrl.cpu.brkpt.chk1     -variable brkpt(en_1)       -state disabled -command "updateBreakpoint 1" -text "Enable"
+pack        .ctrl.cpu.brkpt.chk1     -side left -padx "0"
+entry       .ctrl.cpu.brkpt.addr2    -textvariable brkpt(addr_2) -relief sunken -state disabled  -width 10
+pack        .ctrl.cpu.brkpt.addr2    -side left -padx "20 0"
+bind        .ctrl.cpu.brkpt.addr2    <Return> "highlightCode"
+checkbutton .ctrl.cpu.brkpt.chk2     -variable brkpt(en_2)       -state disabled -command "updateBreakpoint 2" -text "Enable"
+pack        .ctrl.cpu.brkpt.chk2     -side left -padx "0"
+
 
 # CPU Status register
-label       .ctrl.reg_stat.l1     -text "Status register (r2/sr):" -anchor w -state disabled
-pack        .ctrl.reg_stat.l1     -side left
-checkbutton .ctrl.reg_stat.v      -variable sr(v)      -state disabled -command "statRegUpdate" -text "V"
-pack        .ctrl.reg_stat.v      -side left -padx "0"
-checkbutton .ctrl.reg_stat.scg1   -variable sr(scg1)   -state disabled -command "statRegUpdate" -text "SCG1"
-pack        .ctrl.reg_stat.scg1   -side left -padx "0"
-checkbutton .ctrl.reg_stat.oscoff -variable sr(oscoff) -state disabled -command "statRegUpdate" -text "OSCOFF"
-pack        .ctrl.reg_stat.oscoff -side left -padx "0"
-checkbutton .ctrl.reg_stat.cpuoff -variable sr(cpuoff) -state disabled -command "statRegUpdate" -text "CPUOFF"
-pack        .ctrl.reg_stat.cpuoff -side left -padx "0"
-checkbutton .ctrl.reg_stat.gie    -variable sr(gie)    -state disabled -command "statRegUpdate" -text "GIE"
-pack        .ctrl.reg_stat.gie    -side left -padx "0"
-checkbutton .ctrl.reg_stat.n      -variable sr(n)      -state disabled -command "statRegUpdate" -text "N"
-pack        .ctrl.reg_stat.n      -side left -padx "0"
-checkbutton .ctrl.reg_stat.z      -variable sr(z)      -state disabled -command "statRegUpdate" -text "Z"
-pack        .ctrl.reg_stat.z      -side left -padx "0"
-checkbutton .ctrl.reg_stat.c      -variable sr(c)      -state disabled -command "statRegUpdate" -text "C"
-pack        .ctrl.reg_stat.c      -side left -padx "0"
+label       .ctrl.cpu.reg_stat.l1     -text "Status register (r2/sr):" -anchor w -state disabled
+pack        .ctrl.cpu.reg_stat.l1     -side left
+checkbutton .ctrl.cpu.reg_stat.v      -variable sr(v)      -state disabled -command "statRegUpdate" -text "V"
+pack        .ctrl.cpu.reg_stat.v      -side left -padx "0"
+checkbutton .ctrl.cpu.reg_stat.scg1   -variable sr(scg1)   -state disabled -command "statRegUpdate" -text "SCG1"
+pack        .ctrl.cpu.reg_stat.scg1   -side left -padx "0"
+checkbutton .ctrl.cpu.reg_stat.oscoff -variable sr(oscoff) -state disabled -command "statRegUpdate" -text "OSCOFF"
+pack        .ctrl.cpu.reg_stat.oscoff -side left -padx "0"
+checkbutton .ctrl.cpu.reg_stat.cpuoff -variable sr(cpuoff) -state disabled -command "statRegUpdate" -text "CPUOFF"
+pack        .ctrl.cpu.reg_stat.cpuoff -side left -padx "0"
+checkbutton .ctrl.cpu.reg_stat.gie    -variable sr(gie)    -state disabled -command "statRegUpdate" -text "GIE"
+pack        .ctrl.cpu.reg_stat.gie    -side left -padx "0"
+checkbutton .ctrl.cpu.reg_stat.n      -variable sr(n)      -state disabled -command "statRegUpdate" -text "N"
+pack        .ctrl.cpu.reg_stat.n      -side left -padx "0"
+checkbutton .ctrl.cpu.reg_stat.z      -variable sr(z)      -state disabled -command "statRegUpdate" -text "Z"
+pack        .ctrl.cpu.reg_stat.z      -side left -padx "0"
+checkbutton .ctrl.cpu.reg_stat.c      -variable sr(c)      -state disabled -command "statRegUpdate" -text "C"
+pack        .ctrl.cpu.reg_stat.c      -side left -padx "0"
 
 # CPU Registers
-frame  .ctrl.reg_mem.reg.title
-pack   .ctrl.reg_mem.reg.title           -side top
-label  .ctrl.reg_mem.reg.title.l         -text " " -width 8 -anchor w
-pack   .ctrl.reg_mem.reg.title.l         -side left
-label  .ctrl.reg_mem.reg.title.e         -text "Registers" -anchor w  -state disabled
-pack   .ctrl.reg_mem.reg.title.e         -side left
+frame  .ctrl.cpu.reg_mem.reg.title
+pack   .ctrl.cpu.reg_mem.reg.title           -side top
+label  .ctrl.cpu.reg_mem.reg.title.l         -text " " -width 8 -anchor w
+pack   .ctrl.cpu.reg_mem.reg.title.l         -side left
+label  .ctrl.cpu.reg_mem.reg.title.e         -text "Registers" -anchor w  -state disabled
+pack   .ctrl.cpu.reg_mem.reg.title.e         -side left
 for {set i 0} {$i<16} {incr i} {
     switch $i {
 	{0}     {set reg_label "r0 (pc):"}
@@ -662,53 +937,53 @@ for {set i 0} {$i<16} {incr i} {
 	{2}     {set reg_label "r2 (sr):"}
 	default {set reg_label "r$i:"}
     }
-    frame  .ctrl.reg_mem.reg.f$i
-    pack   .ctrl.reg_mem.reg.f$i           -side top
-    label  .ctrl.reg_mem.reg.f$i.l$i       -text $reg_label -width 8 -anchor w  -state disabled
-    pack   .ctrl.reg_mem.reg.f$i.l$i       -side left
-    entry  .ctrl.reg_mem.reg.f$i.e$i       -textvariable reg($i) -relief sunken -state disabled
-    pack   .ctrl.reg_mem.reg.f$i.e$i       -side left
-    bind   .ctrl.reg_mem.reg.f$i.e$i       <Return> "write2Reg $i"
+    frame  .ctrl.cpu.reg_mem.reg.f$i
+    pack   .ctrl.cpu.reg_mem.reg.f$i           -side top
+    label  .ctrl.cpu.reg_mem.reg.f$i.l$i       -text $reg_label -width 8 -anchor w  -state disabled
+    pack   .ctrl.cpu.reg_mem.reg.f$i.l$i       -side left
+    entry  .ctrl.cpu.reg_mem.reg.f$i.e$i       -textvariable reg($i) -relief sunken -state disabled
+    pack   .ctrl.cpu.reg_mem.reg.f$i.e$i       -side left
+    bind   .ctrl.cpu.reg_mem.reg.f$i.e$i       <Return> "write2Reg $i"
 }
-button .ctrl.reg_mem.reg.refresh           -text "Refresh Registers"  -state disabled -command {refreshReg}
-pack   .ctrl.reg_mem.reg.refresh           -side top -padx 5 -pady 10 -fill x -expand true
+button .ctrl.cpu.reg_mem.reg.refresh           -text "Refresh Registers"  -state disabled -command {refreshReg}
+pack   .ctrl.cpu.reg_mem.reg.refresh           -side top -padx 5 -pady 10 -fill x -expand true
 
 
 # CPU Memory
-frame  .ctrl.reg_mem.mem.title
-pack   .ctrl.reg_mem.mem.title             -side top
-label  .ctrl.reg_mem.mem.title.l           -text "      Address      " -anchor w -width 20  -state disabled
-pack   .ctrl.reg_mem.mem.title.l           -side left -fill x -expand true
-label  .ctrl.reg_mem.mem.title.e           -text "        Data       " -anchor w -width 20  -state disabled
-pack   .ctrl.reg_mem.mem.title.e           -side left -fill x -expand true
+frame  .ctrl.cpu.reg_mem.mem.title
+pack   .ctrl.cpu.reg_mem.mem.title             -side top
+label  .ctrl.cpu.reg_mem.mem.title.l           -text "      Address      " -anchor w -width 20  -state disabled
+pack   .ctrl.cpu.reg_mem.mem.title.l           -side left -fill x -expand true
+label  .ctrl.cpu.reg_mem.mem.title.e           -text "        Data       " -anchor w -width 20  -state disabled
+pack   .ctrl.cpu.reg_mem.mem.title.e           -side left -fill x -expand true
 for {set i 0} {$i<16} {incr i} {
-    frame  .ctrl.reg_mem.mem.f$i
-    pack   .ctrl.reg_mem.mem.f$i           -side top
+    frame  .ctrl.cpu.reg_mem.mem.f$i
+    pack   .ctrl.cpu.reg_mem.mem.f$i           -side top
 
-    entry  .ctrl.reg_mem.mem.f$i.addr_e$i  -textvariable mem(address_$i) -relief sunken -state disabled  -width 20
-    pack   .ctrl.reg_mem.mem.f$i.addr_e$i  -side left
-    bind   .ctrl.reg_mem.mem.f$i.addr_e$i  <Return> "refreshMem"
-    entry  .ctrl.reg_mem.mem.f$i.data_e$i  -textvariable mem(data_$i)    -relief sunken -state disabled  -width 20
-    pack   .ctrl.reg_mem.mem.f$i.data_e$i  -side left
-    bind   .ctrl.reg_mem.mem.f$i.data_e$i  <Return> "write2Mem $i"
+    entry  .ctrl.cpu.reg_mem.mem.f$i.addr_e$i  -textvariable mem(address_$i) -relief sunken -state disabled  -width 20
+    pack   .ctrl.cpu.reg_mem.mem.f$i.addr_e$i  -side left
+    bind   .ctrl.cpu.reg_mem.mem.f$i.addr_e$i  <Return> "refreshMem"
+    entry  .ctrl.cpu.reg_mem.mem.f$i.data_e$i  -textvariable mem(data_$i)    -relief sunken -state disabled  -width 20
+    pack   .ctrl.cpu.reg_mem.mem.f$i.data_e$i  -side left
+    bind   .ctrl.cpu.reg_mem.mem.f$i.data_e$i  <Return> "write2Mem $i"
 }
-button .ctrl.reg_mem.mem.refresh -text "Refresh Memory"     -state disabled -command {refreshMem}
-pack   .ctrl.reg_mem.mem.refresh -side top -padx 5 -pady 10 -fill x -expand true
+button .ctrl.cpu.reg_mem.mem.refresh -text "Refresh Memory"     -state disabled -command {refreshMem}
+pack   .ctrl.cpu.reg_mem.mem.refresh -side top -padx 5 -pady 10 -fill x -expand true
 
 
 # Load TCL script fields
 frame  .ctrl.tclscript.ft
-pack   .ctrl.tclscript.ft        -side top -fill x
+pack   .ctrl.tclscript.ft        -side top -padx {10 10} -pady {10 5} -fill x
 label  .ctrl.tclscript.ft.l      -text "TCL script:" -state disabled
 pack   .ctrl.tclscript.ft.l      -side left -padx "0 10"
 entry  .ctrl.tclscript.ft.file   -width 58 -relief sunken -textvariable tcl_file_name -state disabled
 pack   .ctrl.tclscript.ft.file   -side left -padx 10
-button .ctrl.tclscript.ft.browse -text "Browse" -state disabled -command {set tcl_file_name [tk_getOpenFile -filetypes {{{TCL Files} {.tcl}} {{All Files} *}}]}
-pack   .ctrl.tclscript.ft.browse -side left -padx 5 
+button .ctrl.tclscript.ft.browse -text "Browse" -width 9 -state disabled -command {set tcl_file_name [tk_getOpenFile -filetypes {{{TCL Files} {.tcl}} {{All Files} *}}]}
+pack   .ctrl.tclscript.ft.browse -side right -padx 5 
 frame  .ctrl.tclscript.fb
 pack   .ctrl.tclscript.fb        -side top -fill x
 button .ctrl.tclscript.fb.read   -text "Source TCL script !" -state disabled -command {if {[file exists $tcl_file_name]} {source $tcl_file_name}}
-pack   .ctrl.tclscript.fb.read   -side left -padx 5 -fill x
+pack   .ctrl.tclscript.fb.read   -side left -padx 15 -pady {0 10} -fill x
 
 
 ####################################
@@ -735,4 +1010,38 @@ text      .code.text    -width 80 -borderwidth 2  -state disabled  -wrap none -s
                         -xscrollcommand {.code.xscroll set} -yscrollcommand {.code.yscroll set}
 pack      .code.text    -side left   -fill both -expand true
 
-.code.text tag config highlight -background yellow
+.code.text tag config highlightPC       -background $color(PC)
+.code.text tag config highlightBRK0_ACT -background $color(Brk0_active)
+.code.text tag config highlightBRK0_DIS -background $color(Brk0_disabled)
+.code.text tag config highlightBRK1_ACT -background $color(Brk1_active)
+.code.text tag config highlightBRK1_DIS -background $color(Brk1_disabled)
+.code.text tag config highlightBRK2_ACT -background $color(Brk2_active)
+.code.text tag config highlightBRK2_DIS -background $color(Brk2_disabled)
+
+
+#######################################
+#  PERIODICALLY CHECK THE CPU STATUS  #
+#######################################
+
+while 1 {
+
+    # Wait 1 second
+    set ::refresh_flag 0
+    after 1000 set ::refresh_flag 1
+    vwait refresh_flag
+
+    # Check CPU status
+    if {$serial_status} {
+	if {$cpu_status} {
+	    if {[IsHalted]} {
+		.ctrl.cpu.cpu.step  configure -state normal
+		.ctrl.cpu.cpu.run   configure -text "Run"
+		.ctrl.cpu.cpu.l3    configure -text "Stopped" -fg "\#cdad00"
+		set cpu_status 0
+		refreshReg
+		refreshMem
+	    }
+	}
+    }
+}
+
