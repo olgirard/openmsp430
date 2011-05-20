@@ -39,6 +39,10 @@
 
 .global main
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_250,  (__data_start+0x50)
+
 .set   P1IN,  0x0020
 .set   P1OUT, 0x0021
 .set   P1DIR, 0x0022
@@ -71,10 +75,10 @@ main:
 	mov.b #0x01, &P1IE
 
 	; Initialize stack and enable global interrupts
-	mov   #0x0250, r1
+	mov   #DMEM_250, r1
 	eint
 
-	mov    #0x1000, r15
+	mov     #0x1000, r15
 
 	
         /* -------------- SCG1   (<=> R2[7]): turn off SMCLK --------------- */

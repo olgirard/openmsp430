@@ -92,9 +92,9 @@ function [4:0] bcd_add;
 
    reg   [4:0] Z;
    begin
-      Z = {1'b0,X}+{1'b0,Y}+C;
-      if (Z<10) bcd_add = Z;
-      else      bcd_add = Z+6;
+      Z = {1'b0,X}+{1'b0,Y}+{4'b0,C};
+      if (Z<5'd10) bcd_add = Z;
+      else         bcd_add = Z+5'd6;
    end
 
 endfunction
@@ -204,13 +204,13 @@ wire        alu_short_thro = ~(inst_alu[`ALU_AND]   |
                                inst_so[`SWPB]       |
                                inst_so[`SXT]);
 
-wire [16:0] alu_short      = ({16{inst_alu[`ALU_AND]}}   & alu_and)   |
-                             ({16{inst_alu[`ALU_OR]}}    & alu_or)    |
-                             ({16{inst_alu[`ALU_XOR]}}   & alu_xor)   |
-                             ({16{inst_alu[`ALU_SHIFT]}} & alu_shift) |
-                             ({16{inst_so[`SWPB]}}       & alu_swpb)  |
-                             ({16{inst_so[`SXT]}}        & alu_sxt)   |
-                             ({16{alu_short_thro}}       & op_src_in);
+wire [16:0] alu_short      = ({17{inst_alu[`ALU_AND]}}   & alu_and)   |
+                             ({17{inst_alu[`ALU_OR]}}    & alu_or)    |
+                             ({17{inst_alu[`ALU_XOR]}}   & alu_xor)   |
+                             ({17{inst_alu[`ALU_SHIFT]}} & alu_shift) |
+                             ({17{inst_so[`SWPB]}}       & alu_swpb)  |
+                             ({17{inst_so[`SXT]}}        & alu_sxt)   |
+                             ({17{alu_short_thro}}       & op_src_in);
 
 
 // ALU output mux

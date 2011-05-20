@@ -37,6 +37,10 @@
 
 .global main
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_250,  (__data_start+0x50)
+
 .set   BCSCTL1, 0x0057
 .set   BCSCTL2, 0x0058
 
@@ -47,9 +51,9 @@ WAIT_FUNC:
 	ret
 	
 main:
- 	mov  #0x0250, r1 	; # Initialize stack pointer
-	mov  #0x0000, &0x0200
-	mov  #0x0000, r15
+ 	mov #DMEM_250, r1       ; # Initialize stack pointer
+	mov   #0x0000, &DMEM_200
+	mov   #0x0000, r15
 
        /* --------------                ACLK GENERATION             ----------------- */
 
@@ -133,7 +137,36 @@ main:
 
 	mov  #0x4000, r15
 	
-		
+
+        /* --------------      RD/WR ACCESS TO REGISTERS     ----------------- */
+
+ 	mov.b     #0x00, &BCSCTL1
+ 	mov.b     #0x00, &BCSCTL2
+ 	mov.b  &BCSCTL1, r4
+ 	mov.b  &BCSCTL2, r5
+	
+ 	mov.b     #0xff, &BCSCTL1
+ 	mov.b  &BCSCTL1, r6
+ 	mov.b  &BCSCTL2, r7
+	
+ 	mov.b     #0x00, &BCSCTL1
+ 	mov.b  &BCSCTL1, r8
+ 	mov.b  &BCSCTL2, r9
+
+ 	mov.b     #0xff, &BCSCTL2
+ 	mov.b  &BCSCTL1, r10
+ 	mov.b  &BCSCTL2, r11
+	
+ 	mov.b     #0x00, &BCSCTL2
+ 	mov.b  &BCSCTL1, r12
+ 	mov.b  &BCSCTL2, r13
+
+	
+	mov     #0x5000, r15
+ 	mov     #0x0010, r14
+        call    #WAIT_FUNC
+	
+			
         /* ----------------------         END OF TEST        --------------- */
 end_of_test:
 	nop

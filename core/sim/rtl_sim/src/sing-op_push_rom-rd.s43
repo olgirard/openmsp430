@@ -35,6 +35,21 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.set    DMEM_BASE, (__data_start     )
+.set    DMEM_200,  (__data_start+0x00)
+.set    DMEM_212,  (__data_start+0x12)
+.set    DMEM_216,  (__data_start+0x16)
+.set    DMEM_21A,  (__data_start+0x1A)
+.set    DMEM_21E,  (__data_start+0x1E)
+.set    DMEM_220,  (__data_start+0x20)
+.set    DMEM_222,  (__data_start+0x22)
+.set    DMEM_224,  (__data_start+0x24)
+.set    DMEM_230,  (__data_start+0x30)
+.set    DMEM_240,  (__data_start+0x40)
+.set    DMEM_250,  (__data_start+0x50)
+.set    DMEM_252,  (__data_start+0x52)
+.set    DMEM_300,  (__data_start+0x100)
+
 
 .global main
 
@@ -45,7 +60,7 @@ main:
 	#------------------------
 
 	mov     #0x0020, r4        ;# Initialize RAM
-	mov     #0x0230, r5
+	mov   #DMEM_230, r5
 clear_mem_loop:
 	clr    0(r5)
 	incd     r5
@@ -53,7 +68,7 @@ clear_mem_loop:
 	jnz     clear_mem_loop 
 
 
-	mov     #0x0252, r1        ;# Initialize stack pointer
+	mov   #DMEM_252, r1        ;# Initialize stack pointer
 
 
 	mov     #0x1000, r15
@@ -93,8 +108,8 @@ clear_mem_loop:
 
         # Addressing mode: EDE
 	#------------------------
-.set   EDE_21E,  (__data_start+0x001E)
-.set   EDE_220,  (__data_start+0x0020)
+.set   EDE_21E,  DMEM_21E
+.set   EDE_220,  DMEM_220
 
 	push    data_EDE_0x8765                ;# PUSH (0x8765  =>  @=0x0244)
 	push    data_EDE_0x4321                ;# PUSH (0x4321  =>  @=0x0242)
@@ -104,8 +119,8 @@ clear_mem_loop:
 
         # Addressing mode: &EDE
 	#------------------------
-.set   aEDE_222,  0x0222
-.set   aEDE_224,  0x0224
+.set   aEDE_222,  DMEM_222
+.set   aEDE_224,  DMEM_224
 
 	push  &data_aEDE_0x1f2e                ;# PUSH (0x1f2e  =>  @=0x0240)
 	push  &data_aEDE_0x3d4c                ;# PUSH (0x3d4c  =>  @=0x023E)

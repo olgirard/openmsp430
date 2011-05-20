@@ -219,7 +219,7 @@ msp_debug msp_debug_0 (
 
 // INPUTs
     .mclk         (mclk),          // Main system clock
-    .puc          (puc)            // Main system reset
+    .puc_rst      (puc_rst)        // Main system reset
 );
 
 //

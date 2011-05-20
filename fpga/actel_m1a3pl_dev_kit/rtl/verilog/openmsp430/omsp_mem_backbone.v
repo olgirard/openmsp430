@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 106 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -76,7 +76,7 @@ module  omsp_mem_backbone (
     mclk,                           // Main system clock
     per_dout,                       // Peripheral data output
     pmem_dout,                      // Program Memory data output
-    puc                             // Main system reset
+    puc_rst                         // Main system reset
 );
 
 // OUTPUTs
@@ -89,7 +89,7 @@ output         [1:0] dmem_wen;      // Data Memory write enable (low active)
 output        [15:0] eu_mdb_in;     // Execution Unit Memory data bus input
 output        [15:0] fe_mdb_in;     // Frontend Memory data bus input
 output               fe_pmem_wait;  // Frontend wait for Instruction fetch
-output         [7:0] per_addr;      // Peripheral address
+output        [13:0] per_addr;      // Peripheral address
 output        [15:0] per_din;       // Peripheral data input
 output         [1:0] per_we;        // Peripheral write enable (high active)
 output               per_en;        // Peripheral enable (high active)
@@ -115,7 +115,7 @@ input                fe_mb_en;      // Frontend Memory bus enable
 input                mclk;          // Main system clock
 input         [15:0] per_dout;      // Peripheral data output
 input         [15:0] pmem_dout;     // Program Memory data output
-input                puc;           // Main system reset
+input                puc_rst;       // Main system reset
 
 
 //=============================================================================
@@ -128,12 +128,12 @@ input                puc;           // Main system reset
 // Execution unit access
 wire               eu_dmem_cen   = ~(eu_mb_en & (eu_mab>=(`DMEM_BASE>>1)) &
                                                 (eu_mab<((`DMEM_BASE+`DMEM_SIZE)>>1)));
-wire        [15:0] eu_dmem_addr  = eu_mab-(`DMEM_BASE>>1);
+wire        [15:0] eu_dmem_addr  = {1'b0, eu_mab}-(`DMEM_BASE>>1);
 
 // Debug interface access
 wire               dbg_dmem_cen  = ~(dbg_mem_en & (dbg_mem_addr[15:1]>=(`DMEM_BASE>>1)) &
                                                   (dbg_mem_addr[15:1]<((`DMEM_BASE+`DMEM_SIZE)>>1)));
-wire        [15:0] dbg_dmem_addr = dbg_mem_addr[15:1]-(`DMEM_BASE>>1);
+wire        [15:0] dbg_dmem_addr = {1'b0, dbg_mem_addr[15:1]}-(`DMEM_BASE>>1);
 
    
 // RAM Interface
@@ -157,7 +157,7 @@ wire        [15:0] fe_pmem_addr  = fe_mab-(PMEM_OFFSET>>1);
 
 // Debug interface access
 wire               dbg_pmem_cen  = ~(dbg_mem_en & (dbg_mem_addr[15:1]>=(PMEM_OFFSET>>1)));
-wire        [15:0] dbg_pmem_addr = dbg_mem_addr[15:1]-(PMEM_OFFSET>>1);
+wire        [15:0] dbg_pmem_addr = {1'b0, dbg_mem_addr[15:1]}-(PMEM_OFFSET>>1);
 
    
 // ROM Interface (Execution unit has priority)
@@ -172,17 +172,19 @@ wire               fe_pmem_wait  = (~fe_pmem_cen & ~eu_pmem_cen);
 
 // Peripherals
 //--------------------
-wire         dbg_per_en    =  dbg_mem_en & (dbg_mem_addr[15:9]==7'h00);
-wire         eu_per_en     =  eu_mb_en   & (eu_mab[14:8]==7'h00);
+wire              dbg_per_en   =  dbg_mem_en & (dbg_mem_addr[15:`PER_AWIDTH+1]=={15-`PER_AWIDTH{1'b0}});
+wire              eu_per_en    =  eu_mb_en   & (eu_mab[14:`PER_AWIDTH]        =={15-`PER_AWIDTH{1'b0}});
 
-wire   [7:0] per_addr      =  dbg_mem_en ? dbg_mem_addr[8:1] : eu_mab[7:0];
-wire  [15:0] per_din       =  dbg_mem_en ? dbg_mem_dout      : eu_mdb_out;
-wire   [1:0] per_we        =  dbg_mem_en ? dbg_mem_wr        : eu_mb_wr;
-wire         per_en        =  dbg_mem_en ? dbg_per_en        : eu_per_en;
+wire       [15:0] per_din      =  dbg_mem_en ? dbg_mem_dout               : eu_mdb_out;
+wire        [1:0] per_we       =  dbg_mem_en ? dbg_mem_wr                 : eu_mb_wr;
+wire              per_en       =  dbg_mem_en ? dbg_per_en                 : eu_per_en;
+wire [`PER_MSB:0] per_addr_mux =  dbg_mem_en ? dbg_mem_addr[`PER_MSB+1:1] : eu_mab[`PER_MSB:0];
+wire       [14:0] per_addr_ful =  {{15-`PER_AWIDTH{1'b0}}, per_addr_mux};
+wire       [13:0] per_addr     =   per_addr_ful[13:0];
 
 reg   [15:0] per_dout_val;
-always @ (posedge mclk or posedge puc)
-  if (puc)      per_dout_val <= 16'h0000;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)  per_dout_val <= 16'h0000;
   else          per_dout_val <= per_dout;
 
 
@@ -192,22 +194,22 @@ always @ (posedge mclk or posedge puc)
 
 // Detect whenever the data should be backuped and restored
 reg 	    fe_pmem_cen_dly;
-always @(posedge mclk or posedge puc)
-  if (puc)     fe_pmem_cen_dly <=  1'b0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst) fe_pmem_cen_dly <=  1'b0;
   else         fe_pmem_cen_dly <=  fe_pmem_cen;
 
 wire fe_pmem_save    = ( fe_pmem_cen & ~fe_pmem_cen_dly) & ~dbg_halt_st;
 wire fe_pmem_restore = (~fe_pmem_cen &  fe_pmem_cen_dly) |  dbg_halt_st;
    
 reg  [15:0] pmem_dout_bckup;
-always @(posedge mclk or posedge puc)
-  if (puc)               pmem_dout_bckup     <=  16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)           pmem_dout_bckup     <=  16'h0000;
   else if (fe_pmem_save) pmem_dout_bckup     <=  pmem_dout;
 
 // Mux between the ROM data and the backup
 reg         pmem_dout_bckup_sel;
-always @(posedge mclk or posedge puc)
-  if (puc)                  pmem_dout_bckup_sel <=  1'b0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)              pmem_dout_bckup_sel <=  1'b0;
   else if (fe_pmem_save)    pmem_dout_bckup_sel <=  1'b1;
   else if (fe_pmem_restore) pmem_dout_bckup_sel <=  1'b0;
     
@@ -219,9 +221,9 @@ assign fe_mdb_in = pmem_dout_bckup_sel ? pmem_dout_bckup : pmem_dout;
 
 // Select between peripherals, RAM and ROM
 reg [1:0] eu_mdb_in_sel;
-always @(posedge mclk or posedge puc)
-  if (puc)  eu_mdb_in_sel <= 2'b00;
-  else      eu_mdb_in_sel <= {~eu_pmem_cen, per_en};
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)  eu_mdb_in_sel <= 2'b00;
+  else          eu_mdb_in_sel <= {~eu_pmem_cen, per_en};
 
 // Mux
 assign      eu_mdb_in      = eu_mdb_in_sel[1] ? pmem_dout    :
@@ -233,9 +235,9 @@ assign      eu_mdb_in      = eu_mdb_in_sel[1] ? pmem_dout    :
 // Select between peripherals, RAM and ROM
 `ifdef DBG_EN
 reg   [1:0] dbg_mem_din_sel;
-always @(posedge mclk or posedge puc)
-  if (puc)  dbg_mem_din_sel <= 2'b00;
-  else      dbg_mem_din_sel <= {~dbg_pmem_cen, dbg_per_en};
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)  dbg_mem_din_sel <= 2'b00;
+  else          dbg_mem_din_sel <= {~dbg_pmem_cen, dbg_per_en};
 
 `else
 wire  [1:0] dbg_mem_din_sel  = 2'b00;

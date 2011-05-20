@@ -36,7 +36,7 @@
 /*===========================================================================*/
 
 
-   integer my_test;
+   integer test_nr;
    integer test_var;
 
    
@@ -45,6 +45,8 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
+`ifdef DBG_EN
+      test_nr = 0;
       #1 dbg_en = 0;
       repeat(30) @(posedge mclk);
       stimulus_done = 0;
@@ -52,7 +54,8 @@ initial
       // Make sure the CPU always starts executing when the
       // debug interface is disabled during POR.
       //--------------------------------------------------------
-      dbg_en = 0;
+      dbg_en  = 0;
+      test_nr = 1;
 
       repeat(300) @(posedge mclk);
       if (r14 === 16'h0000)       tb_error("====== CPU is stopped event though the debug interface is disabled - test 1 =====");
@@ -62,8 +65,9 @@ initial
       // Make sure that enabling the debug interface after the POR
       // don't stop the cpu
       //--------------------------------------------------------
-      dbg_en = 1;
-      
+      dbg_en  = 1;
+      test_nr = 2;
+     
       repeat(300) @(posedge mclk);
       if (r14 === test_var[15:0]) tb_error("====== CPU is stopped when the debug interface is disabled after POR - test 2 =====");
 
@@ -71,7 +75,8 @@ initial
       // Create POR with debug enable and observe the
       // behavior depending on the DBG_RST_BRK_EN define
       //--------------------------------------------------------
-      dbg_en = 1;
+      dbg_en  = 1;
+      test_nr = 3;
       
       @(posedge mclk); // Generate POR
       reset_n = 1'b0;
@@ -99,6 +104,7 @@ initial
 
       // Make sure that DBG_EN resets the debug interface
       //--------------------------------------------------------
+      test_nr = 4;
 
       // Let the CPU run
       dbg_uart_wr(CPU_CTL,  16'h0002);
@@ -140,6 +146,7 @@ initial
 
       // Make sure that RESET_N resets the debug interface
       //--------------------------------------------------------
+      test_nr = 5;
 
       // Let the CPU run
       dbg_uart_wr(CPU_CTL,  16'h0002);
@@ -152,6 +159,7 @@ initial
       dbg_uart_rd(MEM_DATA);
       if (dbg_uart_buf !== 16'haa55)  tb_error("====== MEM_DATA write access failed - test 11 =====");
 
+      test_nr = 6;
 
       @(posedge mclk); // Generates POR
       reset_n = 1'b0;
@@ -164,6 +172,8 @@ initial
      
       // Send uart synchronization frame
       dbg_uart_tx(DBG_SYNC);
+
+      test_nr = 7;
 
       // Check CPU_CTL reset value
       dbg_uart_rd(CPU_CTL);
@@ -179,11 +189,21 @@ initial
       // Let the CPU run
       dbg_uart_wr(CPU_CTL,  16'h0002);
 
+      test_nr = 8;
+
       // Generate IRQ to terminate the test pattern
       irq[1] = 1'b1;
       @(r13);
       irq[1] = 1'b0;
       
       stimulus_done = 1;
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|      (serial debug interface not included)    |");
+       $display(" ===============================================");
+       $finish;
+`endif
    end
 

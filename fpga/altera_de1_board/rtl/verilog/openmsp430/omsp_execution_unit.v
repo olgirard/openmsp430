@@ -78,7 +78,7 @@ module  omsp_execution_unit (
     mdb_in,                        // Memory data bus input
     pc,                            // Program counter
     pc_nxt,                        // Next PC value (for CALL & IRQ)
-    puc                            // Main system reset
+    puc_rst                        // Main system reset
 );
 
 // OUTPUTs
@@ -119,7 +119,7 @@ input               mclk;          // Main system clock
 input        [15:0] mdb_in;        // Memory data bus input
 input        [15:0] pc;            // Program counter
 input        [15:0] pc_nxt;        // Next PC value (for CALL & IRQ)
-input               puc;           // Main system reset
+input               puc_rst;       // Main system reset
 
 
 //=============================================================================
@@ -190,7 +190,7 @@ omsp_register_file register_file_0 (
     .inst_src     (inst_src),     // Register source selection
     .mclk         (mclk),         // Main system clock
     .pc           (pc),           // Program counter
-    .puc          (puc),          // Main system reset
+    .puc_rst      (puc_rst),      // Main system reset
     .reg_dest_val (alu_out),      // Selected register destination value
     .reg_dest_wr  (reg_dest_wr),  // Write selected register destination
     .reg_pc_call  (reg_pc_call),  // Trigger PC update for a CALL instruction
@@ -337,8 +337,8 @@ assign      mab       = alu_out_add[15:0];
 
 // Memory data bus output
 reg  [15:0] mdb_out_nxt;
-always @(posedge mclk or posedge puc)
-  if (puc)                                            mdb_out_nxt <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)                                        mdb_out_nxt <= 16'h0000;
   else if (e_state==`E_DST_RD)                        mdb_out_nxt <= pc_nxt;
   else if ((e_state==`E_EXEC & ~inst_so[`CALL]) |
            (e_state==`E_IRQ_0) | (e_state==`E_IRQ_2)) mdb_out_nxt <= alu_out;
@@ -347,8 +347,8 @@ assign      mdb_out = inst_bw ? {2{mdb_out_nxt[7:0]}} : mdb_out_nxt;
 
 // Format memory data bus input depending on BW
 reg        mab_lsb;
-always @(posedge mclk or posedge puc)
-  if (puc)        mab_lsb <= 1'b0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)    mab_lsb <= 1'b0;
   else if (mb_en) mab_lsb <= alu_out_add[0];
 
 assign mdb_in_bw  = ~inst_bw ? mdb_in :
@@ -356,19 +356,19 @@ assign mdb_in_bw  = ~inst_bw ? mdb_in :
 
 // Memory data bus input buffer (buffer after a source read)
 reg         mdb_in_buf_en;
-always @(posedge mclk or posedge puc)
-  if (puc)  mdb_in_buf_en <= 1'b0;
-  else      mdb_in_buf_en <= (e_state==`E_SRC_RD);
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)  mdb_in_buf_en <= 1'b0;
+  else          mdb_in_buf_en <= (e_state==`E_SRC_RD);
 
 reg         mdb_in_buf_valid;
-always @(posedge mclk or posedge puc)
-  if (puc)                   mdb_in_buf_valid <= 1'b0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)               mdb_in_buf_valid <= 1'b0;
   else if (e_state==`E_EXEC) mdb_in_buf_valid <= 1'b0;
   else if (mdb_in_buf_en)    mdb_in_buf_valid <= 1'b1;
 
 reg  [15:0] mdb_in_buf;
-always @(posedge mclk or posedge puc)
-  if (puc)                mdb_in_buf <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)            mdb_in_buf <= 16'h0000;
   else if (mdb_in_buf_en) mdb_in_buf <= mdb_in_bw;
 
 assign mdb_in_val = mdb_in_buf_valid ? mdb_in_buf : mdb_in_bw;

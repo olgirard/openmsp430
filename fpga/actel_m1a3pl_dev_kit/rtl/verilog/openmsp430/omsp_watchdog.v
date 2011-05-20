@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 106 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -59,7 +59,7 @@ module  omsp_watchdog (
     per_din,                        // Peripheral data input
     per_en,                         // Peripheral enable (high active)
     per_we,                         // Peripheral write enable (high active)
-    puc,                            // Main system reset
+    puc_rst,                        // Main system reset
     smclk_en,                       // SMCLK enable
     wdtie                           // Watchdog timer interrupt enable
 );
@@ -79,11 +79,11 @@ input               dbg_freeze;     // Freeze Watchdog counter
 input               mclk;           // Main system clock
 input               nmi;            // Non-maskable interrupt (asynchronous)
 input               nmie;           // Non-maskable interrupt enable
-input         [7:0] per_addr;       // Peripheral address
+input        [13:0] per_addr;       // Peripheral address
 input        [15:0] per_din;        // Peripheral data input
 input               per_en;         // Peripheral enable (high active)
 input         [1:0] per_we;         // Peripheral write enable (high active)
-input               puc;            // Main system reset
+input               puc_rst;        // Main system reset
 input               smclk_en;       // SMCLK enable
 input               wdtie;          // Watchdog timer interrupt enable
 
@@ -92,33 +92,43 @@ input               wdtie;          // Watchdog timer interrupt enable
 // 1)  PARAMETER DECLARATION
 //=============================================================================
 
-// Register addresses
-parameter           WDTCTL     = 9'h120;
+// Register base address (must be aligned to decoder bit width)
+parameter       [14:0] BASE_ADDR   = 15'h0120;
 
+// Decoder bit width (defines how many bits are considered for address decoding)
+parameter              DEC_WD      =  2;
+
+// Register addresses offset
+parameter [DEC_WD-1:0] WDTCTL      = 'h0;
+
+// Register one-hot decoder utilities
+parameter              DEC_SZ      =  2**DEC_WD;
+parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder
-parameter           WDTCTL_D   = (512'h1 << WDTCTL);
+parameter [DEC_SZ-1:0] WDTCTL_D    = (BASE_REG << WDTCTL);
 
 
 //============================================================================
 // 2)  REGISTER DECODER
 //============================================================================
 
+// Local register selection
+wire              reg_sel   =  per_en & (per_addr[13:DEC_WD-1]==BASE_ADDR[14:DEC_WD]);
+
+// Register local address
+wire [DEC_WD-1:0] reg_addr  =  {per_addr[DEC_WD-2:0], 1'b0};
+
 // Register address decode
-reg  [511:0]  reg_dec; 
-always @(per_addr)
-  case ({per_addr,1'b0})
-    WDTCTL :     reg_dec  =  WDTCTL_D;
-    default:     reg_dec  =  {512{1'b0}};
-  endcase
+wire [DEC_SZ-1:0] reg_dec   =  (WDTCTL_D & {DEC_SZ{(reg_addr==WDTCTL)}});
 
 // Read/Write probes
-wire reg_write =  |per_we & per_en;
-wire reg_read  = ~|per_we & per_en;
+wire              reg_write =  |per_we & reg_sel;
+wire              reg_read  = ~|per_we & reg_sel;
 
 // Read/Write vectors
-wire [511:0] reg_wr    = reg_dec & {512{reg_write}};
-wire [511:0] reg_rd    = reg_dec & {512{reg_read}};
+wire [DEC_SZ-1:0] reg_wr    = reg_dec & {DEC_SZ{reg_write}};
+wire [DEC_SZ-1:0] reg_rd    = reg_dec & {DEC_SZ{reg_read}};
 
 
 //============================================================================
@@ -133,8 +143,8 @@ reg  [7:0] wdtctl;
 
 wire       wdtctl_wr = reg_wr[WDTCTL];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            wdtctl <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        wdtctl <=  8'h00;
   else if (wdtctl_wr) wdtctl <=  per_din[7:0] & 8'hd7;
 
 wire       wdtpw_error = wdtctl_wr & (per_din[15:8]!=8'h5a);
@@ -155,15 +165,28 @@ wire [15:0] per_dout   =  wdtctl_rd;
 // 4)  NMI GENERATION
 //=============================================================================
 
-// Synchronization state
-reg [2:0] nmi_sync;
-always @ (posedge mclk or posedge puc)
-  if (puc)  nmi_sync <= 3'h0;
-  else      nmi_sync <= {nmi_sync[1:0], nmi};
+// Synchronization
+wire   nmi_s;
+`ifdef SYNC_NMI
+omsp_sync_cell sync_cell_nmi (
+    .data_out (nmi_s),
+    .clk      (mclk),
+    .data_in  (nmi),
+    .rst      (puc_rst)
+);
+`else
+assign nmi_s = nmi;
+`endif
+   
+// Delay
+reg  nmi_dly;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst) nmi_dly <= 1'b0;
+  else         nmi_dly <= nmi_s;
 
 // Edge detection
-wire        nmi_re    = ~nmi_sync[2] &  nmi_sync[1] & nmie;
-wire        nmi_fe    =  nmi_sync[2] & ~nmi_sync[1] & nmie;
+wire        nmi_re    = ~nmi_dly &  nmi_s & nmie;
+wire        nmi_fe    =  nmi_dly & ~nmi_s & nmie;
 
 // NMI event
 wire        nmi_evt   = wdtctl[6] ? nmi_fe : nmi_re;
@@ -184,8 +207,8 @@ reg [15:0] wdtcnt;
 
 wire       wdtcnt_clr = (wdtctl_wr & per_din[3]) | wdtifg_set;
 
-always @ (posedge mclk or posedge puc)
-  if (puc)                                        wdtcnt <= 16'h0000;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)                                    wdtcnt <= 16'h0000;
   else if (wdtcnt_clr)                            wdtcnt <= 16'h0000;
   else if (~wdtctl[7] & clk_src_en & ~dbg_freeze) wdtcnt <= wdtcnt+16'h0001;
 
@@ -207,9 +230,9 @@ always @(wdtctl or wdtcnt)
 //-----------------------------
 reg        wdtqn_dly;
 
-always @ (posedge mclk or posedge puc)
-  if (puc) wdtqn_dly <= 1'b0;
-  else     wdtqn_dly <= wdtqn;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst) wdtqn_dly <= 1'b0;
+  else         wdtqn_dly <= wdtqn;
 
 wire       wdtifg_set =  (~wdtqn_dly & wdtqn) | wdtpw_error;
 

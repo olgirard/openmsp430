@@ -163,7 +163,7 @@ initial
       repeat (80) @(negedge mclk);
       if (inst_cnt <= 16'h0025) tb_error("====== CPUOFF TEST 3: CPU IS NOT RUNNING DURING IRQ (PORT 1) =====");
       
-      @(r1==16'h0250);
+      @(r1==(`PER_SIZE+16'h0050));
       repeat (3) @(negedge mclk);
       inst_cnt  = 0;
       repeat (80) @(negedge mclk);

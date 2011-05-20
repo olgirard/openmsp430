@@ -57,7 +57,7 @@ module  omsp_sfr (
     per_en,                       // Peripheral enable (high active)
     per_we,                       // Peripheral write enable (high active)
     por,                          // Power-on reset
-    puc,                          // Main system reset
+    puc_rst,                      // Main system reset
     wdtifg_clr,                   // Clear Watchdog-timer interrupt flag
     wdtifg_set,                   // Set Watchdog-timer interrupt flag
     wdtpw_error,                  // Watchdog-timer password error
@@ -76,12 +76,12 @@ output              wdtie;        // Watchdog-timer interrupt enable
 //=========
 input               mclk;         // Main system clock
 input               nmi_acc;      // Non-Maskable interrupt request accepted
-input         [7:0] per_addr;     // Peripheral address
+input        [13:0] per_addr;     // Peripheral address
 input        [15:0] per_din;      // Peripheral data input
 input               per_en;       // Peripheral enable (high active)
 input         [1:0] per_we;       // Peripheral write enable (high active)
 input               por;          // Power-on reset
-input               puc;          // Main system reset
+input               puc_rst;      // Main system reset
 input               wdtifg_clr;   // Clear Watchdog-timer interrupt flag
 input               wdtifg_set;   // Set Watchdog-timer interrupt flag
 input               wdtpw_error;  // Watchdog-timer password error
@@ -92,37 +92,48 @@ input               wdttmsel;     // Watchdog-timer mode select
 // 1)  PARAMETER DECLARATION
 //=============================================================================
 
-// Register addresses
-parameter           IE1        = 9'h000;
-parameter           IFG1       = 9'h002;
+// Register base address (must be aligned to decoder bit width)
+parameter       [14:0] BASE_ADDR   = 15'h0000;
+
+// Decoder bit width (defines how many bits are considered for address decoding)
+parameter              DEC_WD      =  2;
+
+// Register addresses offset
+parameter [DEC_WD-1:0] IE1         =  'h0,
+                       IFG1        =  'h2;
+
+// Register one-hot decoder utilities
+parameter              DEC_SZ      =  2**DEC_WD;
+parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder
-parameter           IE1_D      = (256'h1 << (IE1  /2));
-parameter           IFG1_D     = (256'h1 << (IFG1 /2)); 
+parameter [DEC_SZ-1:0] IE1_D       = (BASE_REG << IE1),
+                       IFG1_D      = (BASE_REG << IFG1);
 
 
 //============================================================================
 // 2)  REGISTER DECODER
 //============================================================================
 
+// Local register selection
+wire              reg_sel      =  per_en & (per_addr[13:DEC_WD-1]==BASE_ADDR[14:DEC_WD]);
+
+// Register local address
+wire [DEC_WD-1:0] reg_addr     =  {1'b0, per_addr[DEC_WD-2:0]};
+
 // Register address decode
-reg  [255:0]  reg_dec; 
-always @(per_addr)
-  case (per_addr)
-    (IE1  /2):     reg_dec  =  IE1_D;
-    (IFG1 /2):     reg_dec  =  IFG1_D;
-    default  :     reg_dec  =  {256{1'b0}};
-  endcase
+wire [DEC_SZ-1:0] reg_dec      = (IE1_D   &  {DEC_SZ{(reg_addr==(IE1  >>1))}})  |
+                                 (IFG1_D  &  {DEC_SZ{(reg_addr==(IFG1 >>1))}});
 
 // Read/Write probes
-wire         reg_lo_write =  per_we[0] & per_en;
-wire         reg_hi_write =  per_we[1] & per_en;
-wire         reg_read     = ~|per_we   & per_en;
+wire              reg_lo_write =  per_we[0] & reg_sel;
+wire              reg_hi_write =  per_we[1] & reg_sel;
+wire              reg_read     = ~|per_we   & reg_sel;
 
 // Read/Write vectors
-wire [255:0] reg_hi_wr    = reg_dec & {256{reg_hi_write}};
-wire [255:0] reg_lo_wr    = reg_dec & {256{reg_lo_write}};
-wire [255:0] reg_rd       = reg_dec & {256{reg_read}};
+wire [DEC_SZ-1:0] reg_hi_wr    = reg_dec & {DEC_SZ{reg_hi_write}};
+wire [DEC_SZ-1:0] reg_lo_wr    = reg_dec & {DEC_SZ{reg_lo_write}};
+wire [DEC_SZ-1:0] reg_rd       = reg_dec & {DEC_SZ{reg_read}};
 
 
 //============================================================================
@@ -132,19 +143,19 @@ wire [255:0] reg_rd       = reg_dec & {256{reg_read}};
 // IE1 Register
 //--------------
 wire [7:0] ie1;
-wire       ie1_wr  = IE1[0] ? reg_hi_wr[IE1/2] : reg_lo_wr[IE1/2];
-wire [7:0] ie1_nxt = IE1[0] ? per_din[15:8]    : per_din[7:0];
+wire       ie1_wr  = IE1[0] ? reg_hi_wr[IE1] : reg_lo_wr[IE1];
+wire [7:0] ie1_nxt = IE1[0] ? per_din[15:8]  : per_din[7:0];
 
 reg        nmie;
-always @ (posedge mclk or posedge puc)
-  if (puc)          nmie  <=  1'b0;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)      nmie  <=  1'b0;
   else if (nmi_acc) nmie  <=  1'b0; 
   else if (ie1_wr)  nmie  <=  ie1_nxt[4];    
 
 reg        wdtie;
-always @ (posedge mclk or posedge puc)
-  if (puc)           wdtie <=  1'b0;
-  else if (ie1_wr)   wdtie <=  ie1_nxt[0];    
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)      wdtie <=  1'b0;
+  else if (ie1_wr)  wdtie <=  ie1_nxt[0];    
 
 assign  ie1 = {3'b000, nmie, 3'b000, wdtie};
 
@@ -152,12 +163,12 @@ assign  ie1 = {3'b000, nmie, 3'b000, wdtie};
 // IFG1 Register
 //---------------
 wire [7:0] ifg1;
-wire       ifg1_wr  = IFG1[0] ? reg_hi_wr[IFG1/2] : reg_lo_wr[IFG1/2];
-wire [7:0] ifg1_nxt = IFG1[0] ? per_din[15:8]     : per_din[7:0];
+wire       ifg1_wr  = IFG1[0] ? reg_hi_wr[IFG1] : reg_lo_wr[IFG1];
+wire [7:0] ifg1_nxt = IFG1[0] ? per_din[15:8]   : per_din[7:0];
 
 reg        nmiifg;
-always @ (posedge mclk or posedge puc)
-  if (puc)           nmiifg <=  1'b0;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)       nmiifg <=  1'b0;
   else if (nmi_acc)  nmiifg <=  1'b1;
   else if (ifg1_wr)  nmiifg <=  ifg1_nxt[4];
 
@@ -176,8 +187,8 @@ assign  ifg1 = {3'b000, nmiifg, 3'b000, wdtifg};
 //============================================================================
 
 // Data output mux
-wire [15:0] ie1_rd   = {8'h00, (ie1  & {8{reg_rd[IE1/2]}})}  << (8 & {4{IE1[0]}});
-wire [15:0] ifg1_rd  = {8'h00, (ifg1 & {8{reg_rd[IFG1/2]}})} << (8 & {4{IFG1[0]}});
+wire [15:0] ie1_rd   = {8'h00, (ie1  & {8{reg_rd[IE1]}})}  << (8 & {4{IE1[0]}});
+wire [15:0] ifg1_rd  = {8'h00, (ifg1 & {8{reg_rd[IFG1]}})} << (8 & {4{IFG1[0]}});
 
 wire [15:0] per_dout =  ie1_rd   |
                         ifg1_rd;

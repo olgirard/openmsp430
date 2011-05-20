@@ -1,9 +1,10 @@
 # makfile configuration
 NAME            = sandbox
 OBJECTS         = main.o
-CPU             = msp430x1111
+#CPU             = msp430x1111
 
-CFLAGS          = -mmcu=${CPU} -O2 -Wall -g
+#CFLAGS          = -mmcu=${CPU} -O2 -Wall -g
+CFLAGS          = -O2 -Wall -g
 
 #switch the compiler (for the internal make rules)
 CC              = msp430-gcc
@@ -21,7 +22,7 @@ download: download-uart
 
 #additional rules for files
 ${NAME}.elf: ${OBJECTS}
-	${CC} -mmcu=${CPU} -o $@ ${OBJECTS}
+	${CC} -T linker.def -o $@ ${OBJECTS}
 
 ${NAME}.a43: ${NAME}.elf
 	msp430-objcopy -O ihex $^ $@

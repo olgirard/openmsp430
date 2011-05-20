@@ -35,6 +35,10 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_250,  (__data_start+0x50)
+
 .global main
 
 	
@@ -44,9 +48,9 @@ WAIT_FUNC:
 	ret
 	
 main:
- 	mov  #0x0250, r1 	; # Initialize stack pointer
-	mov  #0x0000, &0x0200
-	mov  #0x0000, r15
+ 	mov #DMEM_250, r1 	; # Initialize stack pointer
+	mov   #0x0000, &DMEM_200
+	mov   #0x0000, r15
 	nop
 	.word 0x4343            ; # Software BREAKPOINT
 ;	nop.b

@@ -37,6 +37,13 @@
 
 .global main
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_202,  (__data_start+0x02)
+.set   DMEM_204,  (__data_start+0x04)
+.set   DMEM_206,  (__data_start+0x06)
+.set   DMEM_250,  (__data_start+0x50)
+
 .set   TACTL,   0x0160
 .set   TAR,     0x0170
 .set   TACCTL0, 0x0162
@@ -54,8 +61,8 @@ WAIT_FUNC:
 	ret
 	
 main:
- 	mov  #0x0250, r1 	; # Initialize stack pointer
-	mov  #0x0000, &0x0200
+ 	mov #DMEM_250, r1 	; # Initialize stack pointer
+	mov   #0x0000, &DMEM_200
 
 	
        /* --------------   TIMER A TEST:  COMPARATOR 0   ----------------- */
@@ -72,27 +79,27 @@ main:
 	mov  #0x0000, &TACCTL0
 	mov  #0x0200, &TACTL
 	mov  #0x0004, &TACCTL0  ; # Set to 1
-	mov  #0x0001, &0x0200
+	mov  #0x0001, &DMEM_200
 	mov  #0x0000, &TACCTL0  ; # Set to 0
-	mov  #0x0002, &0x0200
+	mov  #0x0002, &DMEM_200
 
 	                        ; # --------- Set          (mode 1) ----------
 	mov  #0x0204, &TACTL
 	mov  #0x0015, &TACCR0   ; # Period = (0x15+1)*2
  	mov  #0x0020, &TACCTL0  ; # Compare mode, set mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
-	mov  #0x0003, &0x0200
+	mov  #0x0003, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 	mov  #0x0204, &TACTL
- 	mov  #0x0004, &0x0200
+ 	mov  #0x0004, &DMEM_200
 
 	                        ; # --------- Toggle       (mode 4) ----------
 	mov  #0x0204, &TACTL
 	mov  #0x0015, &TACCR0   ; # Period = (0x15+1)*2
  	mov  #0x0080, &TACCTL0  ; # Compare mode, Toggle mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x0005, &0x0200
+ 	mov  #0x0005, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 
@@ -102,13 +109,13 @@ main:
  	mov  #0x0004, &TACCTL0  ; # Compare mode, Output mode (initialize to 1)
  	mov  #0x00A0, &TACCTL0  ; # Compare mode, Reset mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x0006, &0x0200
+ 	mov  #0x0006, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 
 	
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x1000, r15
 
 	
@@ -127,9 +134,9 @@ main:
 	mov  #0x0000, &TACCTL0
 	mov  #0x0200, &TACTL
 	mov  #0x0004, &TACCTL1  ; # Set to 1
-	mov  #0x0001, &0x0200
+	mov  #0x0001, &DMEM_200
 	mov  #0x0000, &TACCTL1  ; # Set to 0
-	mov  #0x0002, &0x0200
+	mov  #0x0002, &DMEM_200
 
 	                        ; # --------- Set          (mode 1) ----------
  	mov  #0x0000, &TACCTL1
@@ -139,11 +146,11 @@ main:
 	mov  #0x0015, &TACCR1
  	mov  #0x0020, &TACCTL1  ; # Compare mode, set mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
-	mov  #0x0003, &0x0200
+	mov  #0x0003, &DMEM_200
         mov  #0x0030, r14                                                        
         call #WAIT_FUNC                                                          
 	mov  #0x0204, &TACTL
- 	mov  #0x0004, &0x0200
+ 	mov  #0x0004, &DMEM_200
 
 	                        ; # --------- Toggle/Reset (mode 2) ----------
  	mov  #0x0000, &TACCTL1
@@ -153,7 +160,7 @@ main:
 	mov  #0x0015, &TACCR1
  	mov  #0x0040, &TACCTL1  ; # Compare mode, toggle/reset mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x0005, &0x0200
+ 	mov  #0x0005, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 	mov  #0x0204, &TACTL
@@ -163,7 +170,7 @@ main:
  	mov  #0x0004, &TACCTL1  ; # Init to 1
  	mov  #0x0040, &TACCTL1  ; # Compare mode, toggle/reset mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x0006, &0x0200
+ 	mov  #0x0006, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 
@@ -175,7 +182,7 @@ main:
 	mov  #0x0015, &TACCR1
  	mov  #0x0060, &TACCTL1  ; # Compare mode, set/reset mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x0007, &0x0200
+ 	mov  #0x0007, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
  	mov  #0x0000, &TACCTL1
@@ -186,7 +193,7 @@ main:
  	mov  #0x0004, &TACCTL1  ; # Init to 1
  	mov  #0x0060, &TACCTL1  ; # Compare mode, set/reset mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x0008, &0x0200
+ 	mov  #0x0008, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 
@@ -198,7 +205,7 @@ main:
 	mov  #0x0015, &TACCR1   ; # Period = (0x15+1)*2
  	mov  #0x0080, &TACCTL1  ; # Compare mode, Toggle mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x0009, &0x0200
+ 	mov  #0x0009, &DMEM_200
         mov  #0x0030, r14                                                        
         call #WAIT_FUNC                                                          
 
@@ -211,7 +218,7 @@ main:
  	mov  #0x0004, &TACCTL1  ; # Compare mode, Output mode (initialize to 1)
  	mov  #0x00A0, &TACCTL1  ; # Compare mode, Reset mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x000A, &0x0200
+ 	mov  #0x000A, &DMEM_200
         mov  #0x0030, r14                                                        
         call #WAIT_FUNC                                                          
 	
@@ -223,7 +230,7 @@ main:
 	mov  #0x0015, &TACCR1
  	mov  #0x00C0, &TACCTL1  ; # Compare mode, toggle/set mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x000B, &0x0200
+ 	mov  #0x000B, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 	mov  #0x0204, &TACTL
@@ -233,7 +240,7 @@ main:
  	mov  #0x0004, &TACCTL1  ; # Init to 1
  	mov  #0x00C0, &TACCTL1  ; # Compare mode, toggle/set mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x000C, &0x0200
+ 	mov  #0x000C, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 
@@ -245,7 +252,7 @@ main:
 	mov  #0x0015, &TACCR1
  	mov  #0x00E0, &TACCTL1  ; # Compare mode, reset/set mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x000D, &0x0200
+ 	mov  #0x000D, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
  	mov  #0x0000, &TACCTL1
@@ -256,12 +263,12 @@ main:
  	mov  #0x0004, &TACCTL1  ; # Init to 1
  	mov  #0x00E0, &TACCTL1  ; # Compare mode, reset/set mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x000E, &0x0200
+ 	mov  #0x000E, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x2000, r15
 
 	
@@ -280,9 +287,9 @@ main:
 	mov  #0x0000, &TACCTL0
 	mov  #0x0200, &TACTL
 	mov  #0x0004, &TACCTL2  ; # Set to 1
-	mov  #0x0001, &0x0200
+	mov  #0x0001, &DMEM_200
 	mov  #0x0000, &TACCTL2  ; # Set to 0
-	mov  #0x0002, &0x0200
+	mov  #0x0002, &DMEM_200
 
 	                        ; # --------- Set          (mode 1) ----------
  	mov  #0x0000, &TACCTL2
@@ -292,11 +299,11 @@ main:
 	mov  #0x0015, &TACCR2
  	mov  #0x0020, &TACCTL2  ; # Compare mode, set mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
-	mov  #0x0003, &0x0200
+	mov  #0x0003, &DMEM_200
         mov  #0x0030, r14                                                        
         call #WAIT_FUNC                                                          
 	mov  #0x0204, &TACTL
- 	mov  #0x0004, &0x0200
+ 	mov  #0x0004, &DMEM_200
 
 	                        ; # --------- Toggle/Reset (mode 2) ----------
  	mov  #0x0000, &TACCTL2
@@ -306,7 +313,7 @@ main:
 	mov  #0x0015, &TACCR2
  	mov  #0x0040, &TACCTL2  ; # Compare mode, toggle/reset mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x0005, &0x0200
+ 	mov  #0x0005, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 	mov  #0x0204, &TACTL
@@ -316,7 +323,7 @@ main:
  	mov  #0x0004, &TACCTL2  ; # Init to 1
  	mov  #0x0040, &TACCTL2  ; # Compare mode, toggle/reset mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x0006, &0x0200
+ 	mov  #0x0006, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 
@@ -328,7 +335,7 @@ main:
 	mov  #0x0015, &TACCR2
  	mov  #0x0060, &TACCTL2  ; # Compare mode, set/reset mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x0007, &0x0200
+ 	mov  #0x0007, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
  	mov  #0x0000, &TACCTL2
@@ -339,7 +346,7 @@ main:
  	mov  #0x0004, &TACCTL2  ; # Init to 1
  	mov  #0x0060, &TACCTL2  ; # Compare mode, set/reset mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x0008, &0x0200
+ 	mov  #0x0008, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 
@@ -351,7 +358,7 @@ main:
 	mov  #0x0015, &TACCR2   ; # Period = (0x15+1)*2
  	mov  #0x0080, &TACCTL2  ; # Compare mode, Toggle mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x0009, &0x0200
+ 	mov  #0x0009, &DMEM_200
         mov  #0x0030, r14                                                        
         call #WAIT_FUNC                                                          
 
@@ -364,7 +371,7 @@ main:
  	mov  #0x0004, &TACCTL2  ; # Compare mode, Output mode (initialize to 1)
  	mov  #0x00A0, &TACCTL2  ; # Compare mode, Reset mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x000A, &0x0200
+ 	mov  #0x000A, &DMEM_200
         mov  #0x0030, r14                                                        
         call #WAIT_FUNC                                                          
 	
@@ -376,7 +383,7 @@ main:
 	mov  #0x0015, &TACCR2
  	mov  #0x00C0, &TACCTL2  ; # Compare mode, toggle/set mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x000B, &0x0200
+ 	mov  #0x000B, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 	mov  #0x0204, &TACTL
@@ -386,7 +393,7 @@ main:
  	mov  #0x0004, &TACCTL2  ; # Init to 1
  	mov  #0x00C0, &TACCTL2  ; # Compare mode, toggle/set mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x000C, &0x0200
+ 	mov  #0x000C, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 
@@ -398,7 +405,7 @@ main:
 	mov  #0x0015, &TACCR2
  	mov  #0x00E0, &TACCTL2  ; # Compare mode, reset/set mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x000D, &0x0200
+ 	mov  #0x000D, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
  	mov  #0x0000, &TACCTL2
@@ -409,12 +416,12 @@ main:
  	mov  #0x0004, &TACCTL2  ; # Init to 1
  	mov  #0x00E0, &TACCTL2  ; # Compare mode, reset/set mode
  	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
- 	mov  #0x000E, &0x0200
+ 	mov  #0x000E, &DMEM_200
         mov  #0x0020, r14                                                        
         call #WAIT_FUNC                                                          
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x3000, r15
 
 	
@@ -427,13 +434,13 @@ end_of_test:
         /* ----------------------      INTERRUPT ROUTINES    --------------- */
 
 TIMERA_CCR0_VECTOR:
-	mov     &TAR, &0x0202
+	mov     &TAR, &DMEM_202
 	reti
 
 	
 TIMERA_TAIV_VECTOR:
-	mov     &TAR, &0x0204
-	mov    &TAIV, &0x0206
+	mov     &TAR, &DMEM_204
+	mov    &TAIV, &DMEM_206
 	reti
 
 

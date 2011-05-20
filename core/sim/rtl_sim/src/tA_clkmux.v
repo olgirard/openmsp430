@@ -43,8 +43,8 @@ wire [15:0] tar = timerA_0.tar;
 
 // Generate TACLK as MCLK/3
 integer taclk_cnt;
-always @ (posedge mclk or posedge puc)
-  if (puc)               taclk_cnt <=  0;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)           taclk_cnt <=  0;
   else if (taclk_cnt==2) taclk_cnt <=  0;
   else                   taclk_cnt <=  taclk_cnt+1;
 
@@ -54,8 +54,8 @@ always @ (taclk_cnt)
 
 // Generate INCLK as MCLK/5
 integer inclk_cnt;
-always @ (posedge mclk or posedge puc)
-  if (puc)               inclk_cnt <=  0;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)           inclk_cnt <=  0;
   else if (inclk_cnt==4) inclk_cnt <=  0;
   else                   inclk_cnt <=  inclk_cnt+1;
 

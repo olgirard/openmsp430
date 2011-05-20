@@ -44,6 +44,7 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
+`ifdef MULTIPLIER
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
@@ -251,6 +252,49 @@ initial
       $display("Signed Multiply Accumulate test completed (MACS mode)");
 
 
+      // RD/WR ACCESS OPERANDS
+      //--------------------------------------------------------
+
+      @(r15===16'h0001);
+      if (r10 !== 16'h1234) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MPY  (1) =====");
+      if (r11 !== 16'h1234) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MPYS (1) =====");
+      if (r12 !== 16'h1234) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MAC  (1) =====");
+      if (r13 !== 16'h1234) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MACS (1) =====");
+      if (r14 !== 16'h5678) tb_error("====== RD/WR ACCESS OPERANDS: OP2      (1) =====");
+
+      @(r15===16'h0002);
+      if (r10 !== 16'h4321) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MPY  (2) =====");
+      if (r11 !== 16'h4321) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MPYS (2) =====");
+      if (r12 !== 16'h4321) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MAC  (2) =====");
+      if (r13 !== 16'h4321) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MACS (2) =====");
+      if (r14 !== 16'h8765) tb_error("====== RD/WR ACCESS OPERANDS: OP2      (2) =====");
+
+      @(r15===16'h0003);
+      if (r10 !== 16'h9ABC) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MPY  (3) =====");
+      if (r11 !== 16'h9ABC) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MPYS (3) =====");
+      if (r12 !== 16'h9ABC) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MAC  (3) =====");
+      if (r13 !== 16'h9ABC) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MACS (3) =====");
+      if (r14 !== 16'hDEF0) tb_error("====== RD/WR ACCESS OPERANDS: OP2      (3) =====");
+
+      @(r15===16'h0004);
+      if (r10 !== 16'hCBA9) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MPY  (4) =====");
+      if (r11 !== 16'hCBA9) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MPYS (4) =====");
+      if (r12 !== 16'hCBA9) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MAC  (4) =====");
+      if (r13 !== 16'hCBA9) tb_error("====== RD/WR ACCESS OPERANDS: OP1_MACS (4) =====");
+      if (r14 !== 16'h0FED) tb_error("====== RD/WR ACCESS OPERANDS: OP2      (4) =====");
+
+
+      $display("RD/WR Access operands test completed");
+     
+
       stimulus_done = 1;
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|      (hardware multiplier not included)       |");
+       $display(" ===============================================");
+       $finish;
+`endif
    end
 

@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 106 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 
 module  omsp_gpio (
@@ -73,7 +73,7 @@ module  omsp_gpio (
     per_din,                        // Peripheral data input
     per_en,                         // Peripheral enable (high active)
     per_we,                         // Peripheral write enable (high active)
-    puc                             // Main system reset
+    puc_rst                         // Main system reset
 );
 
 // PARAMETERs
@@ -119,11 +119,11 @@ input         [7:0] p3_din;         // Port 3 data input
 input         [7:0] p4_din;         // Port 4 data input
 input         [7:0] p5_din;         // Port 5 data input
 input         [7:0] p6_din;         // Port 6 data input
-input         [7:0] per_addr;       // Peripheral address
+input        [13:0] per_addr;       // Peripheral address
 input        [15:0] per_din;        // Peripheral data input
 input               per_en;         // Peripheral enable (high active)
 input         [1:0] per_we;         // Peripheral write enable (high active)
-input               puc;            // Main system reset
+input               puc_rst;        // Main system reset
 
 
 //=============================================================================
@@ -131,130 +131,139 @@ input               puc;            // Main system reset
 //=============================================================================
 
 // Masks
-parameter           P1_EN_MSK   = {8{P1_EN[0]}};
-parameter           P2_EN_MSK   = {8{P2_EN[0]}};
-parameter           P3_EN_MSK   = {8{P3_EN[0]}};
-parameter           P4_EN_MSK   = {8{P4_EN[0]}};
-parameter           P5_EN_MSK   = {8{P5_EN[0]}};
-parameter           P6_EN_MSK   = {8{P6_EN[0]}};
+parameter              P1_EN_MSK   = {8{P1_EN[0]}};
+parameter              P2_EN_MSK   = {8{P2_EN[0]}};
+parameter              P3_EN_MSK   = {8{P3_EN[0]}};
+parameter              P4_EN_MSK   = {8{P4_EN[0]}};
+parameter              P5_EN_MSK   = {8{P5_EN[0]}};
+parameter              P6_EN_MSK   = {8{P6_EN[0]}};
 
-// Register addresses
-parameter           P1IN        = 9'h020;                  // Port 1
-parameter           P1OUT       = 9'h021;
-parameter           P1DIR       = 9'h022;
-parameter           P1IFG       = 9'h023;
-parameter           P1IES       = 9'h024;
-parameter           P1IE        = 9'h025;
-parameter           P1SEL       = 9'h026;
-parameter           P2IN        = 9'h028;                  // Port 2
-parameter           P2OUT       = 9'h029;
-parameter           P2DIR       = 9'h02A;
-parameter           P2IFG       = 9'h02B;
-parameter           P2IES       = 9'h02C;
-parameter           P2IE        = 9'h02D;
-parameter           P2SEL       = 9'h02E;
-parameter           P3IN        = 9'h018;                  // Port 3
-parameter           P3OUT       = 9'h019;
-parameter           P3DIR       = 9'h01A;
-parameter           P3SEL       = 9'h01B;
-parameter           P4IN        = 9'h01C;                  // Port 4
-parameter           P4OUT       = 9'h01D;
-parameter           P4DIR       = 9'h01E;
-parameter           P4SEL       = 9'h01F;
-parameter           P5IN        = 9'h030;                  // Port 5
-parameter           P5OUT       = 9'h031;
-parameter           P5DIR       = 9'h032;
-parameter           P5SEL       = 9'h033;
-parameter           P6IN        = 9'h034;                  // Port 6
-parameter           P6OUT       = 9'h035;
-parameter           P6DIR       = 9'h036;
-parameter           P6SEL       = 9'h037;
+// Register base address (must be aligned to decoder bit width)
+parameter       [14:0] BASE_ADDR   = 15'h0000;
 
-   
+// Decoder bit width (defines how many bits are considered for address decoding)
+parameter              DEC_WD      =  6;
+
+// Register addresses offset
+parameter [DEC_WD-1:0] P1IN        = 'h20,                    // Port 1
+                       P1OUT       = 'h21,
+                       P1DIR       = 'h22,
+                       P1IFG       = 'h23,
+                       P1IES       = 'h24,
+                       P1IE        = 'h25,
+                       P1SEL       = 'h26,
+                       P2IN        = 'h28,                    // Port 2
+                       P2OUT       = 'h29,
+                       P2DIR       = 'h2A,
+                       P2IFG       = 'h2B,
+                       P2IES       = 'h2C,
+                       P2IE        = 'h2D,
+                       P2SEL       = 'h2E,
+                       P3IN        = 'h18,                    // Port 3
+                       P3OUT       = 'h19,
+                       P3DIR       = 'h1A,
+                       P3SEL       = 'h1B,
+                       P4IN        = 'h1C,                    // Port 4
+                       P4OUT       = 'h1D,
+                       P4DIR       = 'h1E,
+                       P4SEL       = 'h1F,
+                       P5IN        = 'h30,                    // Port 5
+                       P5OUT       = 'h31,
+                       P5DIR       = 'h32,
+                       P5SEL       = 'h33,
+                       P6IN        = 'h34,                    // Port 6
+                       P6OUT       = 'h35,
+                       P6DIR       = 'h36,
+                       P6SEL       = 'h37;
+
+// Register one-hot decoder utilities
+parameter              DEC_SZ      =  2**DEC_WD;
+parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
+
 // Register one-hot decoder
-parameter           P1IN_D      = (256'h1 << (P1IN  /2));  // Port 1
-parameter           P1OUT_D     = (256'h1 << (P1OUT /2)); 
-parameter           P1DIR_D     = (256'h1 << (P1DIR /2)); 
-parameter           P1IFG_D     = (256'h1 << (P1IFG /2)); 
-parameter           P1IES_D     = (256'h1 << (P1IES /2)); 
-parameter           P1IE_D      = (256'h1 << (P1IE  /2)); 
-parameter           P1SEL_D     = (256'h1 << (P1SEL /2)); 
-parameter           P2IN_D      = (256'h1 << (P2IN  /2));  // Port 2
-parameter           P2OUT_D     = (256'h1 << (P2OUT /2)); 
-parameter           P2DIR_D     = (256'h1 << (P2DIR /2)); 
-parameter           P2IFG_D     = (256'h1 << (P2IFG /2)); 
-parameter           P2IES_D     = (256'h1 << (P2IES /2)); 
-parameter           P2IE_D      = (256'h1 << (P2IE  /2)); 
-parameter           P2SEL_D     = (256'h1 << (P2SEL /2)); 
-parameter           P3IN_D      = (256'h1 << (P3IN  /2));  // Port 3
-parameter           P3OUT_D     = (256'h1 << (P3OUT /2)); 
-parameter           P3DIR_D     = (256'h1 << (P3DIR /2)); 
-parameter           P3SEL_D     = (256'h1 << (P3SEL /2)); 
-parameter           P4IN_D      = (256'h1 << (P4IN  /2));  // Port 4
-parameter           P4OUT_D     = (256'h1 << (P4OUT /2)); 
-parameter           P4DIR_D     = (256'h1 << (P4DIR /2)); 
-parameter           P4SEL_D     = (256'h1 << (P4SEL /2)); 
-parameter           P5IN_D      = (256'h1 << (P5IN  /2));  // Port 5
-parameter           P5OUT_D     = (256'h1 << (P5OUT /2)); 
-parameter           P5DIR_D     = (256'h1 << (P5DIR /2)); 
-parameter           P5SEL_D     = (256'h1 << (P5SEL /2)); 
-parameter           P6IN_D      = (256'h1 << (P6IN  /2));  // Port 6
-parameter           P6OUT_D     = (256'h1 << (P6OUT /2)); 
-parameter           P6DIR_D     = (256'h1 << (P6DIR /2)); 
-parameter           P6SEL_D     = (256'h1 << (P6SEL /2)); 
+parameter [DEC_SZ-1:0] P1IN_D      =  (BASE_REG << P1IN),     // Port 1
+                       P1OUT_D     =  (BASE_REG << P1OUT),
+                       P1DIR_D     =  (BASE_REG << P1DIR),
+                       P1IFG_D     =  (BASE_REG << P1IFG),
+                       P1IES_D     =  (BASE_REG << P1IES),
+                       P1IE_D      =  (BASE_REG << P1IE),
+                       P1SEL_D     =  (BASE_REG << P1SEL),
+                       P2IN_D      =  (BASE_REG << P2IN),     // Port 2
+                       P2OUT_D     =  (BASE_REG << P2OUT),
+                       P2DIR_D     =  (BASE_REG << P2DIR),
+                       P2IFG_D     =  (BASE_REG << P2IFG),
+                       P2IES_D     =  (BASE_REG << P2IES),
+                       P2IE_D      =  (BASE_REG << P2IE),
+                       P2SEL_D     =  (BASE_REG << P2SEL),
+                       P3IN_D      =  (BASE_REG << P3IN),     // Port 3
+                       P3OUT_D     =  (BASE_REG << P3OUT),
+                       P3DIR_D     =  (BASE_REG << P3DIR),
+                       P3SEL_D     =  (BASE_REG << P3SEL),
+                       P4IN_D      =  (BASE_REG << P4IN),     // Port 4
+                       P4OUT_D     =  (BASE_REG << P4OUT),
+                       P4DIR_D     =  (BASE_REG << P4DIR),
+                       P4SEL_D     =  (BASE_REG << P4SEL),
+                       P5IN_D      =  (BASE_REG << P5IN),     // Port 5
+                       P5OUT_D     =  (BASE_REG << P5OUT),
+                       P5DIR_D     =  (BASE_REG << P5DIR),
+                       P5SEL_D     =  (BASE_REG << P5SEL),
+                       P6IN_D      =  (BASE_REG << P6IN),     // Port 6
+                       P6OUT_D     =  (BASE_REG << P6OUT),
+                       P6DIR_D     =  (BASE_REG << P6DIR),
+                       P6SEL_D     =  (BASE_REG << P6SEL); 
 
 
 //============================================================================
 // 2)  REGISTER DECODER
 //============================================================================
 
+// Local register selection
+wire              reg_sel      =  per_en & (per_addr[13:DEC_WD-1]==BASE_ADDR[14:DEC_WD]);
+
+// Register local address
+wire [DEC_WD-1:0] reg_addr     =  {1'b0, per_addr[DEC_WD-2:0]};
+
 // Register address decode
-reg  [255:0]  reg_dec; 
-always @(per_addr)
-  case (per_addr)
-    (P1IN  /2):   reg_dec  =  P1IN_D   & {256{P1_EN[0]}};
-    (P1OUT /2):   reg_dec  =  P1OUT_D  & {256{P1_EN[0]}};
-    (P1DIR /2):   reg_dec  =  P1DIR_D  & {256{P1_EN[0]}};
-    (P1IFG /2):   reg_dec  =  P1IFG_D  & {256{P1_EN[0]}};
-    (P1IES /2):   reg_dec  =  P1IES_D  & {256{P1_EN[0]}};
-    (P1IE  /2):   reg_dec  =  P1IE_D   & {256{P1_EN[0]}};
-    (P1SEL /2):   reg_dec  =  P1SEL_D  & {256{P1_EN[0]}};
-    (P2IN  /2):   reg_dec  =  P2IN_D   & {256{P2_EN[0]}};
-    (P2OUT /2):   reg_dec  =  P2OUT_D  & {256{P2_EN[0]}};
-    (P2DIR /2):   reg_dec  =  P2DIR_D  & {256{P2_EN[0]}};
-    (P2IFG /2):   reg_dec  =  P2IFG_D  & {256{P2_EN[0]}};
-    (P2IES /2):   reg_dec  =  P2IES_D  & {256{P2_EN[0]}};
-    (P2IE  /2):   reg_dec  =  P2IE_D   & {256{P2_EN[0]}};
-    (P2SEL /2):   reg_dec  =  P2SEL_D  & {256{P2_EN[0]}};
-    (P3IN  /2):   reg_dec  =  P3IN_D   & {256{P3_EN[0]}};
-    (P3OUT /2):   reg_dec  =  P3OUT_D  & {256{P3_EN[0]}};
-    (P3DIR /2):   reg_dec  =  P3DIR_D  & {256{P3_EN[0]}};
-    (P3SEL /2):   reg_dec  =  P3SEL_D  & {256{P3_EN[0]}};
-    (P4IN  /2):   reg_dec  =  P4IN_D   & {256{P4_EN[0]}};
-    (P4OUT /2):   reg_dec  =  P4OUT_D  & {256{P4_EN[0]}};
-    (P4DIR /2):   reg_dec  =  P4DIR_D  & {256{P4_EN[0]}};
-    (P4SEL /2):   reg_dec  =  P4SEL_D  & {256{P4_EN[0]}};
-    (P5IN  /2):   reg_dec  =  P5IN_D   & {256{P5_EN[0]}};
-    (P5OUT /2):   reg_dec  =  P5OUT_D  & {256{P5_EN[0]}};
-    (P5DIR /2):   reg_dec  =  P5DIR_D  & {256{P5_EN[0]}};
-    (P5SEL /2):   reg_dec  =  P5SEL_D  & {256{P5_EN[0]}};
-    (P6IN  /2):   reg_dec  =  P6IN_D   & {256{P6_EN[0]}};
-    (P6OUT /2):   reg_dec  =  P6OUT_D  & {256{P6_EN[0]}};
-    (P6DIR /2):   reg_dec  =  P6DIR_D  & {256{P6_EN[0]}};
-    (P6SEL /2):   reg_dec  =  P6SEL_D  & {256{P6_EN[0]}};
-    default   :   reg_dec  =  {256{1'b0}};
-  endcase
+wire [DEC_SZ-1:0] reg_dec      =  (P1IN_D   &  {DEC_SZ{(reg_addr==(P1IN  >>1))  &  P1_EN[0]}})  |
+                                  (P1OUT_D  &  {DEC_SZ{(reg_addr==(P1OUT >>1))  &  P1_EN[0]}})  |
+                                  (P1DIR_D  &  {DEC_SZ{(reg_addr==(P1DIR >>1))  &  P1_EN[0]}})  |
+                                  (P1IFG_D  &  {DEC_SZ{(reg_addr==(P1IFG >>1))  &  P1_EN[0]}})  |
+                                  (P1IES_D  &  {DEC_SZ{(reg_addr==(P1IES >>1))  &  P1_EN[0]}})  |
+                                  (P1IE_D   &  {DEC_SZ{(reg_addr==(P1IE  >>1))  &  P1_EN[0]}})  |
+                                  (P1SEL_D  &  {DEC_SZ{(reg_addr==(P1SEL >>1))  &  P1_EN[0]}})  |
+                                  (P2IN_D   &  {DEC_SZ{(reg_addr==(P2IN  >>1))  &  P2_EN[0]}})  |
+                                  (P2OUT_D  &  {DEC_SZ{(reg_addr==(P2OUT >>1))  &  P2_EN[0]}})  |
+                                  (P2DIR_D  &  {DEC_SZ{(reg_addr==(P2DIR >>1))  &  P2_EN[0]}})  |
+                                  (P2IFG_D  &  {DEC_SZ{(reg_addr==(P2IFG >>1))  &  P2_EN[0]}})  |
+                                  (P2IES_D  &  {DEC_SZ{(reg_addr==(P2IES >>1))  &  P2_EN[0]}})  |
+                                  (P2IE_D   &  {DEC_SZ{(reg_addr==(P2IE  >>1))  &  P2_EN[0]}})  |
+                                  (P2SEL_D  &  {DEC_SZ{(reg_addr==(P2SEL >>1))  &  P2_EN[0]}})  |
+                                  (P3IN_D   &  {DEC_SZ{(reg_addr==(P3IN  >>1))  &  P3_EN[0]}})  |
+                                  (P3OUT_D  &  {DEC_SZ{(reg_addr==(P3OUT >>1))  &  P3_EN[0]}})  |
+                                  (P3DIR_D  &  {DEC_SZ{(reg_addr==(P3DIR >>1))  &  P3_EN[0]}})  |
+                                  (P3SEL_D  &  {DEC_SZ{(reg_addr==(P3SEL >>1))  &  P3_EN[0]}})  |
+                                  (P4IN_D   &  {DEC_SZ{(reg_addr==(P4IN  >>1))  &  P4_EN[0]}})  |
+                                  (P4OUT_D  &  {DEC_SZ{(reg_addr==(P4OUT >>1))  &  P4_EN[0]}})  |
+                                  (P4DIR_D  &  {DEC_SZ{(reg_addr==(P4DIR >>1))  &  P4_EN[0]}})  |
+                                  (P4SEL_D  &  {DEC_SZ{(reg_addr==(P4SEL >>1))  &  P4_EN[0]}})  |
+                                  (P5IN_D   &  {DEC_SZ{(reg_addr==(P5IN  >>1))  &  P5_EN[0]}})  |
+                                  (P5OUT_D  &  {DEC_SZ{(reg_addr==(P5OUT >>1))  &  P5_EN[0]}})  |
+                                  (P5DIR_D  &  {DEC_SZ{(reg_addr==(P5DIR >>1))  &  P5_EN[0]}})  |
+                                  (P5SEL_D  &  {DEC_SZ{(reg_addr==(P5SEL >>1))  &  P5_EN[0]}})  |
+                                  (P6IN_D   &  {DEC_SZ{(reg_addr==(P6IN  >>1))  &  P6_EN[0]}})  |
+                                  (P6OUT_D  &  {DEC_SZ{(reg_addr==(P6OUT >>1))  &  P6_EN[0]}})  |
+                                  (P6DIR_D  &  {DEC_SZ{(reg_addr==(P6DIR >>1))  &  P6_EN[0]}})  |
+                                  (P6SEL_D  &  {DEC_SZ{(reg_addr==(P6SEL >>1))  &  P6_EN[0]}});
 
 // Read/Write probes
-wire         reg_lo_write =  per_we[0] & per_en;
-wire         reg_hi_write =  per_we[1] & per_en;
-wire         reg_read     = ~|per_we   & per_en;
+wire              reg_lo_write =  per_we[0] & reg_sel;
+wire              reg_hi_write =  per_we[1] & reg_sel;
+wire              reg_read     = ~|per_we   & reg_sel;
 
 // Read/Write vectors
-wire [255:0] reg_hi_wr    = reg_dec & {256{reg_hi_write}};
-wire [255:0] reg_lo_wr    = reg_dec & {256{reg_lo_write}};
-wire [255:0] reg_rd       = reg_dec & {256{reg_read}};
-
+wire [DEC_SZ-1:0] reg_hi_wr    = reg_dec & {DEC_SZ{reg_hi_write}};
+wire [DEC_SZ-1:0] reg_lo_wr    = reg_dec & {DEC_SZ{reg_lo_write}};
+wire [DEC_SZ-1:0] reg_rd       = reg_dec & {DEC_SZ{reg_read}}; 
 
 //============================================================================
 // 3) REGISTERS
@@ -262,31 +271,27 @@ wire [255:0] reg_rd       = reg_dec & {256{reg_read}};
 
 // P1IN Register
 //---------------
-reg  [7:0] p1in_s;
-reg  [7:0] p1in;
+wire [7:0] p1in;
 
-always @ (posedge mclk or posedge puc)
-  if (puc)
-    begin
-       p1in_s <=  8'h00;
-       p1in   <=  8'h00;
-    end
-  else
-    begin
-       p1in_s <=  p1_din & P1_EN_MSK;
-       p1in   <=  p1in_s & P1_EN_MSK;
-    end
+omsp_sync_cell sync_cell_p1in_0 (.data_out(p1in[0]), .clk(mclk), .data_in(p1_din[0] & P1_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p1in_1 (.data_out(p1in[1]), .clk(mclk), .data_in(p1_din[1] & P1_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p1in_2 (.data_out(p1in[2]), .clk(mclk), .data_in(p1_din[2] & P1_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p1in_3 (.data_out(p1in[3]), .clk(mclk), .data_in(p1_din[3] & P1_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p1in_4 (.data_out(p1in[4]), .clk(mclk), .data_in(p1_din[4] & P1_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p1in_5 (.data_out(p1in[5]), .clk(mclk), .data_in(p1_din[5] & P1_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p1in_6 (.data_out(p1in[6]), .clk(mclk), .data_in(p1_din[6] & P1_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p1in_7 (.data_out(p1in[7]), .clk(mclk), .data_in(p1_din[7] & P1_EN[0]), .rst(puc_rst));
 
 
 // P1OUT Register
 //----------------
 reg  [7:0] p1out;
 
-wire       p1out_wr  = P1OUT[0] ? reg_hi_wr[P1OUT/2] : reg_lo_wr[P1OUT/2];
-wire [7:0] p1out_nxt = P1OUT[0] ? per_din[15:8]      : per_din[7:0];
+wire       p1out_wr  = P1OUT[0] ? reg_hi_wr[P1OUT] : reg_lo_wr[P1OUT];
+wire [7:0] p1out_nxt = P1OUT[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p1out <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p1out <=  8'h00;
   else if (p1out_wr)  p1out <=  p1out_nxt & P1_EN_MSK;
 
 assign p1_dout = p1out;
@@ -296,11 +301,11 @@ assign p1_dout = p1out;
 //----------------
 reg  [7:0] p1dir;
 
-wire       p1dir_wr  = P1DIR[0] ? reg_hi_wr[P1DIR/2] : reg_lo_wr[P1DIR/2];
-wire [7:0] p1dir_nxt = P1DIR[0] ? per_din[15:8]      : per_din[7:0];
+wire       p1dir_wr  = P1DIR[0] ? reg_hi_wr[P1DIR] : reg_lo_wr[P1DIR];
+wire [7:0] p1dir_nxt = P1DIR[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p1dir <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p1dir <=  8'h00;
   else if (p1dir_wr)  p1dir <=  p1dir_nxt & P1_EN_MSK;
 
 assign p1_dout_en = p1dir;
@@ -310,12 +315,12 @@ assign p1_dout_en = p1dir;
 //----------------
 reg  [7:0] p1ifg;
 
-wire       p1ifg_wr  = P1IFG[0] ? reg_hi_wr[P1IFG/2] : reg_lo_wr[P1IFG/2];
-wire [7:0] p1ifg_nxt = P1IFG[0] ? per_din[15:8]      : per_din[7:0];
+wire       p1ifg_wr  = P1IFG[0] ? reg_hi_wr[P1IFG] : reg_lo_wr[P1IFG];
+wire [7:0] p1ifg_nxt = P1IFG[0] ? per_din[15:8]    : per_din[7:0];
 wire [7:0] p1ifg_set;
        
-always @ (posedge mclk or posedge puc)
-  if (puc)            p1ifg <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p1ifg <=  8'h00;
   else if (p1ifg_wr)  p1ifg <=  (p1ifg_nxt | p1ifg_set) & P1_EN_MSK;
   else                p1ifg <=  (p1ifg     | p1ifg_set) & P1_EN_MSK;
 
@@ -323,11 +328,11 @@ always @ (posedge mclk or posedge puc)
 //----------------
 reg  [7:0] p1ies;
 
-wire       p1ies_wr  = P1IES[0] ? reg_hi_wr[P1IES/2] : reg_lo_wr[P1IES/2];
-wire [7:0] p1ies_nxt = P1IES[0] ? per_din[15:8]      : per_din[7:0];
+wire       p1ies_wr  = P1IES[0] ? reg_hi_wr[P1IES] : reg_lo_wr[P1IES];
+wire [7:0] p1ies_nxt = P1IES[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p1ies <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p1ies <=  8'h00;
   else if (p1ies_wr)  p1ies <=  p1ies_nxt & P1_EN_MSK;
 
    
@@ -335,11 +340,11 @@ always @ (posedge mclk or posedge puc)
 //----------------
 reg  [7:0] p1ie;
 
-wire       p1ie_wr  = P1IE[0] ? reg_hi_wr[P1IE/2] : reg_lo_wr[P1IE/2];
-wire [7:0] p1ie_nxt = P1IE[0] ? per_din[15:8]     : per_din[7:0];
+wire       p1ie_wr  = P1IE[0] ? reg_hi_wr[P1IE] : reg_lo_wr[P1IE];
+wire [7:0] p1ie_nxt = P1IE[0] ? per_din[15:8]   : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)           p1ie <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)       p1ie <=  8'h00;
   else if (p1ie_wr)  p1ie <=  p1ie_nxt & P1_EN_MSK;
 
 
@@ -347,11 +352,11 @@ always @ (posedge mclk or posedge puc)
 //----------------
 reg  [7:0] p1sel;
 
-wire       p1sel_wr  = P1SEL[0] ? reg_hi_wr[P1SEL/2] : reg_lo_wr[P1SEL/2];
-wire [7:0] p1sel_nxt = P1SEL[0] ? per_din[15:8]      : per_din[7:0];
+wire       p1sel_wr  = P1SEL[0] ? reg_hi_wr[P1SEL] : reg_lo_wr[P1SEL];
+wire [7:0] p1sel_nxt = P1SEL[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)           p1sel <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)       p1sel <=  8'h00;
   else if (p1sel_wr) p1sel <=  p1sel_nxt & P1_EN_MSK;
 
 assign p1_sel = p1sel;
@@ -359,31 +364,27 @@ assign p1_sel = p1sel;
    
 // P2IN Register
 //---------------
-reg  [7:0] p2in_s;
-reg  [7:0] p2in;
+wire [7:0] p2in;
 
-always @ (posedge mclk or posedge puc)
-  if (puc)
-    begin
-       p2in_s <=  8'h00;
-       p2in   <=  8'h00;
-    end
-  else
-    begin
-       p2in_s <=  p2_din & P2_EN_MSK;
-       p2in   <=  p2in_s & P2_EN_MSK;
-    end
+omsp_sync_cell sync_cell_p2in_0 (.data_out(p2in[0]), .clk(mclk), .data_in(p2_din[0] & P2_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p2in_1 (.data_out(p2in[1]), .clk(mclk), .data_in(p2_din[1] & P2_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p2in_2 (.data_out(p2in[2]), .clk(mclk), .data_in(p2_din[2] & P2_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p2in_3 (.data_out(p2in[3]), .clk(mclk), .data_in(p2_din[3] & P2_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p2in_4 (.data_out(p2in[4]), .clk(mclk), .data_in(p2_din[4] & P2_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p2in_5 (.data_out(p2in[5]), .clk(mclk), .data_in(p2_din[5] & P2_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p2in_6 (.data_out(p2in[6]), .clk(mclk), .data_in(p2_din[6] & P2_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p2in_7 (.data_out(p2in[7]), .clk(mclk), .data_in(p2_din[7] & P2_EN[0]), .rst(puc_rst));
 
 
 // P2OUT Register
 //----------------
 reg  [7:0] p2out;
 
-wire       p2out_wr  = P2OUT[0] ? reg_hi_wr[P2OUT/2] : reg_lo_wr[P2OUT/2];
-wire [7:0] p2out_nxt = P2OUT[0] ? per_din[15:8]      : per_din[7:0];
+wire       p2out_wr  = P2OUT[0] ? reg_hi_wr[P2OUT] : reg_lo_wr[P2OUT];
+wire [7:0] p2out_nxt = P2OUT[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p2out <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p2out <=  8'h00;
   else if (p2out_wr)  p2out <=  p2out_nxt & P2_EN_MSK;
 
 assign p2_dout = p2out;
@@ -393,11 +394,11 @@ assign p2_dout = p2out;
 //----------------
 reg  [7:0] p2dir;
 
-wire       p2dir_wr  = P2DIR[0] ? reg_hi_wr[P2DIR/2] : reg_lo_wr[P2DIR/2];
-wire [7:0] p2dir_nxt = P2DIR[0] ? per_din[15:8]      : per_din[7:0];
+wire       p2dir_wr  = P2DIR[0] ? reg_hi_wr[P2DIR] : reg_lo_wr[P2DIR];
+wire [7:0] p2dir_nxt = P2DIR[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p2dir <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p2dir <=  8'h00;
   else if (p2dir_wr)  p2dir <=  p2dir_nxt & P2_EN_MSK;
 
 assign p2_dout_en = p2dir;
@@ -407,12 +408,12 @@ assign p2_dout_en = p2dir;
 //----------------
 reg  [7:0] p2ifg;
 
-wire       p2ifg_wr  = P2IFG[0] ? reg_hi_wr[P2IFG/2] : reg_lo_wr[P2IFG/2];
-wire [7:0] p2ifg_nxt = P2IFG[0] ? per_din[15:8]      : per_din[7:0];
+wire       p2ifg_wr  = P2IFG[0] ? reg_hi_wr[P2IFG] : reg_lo_wr[P2IFG];
+wire [7:0] p2ifg_nxt = P2IFG[0] ? per_din[15:8]    : per_din[7:0];
 wire [7:0] p2ifg_set;
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p2ifg <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p2ifg <=  8'h00;
   else if (p2ifg_wr)  p2ifg <=  (p2ifg_nxt | p2ifg_set) & P2_EN_MSK;
   else                p2ifg <=  (p2ifg     | p2ifg_set) & P2_EN_MSK;
 
@@ -421,11 +422,11 @@ always @ (posedge mclk or posedge puc)
 //----------------
 reg  [7:0] p2ies;
 
-wire       p2ies_wr  = P2IES[0] ? reg_hi_wr[P2IES/2] : reg_lo_wr[P2IES/2];
-wire [7:0] p2ies_nxt = P2IES[0] ? per_din[15:8]      : per_din[7:0];
+wire       p2ies_wr  = P2IES[0] ? reg_hi_wr[P2IES] : reg_lo_wr[P2IES];
+wire [7:0] p2ies_nxt = P2IES[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p2ies <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p2ies <=  8'h00;
   else if (p2ies_wr)  p2ies <=  p2ies_nxt & P2_EN_MSK;
 
    
@@ -433,11 +434,11 @@ always @ (posedge mclk or posedge puc)
 //----------------
 reg  [7:0] p2ie;
 
-wire       p2ie_wr  = P2IE[0] ? reg_hi_wr[P2IE/2] : reg_lo_wr[P2IE/2];
-wire [7:0] p2ie_nxt = P2IE[0] ? per_din[15:8]     : per_din[7:0];
+wire       p2ie_wr  = P2IE[0] ? reg_hi_wr[P2IE] : reg_lo_wr[P2IE];
+wire [7:0] p2ie_nxt = P2IE[0] ? per_din[15:8]   : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)           p2ie <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)       p2ie <=  8'h00;
   else if (p2ie_wr)  p2ie <=  p2ie_nxt & P2_EN_MSK;
 
    
@@ -445,11 +446,11 @@ always @ (posedge mclk or posedge puc)
 //----------------
 reg  [7:0] p2sel;
 
-wire       p2sel_wr  = P2SEL[0] ? reg_hi_wr[P2SEL/2] : reg_lo_wr[P2SEL/2];
-wire [7:0] p2sel_nxt = P2SEL[0] ? per_din[15:8]      : per_din[7:0];
+wire       p2sel_wr  = P2SEL[0] ? reg_hi_wr[P2SEL] : reg_lo_wr[P2SEL];
+wire [7:0] p2sel_nxt = P2SEL[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)           p2sel <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)       p2sel <=  8'h00;
   else if (p2sel_wr) p2sel <=  p2sel_nxt & P2_EN_MSK;
 
 assign p2_sel = p2sel;
@@ -457,31 +458,27 @@ assign p2_sel = p2sel;
    
 // P3IN Register
 //---------------
-reg  [7:0] p3in_s;
-reg  [7:0] p3in;
+wire  [7:0] p3in;
 
-always @ (posedge mclk or posedge puc)
-  if (puc)
-    begin
-       p3in_s <=  8'h00;
-       p3in   <=  8'h00;
-    end
-  else
-    begin
-       p3in_s <=  p3_din & P3_EN_MSK;
-       p3in   <=  p3in_s & P3_EN_MSK;
-    end
+omsp_sync_cell sync_cell_p3in_0 (.data_out(p3in[0]), .clk(mclk), .data_in(p3_din[0] & P3_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p3in_1 (.data_out(p3in[1]), .clk(mclk), .data_in(p3_din[1] & P3_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p3in_2 (.data_out(p3in[2]), .clk(mclk), .data_in(p3_din[2] & P3_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p3in_3 (.data_out(p3in[3]), .clk(mclk), .data_in(p3_din[3] & P3_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p3in_4 (.data_out(p3in[4]), .clk(mclk), .data_in(p3_din[4] & P3_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p3in_5 (.data_out(p3in[5]), .clk(mclk), .data_in(p3_din[5] & P3_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p3in_6 (.data_out(p3in[6]), .clk(mclk), .data_in(p3_din[6] & P3_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p3in_7 (.data_out(p3in[7]), .clk(mclk), .data_in(p3_din[7] & P3_EN[0]), .rst(puc_rst));
 
 
 // P3OUT Register
 //----------------
 reg  [7:0] p3out;
 
-wire       p3out_wr  = P3OUT[0] ? reg_hi_wr[P3OUT/2] : reg_lo_wr[P3OUT/2];
-wire [7:0] p3out_nxt = P3OUT[0] ? per_din[15:8]      : per_din[7:0];
+wire       p3out_wr  = P3OUT[0] ? reg_hi_wr[P3OUT] : reg_lo_wr[P3OUT];
+wire [7:0] p3out_nxt = P3OUT[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p3out <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p3out <=  8'h00;
   else if (p3out_wr)  p3out <=  p3out_nxt & P3_EN_MSK;
 
 assign p3_dout = p3out;
@@ -491,11 +488,11 @@ assign p3_dout = p3out;
 //----------------
 reg  [7:0] p3dir;
 
-wire       p3dir_wr  = P3DIR[0] ? reg_hi_wr[P3DIR/2] : reg_lo_wr[P3DIR/2];
-wire [7:0] p3dir_nxt = P3DIR[0] ? per_din[15:8]      : per_din[7:0];
+wire       p3dir_wr  = P3DIR[0] ? reg_hi_wr[P3DIR] : reg_lo_wr[P3DIR];
+wire [7:0] p3dir_nxt = P3DIR[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p3dir <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p3dir <=  8'h00;
   else if (p3dir_wr)  p3dir <=  p3dir_nxt & P3_EN_MSK;
 
 assign p3_dout_en = p3dir;
@@ -505,11 +502,11 @@ assign p3_dout_en = p3dir;
 //----------------
 reg  [7:0] p3sel;
 
-wire       p3sel_wr  = P3SEL[0] ? reg_hi_wr[P3SEL/2] : reg_lo_wr[P3SEL/2];
-wire [7:0] p3sel_nxt = P3SEL[0] ? per_din[15:8]      : per_din[7:0];
+wire       p3sel_wr  = P3SEL[0] ? reg_hi_wr[P3SEL] : reg_lo_wr[P3SEL];
+wire [7:0] p3sel_nxt = P3SEL[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)           p3sel <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)       p3sel <=  8'h00;
   else if (p3sel_wr) p3sel <=  p3sel_nxt & P3_EN_MSK;
 
 assign p3_sel = p3sel;
@@ -517,31 +514,27 @@ assign p3_sel = p3sel;
    
 // P4IN Register
 //---------------
-reg  [7:0] p4in_s;
-reg  [7:0] p4in;
+wire  [7:0] p4in;
 
-always @ (posedge mclk or posedge puc)
-  if (puc)
-    begin
-       p4in_s <=  8'h00;
-       p4in   <=  8'h00;
-    end
-  else
-    begin
-       p4in_s <=  p4_din & P4_EN_MSK;
-       p4in   <=  p4in_s & P4_EN_MSK;
-    end
+omsp_sync_cell sync_cell_p4in_0 (.data_out(p4in[0]), .clk(mclk), .data_in(p4_din[0] & P4_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p4in_1 (.data_out(p4in[1]), .clk(mclk), .data_in(p4_din[1] & P4_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p4in_2 (.data_out(p4in[2]), .clk(mclk), .data_in(p4_din[2] & P4_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p4in_3 (.data_out(p4in[3]), .clk(mclk), .data_in(p4_din[3] & P4_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p4in_4 (.data_out(p4in[4]), .clk(mclk), .data_in(p4_din[4] & P4_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p4in_5 (.data_out(p4in[5]), .clk(mclk), .data_in(p4_din[5] & P4_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p4in_6 (.data_out(p4in[6]), .clk(mclk), .data_in(p4_din[6] & P4_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p4in_7 (.data_out(p4in[7]), .clk(mclk), .data_in(p4_din[7] & P4_EN[0]), .rst(puc_rst));
 
 
 // P4OUT Register
 //----------------
 reg  [7:0] p4out;
 
-wire       p4out_wr  = P4OUT[0] ? reg_hi_wr[P4OUT/2] : reg_lo_wr[P4OUT/2];
-wire [7:0] p4out_nxt = P4OUT[0] ? per_din[15:8]      : per_din[7:0];
+wire       p4out_wr  = P4OUT[0] ? reg_hi_wr[P4OUT] : reg_lo_wr[P4OUT];
+wire [7:0] p4out_nxt = P4OUT[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p4out <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p4out <=  8'h00;
   else if (p4out_wr)  p4out <=  p4out_nxt & P4_EN_MSK;
 
 assign p4_dout = p4out;
@@ -551,11 +544,11 @@ assign p4_dout = p4out;
 //----------------
 reg  [7:0] p4dir;
 
-wire       p4dir_wr  = P4DIR[0] ? reg_hi_wr[P4DIR/2] : reg_lo_wr[P4DIR/2];
-wire [7:0] p4dir_nxt = P4DIR[0] ? per_din[15:8]      : per_din[7:0];
+wire       p4dir_wr  = P4DIR[0] ? reg_hi_wr[P4DIR] : reg_lo_wr[P4DIR];
+wire [7:0] p4dir_nxt = P4DIR[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p4dir <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p4dir <=  8'h00;
   else if (p4dir_wr)  p4dir <=  p4dir_nxt & P4_EN_MSK;
 
 assign p4_dout_en = p4dir;
@@ -565,11 +558,11 @@ assign p4_dout_en = p4dir;
 //----------------
 reg  [7:0] p4sel;
 
-wire       p4sel_wr  = P4SEL[0] ? reg_hi_wr[P4SEL/2] : reg_lo_wr[P4SEL/2];
-wire [7:0] p4sel_nxt = P4SEL[0] ? per_din[15:8]      : per_din[7:0];
+wire       p4sel_wr  = P4SEL[0] ? reg_hi_wr[P4SEL] : reg_lo_wr[P4SEL];
+wire [7:0] p4sel_nxt = P4SEL[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)           p4sel <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)       p4sel <=  8'h00;
   else if (p4sel_wr) p4sel <=  p4sel_nxt & P4_EN_MSK;
 
 assign p4_sel = p4sel;
@@ -577,31 +570,27 @@ assign p4_sel = p4sel;
    
 // P5IN Register
 //---------------
-reg  [7:0] p5in_s;
-reg  [7:0] p5in;
+wire  [7:0] p5in;
 
-always @ (posedge mclk or posedge puc)
-  if (puc)
-    begin
-       p5in_s <=  8'h00;
-       p5in   <=  8'h00;
-    end
-  else
-    begin
-       p5in_s <=  p5_din & P5_EN_MSK;
-       p5in   <=  p5in_s & P5_EN_MSK;
-    end
+omsp_sync_cell sync_cell_p5in_0 (.data_out(p5in[0]), .clk(mclk), .data_in(p5_din[0] & P5_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p5in_1 (.data_out(p5in[1]), .clk(mclk), .data_in(p5_din[1] & P5_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p5in_2 (.data_out(p5in[2]), .clk(mclk), .data_in(p5_din[2] & P5_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p5in_3 (.data_out(p5in[3]), .clk(mclk), .data_in(p5_din[3] & P5_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p5in_4 (.data_out(p5in[4]), .clk(mclk), .data_in(p5_din[4] & P5_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p5in_5 (.data_out(p5in[5]), .clk(mclk), .data_in(p5_din[5] & P5_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p5in_6 (.data_out(p5in[6]), .clk(mclk), .data_in(p5_din[6] & P5_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p5in_7 (.data_out(p5in[7]), .clk(mclk), .data_in(p5_din[7] & P5_EN[0]), .rst(puc_rst));
 
 
 // P5OUT Register
 //----------------
 reg  [7:0] p5out;
 
-wire       p5out_wr  = P5OUT[0] ? reg_hi_wr[P5OUT/2] : reg_lo_wr[P5OUT/2];
-wire [7:0] p5out_nxt = P5OUT[0] ? per_din[15:8]      : per_din[7:0];
+wire       p5out_wr  = P5OUT[0] ? reg_hi_wr[P5OUT] : reg_lo_wr[P5OUT];
+wire [7:0] p5out_nxt = P5OUT[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p5out <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p5out <=  8'h00;
   else if (p5out_wr)  p5out <=  p5out_nxt & P5_EN_MSK;
 
 assign p5_dout = p5out;
@@ -611,11 +600,11 @@ assign p5_dout = p5out;
 //----------------
 reg  [7:0] p5dir;
 
-wire       p5dir_wr  = P5DIR[0] ? reg_hi_wr[P5DIR/2] : reg_lo_wr[P5DIR/2];
-wire [7:0] p5dir_nxt = P5DIR[0] ? per_din[15:8]      : per_din[7:0];
+wire       p5dir_wr  = P5DIR[0] ? reg_hi_wr[P5DIR] : reg_lo_wr[P5DIR];
+wire [7:0] p5dir_nxt = P5DIR[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p5dir <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p5dir <=  8'h00;
   else if (p5dir_wr)  p5dir <=  p5dir_nxt & P5_EN_MSK;
 
 assign p5_dout_en = p5dir;
@@ -625,11 +614,11 @@ assign p5_dout_en = p5dir;
 //----------------
 reg  [7:0] p5sel;
 
-wire       p5sel_wr  = P5SEL[0] ? reg_hi_wr[P5SEL/2] : reg_lo_wr[P5SEL/2];
-wire [7:0] p5sel_nxt = P5SEL[0] ? per_din[15:8]      : per_din[7:0];
+wire       p5sel_wr  = P5SEL[0] ? reg_hi_wr[P5SEL] : reg_lo_wr[P5SEL];
+wire [7:0] p5sel_nxt = P5SEL[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)           p5sel <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)       p5sel <=  8'h00;
   else if (p5sel_wr) p5sel <=  p5sel_nxt & P5_EN_MSK;
 
 assign p5_sel = p5sel;
@@ -637,31 +626,27 @@ assign p5_sel = p5sel;
    
 // P6IN Register
 //---------------
-reg  [7:0] p6in_s;
-reg  [7:0] p6in;
+wire  [7:0] p6in;
 
-always @ (posedge mclk or posedge puc)
-  if (puc)
-    begin
-       p6in_s <=  8'h00;
-       p6in   <=  8'h00;
-    end
-  else
-    begin
-       p6in_s <=  p6_din & P6_EN_MSK;
-       p6in   <=  p6in_s & P6_EN_MSK;
-    end
+omsp_sync_cell sync_cell_p6in_0 (.data_out(p6in[0]), .clk(mclk), .data_in(p6_din[0] & P6_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p6in_1 (.data_out(p6in[1]), .clk(mclk), .data_in(p6_din[1] & P6_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p6in_2 (.data_out(p6in[2]), .clk(mclk), .data_in(p6_din[2] & P6_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p6in_3 (.data_out(p6in[3]), .clk(mclk), .data_in(p6_din[3] & P6_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p6in_4 (.data_out(p6in[4]), .clk(mclk), .data_in(p6_din[4] & P6_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p6in_5 (.data_out(p6in[5]), .clk(mclk), .data_in(p6_din[5] & P6_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p6in_6 (.data_out(p6in[6]), .clk(mclk), .data_in(p6_din[6] & P6_EN[0]), .rst(puc_rst));
+omsp_sync_cell sync_cell_p6in_7 (.data_out(p6in[7]), .clk(mclk), .data_in(p6_din[7] & P6_EN[0]), .rst(puc_rst));
 
 
 // P6OUT Register
 //----------------
 reg  [7:0] p6out;
 
-wire       p6out_wr  = P6OUT[0] ? reg_hi_wr[P6OUT/2] : reg_lo_wr[P6OUT/2];
-wire [7:0] p6out_nxt = P6OUT[0] ? per_din[15:8]      : per_din[7:0];
+wire       p6out_wr  = P6OUT[0] ? reg_hi_wr[P6OUT] : reg_lo_wr[P6OUT];
+wire [7:0] p6out_nxt = P6OUT[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p6out <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p6out <=  8'h00;
   else if (p6out_wr)  p6out <=  p6out_nxt & P6_EN_MSK;
 
 assign p6_dout = p6out;
@@ -671,11 +656,11 @@ assign p6_dout = p6out;
 //----------------
 reg  [7:0] p6dir;
 
-wire       p6dir_wr  = P6DIR[0] ? reg_hi_wr[P6DIR/2] : reg_lo_wr[P6DIR/2];
-wire [7:0] p6dir_nxt = P6DIR[0] ? per_din[15:8]      : per_din[7:0];
+wire       p6dir_wr  = P6DIR[0] ? reg_hi_wr[P6DIR] : reg_lo_wr[P6DIR];
+wire [7:0] p6dir_nxt = P6DIR[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            p6dir <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        p6dir <=  8'h00;
   else if (p6dir_wr)  p6dir <=  p6dir_nxt & P6_EN_MSK;
 
 assign p6_dout_en = p6dir;
@@ -685,11 +670,11 @@ assign p6_dout_en = p6dir;
 //----------------
 reg  [7:0] p6sel;
 
-wire       p6sel_wr  = P6SEL[0] ? reg_hi_wr[P6SEL/2] : reg_lo_wr[P6SEL/2];
-wire [7:0] p6sel_nxt = P6SEL[0] ? per_din[15:8]      : per_din[7:0];
+wire       p6sel_wr  = P6SEL[0] ? reg_hi_wr[P6SEL] : reg_lo_wr[P6SEL];
+wire [7:0] p6sel_nxt = P6SEL[0] ? per_din[15:8]    : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)           p6sel <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)       p6sel <=  8'h00;
   else if (p6sel_wr) p6sel <=  p6sel_nxt & P6_EN_MSK;
 
 assign p6_sel = p6sel;
@@ -705,8 +690,8 @@ assign p6_sel = p6sel;
 
 // Delay input
 reg    [7:0] p1in_dly;
-always @ (posedge mclk or posedge puc)
-  if (puc)      p1in_dly <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)  p1in_dly <=  8'h00;
   else          p1in_dly <=  p1in & P1_EN_MSK;    
 
 // Edge detection
@@ -732,8 +717,8 @@ assign       irq_port1 = |(p1ie & p1ifg) & P1_EN[0];
 
 // Delay input
 reg    [7:0] p2in_dly;
-always @ (posedge mclk or posedge puc)
-  if (puc)      p2in_dly <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)  p2in_dly <=  8'h00;
   else          p2in_dly <=  p2in & P2_EN_MSK;    
 
 // Edge detection
@@ -759,36 +744,36 @@ assign      irq_port2 = |(p2ie & p2ifg) & P2_EN[0];
 //============================================================================
 
 // Data output mux
-wire [15:0] p1in_rd   = {8'h00, (p1in  & {8{reg_rd[P1IN/2]}})}  << (8 & {4{P1IN[0]}});
-wire [15:0] p1out_rd  = {8'h00, (p1out & {8{reg_rd[P1OUT/2]}})} << (8 & {4{P1OUT[0]}});
-wire [15:0] p1dir_rd  = {8'h00, (p1dir & {8{reg_rd[P1DIR/2]}})} << (8 & {4{P1DIR[0]}});
-wire [15:0] p1ifg_rd  = {8'h00, (p1ifg & {8{reg_rd[P1IFG/2]}})} << (8 & {4{P1IFG[0]}});
-wire [15:0] p1ies_rd  = {8'h00, (p1ies & {8{reg_rd[P1IES/2]}})} << (8 & {4{P1IES[0]}});
-wire [15:0] p1ie_rd   = {8'h00, (p1ie  & {8{reg_rd[P1IE/2]}})}  << (8 & {4{P1IE[0]}});
-wire [15:0] p1sel_rd  = {8'h00, (p1sel & {8{reg_rd[P1SEL/2]}})} << (8 & {4{P1SEL[0]}});
-wire [15:0] p2in_rd   = {8'h00, (p2in  & {8{reg_rd[P2IN/2]}})}  << (8 & {4{P2IN[0]}});
-wire [15:0] p2out_rd  = {8'h00, (p2out & {8{reg_rd[P2OUT/2]}})} << (8 & {4{P2OUT[0]}});
-wire [15:0] p2dir_rd  = {8'h00, (p2dir & {8{reg_rd[P2DIR/2]}})} << (8 & {4{P2DIR[0]}});
-wire [15:0] p2ifg_rd  = {8'h00, (p2ifg & {8{reg_rd[P2IFG/2]}})} << (8 & {4{P2IFG[0]}});
-wire [15:0] p2ies_rd  = {8'h00, (p2ies & {8{reg_rd[P2IES/2]}})} << (8 & {4{P2IES[0]}});
-wire [15:0] p2ie_rd   = {8'h00, (p2ie  & {8{reg_rd[P2IE/2]}})}  << (8 & {4{P2IE[0]}});
-wire [15:0] p2sel_rd  = {8'h00, (p2sel & {8{reg_rd[P2SEL/2]}})} << (8 & {4{P2SEL[0]}});
-wire [15:0] p3in_rd   = {8'h00, (p3in  & {8{reg_rd[P3IN/2]}})}  << (8 & {4{P3IN[0]}});
-wire [15:0] p3out_rd  = {8'h00, (p3out & {8{reg_rd[P3OUT/2]}})} << (8 & {4{P3OUT[0]}});
-wire [15:0] p3dir_rd  = {8'h00, (p3dir & {8{reg_rd[P3DIR/2]}})} << (8 & {4{P3DIR[0]}});
-wire [15:0] p3sel_rd  = {8'h00, (p3sel & {8{reg_rd[P3SEL/2]}})} << (8 & {4{P3SEL[0]}});
-wire [15:0] p4in_rd   = {8'h00, (p4in  & {8{reg_rd[P4IN/2]}})}  << (8 & {4{P4IN[0]}});
-wire [15:0] p4out_rd  = {8'h00, (p4out & {8{reg_rd[P4OUT/2]}})} << (8 & {4{P4OUT[0]}});
-wire [15:0] p4dir_rd  = {8'h00, (p4dir & {8{reg_rd[P4DIR/2]}})} << (8 & {4{P4DIR[0]}});
-wire [15:0] p4sel_rd  = {8'h00, (p4sel & {8{reg_rd[P4SEL/2]}})} << (8 & {4{P4SEL[0]}});
-wire [15:0] p5in_rd   = {8'h00, (p5in  & {8{reg_rd[P5IN/2]}})}  << (8 & {4{P5IN[0]}});
-wire [15:0] p5out_rd  = {8'h00, (p5out & {8{reg_rd[P5OUT/2]}})} << (8 & {4{P5OUT[0]}});
-wire [15:0] p5dir_rd  = {8'h00, (p5dir & {8{reg_rd[P5DIR/2]}})} << (8 & {4{P5DIR[0]}});
-wire [15:0] p5sel_rd  = {8'h00, (p5sel & {8{reg_rd[P5SEL/2]}})} << (8 & {4{P5SEL[0]}});
-wire [15:0] p6in_rd   = {8'h00, (p6in  & {8{reg_rd[P6IN/2]}})}  << (8 & {4{P6IN[0]}});
-wire [15:0] p6out_rd  = {8'h00, (p6out & {8{reg_rd[P6OUT/2]}})} << (8 & {4{P6OUT[0]}});
-wire [15:0] p6dir_rd  = {8'h00, (p6dir & {8{reg_rd[P6DIR/2]}})} << (8 & {4{P6DIR[0]}});
-wire [15:0] p6sel_rd  = {8'h00, (p6sel & {8{reg_rd[P6SEL/2]}})} << (8 & {4{P6SEL[0]}});
+wire [15:0] p1in_rd   = {8'h00, (p1in  & {8{reg_rd[P1IN]}})}  << (8 & {4{P1IN[0]}});
+wire [15:0] p1out_rd  = {8'h00, (p1out & {8{reg_rd[P1OUT]}})} << (8 & {4{P1OUT[0]}});
+wire [15:0] p1dir_rd  = {8'h00, (p1dir & {8{reg_rd[P1DIR]}})} << (8 & {4{P1DIR[0]}});
+wire [15:0] p1ifg_rd  = {8'h00, (p1ifg & {8{reg_rd[P1IFG]}})} << (8 & {4{P1IFG[0]}});
+wire [15:0] p1ies_rd  = {8'h00, (p1ies & {8{reg_rd[P1IES]}})} << (8 & {4{P1IES[0]}});
+wire [15:0] p1ie_rd   = {8'h00, (p1ie  & {8{reg_rd[P1IE]}})}  << (8 & {4{P1IE[0]}});
+wire [15:0] p1sel_rd  = {8'h00, (p1sel & {8{reg_rd[P1SEL]}})} << (8 & {4{P1SEL[0]}});
+wire [15:0] p2in_rd   = {8'h00, (p2in  & {8{reg_rd[P2IN]}})}  << (8 & {4{P2IN[0]}});
+wire [15:0] p2out_rd  = {8'h00, (p2out & {8{reg_rd[P2OUT]}})} << (8 & {4{P2OUT[0]}});
+wire [15:0] p2dir_rd  = {8'h00, (p2dir & {8{reg_rd[P2DIR]}})} << (8 & {4{P2DIR[0]}});
+wire [15:0] p2ifg_rd  = {8'h00, (p2ifg & {8{reg_rd[P2IFG]}})} << (8 & {4{P2IFG[0]}});
+wire [15:0] p2ies_rd  = {8'h00, (p2ies & {8{reg_rd[P2IES]}})} << (8 & {4{P2IES[0]}});
+wire [15:0] p2ie_rd   = {8'h00, (p2ie  & {8{reg_rd[P2IE]}})}  << (8 & {4{P2IE[0]}});
+wire [15:0] p2sel_rd  = {8'h00, (p2sel & {8{reg_rd[P2SEL]}})} << (8 & {4{P2SEL[0]}});
+wire [15:0] p3in_rd   = {8'h00, (p3in  & {8{reg_rd[P3IN]}})}  << (8 & {4{P3IN[0]}});
+wire [15:0] p3out_rd  = {8'h00, (p3out & {8{reg_rd[P3OUT]}})} << (8 & {4{P3OUT[0]}});
+wire [15:0] p3dir_rd  = {8'h00, (p3dir & {8{reg_rd[P3DIR]}})} << (8 & {4{P3DIR[0]}});
+wire [15:0] p3sel_rd  = {8'h00, (p3sel & {8{reg_rd[P3SEL]}})} << (8 & {4{P3SEL[0]}});
+wire [15:0] p4in_rd   = {8'h00, (p4in  & {8{reg_rd[P4IN]}})}  << (8 & {4{P4IN[0]}});
+wire [15:0] p4out_rd  = {8'h00, (p4out & {8{reg_rd[P4OUT]}})} << (8 & {4{P4OUT[0]}});
+wire [15:0] p4dir_rd  = {8'h00, (p4dir & {8{reg_rd[P4DIR]}})} << (8 & {4{P4DIR[0]}});
+wire [15:0] p4sel_rd  = {8'h00, (p4sel & {8{reg_rd[P4SEL]}})} << (8 & {4{P4SEL[0]}});
+wire [15:0] p5in_rd   = {8'h00, (p5in  & {8{reg_rd[P5IN]}})}  << (8 & {4{P5IN[0]}});
+wire [15:0] p5out_rd  = {8'h00, (p5out & {8{reg_rd[P5OUT]}})} << (8 & {4{P5OUT[0]}});
+wire [15:0] p5dir_rd  = {8'h00, (p5dir & {8{reg_rd[P5DIR]}})} << (8 & {4{P5DIR[0]}});
+wire [15:0] p5sel_rd  = {8'h00, (p5sel & {8{reg_rd[P5SEL]}})} << (8 & {4{P5SEL[0]}});
+wire [15:0] p6in_rd   = {8'h00, (p6in  & {8{reg_rd[P6IN]}})}  << (8 & {4{P6IN[0]}});
+wire [15:0] p6out_rd  = {8'h00, (p6out & {8{reg_rd[P6OUT]}})} << (8 & {4{P6OUT[0]}});
+wire [15:0] p6dir_rd  = {8'h00, (p6dir & {8{reg_rd[P6DIR]}})} << (8 & {4{P6DIR[0]}});
+wire [15:0] p6sel_rd  = {8'h00, (p6sel & {8{reg_rd[P6SEL]}})} << (8 & {4{P6SEL[0]}});
 
 wire [15:0] per_dout  =  p1in_rd   |
                          p1out_rd  |

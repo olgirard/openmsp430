@@ -45,6 +45,7 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
+`ifdef DBG_EN
       #1 dbg_en = 1;
       repeat(30) @(posedge mclk);
       stimulus_done = 0;
@@ -86,22 +87,22 @@ initial
       //--------------------------------------------------------
 
       // READ RAM
-      dbg_uart_wr(MEM_ADDR, 16'h0210);  // select memory address
+      dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0010));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0001);  // read memory
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h1122)  tb_error("====== RAM (16b): Read @0x210 =====");
-      dbg_uart_wr(MEM_ADDR, 16'h0212);  // select memory address
+      dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0012));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0001);  // read memory
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h3344)  tb_error("====== RAM (16b): Read @0x212 =====");
 
       // WRITE RAM
-      dbg_uart_wr(MEM_ADDR, 16'h0210);  // select memory address
+      dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0010));  // select memory address
       dbg_uart_wr(MEM_DATA, 16'ha976);  // write data
       dbg_uart_wr(MEM_CTL,  16'h0003);  // write memory
       repeat(20) @(posedge mclk);
       if (mem210 !== 16'ha976)  tb_error("====== RAM (16b): Write @0x210 =====");
-      dbg_uart_wr(MEM_ADDR, 16'h0212);  // select register
+      dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0012));  // select register
       dbg_uart_wr(MEM_DATA, 16'h8798);  // write data
       dbg_uart_wr(MEM_CTL,  16'h0003);  // write register
       repeat(20) @(posedge mclk);
@@ -112,22 +113,22 @@ initial
       //--------------------------------------------------------
 
       // READ RAM
-      dbg_uart_wr(MEM_ADDR, 16'h0210);  // select memory address
+      dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0010));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0009);  // read memory
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h0076)  tb_error("====== RAM (8b): Read @0x210 =====");
-      dbg_uart_wr(MEM_ADDR, 16'h0211);  // select memory address
+      dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0011));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0009);  // read memory
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h00a9)  tb_error("====== RAM (8b): Read @0x211 =====");
 
       // WRITE RAM
-      dbg_uart_wr(MEM_ADDR, 16'h0210);  // select memory address
+      dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0010));  // select memory address
       dbg_uart_wr(MEM_DATA, 16'h14b3);  // write data
       dbg_uart_wr(MEM_CTL,  16'h000b);  // write memory
       repeat(20) @(posedge mclk);
       if (mem210 !== 16'ha9b3)  tb_error("====== RAM (8b): Write @0x210 =====");
-      dbg_uart_wr(MEM_ADDR, 16'h0211);  // select register
+      dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0011));  // select register
       dbg_uart_wr(MEM_DATA, 16'h25c4);  // write data
       dbg_uart_wr(MEM_CTL,  16'h000b);  // write register
       repeat(20) @(posedge mclk);
@@ -190,26 +191,46 @@ initial
       //--------------------------------------------------------
       
       // WRITE PERIPHERAL
-      dbg_uart_wr(MEM_ADDR, 16'h0170);  // select memory address
-      dbg_uart_wr(MEM_DATA, 16'h9dc7);  // write data
-      dbg_uart_wr(MEM_CTL,  16'h0003);  // write memory
+      dbg_uart_wr(MEM_ADDR, 16'h0170);                        // select memory address
+      dbg_uart_wr(MEM_DATA, 16'h9dc7);                        // write data
+      dbg_uart_wr(MEM_CTL,  16'h0003);                        // write memory
       repeat(20) @(posedge mclk);
       if (timerA_0.tar !== 16'h9dc7)  tb_error("====== Peripheral (16b): Write @0x0170 =====");
-      dbg_uart_wr(MEM_ADDR, 16'h0172);  // select register
-      dbg_uart_wr(MEM_DATA, 16'haed8);  // write data
-      dbg_uart_wr(MEM_CTL,  16'h0003);  // write register
+      dbg_uart_wr(MEM_ADDR, 16'h0172);                        // select register
+      dbg_uart_wr(MEM_DATA, 16'haed8);                        // write data
+      dbg_uart_wr(MEM_CTL,  16'h0003);                        // write register
       repeat(20) @(posedge mclk);
       if (timerA_0.taccr0 !== 16'haed8)  tb_error("====== Peripheral (16b): Write @0x0172 =====");
+      dbg_uart_wr(MEM_ADDR, (`DMEM_BASE-16'h0070+16'h0002));  // select memory address
+      dbg_uart_wr(MEM_DATA, 16'hdead);                        // write data
+      dbg_uart_wr(MEM_CTL,  16'h0003);                        // write memory
+      repeat(20) @(posedge mclk);
+      if (template_periph_16b_0.cntrl2 !== 16'hdead)  tb_error("====== Peripheral (16b): Write @(DMEM_BASE-0x0070+0x0002) =====");
+      dbg_uart_wr(MEM_ADDR, (`DMEM_BASE-16'h0070+16'h0006));  // select memory address
+      dbg_uart_wr(MEM_DATA, 16'hbeef);                        // write data
+      dbg_uart_wr(MEM_CTL,  16'h0003);                        // write memory
+      repeat(20) @(posedge mclk);
+      if (template_periph_16b_0.cntrl4 !== 16'hbeef)  tb_error("====== Peripheral (16b): Write @(DMEM_BASE-0x0070+0x0006) =====");
 
       // READ PERIPHERAL
-      dbg_uart_wr(MEM_ADDR, 16'h0170);  // select memory address
-      dbg_uart_wr(MEM_CTL,  16'h0001);  // read memory
-      dbg_uart_rd(MEM_DATA);            // read data
+      dbg_uart_wr(MEM_ADDR, 16'h0170);                        // select memory address
+      dbg_uart_wr(MEM_CTL,  16'h0001);                        // read memory
+      dbg_uart_rd(MEM_DATA);                                  // read data
       if (dbg_uart_buf !== 16'h9dc7)  tb_error("====== Peripheral (16b): Read @0x0170 =====");
-      dbg_uart_wr(MEM_ADDR, 16'h0172);  // select memory address
-      dbg_uart_wr(MEM_CTL,  16'h0001);  // read memory
-      dbg_uart_rd(MEM_DATA);            // read data
+      dbg_uart_wr(MEM_ADDR, 16'h0172);                        // select memory address
+      dbg_uart_wr(MEM_CTL,  16'h0001);                        // read memory
+      dbg_uart_rd(MEM_DATA);                                  // read data
       if (dbg_uart_buf !== 16'haed8)  tb_error("====== Peripheral (16b): Read @0x0172 =====");
+      dbg_uart_wr(MEM_ADDR, (`DMEM_BASE-16'h0070+16'h0002));  // select memory address
+      dbg_uart_wr(MEM_CTL,  16'h0001);                        // read memory
+      dbg_uart_rd(MEM_DATA);                                  // read data
+      repeat(20) @(posedge mclk);
+      if (dbg_uart_buf !== 16'hdead)  tb_error("====== Peripheral (16b): Read @(DMEM_BASE-0x0070+0x0002) =====");
+      dbg_uart_wr(MEM_ADDR, (`DMEM_BASE-16'h0070+16'h0006));  // select memory address
+      dbg_uart_wr(MEM_CTL,  16'h0001);                        // read memory
+      dbg_uart_rd(MEM_DATA);                                  // read data
+      repeat(20) @(posedge mclk);
+      if (dbg_uart_buf !== 16'hbeef)  tb_error("====== Peripheral (16b): Read @(DMEM_BASE-0x0070+0x0006) =====");
 
 
       // RD/WR ACCESS: PERIPHERAL (8b)
@@ -241,5 +262,13 @@ initial
 
      
       stimulus_done = 1;
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|      (serial debug interface not included)    |");
+       $display(" ===============================================");
+       $finish;
+`endif
    end
 

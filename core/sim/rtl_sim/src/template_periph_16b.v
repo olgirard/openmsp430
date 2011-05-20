@@ -47,19 +47,24 @@ initial
       //--------------------------------------------------------
       @(r15==16'h0001);
 
-      if (mem200 !== 16'h5555) tb_error("====== CNTRL1: @0x200 != 0x5555 =====");
-      if (mem202 !== 16'haaaa) tb_error("====== CNTRL1: @0x202 != 0xaaaa =====");
+      if (mem200 !== 16'h0000) tb_error("====== UNUSED 0: @0x200 != 0x5555 =====");
+      if (mem202 !== 16'h0000) tb_error("====== UNUSED 0: @0x202 != 0xaaaa =====");
 
-      if (mem204 !== 16'haaaa) tb_error("====== CNTRL2: @0x204 != 0xaaaa =====");
-      if (mem206 !== 16'h5555) tb_error("====== CNTRL2: @0x206 != 0x5555 =====");
+      if (mem204 !== 16'h5555) tb_error("====== CNTRL1:   @0x204 != 0x5555 =====");
+      if (mem206 !== 16'haaaa) tb_error("====== CNTRL1:   @0x206 != 0xaaaa =====");
 
-      if (mem208 !== 16'h55aa) tb_error("====== CNTRL3: @0x208 != 0x55aa =====");
-      if (mem20A !== 16'haa55) tb_error("====== CNTRL3: @0x20a != 0xaa55 =====");
+      if (mem208 !== 16'haaaa) tb_error("====== CNTRL2:   @0x208 != 0xaaaa =====");
+      if (mem20A !== 16'h5555) tb_error("====== CNTRL2:   @0x20A != 0x5555 =====");
 
-      if (mem20C !== 16'haa55) tb_error("====== CNTRL4: @0x20c != 0xaa55 =====");
-      if (mem20E !== 16'h55aa) tb_error("====== CNTRL4: @0x20e != 0x55aa =====");
+      if (mem20C !== 16'h55aa) tb_error("====== CNTRL3:   @0x20C != 0x55aa =====");
+      if (mem20E !== 16'haa55) tb_error("====== CNTRL3:   @0x20E != 0xaa55 =====");
 
-      
+      if (mem210 !== 16'haa55) tb_error("====== CNTRL4:   @0x210 != 0xaa55 =====");
+      if (mem212 !== 16'h55aa) tb_error("====== CNTRL4:   @0x212 != 0x55aa =====");
+
+      if (mem214 !== 16'h0000) tb_error("====== UNUSED 1: @0x214 != 0x5555 =====");
+      if (mem216 !== 16'h0000) tb_error("====== UNUSED 1: @0x216 != 0xaaaa =====");
+     
       stimulus_done = 1;
    end
 

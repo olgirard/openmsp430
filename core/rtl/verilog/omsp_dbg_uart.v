@@ -88,20 +88,37 @@ input               mem_bw;         // Burst byte width
 // 1)  UART RECEIVE LINE SYNCHRONIZTION & FILTERING
 //=============================================================================
 
-// Synchronize RXD input & buffer
+// Synchronize RXD input
 //--------------------------------
-reg  [3:0] rxd_sync;
+`ifdef SYNC_DBG_UART_RXD
+
+    wire uart_rxd_n;
+
+    omsp_sync_cell sync_cell_uart_rxd (
+        .data_out (uart_rxd_n),
+        .clk      (dbg_clk),
+        .data_in  (~dbg_uart_rxd),
+        .rst      (dbg_rst)
+    );
+    wire uart_rxd = ~uart_rxd_n;
+`else
+    wire uart_rxd = dbg_uart_rxd;
+`endif
+   
+// RXD input buffer
+//--------------------------------
+reg  [1:0] rxd_buf;
 always @ (posedge dbg_clk or posedge dbg_rst)
-  if (dbg_rst) rxd_sync <=  4'hf;
-  else         rxd_sync <=  {rxd_sync[2:0], dbg_uart_rxd};
+  if (dbg_rst) rxd_buf <=  2'h3;
+  else         rxd_buf <=  {rxd_buf[0], uart_rxd};
 
 // Majority decision
 //------------------------
 reg        rxd_maj;
 
-wire [1:0] rxd_maj_cnt = {1'b0, rxd_sync[1]} +
-                         {1'b0, rxd_sync[2]} +
-                         {1'b0, rxd_sync[3]};
+wire [1:0] rxd_maj_cnt = {1'b0, uart_rxd}   +
+                         {1'b0, rxd_buf[0]} +
+                         {1'b0, rxd_buf[1]};
 wire       rxd_maj_nxt = (rxd_maj_cnt>=2'b10);
    
 always @ (posedge dbg_clk or posedge dbg_rst)

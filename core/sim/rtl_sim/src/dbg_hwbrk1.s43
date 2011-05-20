@@ -35,34 +35,42 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.set    DMEM_BASE, (__data_start     )
+.set    DMEM_200,  (__data_start+0x00)
+.set    DMEM_202,  (__data_start+0x02)
+.set    DMEM_204,  (__data_start+0x04)
+.set    DMEM_206,  (__data_start+0x06)
+.set    DMEM_208,  (__data_start+0x08)
+.set    DMEM_250,  (__data_start+0x50)
+
 .global main
 
 	
 WAIT_FUNC:
-	inc &0x206
-	inc &0x202
-	inc &0x204
-	inc &0x200
-	inc &0x208
-	mov &0x204, r10
-	mov &0x208, r9
+	inc &DMEM_206
+	inc &DMEM_202
+	inc &DMEM_204
+	inc &DMEM_200
+	inc &DMEM_208
+	mov &DMEM_204, r10
+	mov &DMEM_208, r9
 	dec r14
 	jnz WAIT_FUNC
 	ret
 	
 main:
- 	mov  #0x0250, r1 	; # Initialize stack pointer
-	mov  #0x0000, &0x0200
-	mov  #0x0000, r15
+ 	mov #DMEM_250, r1 	; # Initialize stack pointer
+	mov   #0x0000, &DMEM_200
+	mov   #0x0000, r15
 
        /* --------------                ACLK GENERATION             ----------------- */
 
 	mov  #0x0001, r15
-	mov  #0x0000, &0x0200
-	mov  #0x0001, &0x0202
-	mov  #0x0002, &0x0204
-	mov  #0x0003, &0x0206
-	mov  #0x0004, &0x0208
+	mov  #0x0000, &DMEM_200
+	mov  #0x0001, &DMEM_202
+	mov  #0x0002, &DMEM_204
+	mov  #0x0003, &DMEM_206
+	mov  #0x0004, &DMEM_208
 	mov  #0x0080, r14
         call #WAIT_FUNC
 

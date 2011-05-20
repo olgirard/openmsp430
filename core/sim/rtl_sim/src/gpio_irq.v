@@ -35,6 +35,8 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+integer test_step;
+
 initial
    begin
       $display(" ===============================================");
@@ -42,208 +44,222 @@ initial
       $display(" ===============================================");
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
-
+      test_step     = 0;
 
       // PORT 1: TEST INTERRUPT FLAGS
       //--------------------------------------------------------
 
-      @(r15==16'h0200) p1_din = 8'h01;
-      @(r15==16'h0201) p1_din = 8'h03;
-      @(r15==16'h0202) p1_din = 8'h07;
-      @(r15==16'h0203) p1_din = 8'h0f;
-      @(r15==16'h0204) p1_din = 8'h1f;
-      @(r15==16'h0205) p1_din = 8'h3f;
-      @(r15==16'h0206) p1_din = 8'h7f;
-      @(r15==16'h0207) p1_din = 8'hff;
-      @(r15==16'h0208);
+      @(r15==(`PER_SIZE+16'h0000)) p1_din = 8'h01;
+      @(r15==(`PER_SIZE+16'h0001)) p1_din = 8'h03;
+      @(r15==(`PER_SIZE+16'h0002)) p1_din = 8'h07;
+      @(r15==(`PER_SIZE+16'h0003)) p1_din = 8'h0f;
+      @(r15==(`PER_SIZE+16'h0004)) p1_din = 8'h1f;
+      @(r15==(`PER_SIZE+16'h0005)) p1_din = 8'h3f;
+      @(r15==(`PER_SIZE+16'h0006)) p1_din = 8'h7f;
+      @(r15==(`PER_SIZE+16'h0007)) p1_din = 8'hff;
+      @(r15==(`PER_SIZE+16'h0008));
       if (mem200 !== 16'h0201) tb_error("====== RISING EDGE TEST: P1IFG != 0x0201 =====");
       if (mem202 !== 16'h0804) tb_error("====== RISING EDGE TEST: P1IFG != 0x0804 =====");
       if (mem204 !== 16'h2010) tb_error("====== RISING EDGE TEST: P1IFG != 0x2010 =====");
       if (mem206 !== 16'h8040) tb_error("====== RISING EDGE TEST: P1IFG != 0x8040 =====");
+      test_step = 1;
 
       
-      @(r15==16'h0210) p1_din = 8'h7f;
-      @(r15==16'h0211) p1_din = 8'h3f;
-      @(r15==16'h0212) p1_din = 8'h1f;
-      @(r15==16'h0213) p1_din = 8'h0f;
-      @(r15==16'h0214) p1_din = 8'h07;
-      @(r15==16'h0215) p1_din = 8'h03;
-      @(r15==16'h0216) p1_din = 8'h01;
-      @(r15==16'h0217) p1_din = 8'h00;
-      @(r15==16'h0218);
+      @(r15==(`PER_SIZE+16'h0010)) p1_din = 8'h7f;
+      @(r15==(`PER_SIZE+16'h0011)) p1_din = 8'h3f;
+      @(r15==(`PER_SIZE+16'h0012)) p1_din = 8'h1f;
+      @(r15==(`PER_SIZE+16'h0013)) p1_din = 8'h0f;
+      @(r15==(`PER_SIZE+16'h0014)) p1_din = 8'h07;
+      @(r15==(`PER_SIZE+16'h0015)) p1_din = 8'h03;
+      @(r15==(`PER_SIZE+16'h0016)) p1_din = 8'h01;
+      @(r15==(`PER_SIZE+16'h0017)) p1_din = 8'h00;
+      @(r15==(`PER_SIZE+16'h0018));
       if (mem210 !== 16'h0000) tb_error("====== RISING EDGE TEST: P1IFG != 0x0000 =====");
       if (mem212 !== 16'h0000) tb_error("====== RISING EDGE TEST: P1IFG != 0x0000 =====");
       if (mem214 !== 16'h0000) tb_error("====== RISING EDGE TEST: P1IFG != 0x0000 =====");
       if (mem216 !== 16'h0000) tb_error("====== RISING EDGE TEST: P1IFG != 0x0000 =====");
+      test_step = 2;
 
       
-      @(r15==16'h0220) p1_din = 8'h01;
-      @(r15==16'h0221) p1_din = 8'h03;
-      @(r15==16'h0222) p1_din = 8'h07;
-      @(r15==16'h0223) p1_din = 8'h0f;
-      @(r15==16'h0224) p1_din = 8'h1f;
-      @(r15==16'h0225) p1_din = 8'h3f;
-      @(r15==16'h0226) p1_din = 8'h7f;
-      @(r15==16'h0227) p1_din = 8'hff;
-      @(r15==16'h0228);
+      @(r15==(`PER_SIZE+16'h0020)) p1_din = 8'h01;
+      @(r15==(`PER_SIZE+16'h0021)) p1_din = 8'h03;
+      @(r15==(`PER_SIZE+16'h0022)) p1_din = 8'h07;
+      @(r15==(`PER_SIZE+16'h0023)) p1_din = 8'h0f;
+      @(r15==(`PER_SIZE+16'h0024)) p1_din = 8'h1f;
+      @(r15==(`PER_SIZE+16'h0025)) p1_din = 8'h3f;
+      @(r15==(`PER_SIZE+16'h0026)) p1_din = 8'h7f;
+      @(r15==(`PER_SIZE+16'h0027)) p1_din = 8'hff;
+      @(r15==(`PER_SIZE+16'h0028));
       if (mem220 !== 16'h0301) tb_error("====== RISING EDGE TEST: P1IFG != 0x0301 =====");
       if (mem222 !== 16'h0f07) tb_error("====== RISING EDGE TEST: P1IFG != 0x0f07 =====");
       if (mem224 !== 16'h3f1f) tb_error("====== RISING EDGE TEST: P1IFG != 0x3f1f =====");
       if (mem226 !== 16'hff7f) tb_error("====== RISING EDGE TEST: P1IFG != 0xff7f =====");
+      test_step = 3;
 
    
-      @(r15==16'h0230) p1_din = 8'h7f;
-      @(r15==16'h0231) p1_din = 8'h3f;
-      @(r15==16'h0232) p1_din = 8'h1f;
-      @(r15==16'h0233) p1_din = 8'h0f;
-      @(r15==16'h0234) p1_din = 8'h07;
-      @(r15==16'h0235) p1_din = 8'h03;
-      @(r15==16'h0236) p1_din = 8'h01;
-      @(r15==16'h0237) p1_din = 8'h00;
-      @(r15==16'h0238);
+      @(r15==(`PER_SIZE+16'h0030)) p1_din = 8'h7f;
+      @(r15==(`PER_SIZE+16'h0031)) p1_din = 8'h3f;
+      @(r15==(`PER_SIZE+16'h0032)) p1_din = 8'h1f;
+      @(r15==(`PER_SIZE+16'h0033)) p1_din = 8'h0f;
+      @(r15==(`PER_SIZE+16'h0034)) p1_din = 8'h07;
+      @(r15==(`PER_SIZE+16'h0035)) p1_din = 8'h03;
+      @(r15==(`PER_SIZE+16'h0036)) p1_din = 8'h01;
+      @(r15==(`PER_SIZE+16'h0037)) p1_din = 8'h00;
+      @(r15==(`PER_SIZE+16'h0038));
       if (mem230 !== 16'h4080) tb_error("====== FALLING EDGE TEST: P1IFG != 0x4080 =====");
       if (mem232 !== 16'h1020) tb_error("====== FALLING EDGE TEST: P1IFG != 0x1020 =====");
       if (mem234 !== 16'h0408) tb_error("====== FALLING EDGE TEST: P1IFG != 0x0408 =====");
       if (mem236 !== 16'h0102) tb_error("====== FALLING EDGE TEST: P1IFG != 0x0102 =====");
+      test_step = 4;
 
-      @(r15==16'h0240) p1_din = 8'h01;
-      @(r15==16'h0241) p1_din = 8'h03;
-      @(r15==16'h0242) p1_din = 8'h07;
-      @(r15==16'h0243) p1_din = 8'h0f;
-      @(r15==16'h0244) p1_din = 8'h1f;
-      @(r15==16'h0245) p1_din = 8'h3f;
-      @(r15==16'h0246) p1_din = 8'h7f;
-      @(r15==16'h0247) p1_din = 8'hff;
-      @(r15==16'h0248);
+      @(r15==(`PER_SIZE+16'h0040)) p1_din = 8'h01;
+      @(r15==(`PER_SIZE+16'h0041)) p1_din = 8'h03;
+      @(r15==(`PER_SIZE+16'h0042)) p1_din = 8'h07;
+      @(r15==(`PER_SIZE+16'h0043)) p1_din = 8'h0f;
+      @(r15==(`PER_SIZE+16'h0044)) p1_din = 8'h1f;
+      @(r15==(`PER_SIZE+16'h0045)) p1_din = 8'h3f;
+      @(r15==(`PER_SIZE+16'h0046)) p1_din = 8'h7f;
+      @(r15==(`PER_SIZE+16'h0047)) p1_din = 8'hff;
+      @(r15==(`PER_SIZE+16'h0048));
       if (mem240 !== 16'h0000) tb_error("====== FALLING EDGE TEST: P1IFG != 0x0000 =====");
       if (mem242 !== 16'h0000) tb_error("====== FALLING EDGE TEST: P1IFG != 0x0000 =====");
       if (mem244 !== 16'h0000) tb_error("====== FALLING EDGE TEST: P1IFG != 0x0000 =====");
       if (mem246 !== 16'h0000) tb_error("====== FALLING EDGE TEST: P1IFG != 0x0000 =====");
+      test_step = 5;
 
-      @(r15==16'h0250) p1_din = 8'h7f;
-      @(r15==16'h0251) p1_din = 8'h3f;
-      @(r15==16'h0252) p1_din = 8'h1f;
-      @(r15==16'h0253) p1_din = 8'h0f;
-      @(r15==16'h0254) p1_din = 8'h07;
-      @(r15==16'h0255) p1_din = 8'h03;
-      @(r15==16'h0256) p1_din = 8'h01;
-      @(r15==16'h0257) p1_din = 8'h00;
-      @(r15==16'h0258);
+      @(r15==(`PER_SIZE+16'h0050)) p1_din = 8'h7f;
+      @(r15==(`PER_SIZE+16'h0051)) p1_din = 8'h3f;
+      @(r15==(`PER_SIZE+16'h0052)) p1_din = 8'h1f;
+      @(r15==(`PER_SIZE+16'h0053)) p1_din = 8'h0f;
+      @(r15==(`PER_SIZE+16'h0054)) p1_din = 8'h07;
+      @(r15==(`PER_SIZE+16'h0055)) p1_din = 8'h03;
+      @(r15==(`PER_SIZE+16'h0056)) p1_din = 8'h01;
+      @(r15==(`PER_SIZE+16'h0057)) p1_din = 8'h00;
+      @(r15==(`PER_SIZE+16'h0058));
       if (mem250 !== 16'hc080) tb_error("====== FALLING EDGE TEST: P1IFG != 0xc080 =====");
       if (mem252 !== 16'hf0e0) tb_error("====== FALLING EDGE TEST: P1IFG != 0xf0e0 =====");
       if (mem254 !== 16'hfcf8) tb_error("====== FALLING EDGE TEST: P1IFG != 0xfcf8 =====");
       if (mem256 !== 16'hfffe) tb_error("====== FALLING EDGE TEST: P1IFG != 0xfffe =====");
+      test_step = 6;
 
       
       // PORT 2: TEST INTERRUPT FLAGS
       //--------------------------------------------------------
 
-      @(r15==16'h0200) p2_din = 8'h01;
-      @(r15==16'h0201) p2_din = 8'h03;
-      @(r15==16'h0202) p2_din = 8'h07;
-      @(r15==16'h0203) p2_din = 8'h0f;
-      @(r15==16'h0204) p2_din = 8'h1f;
-      @(r15==16'h0205) p2_din = 8'h3f;
-      @(r15==16'h0206) p2_din = 8'h7f;
-      @(r15==16'h0207) p2_din = 8'hff;
-      @(r15==16'h0208);
+      @(r15==(`PER_SIZE+16'h0000)) p2_din = 8'h01;
+      @(r15==(`PER_SIZE+16'h0001)) p2_din = 8'h03;
+      @(r15==(`PER_SIZE+16'h0002)) p2_din = 8'h07;
+      @(r15==(`PER_SIZE+16'h0003)) p2_din = 8'h0f;
+      @(r15==(`PER_SIZE+16'h0004)) p2_din = 8'h1f;
+      @(r15==(`PER_SIZE+16'h0005)) p2_din = 8'h3f;
+      @(r15==(`PER_SIZE+16'h0006)) p2_din = 8'h7f;
+      @(r15==(`PER_SIZE+16'h0007)) p2_din = 8'hff;
+      @(r15==(`PER_SIZE+16'h0008));
       if (mem200 !== 16'h0201) tb_error("====== RISING EDGE TEST: P2IFG != 0x0201 =====");
       if (mem202 !== 16'h0804) tb_error("====== RISING EDGE TEST: P2IFG != 0x0804 =====");
       if (mem204 !== 16'h2010) tb_error("====== RISING EDGE TEST: P2IFG != 0x2010 =====");
       if (mem206 !== 16'h8040) tb_error("====== RISING EDGE TEST: P2IFG != 0x8040 =====");
+      test_step = 7;
 
       
-      @(r15==16'h0210) p2_din = 8'h7f;
-      @(r15==16'h0211) p2_din = 8'h3f;
-      @(r15==16'h0212) p2_din = 8'h1f;
-      @(r15==16'h0213) p2_din = 8'h0f;
-      @(r15==16'h0214) p2_din = 8'h07;
-      @(r15==16'h0215) p2_din = 8'h03;
-      @(r15==16'h0216) p2_din = 8'h01;
-      @(r15==16'h0217) p2_din = 8'h00;
-      @(r15==16'h0218);
+      @(r15==(`PER_SIZE+16'h0010)) p2_din = 8'h7f;
+      @(r15==(`PER_SIZE+16'h0011)) p2_din = 8'h3f;
+      @(r15==(`PER_SIZE+16'h0012)) p2_din = 8'h1f;
+      @(r15==(`PER_SIZE+16'h0013)) p2_din = 8'h0f;
+      @(r15==(`PER_SIZE+16'h0014)) p2_din = 8'h07;
+      @(r15==(`PER_SIZE+16'h0015)) p2_din = 8'h03;
+      @(r15==(`PER_SIZE+16'h0016)) p2_din = 8'h01;
+      @(r15==(`PER_SIZE+16'h0017)) p2_din = 8'h00;
+      @(r15==(`PER_SIZE+16'h0018));
       if (mem210 !== 16'h0000) tb_error("====== RISING EDGE TEST: P2IFG != 0x0000 =====");
       if (mem212 !== 16'h0000) tb_error("====== RISING EDGE TEST: P2IFG != 0x0000 =====");
       if (mem214 !== 16'h0000) tb_error("====== RISING EDGE TEST: P2IFG != 0x0000 =====");
       if (mem216 !== 16'h0000) tb_error("====== RISING EDGE TEST: P2IFG != 0x0000 =====");
+      test_step = 8;
 
       
-      @(r15==16'h0220) p2_din = 8'h01;
-      @(r15==16'h0221) p2_din = 8'h03;
-      @(r15==16'h0222) p2_din = 8'h07;
-      @(r15==16'h0223) p2_din = 8'h0f;
-      @(r15==16'h0224) p2_din = 8'h1f;
-      @(r15==16'h0225) p2_din = 8'h3f;
-      @(r15==16'h0226) p2_din = 8'h7f;
-      @(r15==16'h0227) p2_din = 8'hff;
-      @(r15==16'h0228);
+      @(r15==(`PER_SIZE+16'h0020)) p2_din = 8'h01;
+      @(r15==(`PER_SIZE+16'h0021)) p2_din = 8'h03;
+      @(r15==(`PER_SIZE+16'h0022)) p2_din = 8'h07;
+      @(r15==(`PER_SIZE+16'h0023)) p2_din = 8'h0f;
+      @(r15==(`PER_SIZE+16'h0024)) p2_din = 8'h1f;
+      @(r15==(`PER_SIZE+16'h0025)) p2_din = 8'h3f;
+      @(r15==(`PER_SIZE+16'h0026)) p2_din = 8'h7f;
+      @(r15==(`PER_SIZE+16'h0027)) p2_din = 8'hff;
+      @(r15==(`PER_SIZE+16'h0028));
       if (mem220 !== 16'h0301) tb_error("====== RISING EDGE TEST: P2IFG != 0x0301 =====");
       if (mem222 !== 16'h0f07) tb_error("====== RISING EDGE TEST: P2IFG != 0x0f07 =====");
       if (mem224 !== 16'h3f1f) tb_error("====== RISING EDGE TEST: P2IFG != 0x3f1f =====");
       if (mem226 !== 16'hff7f) tb_error("====== RISING EDGE TEST: P2IFG != 0xff7f =====");
+      test_step = 9;
 
    
-      @(r15==16'h0230) p2_din = 8'h7f;
-      @(r15==16'h0231) p2_din = 8'h3f;
-      @(r15==16'h0232) p2_din = 8'h1f;
-      @(r15==16'h0233) p2_din = 8'h0f;
-      @(r15==16'h0234) p2_din = 8'h07;
-      @(r15==16'h0235) p2_din = 8'h03;
-      @(r15==16'h0236) p2_din = 8'h01;
-      @(r15==16'h0237) p2_din = 8'h00;
-      @(r15==16'h0238);
+      @(r15==(`PER_SIZE+16'h0030)) p2_din = 8'h7f;
+      @(r15==(`PER_SIZE+16'h0031)) p2_din = 8'h3f;
+      @(r15==(`PER_SIZE+16'h0032)) p2_din = 8'h1f;
+      @(r15==(`PER_SIZE+16'h0033)) p2_din = 8'h0f;
+      @(r15==(`PER_SIZE+16'h0034)) p2_din = 8'h07;
+      @(r15==(`PER_SIZE+16'h0035)) p2_din = 8'h03;
+      @(r15==(`PER_SIZE+16'h0036)) p2_din = 8'h01;
+      @(r15==(`PER_SIZE+16'h0037)) p2_din = 8'h00;
+      @(r15==(`PER_SIZE+16'h0038));
       if (mem230 !== 16'h4080) tb_error("====== FALLING EDGE TEST: P2IFG != 0x4080 =====");
       if (mem232 !== 16'h1020) tb_error("====== FALLING EDGE TEST: P2IFG != 0x1020 =====");
       if (mem234 !== 16'h0408) tb_error("====== FALLING EDGE TEST: P2IFG != 0x0408 =====");
       if (mem236 !== 16'h0102) tb_error("====== FALLING EDGE TEST: P2IFG != 0x0102 =====");
+      test_step = 10;
 
-      @(r15==16'h0240) p2_din = 8'h01;
-      @(r15==16'h0241) p2_din = 8'h03;
-      @(r15==16'h0242) p2_din = 8'h07;
-      @(r15==16'h0243) p2_din = 8'h0f;
-      @(r15==16'h0244) p2_din = 8'h1f;
-      @(r15==16'h0245) p2_din = 8'h3f;
-      @(r15==16'h0246) p2_din = 8'h7f;
-      @(r15==16'h0247) p2_din = 8'hff;
-      @(r15==16'h0248);
+      @(r15==(`PER_SIZE+16'h0040)) p2_din = 8'h01;
+      @(r15==(`PER_SIZE+16'h0041)) p2_din = 8'h03;
+      @(r15==(`PER_SIZE+16'h0042)) p2_din = 8'h07;
+      @(r15==(`PER_SIZE+16'h0043)) p2_din = 8'h0f;
+      @(r15==(`PER_SIZE+16'h0044)) p2_din = 8'h1f;
+      @(r15==(`PER_SIZE+16'h0045)) p2_din = 8'h3f;
+      @(r15==(`PER_SIZE+16'h0046)) p2_din = 8'h7f;
+      @(r15==(`PER_SIZE+16'h0047)) p2_din = 8'hff;
+      @(r15==(`PER_SIZE+16'h0048));
       if (mem240 !== 16'h0000) tb_error("====== FALLING EDGE TEST: P2IFG != 0x0000 =====");
       if (mem242 !== 16'h0000) tb_error("====== FALLING EDGE TEST: P2IFG != 0x0000 =====");
       if (mem244 !== 16'h0000) tb_error("====== FALLING EDGE TEST: P2IFG != 0x0000 =====");
       if (mem246 !== 16'h0000) tb_error("====== FALLING EDGE TEST: P2IFG != 0x0000 =====");
+      test_step = 11;
 
-      @(r15==16'h0250) p2_din = 8'h7f;
-      @(r15==16'h0251) p2_din = 8'h3f;
-      @(r15==16'h0252) p2_din = 8'h1f;
-      @(r15==16'h0253) p2_din = 8'h0f;
-      @(r15==16'h0254) p2_din = 8'h07;
-      @(r15==16'h0255) p2_din = 8'h03;
-      @(r15==16'h0256) p2_din = 8'h01;
-      @(r15==16'h0257) p2_din = 8'h00;
-      @(r15==16'h0258);
+      @(r15==(`PER_SIZE+16'h0050)) p2_din = 8'h7f;
+      @(r15==(`PER_SIZE+16'h0051)) p2_din = 8'h3f;
+      @(r15==(`PER_SIZE+16'h0052)) p2_din = 8'h1f;
+      @(r15==(`PER_SIZE+16'h0053)) p2_din = 8'h0f;
+      @(r15==(`PER_SIZE+16'h0054)) p2_din = 8'h07;
+      @(r15==(`PER_SIZE+16'h0055)) p2_din = 8'h03;
+      @(r15==(`PER_SIZE+16'h0056)) p2_din = 8'h01;
+      @(r15==(`PER_SIZE+16'h0057)) p2_din = 8'h00;
+      @(r15==(`PER_SIZE+16'h0058));
       if (mem250 !== 16'hc080) tb_error("====== FALLING EDGE TEST: P2IFG != 0xc080 =====");
       if (mem252 !== 16'hf0e0) tb_error("====== FALLING EDGE TEST: P2IFG != 0xf0e0 =====");
       if (mem254 !== 16'hfcf8) tb_error("====== FALLING EDGE TEST: P2IFG != 0xfcf8 =====");
       if (mem256 !== 16'hfffe) tb_error("====== FALLING EDGE TEST: P2IFG != 0xfffe =====");
+      test_step = 12;
 
       
       // PORT 1: TEST INTERRUPT VECTOR
       //--------------------------------------------------------
 
-      @(r15==16'h0208);
+      @(r15==(`PER_SIZE+16'h0008));
       if (mem200 !== 16'h0201) tb_error("====== INTERRUPT VECTOR TEST: P1IFG != 0x0201 =====");
       if (mem202 !== 16'h0804) tb_error("====== INTERRUPT VECTOR TEST: P1IFG != 0x0804 =====");
       if (mem204 !== 16'h2010) tb_error("====== INTERRUPT VECTOR TEST: P1IFG != 0x2010 =====");
       if (mem206 !== 16'h8040) tb_error("====== INTERRUPT VECTOR TEST: P1IFG != 0x8040 =====");
+      test_step = 13;
 
       
       // PORT 2: TEST INTERRUPT VECTOR
       //--------------------------------------------------------
 
-      @(r15==16'h0218);
+      @(r15==(`PER_SIZE+16'h0018));
       if (mem210 !== 16'h0201) tb_error("====== INTERRUPT VECTOR TEST: P1IFG != 0x0201 =====");
       if (mem212 !== 16'h0804) tb_error("====== INTERRUPT VECTOR TEST: P1IFG != 0x0804 =====");
       if (mem214 !== 16'h2010) tb_error("====== INTERRUPT VECTOR TEST: P1IFG != 0x2010 =====");
       if (mem216 !== 16'h8040) tb_error("====== INTERRUPT VECTOR TEST: P1IFG != 0x8040 =====");
+      test_step = 14;
 
 
       stimulus_done = 1;

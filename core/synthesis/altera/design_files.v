@@ -86,6 +86,7 @@
 `include "../../../rtl/verilog/omsp_clock_module.v"
 `include "../../../rtl/verilog/omsp_sfr.v"
 `include "../../../rtl/verilog/omsp_watchdog.v"
+`include "../../../rtl/verilog/omsp_sync_cell.v"
 
 `include "../src/openMSP430_defines.v"
 `ifdef DBG_EN

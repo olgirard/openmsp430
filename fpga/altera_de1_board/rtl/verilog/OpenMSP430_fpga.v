@@ -233,7 +233,7 @@ wire clk_sys;
 //=============================================================================
 
 // openMSP430 output buses
-wire         [7:0] per_addr;
+wire        [13:0] per_addr;
 wire        [15:0] per_din;
 wire         [1:0] per_we;
 wire [`DMEM_MSB:0] dmem_addr;
@@ -310,7 +310,7 @@ openMSP430 openMSP430_0 (
     .pmem_cen     (pmem_cen),     // Program Memory chip enable (low active)
     .pmem_din     (pmem_din),     // Program Memory data input (optional)
     .pmem_wen     (pmem_wen),     // Program Memory write enable (low active) (optional)
-    .puc          (puc),          // Main system reset
+    .puc_rst      (puc_rst),      // Main system reset
     .smclk_en     (smclk_en),     // SMCLK enable
 
 // INPUTs
@@ -382,7 +382,7 @@ omsp_gpio #(.P1_EN(1),
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
     .per_we       (per_we),        // Peripheral write enable (high active)
-    .puc          (puc)            // Main system reset
+    .puc_rst      (puc_rst)        // Main system reset
 );
 
 //
@@ -412,7 +412,7 @@ omsp_timerA timerA_0 (
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
     .per_we       (per_we),        // Peripheral write enable (high active)
-    .puc          (puc),           // Main system reset
+    .puc_rst      (puc_rst),       // Main system reset
     .smclk_en     (smclk_en),      // SMCLK enable (from CPU)
     .ta_cci0a     (ta_cci0a),      // Timer A capture 0 input A
     .ta_cci0b     (ta_cci0b),      // Timer A capture 0 input B
@@ -445,7 +445,7 @@ driver_7segment driver_7segment_0 (
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
     .per_we       (per_we),        // Peripheral write enable (high active)
-    .puc          (puc)            // Main system reset
+    .puc_rst      (puc_rst)        // Main system reset
 );
 
 

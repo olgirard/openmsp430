@@ -39,8 +39,13 @@
 
 `define LONG_TIMEOUT
 
-reg [15:0] dbg_id_pmem;
-reg [15:0] dbg_id_dmem;
+reg  [2:0] cpu_version;
+reg        cpu_asic;
+reg  [4:0] user_version;
+reg  [6:0] per_space;
+reg        mpy_info;
+reg  [8:0] dmem_size;
+reg  [5:0] pmem_size;
 reg [31:0] dbg_id;
    
 initial
@@ -48,7 +53,9 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
-      #1 dbg_en = 1;
+`ifdef DBG_EN
+`ifdef DBG_UART
+    #1 dbg_en = 1;
       repeat(30) @(posedge mclk);
       stimulus_done = 0;
 
@@ -61,9 +68,30 @@ initial
 
       // TEST CPU REGISTERS
       //--------------------------------------------------------
-      dbg_id_pmem = `PMEM_SIZE;
-      dbg_id_dmem = `DMEM_SIZE;
-      dbg_id      = {dbg_id_pmem, dbg_id_dmem};
+
+      cpu_version  =  `CPU_VERSION;
+`ifdef ASIC
+      cpu_asic     =  1'b1;
+`else
+      cpu_asic     =  1'b0;
+`endif
+      user_version =  `USER_VERSION;
+      per_space    = (`PER_SIZE  >> 9);
+`ifdef MULTIPLIER
+      mpy_info     =  1'b1;
+`else
+      mpy_info     =  1'b0;
+`endif
+      dmem_size    = (`DMEM_SIZE >> 7);
+      pmem_size    = (`PMEM_SIZE >> 10);
+
+      dbg_id       = {pmem_size,
+		      dmem_size,
+		      mpy_info,
+		      per_space,
+		      user_version,
+		      cpu_asic,
+                      cpu_version};
 
       dbg_uart_wr(CPU_ID_LO  ,  16'hffff);
       dbg_uart_rd(CPU_ID_LO);
@@ -128,7 +156,7 @@ initial
 
       // TEST HARDWARE BREAKPOINT 0 REGISTERS
       //--------------------------------------------------------
-
+`ifdef DBG_HWBRK_0
       dbg_uart_wr(BRK0_CTL   ,  16'hffff);
       dbg_uart_rd(BRK0_CTL);
       if (`HWBRK_RANGE)
@@ -163,11 +191,11 @@ initial
       dbg_uart_wr(BRK0_ADDR1 ,  16'h0000);
       dbg_uart_rd(BRK0_ADDR1);
       if (dbg_uart_buf !== 16'h0000)      tb_error("====== BRK0_ADDR1 uncorrect =====");
-
+`endif
 
       // TEST HARDWARE BREAKPOINT 1 REGISTERS
       //--------------------------------------------------------
-
+`ifdef DBG_HWBRK_1
       dbg_uart_wr(BRK1_CTL   ,  16'hffff);
       dbg_uart_rd(BRK1_CTL);
       if (`HWBRK_RANGE)
@@ -202,11 +230,11 @@ initial
       dbg_uart_wr(BRK1_ADDR1 ,  16'h0000);
       dbg_uart_rd(BRK1_ADDR1);
       if (dbg_uart_buf !== 16'h0000)      tb_error("====== BRK1_ADDR1 uncorrect =====");
-
+`endif
 
       // TEST HARDWARE BREAKPOINT 2 REGISTERS
       //--------------------------------------------------------
-
+`ifdef DBG_HWBRK_2
       dbg_uart_wr(BRK2_CTL   ,  16'hffff);
       dbg_uart_rd(BRK2_CTL);
       if (`HWBRK_RANGE)
@@ -241,11 +269,11 @@ initial
       dbg_uart_wr(BRK2_ADDR1 ,  16'h0000);
       dbg_uart_rd(BRK2_ADDR1);
       if (dbg_uart_buf !== 16'h0000)      tb_error("====== BRK2_ADDR1 uncorrect =====");
-
+`endif
       
       // TEST HARDWARE BREAKPOINT 3 REGISTERS
       //--------------------------------------------------------
-
+`ifdef DBG_HWBRK_3
       dbg_uart_wr(BRK3_CTL   ,  16'hffff);
       dbg_uart_rd(BRK3_CTL);
       if (`HWBRK_RANGE)
@@ -280,13 +308,13 @@ initial
       dbg_uart_wr(BRK3_ADDR1 ,  16'h0000);
       dbg_uart_rd(BRK3_ADDR1);
       if (dbg_uart_buf !== 16'h0000)      tb_error("====== BRK3_ADDR1 uncorrect =====");
-
+`endif
 
       // TEST 16B WRITE BURSTS (MEMORY)
       //--------------------------------------------------------
 
-      dbg_uart_wr(MEM_ADDR, 16'h0200); // select @0x0200
-      dbg_uart_wr(MEM_CNT,  16'h0004); // 5 consecutive access
+      dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0000)); // select @0x0200
+      dbg_uart_wr(MEM_CNT,  16'h0004);             // 5 consecutive access
  
       dbg_uart_wr(MEM_CTL,  16'h0003); // Start burst to 16 bit memory write
       dbg_uart_tx16(16'h1234);         // write 1st data
@@ -305,8 +333,8 @@ initial
       repeat(12) @(posedge mclk);
       if (mem208 !== 16'h0fed)      tb_error("====== 16B WRITE BURSTS (MEMORY) WR ERROR: 5th DATA =====");
       
-      dbg_uart_wr(MEM_ADDR, 16'h0200); // select @0x0200
-      dbg_uart_wr(MEM_CNT,  16'h0004); // 5 consecutive access
+      dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0000)); // select @0x0200
+      dbg_uart_wr(MEM_CNT,  16'h0004);             // 5 consecutive access
       
       dbg_uart_wr(MEM_CTL,  16'h0001); // Start burst to 16 bit registers read
       dbg_uart_rx16();                 // read 1st data
@@ -363,7 +391,7 @@ initial
       // TEST 8B WRITE BURSTS (MEMORY)
       //--------------------------------------------------------
 
-      dbg_uart_wr(MEM_ADDR, 16'h0200); // select @0x0210
+      dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0000)); // select @0x0210
       dbg_uart_wr(MEM_CNT,  16'h0004); // 5 consecutive access
  
       dbg_uart_wr(MEM_CTL,  16'h000b); // Start burst to 8 bit memory write
@@ -383,7 +411,7 @@ initial
       repeat(12) @(posedge mclk);
       if (mem204 !== 16'h9a55)      tb_error("====== 8B WRITE BURSTS (MEMORY) WR ERROR: 5th DATA =====");
       
-      dbg_uart_wr(MEM_ADDR, 16'h0200); // select @0x0200
+      dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0000)); // select @0x0200
       dbg_uart_wr(MEM_CNT,  16'h0004); // 5 consecutive access
       
       dbg_uart_wr(MEM_CTL,  16'h0009); // Start burst to 8 bit registers read
@@ -406,5 +434,21 @@ initial
       repeat(10) @(posedge mclk);
 
       stimulus_done = 1;
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|   (serial debug interface UART not included)  |");
+       $display(" ===============================================");
+       $finish;
+`endif
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|      (serial debug interface not included)    |");
+       $display(" ===============================================");
+       $finish;
+`endif
    end
 

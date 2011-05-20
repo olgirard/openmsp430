@@ -69,7 +69,7 @@
 //=============================================================================
 
 +incdir+../../../rtl/verilog/openmsp430/
-+incdir+../../../rtl/verilog/openmsp430/periph
++incdir+../../../rtl/verilog/openmsp430/periph/
 ../../../rtl/verilog/openmsp430/openMSP430.v
 ../../../rtl/verilog/openmsp430/omsp_frontend.v
 ../../../rtl/verilog/openmsp430/omsp_execution_unit.v
@@ -83,5 +83,6 @@
 ../../../rtl/verilog/openmsp430/omsp_dbg_uart.v
 ../../../rtl/verilog/openmsp430/omsp_watchdog.v
 ../../../rtl/verilog/openmsp430/omsp_multiplier.v
+../../../rtl/verilog/openmsp430/omsp_sync_cell.v
 ../../../rtl/verilog/openmsp430/periph/omsp_gpio.v
 ../../../rtl/verilog/openmsp430/periph/omsp_timerA.v

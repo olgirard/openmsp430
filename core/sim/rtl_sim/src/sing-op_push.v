@@ -46,7 +46,7 @@ initial
 
       // Initialization
       @(r15==16'h1000);
-      if (r1     !==16'h0252) tb_error("====== SP  initialization (R1 value)      =====");
+      if (r1     !==(`PER_SIZE+16'h0052)) tb_error("====== SP  initialization (R1 value)      =====");
       if (mem250 !==16'h0000) tb_error("====== RAM Initialization (@0x0250 value) =====");
       if (mem24E !==16'h0000) tb_error("====== RAM Initialization (@0x024e value) =====");
       if (mem24C !==16'h0000) tb_error("====== RAM Initialization (@0x024c value) =====");
@@ -68,7 +68,7 @@ initial
 
       // Addressing mode: Rn
       @(r15==16'h2000);
-      if (r1     !==16'h024E) tb_error("====== PUSH (Rn mode): SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h004E)) tb_error("====== PUSH (Rn mode): SP value      =====");
       if (mem250 !==16'h7524) tb_error("====== PUSH (Rn mode): @0x0250 value =====");
       if (mem24E !==16'h1cb6) tb_error("====== PUSH (Rn mode): @0x024E value =====");
       if (mem24C !==16'h0000) tb_error("====== PUSH (Rn mode): @0x024c value =====");
@@ -90,7 +90,7 @@ initial
 
       // Addressing mode: @Rn
       @(r15==16'h3000);
-      if (r1     !==16'h024A) tb_error("====== PUSH (@Rn mode): SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h004A)) tb_error("====== PUSH (@Rn mode): SP value      =====");
       if (mem250 !==16'h7524) tb_error("====== PUSH (@Rn mode): @0x0250 value =====");
       if (mem24E !==16'h1cb6) tb_error("====== PUSH (@Rn mode): @0x024E value =====");
       if (mem24C !==16'h1234) tb_error("====== PUSH (@Rn mode): @0x024c value =====");
@@ -112,8 +112,8 @@ initial
 
       // Addressing mode: @Rn+
       @(r15==16'h4000);
-      if (r4     !==16'h021A) tb_error("====== PUSH (@Rn+ mode): R4 value      =====");
-      if (r1     !==16'h0246) tb_error("====== PUSH (@Rn+ mode): SP value      =====");
+      if (r4     !==(`PER_SIZE+16'h001A)) tb_error("====== PUSH (@Rn+ mode): R4 value      =====");
+      if (r1     !==(`PER_SIZE+16'h0046)) tb_error("====== PUSH (@Rn+ mode): SP value      =====");
       if (mem250 !==16'h7524) tb_error("====== PUSH (@Rn+ mode): @0x0250 value =====");
       if (mem24E !==16'h1cb6) tb_error("====== PUSH (@Rn+ mode): @0x024E value =====");
       if (mem24C !==16'h1234) tb_error("====== PUSH (@Rn+ mode): @0x024c value =====");
@@ -135,7 +135,7 @@ initial
 
       // Addressing mode: X(Rn)
       @(r15==16'h5000);
-      if (r1     !==16'h0242) tb_error("====== PUSH (X(Rn) mode): SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h0042)) tb_error("====== PUSH (X(Rn) mode): SP value      =====");
       if (mem250 !==16'h7524) tb_error("====== PUSH (X(Rn) mode): @0x0250 value =====");
       if (mem24E !==16'h1cb6) tb_error("====== PUSH (X(Rn) mode): @0x024E value =====");
       if (mem24C !==16'h1234) tb_error("====== PUSH (X(Rn) mode): @0x024c value =====");
@@ -157,7 +157,7 @@ initial
 
       // Addressing mode: EDE
       @(r15==16'h6000);
-      if (r1     !==16'h023E) tb_error("====== PUSH (EDE mode): SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h003E)) tb_error("====== PUSH (EDE mode): SP value      =====");
       if (mem250 !==16'h7524) tb_error("====== PUSH (EDE mode): @0x0250 value =====");
       if (mem24E !==16'h1cb6) tb_error("====== PUSH (EDE mode): @0x024E value =====");
       if (mem24C !==16'h1234) tb_error("====== PUSH (EDE mode): @0x024c value =====");
@@ -179,7 +179,7 @@ initial
 
       // Addressing mode: &EDE
       @(r15==16'h7000);
-      if (r1     !==16'h023A) tb_error("====== PUSH (&EDE mode): SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h003A)) tb_error("====== PUSH (&EDE mode): SP value      =====");
       if (mem250 !==16'h7524) tb_error("====== PUSH (&EDE mode): @0x0250 value =====");
       if (mem24E !==16'h1cb6) tb_error("====== PUSH (&EDE mode): @0x024E value =====");
       if (mem24C !==16'h1234) tb_error("====== PUSH (&EDE mode): @0x024c value =====");
@@ -201,7 +201,7 @@ initial
 
       // Addressing mode: #N
       @(r15==16'h7001);
-      if (r1     !==16'h0236) tb_error("====== PUSH (#N mode): SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h0036)) tb_error("====== PUSH (#N mode): SP value      =====");
       if (mem250 !==16'h7524) tb_error("====== PUSH (#N mode): @0x0250 value =====");
       if (mem24E !==16'h1cb6) tb_error("====== PUSH (#N mode): @0x024E value =====");
       if (mem24C !==16'h1234) tb_error("====== PUSH (#N mode): @0x024c value =====");
@@ -225,7 +225,7 @@ initial
 
       // Initialization
       @(r15==16'h8000);
-      if (r1     !==16'h0252) tb_error("====== SP  initialization (R1 value)      =====");
+      if (r1     !==(`PER_SIZE+16'h0052)) tb_error("====== SP  initialization (R1 value)      =====");
       if (mem250 !==16'h7524) tb_error("====== RAM Initialization (@0x0250 value) =====");
       if (mem24E !==16'h1cb6) tb_error("====== RAM Initialization (@0x024E value) =====");
       if (mem24C !==16'h1234) tb_error("====== RAM Initialization (@0x024c value) =====");
@@ -247,7 +247,7 @@ initial
 
       // Addressing mode: Rn
       @(r15==16'h9000);
-      if (r1     !==16'h024E) tb_error("====== PUSH.B (Rn mode): SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h004E)) tb_error("====== PUSH.B (Rn mode): SP value      =====");
       if (mem250 !==16'h75e2) tb_error("====== PUSH.B (Rn mode): @0x0250 value =====");
       if (mem24E !==16'h1cc4) tb_error("====== PUSH.B (Rn mode): @0x024E value =====");
       if (mem24C !==16'h1234) tb_error("====== PUSH.B (Rn mode): @0x024c value =====");
@@ -269,7 +269,7 @@ initial
 
       // Addressing mode: @Rn
       @(r15==16'hA000);
-      if (r1     !==16'h024A) tb_error("====== PUSH.B (@Rn mode): SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h004A)) tb_error("====== PUSH.B (@Rn mode): SP value      =====");
       if (mem250 !==16'h75e2) tb_error("====== PUSH.B (@Rn mode): @0x0250 value =====");
       if (mem24E !==16'h1cc4) tb_error("====== PUSH.B (@Rn mode): @0x024E value =====");
       if (mem24C !==16'h12a6) tb_error("====== PUSH.B (@Rn mode): @0x024c value =====");
@@ -291,8 +291,8 @@ initial
 
       // Addressing mode: @Rn+
       @(r15==16'hB000);
-      if (r4     !==16'h0218) tb_error("====== PUSH.B (@Rn+ mode): R4 value      =====");
-      if (r1     !==16'h0246) tb_error("====== PUSH.B (@Rn+ mode): SP value      =====");
+      if (r4     !==(`PER_SIZE+16'h0018)) tb_error("====== PUSH.B (@Rn+ mode): R4 value      =====");
+      if (r1     !==(`PER_SIZE+16'h0046)) tb_error("====== PUSH.B (@Rn+ mode): SP value      =====");
       if (mem250 !==16'h75e2) tb_error("====== PUSH.B (@Rn+ mode): @0x0250 value =====");
       if (mem24E !==16'h1cc4) tb_error("====== PUSH.B (@Rn+ mode): @0x024E value =====");
       if (mem24C !==16'h12a6) tb_error("====== PUSH.B (@Rn+ mode): @0x024c value =====");
@@ -314,7 +314,7 @@ initial
 
       // Addressing mode: X(Rn)
       @(r15==16'hC000);
-      if (r1     !==16'h0242) tb_error("====== PUSH.B (X(Rn) mode): SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h0042)) tb_error("====== PUSH.B (X(Rn) mode): SP value      =====");
       if (mem250 !==16'h75e2) tb_error("====== PUSH.B (X(Rn) mode): @0x0250 value =====");
       if (mem24E !==16'h1cc4) tb_error("====== PUSH.B (X(Rn) mode): @0x024E value =====");
       if (mem24C !==16'h12a6) tb_error("====== PUSH.B (X(Rn) mode): @0x024c value =====");
@@ -336,7 +336,7 @@ initial
 
       // Addressing mode: EDE
       @(r15==16'hD000);
-      if (r1     !==16'h023E) tb_error("====== PUSH.B (EDE mode): SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h003E)) tb_error("====== PUSH.B (EDE mode): SP value      =====");
       if (mem250 !==16'h75e2) tb_error("====== PUSH.B (EDE mode): @0x0250 value =====");
       if (mem24E !==16'h1cc4) tb_error("====== PUSH.B (EDE mode): @0x024E value =====");
       if (mem24C !==16'h12a6) tb_error("====== PUSH.B (EDE mode): @0x024c value =====");
@@ -358,7 +358,7 @@ initial
 
       // Addressing mode: &EDE
       @(r15==16'hE000);
-      if (r1     !==16'h023A) tb_error("====== PUSH.B (&EDE mode): SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h003A)) tb_error("====== PUSH.B (&EDE mode): SP value      =====");
       if (mem250 !==16'h75e2) tb_error("====== PUSH.B (&EDE mode): @0x0250 value =====");
       if (mem24E !==16'h1cc4) tb_error("====== PUSH.B (&EDE mode): @0x024E value =====");
       if (mem24C !==16'h12a6) tb_error("====== PUSH.B (&EDE mode): @0x024c value =====");
@@ -380,7 +380,7 @@ initial
 
       // Addressing mode: #N
       @(r15==16'hF000);
-      if (r1     !==16'h0236) tb_error("====== PUSH.B (#N mode): SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h0036)) tb_error("====== PUSH.B (#N mode): SP value      =====");
       if (mem250 !==16'h75e2) tb_error("====== PUSH.B (#N mode): @0x0250 value =====");
       if (mem24E !==16'h1cc4) tb_error("====== PUSH.B (#N mode): @0x024E value =====");
       if (mem24C !==16'h12a6) tb_error("====== PUSH.B (#N mode): @0x024c value =====");
@@ -403,7 +403,7 @@ initial
 
       // Addressing mode: SR
       @(r15==16'hF100);
-      if (r1     !==16'h0232) tb_error("====== PUSH SR : SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h0032)) tb_error("====== PUSH SR : SP value      =====");
       if (mem250 !==16'h75e2) tb_error("====== PUSH SR : @0x0250 value =====");
       if (mem24E !==16'h1cc4) tb_error("====== PUSH SR : @0x024E value =====");
       if (mem24C !==16'h12a6) tb_error("====== PUSH SR : @0x024c value =====");
@@ -418,13 +418,13 @@ initial
       if (mem23A !==16'h3d3b) tb_error("====== PUSH SR : @0x023a value =====");
       if (mem238 !==16'h71d9) tb_error("====== PUSH SR : @0x0238 value =====");
       if (mem236 !==16'h178d) tb_error("====== PUSH SR : @0x0236 value =====");
-      if (mem234 !==16'h0234) tb_error("====== PUSH SR : @0x0234 value =====");
-      if (mem232 !==16'h0232) tb_error("====== PUSH SR : @0x0232 value =====");
+      if (mem234 !==(`PER_SIZE+16'h0034)) tb_error("====== PUSH SR : @0x0234 value =====");
+      if (mem232 !==(`PER_SIZE+16'h0032)) tb_error("====== PUSH SR : @0x0232 value =====");
       if (mem230 !==16'h0000) tb_error("====== PUSH SR : @0x0230 value =====");
 
       // Addressing mode: @SR
       @(r15==16'hF200);
-      if (r1     !==16'h022E) tb_error("====== PUSH @SR : SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h002E)) tb_error("====== PUSH @SR : SP value      =====");
       if (mem250 !==16'h75e2) tb_error("====== PUSH @SR : @0x0250 value =====");
       if (mem24E !==16'h1cc4) tb_error("====== PUSH @SR : @0x024E value =====");
       if (mem24C !==16'h12a6) tb_error("====== PUSH @SR : @0x024c value =====");
@@ -439,15 +439,15 @@ initial
       if (mem23A !==16'h3d3b) tb_error("====== PUSH @SR : @0x023a value =====");
       if (mem238 !==16'h71d9) tb_error("====== PUSH @SR : @0x0238 value =====");
       if (mem236 !==16'h178d) tb_error("====== PUSH @SR : @0x0236 value =====");
-      if (mem234 !==16'h0234) tb_error("====== PUSH @SR : @0x0234 value =====");
-      if (mem232 !==16'h0232) tb_error("====== PUSH @SR : @0x0232 value =====");
+      if (mem234 !==(`PER_SIZE+16'h0034)) tb_error("====== PUSH @SR : @0x0234 value =====");
+      if (mem232 !==(`PER_SIZE+16'h0032)) tb_error("====== PUSH @SR : @0x0232 value =====");
       if (mem230 !==16'h0000) tb_error("====== PUSH @SR : @0x0230 value =====");
       if (mem22E !==16'h1234) tb_error("====== PUSH @SR : @0x022E value =====");
       if (mem22C !==16'h5678) tb_error("====== PUSH @SR : @0x022C value =====");
 
       // Addressing mode: @SR+
       @(r15==16'hF300);
-      if (r1     !==16'h022E) tb_error("====== PUSH @SR : SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h002E)) tb_error("====== PUSH @SR : SP value      =====");
       if (mem250 !==16'h75e2) tb_error("====== PUSH @SR : @0x0250 value =====");
       if (mem24E !==16'h1cc4) tb_error("====== PUSH @SR : @0x024E value =====");
       if (mem24C !==16'h12a6) tb_error("====== PUSH @SR : @0x024c value =====");
@@ -462,8 +462,8 @@ initial
       if (mem23A !==16'h3d3b) tb_error("====== PUSH @SR : @0x023a value =====");
       if (mem238 !==16'h71d9) tb_error("====== PUSH @SR : @0x0238 value =====");
       if (mem236 !==16'h178d) tb_error("====== PUSH @SR : @0x0236 value =====");
-      if (mem234 !==16'h0234) tb_error("====== PUSH @SR : @0x0234 value =====");
-      if (mem232 !==16'h0232) tb_error("====== PUSH @SR : @0x0232 value =====");
+      if (mem234 !==(`PER_SIZE+16'h0034)) tb_error("====== PUSH @SR : @0x0234 value =====");
+      if (mem232 !==(`PER_SIZE+16'h0032)) tb_error("====== PUSH @SR : @0x0232 value =====");
       if (mem230 !==16'h0000) tb_error("====== PUSH @SR : @0x0230 value =====");
       if (mem22E !==16'h1234) tb_error("====== PUSH @SR : @0x022E value =====");
       if (mem22C !==16'h5678) tb_error("====== PUSH @SR : @0x022C value =====");
@@ -472,7 +472,7 @@ initial
 
       // Addressing mode: x(SR)
       @(r15==16'hF400);
-      if (r1     !==16'h022A) tb_error("====== PUSH @SR : SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h002A)) tb_error("====== PUSH @SR : SP value      =====");
       if (mem250 !==16'h75e2) tb_error("====== PUSH @SR : @0x0250 value =====");
       if (mem24E !==16'h1cc4) tb_error("====== PUSH @SR : @0x024E value =====");
       if (mem24C !==16'h12a6) tb_error("====== PUSH @SR : @0x024c value =====");
@@ -487,8 +487,8 @@ initial
       if (mem23A !==16'h3d3b) tb_error("====== PUSH @SR : @0x023a value =====");
       if (mem238 !==16'h71d9) tb_error("====== PUSH @SR : @0x0238 value =====");
       if (mem236 !==16'h178d) tb_error("====== PUSH @SR : @0x0236 value =====");
-      if (mem234 !==16'h0234) tb_error("====== PUSH @SR : @0x0234 value =====");
-      if (mem232 !==16'h0232) tb_error("====== PUSH @SR : @0x0232 value =====");
+      if (mem234 !==(`PER_SIZE+16'h0034)) tb_error("====== PUSH @SR : @0x0234 value =====");
+      if (mem232 !==(`PER_SIZE+16'h0032)) tb_error("====== PUSH @SR : @0x0232 value =====");
       if (mem230 !==16'h0000) tb_error("====== PUSH @SR : @0x0230 value =====");
       if (mem22E !==16'h1234) tb_error("====== PUSH @SR : @0x022E value =====");
       if (mem22C !==16'h71d9) tb_error("====== PUSH @SR : @0x022C value =====");
@@ -500,7 +500,7 @@ initial
 
       // Addressing mode: x(SR)
       @(r15==16'hF500);
-      if (r1     !==16'h022E) tb_error("====== PUSH @SR : SP value      =====");
+      if (r1     !==(`PER_SIZE+16'h002E)) tb_error("====== PUSH @SR : SP value      =====");
       if (mem250 !==16'h75e2) tb_error("====== PUSH @SR : @0x0250 value =====");
       if (mem24E !==16'h1cc4) tb_error("====== PUSH @SR : @0x024E value =====");
       if (mem24C !==16'h12a6) tb_error("====== PUSH @SR : @0x024c value =====");

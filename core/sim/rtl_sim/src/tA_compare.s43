@@ -37,6 +37,22 @@
 
 .global main
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_202,  (__data_start+0x02)
+.set   DMEM_204,  (__data_start+0x04)
+.set   DMEM_206,  (__data_start+0x06)
+.set   DMEM_208,  (__data_start+0x08)
+.set   DMEM_212,  (__data_start+0x12)
+.set   DMEM_214,  (__data_start+0x14)
+.set   DMEM_216,  (__data_start+0x16)
+.set   DMEM_218,  (__data_start+0x18)
+.set   DMEM_222,  (__data_start+0x22)
+.set   DMEM_224,  (__data_start+0x24)
+.set   DMEM_226,  (__data_start+0x26)
+.set   DMEM_228,  (__data_start+0x28)
+.set   DMEM_250,  (__data_start+0x50)
+
 .set   TACTL,   0x0160
 .set   TAR,     0x0170
 .set   TACCTL0, 0x0162
@@ -54,8 +70,8 @@ WAIT_FUNC:
 	ret
 	
 main:
- 	mov  #0x0250, r1 	; # Initialize stack pointer
-	mov  #0x0000, &0x0200
+ 	mov  #DMEM_250, r1 	; # Initialize stack pointer
+	mov  #0x0000, &DMEM_200
 
 	
        /* --------------   TIMER A TEST:  UP MODE   ----------------- */
@@ -75,7 +91,7 @@ main:
 	mov  #0x0000, &TACCR2   ; #
 	mov  #0x0000, &TACCTL2  ; # Disabled
 	mov  #0x0256, &TACTL    ; # Up-mode & clk/2, IRQ enabled
-	mov  #0x0001, &0x0200
+	mov  #0x0001, &DMEM_200
 	mov  #0x0010, r14
         call #WAIT_FUNC
 
@@ -89,7 +105,7 @@ main:
 	mov  #0x0000, &TACCR2   ; #
 	mov  #0x0000, &TACCTL2  ; # Disabled
 	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
-	mov  #0x0002, &0x0200
+	mov  #0x0002, &DMEM_200
 	mov  #0x0008, r14
         call #WAIT_FUNC
 
@@ -103,13 +119,13 @@ main:
 	mov  #0x000C, &TACCR2   ; #
 	mov  #0x0090, &TACCTL2  ; # Compare mode, output toggle mode, IRQ enabled
 	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
-	mov  #0x0003, &0x0200
+	mov  #0x0003, &DMEM_200
 	mov  #0x0008, r14
         call #WAIT_FUNC
 
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x1000, r15
 
 	
@@ -131,7 +147,7 @@ main:
 	mov  #0x0090, &TACCTL2  ; # Compare mode, output toggle mode, IRQ enabled
 	mov  #0x0266, &TACTL    ; # Continuous-mode & clk/2, IRQ enabled
 	mov  #0xfff0, &TAR
-	mov  #0x0001, &0x0200
+	mov  #0x0001, &DMEM_200
 	mov  #0x0080, r14
         call #WAIT_FUNC
 
@@ -145,13 +161,13 @@ main:
 	mov  #0x0090, &TACCTL2  ; # Compare mode, output toggle mode, IRQ enabled
 	mov  #0x0266, &TACTL    ; # Continuous-mode & clk/2, IRQ enabled
 	mov  #0xfff0, &TAR
-	mov  #0x0002, &0x0200
+	mov  #0x0002, &DMEM_200
 	mov  #0x0080, r14
         call #WAIT_FUNC
 
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x2000, r15
 	
 	
@@ -171,7 +187,7 @@ main:
 	mov  #0x0090, &TACCTL1  ; # Compare mode, output toggle mode, IRQ enabled
 	mov  #0x0030, &TACCR2
 	mov  #0x0090, &TACCTL2  ; # Compare mode, output toggle mode, IRQ enabled
-	mov  #0x0001, &0x0200
+	mov  #0x0001, &DMEM_200
 	mov  #0x0277, &TACTL    ; # Up-down mode & clk/2, IRQ enabled
 	mov  #0x00E0, r14
         call #WAIT_FUNC
@@ -189,14 +205,14 @@ main:
 	mov  #0x0090, &TACCTL1  ; # Compare mode, output toggle mode, IRQ enabled
 	mov  #0x0030, &TACCR2
 	mov  #0x0090, &TACCTL2  ; # Compare mode, output toggle mode, IRQ enabled
-	mov  #0x0002, &0x0200
+	mov  #0x0002, &DMEM_200
 	mov  #0x0277, &TACTL    ; # Up-down mode & clk/2, IRQ enabled
 	mov  #0x00E0, r14
         call #WAIT_FUNC
 
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x3000, r15
 	
         /* --------------   TIMER A TEST:  CCI INPUT LATCHING (SCCI)  ----------------- */
@@ -215,25 +231,25 @@ main:
 	mov  #0x0000, &TACCTL1  ; # Disabled
 	mov  #0x0000, &TACCR2
 	mov  #0x0000, &TACCTL2  ; # Disabled
-	mov  #0x0001, &0x0200
+	mov  #0x0001, &DMEM_200
 	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
 
 comp0_check_0:                  ; # Wait until SCCI is set to 1
-	mov       r5, &0x0202
+	mov       r5, &DMEM_202
 	mov &TACCTL0, r5
 	mov       r5, r4
 	and  #0x0001, r4
 	jz  comp0_check_0
-	mov &TACCTL0, &0x0204
+	mov &TACCTL0, &DMEM_204
 
 	mov  #0x2080, &TACCTL0  ; # Wait until SCCI is set back to 0
 comp0_check_1:
-	mov       r5, &0x0206
+	mov       r5, &DMEM_206
 	mov &TACCTL0, r5
 	mov       r5, r4
 	and  #0x0001, r4
 	jz  comp0_check_1
-	mov &TACCTL0, &0x0208
+	mov &TACCTL0, &DMEM_208
 
 	
 	                        ; # --------- UP-MODE - COMPARATOR 1 ----------
@@ -244,25 +260,25 @@ comp0_check_1:
 	mov  #0x3080, &TACCTL1  ; # Compare mode, output toggle mode, select VCC input
 	mov  #0x0000, &TACCR2
 	mov  #0x0000, &TACCTL2  ; # Disabled
-	mov  #0x0002, &0x0200
+	mov  #0x0002, &DMEM_200
 	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
 
 comp1_check_0:                  ; # Wait until SCCI is set to 1
-	mov       r5, &0x0212
+	mov       r5, &DMEM_212
 	mov &TACCTL1, r5
 	mov       r5, r4
 	and  #0x0001, r4
 	jz  comp1_check_0
-	mov &TACCTL1, &0x0214
+	mov &TACCTL1, &DMEM_214
 
 	mov  #0x2080, &TACCTL1  ; # Wait until SCCI is set back to 0
 comp1_check_1:
-	mov       r5, &0x0216
+	mov       r5, &DMEM_216
 	mov &TACCTL1, r5
 	mov       r5, r4
 	and  #0x0001, r4
 	jz  comp1_check_1
-	mov &TACCTL1, &0x0218
+	mov &TACCTL1, &DMEM_218
 	
 	
 	                        ; # --------- UP-MODE - COMPARATOR 2 ----------
@@ -273,29 +289,29 @@ comp1_check_1:
 	mov  #0x0000, &TACCTL1  ; # Disabled
 	mov  #0x0020, &TACCR2
 	mov  #0x3080, &TACCTL2  ; # Compare mode, output toggle mode, select VCC input
-	mov  #0x0003, &0x0200
+	mov  #0x0003, &DMEM_200
 	mov  #0x0254, &TACTL    ; # Up-mode & clk/2
 
 comp2_check_0:                  ; # Wait until SCCI is set to 1
-	mov       r5, &0x0222
+	mov       r5, &DMEM_222
 	mov &TACCTL2, r5
 	mov       r5, r4
 	and  #0x0001, r4
 	jz  comp2_check_0
-	mov &TACCTL2, &0x0224
+	mov &TACCTL2, &DMEM_224
 
 	mov  #0x2080, &TACCTL2  ; # Wait until SCCI is set back to 0
 comp2_check_1:
-	mov       r5, &0x0226
+	mov       r5, &DMEM_226
 	mov &TACCTL2, r5
 	mov       r5, r4
 	and  #0x0001, r4
 	jz  comp2_check_1
-	mov &TACCTL2, &0x0228
+	mov &TACCTL2, &DMEM_228
 	
 		
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x4000, r15
 
 	
@@ -308,13 +324,13 @@ end_of_test:
         /* ----------------------      INTERRUPT ROUTINES    --------------- */
 
 TIMERA_CCR0_VECTOR:
-	mov     &TAR, &0x0202
+	mov     &TAR, &DMEM_202
 	reti
 
 	
 TIMERA_TAIV_VECTOR:
-	mov     &TAR, &0x0204
-	mov    &TAIV, &0x0206
+	mov     &TAR, &DMEM_204
+	mov    &TAIV, &DMEM_206
 	reti
 
 

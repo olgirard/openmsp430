@@ -17,8 +17,9 @@ set RTL_SOURCE_FILES {../../rtl/verilog/openMSP430.v
                       ../../rtl/verilog/omsp_dbg.v
                       ../../rtl/verilog/omsp_dbg_uart.v
                       ../../rtl/verilog/omsp_dbg_hwbrk.v
+                      ../../rtl/verilog/omsp_multiplier.v
+                      ../../rtl/verilog/omsp_sync_cell.v
 }
-
 
 set_svf ./results/$DESIGN_NAME.svf
 define_design_lib WORK -path ./WORK

@@ -61,7 +61,7 @@ module  omsp_register_file (
     inst_src,                     // Register source selection
     mclk,                         // Main system clock
     pc,                           // Program counter
-    puc,                          // Main system reset
+    puc_rst,                      // Main system reset
     reg_dest_val,                 // Selected register destination value
     reg_dest_wr,                  // Write selected register destination
     reg_pc_call,                  // Trigger PC update for a CALL instruction
@@ -93,7 +93,7 @@ input        [15:0] inst_dest;    // Register destination selection
 input        [15:0] inst_src;     // Register source selection
 input               mclk;         // Main system clock
 input        [15:0] pc;           // Program counter
-input               puc;          // Main system reset
+input               puc_rst;      // Main system reset
 input        [15:0] reg_dest_val; // Selected register destination value
 input               reg_dest_wr;  // Write selected register destination
 input               reg_pc_call;  // Trigger PC update for a CALL instruction
@@ -139,8 +139,8 @@ reg [15:0] r1;
 wire       r1_wr  = inst_dest[1] & reg_dest_wr;
 wire       r1_inc = inst_src_in[1]  & reg_incr;
 
-always @(posedge mclk or posedge puc)
-  if (puc)            r1 <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)        r1 <= 16'h0000;
   else if (r1_wr)     r1 <= reg_dest_val_in & 16'hfffe;
   else if (reg_sp_wr) r1 <= reg_sp_val      & 16'hfffe;
   else if (r1_inc)    r1 <= reg_incr_val    & 16'hfffe;
@@ -166,8 +166,8 @@ wire        r2_v   = alu_stat_wr[3] ? alu_stat[3]       :
                      r2_wr          ? reg_dest_val_in[8]   : r2[8]; // V
 
 
-always @(posedge mclk or posedge puc)
-  if (puc)             r2 <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)         r2 <= 16'h0000;
   else if (reg_sr_clr) r2 <= 16'h0000;
   else                 r2 <= {7'h00, r2_v, r2_nxt, r2_n, r2_z, r2_c};
 
@@ -184,8 +184,8 @@ reg [15:0] r3;
 wire       r3_wr  = inst_dest[3] & reg_dest_wr;
 wire       r3_inc = inst_src_in[3]  & reg_incr;
 
-always @(posedge mclk or posedge puc)
-  if (puc)         r3 <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     r3 <= 16'h0000;
   else if (r3_wr)  r3 <= reg_dest_val_in;
   else if (r3_inc) r3 <= reg_incr_val;
 
@@ -198,8 +198,8 @@ always @(posedge mclk or posedge puc)
 reg [15:0] r4;
 wire       r4_wr  = inst_dest[4] & reg_dest_wr;
 wire       r4_inc = inst_src_in[4]  & reg_incr;
-always @(posedge mclk or posedge puc)
-  if (puc)          r4  <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      r4  <= 16'h0000;
   else if (r4_wr)   r4  <= reg_dest_val_in;
   else if (r4_inc)  r4  <= reg_incr_val;
 
@@ -207,8 +207,8 @@ always @(posedge mclk or posedge puc)
 reg [15:0] r5;
 wire       r5_wr  = inst_dest[5] & reg_dest_wr;
 wire       r5_inc = inst_src_in[5]  & reg_incr;
-always @(posedge mclk or posedge puc)
-  if (puc)          r5  <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      r5  <= 16'h0000;
   else if (r5_wr)   r5  <= reg_dest_val_in;
   else if (r5_inc)  r5  <= reg_incr_val;
 
@@ -216,8 +216,8 @@ always @(posedge mclk or posedge puc)
 reg [15:0] r6;
 wire       r6_wr  = inst_dest[6] & reg_dest_wr;
 wire       r6_inc = inst_src_in[6]  & reg_incr;
-always @(posedge mclk or posedge puc)
-  if (puc)          r6  <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      r6  <= 16'h0000;
   else if (r6_wr)   r6  <= reg_dest_val_in;
   else if (r6_inc)  r6  <= reg_incr_val;
 
@@ -225,8 +225,8 @@ always @(posedge mclk or posedge puc)
 reg [15:0] r7;
 wire       r7_wr  = inst_dest[7] & reg_dest_wr;
 wire       r7_inc = inst_src_in[7]  & reg_incr;
-always @(posedge mclk or posedge puc)
-  if (puc)          r7  <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      r7  <= 16'h0000;
   else if (r7_wr)   r7  <= reg_dest_val_in;
   else if (r7_inc)  r7  <= reg_incr_val;
 
@@ -234,8 +234,8 @@ always @(posedge mclk or posedge puc)
 reg [15:0] r8;
 wire       r8_wr  = inst_dest[8] & reg_dest_wr;
 wire       r8_inc = inst_src_in[8]  & reg_incr;
-always @(posedge mclk or posedge puc)
-  if (puc)          r8  <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      r8  <= 16'h0000;
   else if (r8_wr)   r8  <= reg_dest_val_in;
   else if (r8_inc)  r8  <= reg_incr_val;
 
@@ -243,8 +243,8 @@ always @(posedge mclk or posedge puc)
 reg [15:0] r9;
 wire       r9_wr  = inst_dest[9] & reg_dest_wr;
 wire       r9_inc = inst_src_in[9]  & reg_incr;
-always @(posedge mclk or posedge puc)
-  if (puc)          r9  <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      r9  <= 16'h0000;
   else if (r9_wr)   r9  <= reg_dest_val_in;
   else if (r9_inc)  r9  <= reg_incr_val;
 
@@ -252,8 +252,8 @@ always @(posedge mclk or posedge puc)
 reg [15:0] r10;
 wire       r10_wr  = inst_dest[10] & reg_dest_wr;
 wire       r10_inc = inst_src_in[10]  & reg_incr;
-always @(posedge mclk or posedge puc)
-  if (puc)          r10 <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      r10 <= 16'h0000;
   else if (r10_wr)  r10 <= reg_dest_val_in;
   else if (r10_inc) r10 <= reg_incr_val;
 
@@ -261,8 +261,8 @@ always @(posedge mclk or posedge puc)
 reg [15:0] r11;
 wire       r11_wr  = inst_dest[11] & reg_dest_wr;
 wire       r11_inc = inst_src_in[11]  & reg_incr;
-always @(posedge mclk or posedge puc)
-  if (puc)          r11 <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      r11 <= 16'h0000;
   else if (r11_wr)  r11 <= reg_dest_val_in;
   else if (r11_inc) r11 <= reg_incr_val;
 
@@ -270,8 +270,8 @@ always @(posedge mclk or posedge puc)
 reg [15:0] r12;
 wire       r12_wr  = inst_dest[12] & reg_dest_wr;
 wire       r12_inc = inst_src_in[12]  & reg_incr;
-always @(posedge mclk or posedge puc)
-  if (puc)          r12 <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      r12 <= 16'h0000;
   else if (r12_wr)  r12 <= reg_dest_val_in;
   else if (r12_inc) r12 <= reg_incr_val;
 
@@ -279,8 +279,8 @@ always @(posedge mclk or posedge puc)
 reg [15:0] r13;
 wire       r13_wr  = inst_dest[13] & reg_dest_wr;
 wire       r13_inc = inst_src_in[13]  & reg_incr;
-always @(posedge mclk or posedge puc)
-  if (puc)          r13 <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      r13 <= 16'h0000;
   else if (r13_wr)  r13 <= reg_dest_val_in;
   else if (r13_inc) r13 <= reg_incr_val;
 
@@ -288,8 +288,8 @@ always @(posedge mclk or posedge puc)
 reg [15:0] r14;
 wire       r14_wr  = inst_dest[14] & reg_dest_wr;
 wire       r14_inc = inst_src_in[14]  & reg_incr;
-always @(posedge mclk or posedge puc)
-  if (puc)          r14 <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      r14 <= 16'h0000;
   else if (r14_wr)  r14 <= reg_dest_val_in;
   else if (r14_inc) r14 <= reg_incr_val;
 
@@ -297,8 +297,8 @@ always @(posedge mclk or posedge puc)
 reg [15:0] r15;
 wire       r15_wr  = inst_dest[15] & reg_dest_wr;
 wire       r15_inc = inst_src_in[15]  & reg_incr;
-always @(posedge mclk or posedge puc)
-  if (puc)          r15 <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      r15 <= 16'h0000;
   else if (r15_wr)  r15 <= reg_dest_val_in;
   else if (r15_inc) r15 <= reg_incr_val;
 

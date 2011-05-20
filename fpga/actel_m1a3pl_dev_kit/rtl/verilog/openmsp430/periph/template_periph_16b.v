@@ -36,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 106 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 
 module  template_periph_16b (
@@ -52,7 +52,7 @@ module  template_periph_16b (
     per_din,                        // Peripheral data input
     per_en,                         // Peripheral enable (high active)
     per_we,                         // Peripheral write enable (high active)
-    puc                             // Main system reset
+    puc_rst                         // Main system reset
 );
 
 // OUTPUTs
@@ -62,53 +62,63 @@ output       [15:0] per_dout;       // Peripheral data output
 // INPUTs
 //=========
 input               mclk;           // Main system clock
-input         [7:0] per_addr;       // Peripheral address
+input        [13:0] per_addr;       // Peripheral address
 input        [15:0] per_din;        // Peripheral data input
 input               per_en;         // Peripheral enable (high active)
 input         [1:0] per_we;         // Peripheral write enable (high active)
-input               puc;            // Main system reset
+input               puc_rst;        // Main system reset
 
 
 //=============================================================================
 // 1)  PARAMETER DECLARATION
 //=============================================================================
 
-// Register addresses
-parameter           CNTRL1     = 9'h190;
-parameter           CNTRL2     = 9'h192;
-parameter           CNTRL3     = 9'h194;
-parameter           CNTRL4     = 9'h196;
+// Register base address (must be aligned to decoder bit width)
+parameter       [14:0] BASE_ADDR   = 15'h0190;
 
+// Decoder bit width (defines how many bits are considered for address decoding)
+parameter              DEC_WD      =  3;
+
+// Register addresses offset
+parameter [DEC_WD-1:0] CNTRL1      = 'h0,
+                       CNTRL2      = 'h2,
+                       CNTRL3      = 'h4,
+                       CNTRL4      = 'h6;
+
+// Register one-hot decoder utilities
+parameter              DEC_SZ      =  2**DEC_WD;
+parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder
-parameter           CNTRL1_D   = (512'h1 << CNTRL1);
-parameter           CNTRL2_D   = (512'h1 << CNTRL2);
-parameter           CNTRL3_D   = (512'h1 << CNTRL3);
-parameter           CNTRL4_D   = (512'h1 << CNTRL4);
+parameter [DEC_SZ-1:0] CNTRL1_D    = (BASE_REG << CNTRL1),
+                       CNTRL2_D    = (BASE_REG << CNTRL2),
+                       CNTRL3_D    = (BASE_REG << CNTRL3),
+                       CNTRL4_D    = (BASE_REG << CNTRL4);
 
 
 //============================================================================
 // 2)  REGISTER DECODER
 //============================================================================
 
+// Local register selection
+wire              reg_sel   =  per_en & (per_addr[13:DEC_WD-1]==BASE_ADDR[14:DEC_WD]);
+
+// Register local address
+wire [DEC_WD-1:0] reg_addr  =  {per_addr[DEC_WD-2:0], 1'b0};
+
 // Register address decode
-reg  [511:0]  reg_dec; 
-always @(per_addr)
-  case ({per_addr,1'b0})
-    CNTRL1 :     reg_dec  =  CNTRL1_D;
-    CNTRL2 :     reg_dec  =  CNTRL2_D;
-    CNTRL3 :     reg_dec  =  CNTRL3_D;
-    CNTRL4 :     reg_dec  =  CNTRL4_D;
-    default:     reg_dec  =  {512{1'b0}};
-  endcase
+wire [DEC_SZ-1:0] reg_dec   =  (CNTRL1_D  &  {DEC_SZ{(reg_addr == CNTRL1 )}})  |
+                               (CNTRL2_D  &  {DEC_SZ{(reg_addr == CNTRL2 )}})  |
+                               (CNTRL3_D  &  {DEC_SZ{(reg_addr == CNTRL3 )}})  |
+                               (CNTRL4_D  &  {DEC_SZ{(reg_addr == CNTRL4 )}});
 
 // Read/Write probes
-wire         reg_write =  |per_we & per_en;
-wire         reg_read  = ~|per_we & per_en;
+wire              reg_write =  |per_we & reg_sel;
+wire              reg_read  = ~|per_we & reg_sel;
 
 // Read/Write vectors
-wire [511:0] reg_wr    = reg_dec & {512{reg_write}};
-wire [511:0] reg_rd    = reg_dec & {512{reg_read}};
+wire [DEC_SZ-1:0] reg_wr    = reg_dec & {DEC_SZ{reg_write}};
+wire [DEC_SZ-1:0] reg_rd    = reg_dec & {DEC_SZ{reg_read}};
 
 
 //============================================================================
@@ -121,8 +131,8 @@ reg  [15:0] cntrl1;
 
 wire        cntrl1_wr = reg_wr[CNTRL1];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            cntrl1 <=  16'h0000;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        cntrl1 <=  16'h0000;
   else if (cntrl1_wr) cntrl1 <=  per_din;
 
    
@@ -132,8 +142,8 @@ reg  [15:0] cntrl2;
 
 wire        cntrl2_wr = reg_wr[CNTRL2];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            cntrl2 <=  16'h0000;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        cntrl2 <=  16'h0000;
   else if (cntrl2_wr) cntrl2 <=  per_din;
 
    
@@ -143,8 +153,8 @@ reg  [15:0] cntrl3;
 
 wire        cntrl3_wr = reg_wr[CNTRL3];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            cntrl3 <=  16'h0000;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        cntrl3 <=  16'h0000;
   else if (cntrl3_wr) cntrl3 <=  per_din;
 
    
@@ -154,8 +164,8 @@ reg  [15:0] cntrl4;
 
 wire        cntrl4_wr = reg_wr[CNTRL4];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)            cntrl4 <=  16'h0000;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)        cntrl4 <=  16'h0000;
   else if (cntrl4_wr) cntrl4 <=  per_din;
 
 

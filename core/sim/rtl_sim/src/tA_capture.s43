@@ -37,6 +37,13 @@
 
 .global main
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_202,  (__data_start+0x02)
+.set   DMEM_204,  (__data_start+0x04)
+.set   DMEM_206,  (__data_start+0x06)
+.set   DMEM_250,  (__data_start+0x50)
+
 .set   TACTL,   0x0160
 .set   TAR,     0x0170
 .set   TACCTL0, 0x0162
@@ -54,8 +61,8 @@ WAIT_FUNC:
 	ret
 	
 main:
- 	mov  #0x0250, r1 	; # Initialize stack pointer
-	mov  #0x0000, &0x0200
+ 	mov  #DMEM_250, r1 	; # Initialize stack pointer
+	mov  #0x0000, &DMEM_200
 	mov  #0x0000, r15
 
        /* --------------   TIMER A TEST:  INPUT MUX (CCI) ----------------- */
@@ -70,98 +77,98 @@ main:
 	mov  #0x0204, &TACTL
 	mov  #0x0000, &TACCR0
 	mov  #0x0000, &TACCTL0  ; # CCIxA
- 	mov  #0x0001, &0x0200
-	mov &TACCTL0, &0x0202
- 	mov  #0x0002, &0x0200
-	mov &TACCTL0, &0x0204
- 	mov  #0x0003, &0x0200
+ 	mov  #0x0001, &DMEM_200
+	mov &TACCTL0, &DMEM_202
+ 	mov  #0x0002, &DMEM_200
+	mov &TACCTL0, &DMEM_204
+ 	mov  #0x0003, &DMEM_200
 
 	mov  #0x1000, &TACCTL0  ; # CCIxB
- 	mov  #0x0004, &0x0200
-	mov &TACCTL0, &0x0202
- 	mov  #0x0005, &0x0200
-	mov &TACCTL0, &0x0204
- 	mov  #0x0006, &0x0200
+ 	mov  #0x0004, &DMEM_200
+	mov &TACCTL0, &DMEM_202
+ 	mov  #0x0005, &DMEM_200
+	mov &TACCTL0, &DMEM_204
+ 	mov  #0x0006, &DMEM_200
 
 	mov  #0x2000, &TACCTL0  ; # GND
- 	mov  #0x0007, &0x0200
-	mov &TACCTL0, &0x0202
- 	mov  #0x0008, &0x0200
-	mov &TACCTL0, &0x0204
- 	mov  #0x0009, &0x0200
+ 	mov  #0x0007, &DMEM_200
+	mov &TACCTL0, &DMEM_202
+ 	mov  #0x0008, &DMEM_200
+	mov &TACCTL0, &DMEM_204
+ 	mov  #0x0009, &DMEM_200
 
 	mov  #0x3000, &TACCTL0  ; # VDD
- 	mov  #0x000A, &0x0200
-	mov &TACCTL0, &0x0202
- 	mov  #0x000B, &0x0200
-	mov &TACCTL0, &0x0204
- 	mov  #0x000C, &0x0200
+ 	mov  #0x000A, &DMEM_200
+	mov &TACCTL0, &DMEM_202
+ 	mov  #0x000B, &DMEM_200
+	mov &TACCTL0, &DMEM_204
+ 	mov  #0x000C, &DMEM_200
 
 	                        ; # --------- Comparator 1 ----------
 	mov  #0x0204, &TACTL
 	mov  #0x0000, &TACCR1
 	mov  #0x0000, &TACCTL1  ; # CCIxA
- 	mov  #0x0011, &0x0200
-	mov &TACCTL1, &0x0202
- 	mov  #0x0012, &0x0200
-	mov &TACCTL1, &0x0204
- 	mov  #0x0013, &0x0200
+ 	mov  #0x0011, &DMEM_200
+	mov &TACCTL1, &DMEM_202
+ 	mov  #0x0012, &DMEM_200
+	mov &TACCTL1, &DMEM_204
+ 	mov  #0x0013, &DMEM_200
 
 	mov  #0x1000, &TACCTL1  ; # CCIxB
- 	mov  #0x0014, &0x0200
-	mov &TACCTL1, &0x0202
- 	mov  #0x0015, &0x0200
-	mov &TACCTL1, &0x0204
- 	mov  #0x0016, &0x0200
+ 	mov  #0x0014, &DMEM_200
+	mov &TACCTL1, &DMEM_202
+ 	mov  #0x0015, &DMEM_200
+	mov &TACCTL1, &DMEM_204
+ 	mov  #0x0016, &DMEM_200
 
 	mov  #0x2000, &TACCTL1  ; # GND
- 	mov  #0x0017, &0x0200
-	mov &TACCTL1, &0x0202
- 	mov  #0x0018, &0x0200
-	mov &TACCTL1, &0x0204
- 	mov  #0x0019, &0x0200
+ 	mov  #0x0017, &DMEM_200
+	mov &TACCTL1, &DMEM_202
+ 	mov  #0x0018, &DMEM_200
+	mov &TACCTL1, &DMEM_204
+ 	mov  #0x0019, &DMEM_200
 
 	mov  #0x3000, &TACCTL1  ; # VDD
- 	mov  #0x001A, &0x0200
-	mov &TACCTL1, &0x0202
- 	mov  #0x001B, &0x0200
-	mov &TACCTL1, &0x0204
- 	mov  #0x001C, &0x0200
+ 	mov  #0x001A, &DMEM_200
+	mov &TACCTL1, &DMEM_202
+ 	mov  #0x001B, &DMEM_200
+	mov &TACCTL1, &DMEM_204
+ 	mov  #0x001C, &DMEM_200
 
 	                        ; # --------- Comparator 2 ----------
 	mov  #0x0204, &TACTL
 	mov  #0x0000, &TACCR2
 	mov  #0x0000, &TACCTL2  ; # CCIxA
- 	mov  #0x0021, &0x0200
-	mov &TACCTL2, &0x0202
- 	mov  #0x0022, &0x0200
-	mov &TACCTL2, &0x0204
- 	mov  #0x0023, &0x0200
+ 	mov  #0x0021, &DMEM_200
+	mov &TACCTL2, &DMEM_202
+ 	mov  #0x0022, &DMEM_200
+	mov &TACCTL2, &DMEM_204
+ 	mov  #0x0023, &DMEM_200
 
 	mov  #0x1000, &TACCTL2  ; # CCIxB
- 	mov  #0x0024, &0x0200
-	mov &TACCTL2, &0x0202
- 	mov  #0x0025, &0x0200
-	mov &TACCTL2, &0x0204
- 	mov  #0x0026, &0x0200
+ 	mov  #0x0024, &DMEM_200
+	mov &TACCTL2, &DMEM_202
+ 	mov  #0x0025, &DMEM_200
+	mov &TACCTL2, &DMEM_204
+ 	mov  #0x0026, &DMEM_200
 
 	mov  #0x2000, &TACCTL2  ; # GND
- 	mov  #0x0027, &0x0200
-	mov &TACCTL2, &0x0202
- 	mov  #0x0028, &0x0200
-	mov &TACCTL2, &0x0204
- 	mov  #0x0029, &0x0200
+ 	mov  #0x0027, &DMEM_200
+	mov &TACCTL2, &DMEM_202
+ 	mov  #0x0028, &DMEM_200
+	mov &TACCTL2, &DMEM_204
+ 	mov  #0x0029, &DMEM_200
 
 	mov  #0x3000, &TACCTL2  ; # VDD
- 	mov  #0x002A, &0x0200
-	mov &TACCTL2, &0x0202
- 	mov  #0x002B, &0x0200
-	mov &TACCTL2, &0x0204
- 	mov  #0x002C, &0x0200
+ 	mov  #0x002A, &DMEM_200
+	mov &TACCTL2, &DMEM_202
+ 	mov  #0x002B, &DMEM_200
+	mov &TACCTL2, &DMEM_204
+ 	mov  #0x002C, &DMEM_200
 
 	
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x1000, r15
 
        /* --------------   TIMER A TEST:  CAPTURE, EDGE SELECTION AND INTERRUPT ----------------- */
@@ -177,69 +184,69 @@ main:
 	mov  #0x1234, &TAR
 	mov  #0x0110, &TACCTL0  ; # No capture, Interrupt enable
 	mov  #0x0000, &TACCR0
- 	mov  #0x0001, &0x0200
+ 	mov  #0x0001, &DMEM_200
 	nop
 	nop
-	mov  &TACCR0, &0x0202
+	mov  &TACCR0, &DMEM_202
 	mov  #0x0110, &TACCTL0  ; # No capture, Interrupt enable
 	mov  #0x0000, &TACCR0
- 	mov  #0x0002, &0x0200
+ 	mov  #0x0002, &DMEM_200
 	nop
 	nop
-	mov  &TACCR0, &0x0204
+	mov  &TACCR0, &DMEM_204
 	mov  #0x0000, &TACCTL0
- 	mov  #0x0003, &0x0200
+ 	mov  #0x0003, &DMEM_200
 	
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0x4110, &TACCTL0  ; # Rising edge, Interrupt enable
 	mov  #0x0000, &TACCR0
- 	mov  #0x0004, &0x0200
+ 	mov  #0x0004, &DMEM_200
 	nop
 	nop
-	mov  &TACCR0, &0x0202
+	mov  &TACCR0, &DMEM_202
 	mov  #0x4110, &TACCTL0  ; # Rising edge, Interrupt enable
  	mov  #0x0000, &TACCR0
-	mov  #0x0005, &0x0200
+	mov  #0x0005, &DMEM_200
 	nop
 	nop
-	mov  &TACCR0, &0x0204
+	mov  &TACCR0, &DMEM_204
 	mov  #0x0000, &TACCTL0
- 	mov  #0x0006, &0x0200
+ 	mov  #0x0006, &DMEM_200
 	
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0x8110, &TACCTL0  ; # Falling edge, Interrupt enable
 	mov  #0x0000, &TACCR0
- 	mov  #0x0007, &0x0200
+ 	mov  #0x0007, &DMEM_200
 	nop
 	nop
-	mov  &TACCR0, &0x0202
+	mov  &TACCR0, &DMEM_202
 	mov  #0x8110, &TACCTL0  ; # Falling edge, Interrupt enable
  	mov  #0x0000, &TACCR0
-	mov  #0x0008, &0x0200
+	mov  #0x0008, &DMEM_200
 	nop
 	nop
-	mov  &TACCR0, &0x0204
+	mov  &TACCR0, &DMEM_204
 	mov  #0x0000, &TACCTL0
- 	mov  #0x0009, &0x0200
+ 	mov  #0x0009, &DMEM_200
 	
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0xC110, &TACCTL0  ; # Rising/Falling edge, Interrupt enable
 	mov  #0x0000, &TACCR0
- 	mov  #0x000A, &0x0200
+ 	mov  #0x000A, &DMEM_200
 	nop
 	nop
-	mov  &TACCR0, &0x0202
+	mov  &TACCR0, &DMEM_202
 	mov  #0xC110, &TACCTL0  ; # Rising/Falling edge, Interrupt enable
  	mov  #0x0000, &TACCR0
-	mov  #0x000B, &0x0200
+	mov  #0x000B, &DMEM_200
 	nop
 	nop
-	mov  &TACCR0, &0x0204
+	mov  &TACCR0, &DMEM_204
 	mov  #0x0000, &TACCTL0
- 	mov  #0x000C, &0x0200
+ 	mov  #0x000C, &DMEM_200
 	
 
 	                        ; # --------- Comparator 1 ----------
@@ -247,69 +254,69 @@ main:
 	mov  #0x1234, &TAR
 	mov  #0x0110, &TACCTL1  ; # No capture, Interrupt enable
 	mov  #0x0000, &TACCR1
- 	mov  #0x0001, &0x0200
+ 	mov  #0x0001, &DMEM_200
 	nop
 	nop
-	mov  &TACCR1, &0x0202
+	mov  &TACCR1, &DMEM_202
 	mov  #0x0110, &TACCTL1  ; # No capture, Interrupt enable
 	mov  #0x0000, &TACCR1
- 	mov  #0x0002, &0x0200
+ 	mov  #0x0002, &DMEM_200
 	nop
 	nop
-	mov  &TACCR1, &0x0204
+	mov  &TACCR1, &DMEM_204
 	mov  #0x0000, &TACCTL1
- 	mov  #0x0003, &0x0200
+ 	mov  #0x0003, &DMEM_200
 	
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0x4110, &TACCTL1  ; # Rising edge, Interrupt enable
 	mov  #0x0000, &TACCR1
- 	mov  #0x0004, &0x0200
+ 	mov  #0x0004, &DMEM_200
 	nop
 	nop
-	mov  &TACCR1, &0x0202
+	mov  &TACCR1, &DMEM_202
 	mov  #0x4110, &TACCTL1  ; # Rising edge, Interrupt enable
  	mov  #0x0000, &TACCR1
-	mov  #0x0005, &0x0200
+	mov  #0x0005, &DMEM_200
 	nop
 	nop
-	mov  &TACCR1, &0x0204
+	mov  &TACCR1, &DMEM_204
 	mov  #0x0000, &TACCTL1
- 	mov  #0x0006, &0x0200
+ 	mov  #0x0006, &DMEM_200
 	
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0x8110, &TACCTL1  ; # Falling edge, Interrupt enable
 	mov  #0x0000, &TACCR1
- 	mov  #0x0007, &0x0200
+ 	mov  #0x0007, &DMEM_200
 	nop
 	nop
-	mov  &TACCR1, &0x0202
+	mov  &TACCR1, &DMEM_202
 	mov  #0x8110, &TACCTL1  ; # Falling edge, Interrupt enable
  	mov  #0x0000, &TACCR1
-	mov  #0x0008, &0x0200
+	mov  #0x0008, &DMEM_200
 	nop
 	nop
-	mov  &TACCR1, &0x0204
+	mov  &TACCR1, &DMEM_204
 	mov  #0x0000, &TACCTL1
- 	mov  #0x0009, &0x0200
+ 	mov  #0x0009, &DMEM_200
 	
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0xC110, &TACCTL1  ; # Rising/Falling edge, Interrupt enable
 	mov  #0x0000, &TACCR1
- 	mov  #0x000A, &0x0200
+ 	mov  #0x000A, &DMEM_200
 	nop
 	nop
-	mov  &TACCR1, &0x0202
+	mov  &TACCR1, &DMEM_202
 	mov  #0xC110, &TACCTL1  ; # Rising/Falling edge, Interrupt enable
  	mov  #0x0000, &TACCR1
-	mov  #0x000B, &0x0200
+	mov  #0x000B, &DMEM_200
 	nop
 	nop
-	mov  &TACCR1, &0x0204
+	mov  &TACCR1, &DMEM_204
 	mov  #0x0000, &TACCTL1
- 	mov  #0x000C, &0x0200
+ 	mov  #0x000C, &DMEM_200
 
 	
 	                        ; # --------- Comparator 2 ----------
@@ -317,73 +324,73 @@ main:
 	mov  #0x1234, &TAR
 	mov  #0x0110, &TACCTL2  ; # No capture, Interrupt enable
 	mov  #0x0000, &TACCR2
- 	mov  #0x0001, &0x0200
+ 	mov  #0x0001, &DMEM_200
 	nop
 	nop
-	mov  &TACCR2, &0x0202
+	mov  &TACCR2, &DMEM_202
 	mov  #0x0110, &TACCTL2  ; # No capture, Interrupt enable
 	mov  #0x0000, &TACCR2
- 	mov  #0x0002, &0x0200
+ 	mov  #0x0002, &DMEM_200
 	nop
 	nop
-	mov  &TACCR2, &0x0204
+	mov  &TACCR2, &DMEM_204
 	mov  #0x0000, &TACCTL2
- 	mov  #0x0003, &0x0200
+ 	mov  #0x0003, &DMEM_200
 	
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0x4110, &TACCTL2  ; # Rising edge, Interrupt enable
 	mov  #0x0000, &TACCR2
- 	mov  #0x0004, &0x0200
+ 	mov  #0x0004, &DMEM_200
 	nop
 	nop
-	mov  &TACCR2, &0x0202
+	mov  &TACCR2, &DMEM_202
 	mov  #0x4110, &TACCTL2  ; # Rising edge, Interrupt enable
  	mov  #0x0000, &TACCR2
-	mov  #0x0005, &0x0200
+	mov  #0x0005, &DMEM_200
 	nop
 	nop
-	mov  &TACCR2, &0x0204
+	mov  &TACCR2, &DMEM_204
 	mov  #0x0000, &TACCTL2
- 	mov  #0x0006, &0x0200
+ 	mov  #0x0006, &DMEM_200
 	
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0x8110, &TACCTL2  ; # Falling edge, Interrupt enable
 	mov  #0x0000, &TACCR2
- 	mov  #0x0007, &0x0200
+ 	mov  #0x0007, &DMEM_200
 	nop
 	nop
-	mov  &TACCR2, &0x0202
+	mov  &TACCR2, &DMEM_202
 	mov  #0x8110, &TACCTL2  ; # Falling edge, Interrupt enable
  	mov  #0x0000, &TACCR2
-	mov  #0x0008, &0x0200
+	mov  #0x0008, &DMEM_200
 	nop
 	nop
-	mov  &TACCR2, &0x0204
+	mov  &TACCR2, &DMEM_204
 	mov  #0x0000, &TACCTL2
- 	mov  #0x0009, &0x0200
+ 	mov  #0x0009, &DMEM_200
 	
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0xC110, &TACCTL2  ; # Rising/Falling edge, Interrupt enable
 	mov  #0x0000, &TACCR2
- 	mov  #0x000A, &0x0200
+ 	mov  #0x000A, &DMEM_200
 	nop
 	nop
-	mov  &TACCR2, &0x0202
+	mov  &TACCR2, &DMEM_202
 	mov  #0xC110, &TACCTL2  ; # Rising/Falling edge, Interrupt enable
  	mov  #0x0000, &TACCR2
-	mov  #0x000B, &0x0200
+	mov  #0x000B, &DMEM_200
 	nop
 	nop
-	mov  &TACCR2, &0x0204
+	mov  &TACCR2, &DMEM_204
 	mov  #0x0000, &TACCTL2
- 	mov  #0x000C, &0x0200
+ 	mov  #0x000C, &DMEM_200
 	
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x2000, r15
 	
        /* --------------   TIMER A TEST:  CAPTURE OVERFLOW ----------------- */
@@ -397,89 +404,89 @@ main:
 	                        ; # --------- Comparator 0 ----------
 	mov  #0x0204, &TACTL
 	mov  #0xC000, &TACCTL0  ; # Both edges:	 No read -> overflow
- 	mov  #0x0001, &0x0200
+ 	mov  #0x0001, &DMEM_200
 	nop
 	nop
-	mov &TACCTL0, &0x0202
- 	mov  #0x0002, &0x0200
+	mov &TACCTL0, &DMEM_202
+ 	mov  #0x0002, &DMEM_200
 	nop
 	nop
-	mov &TACCTL0, &0x0204
+	mov &TACCTL0, &DMEM_204
 	mov  #0x0000, &TACCTL0
- 	mov  #0x0003, &0x0200
+ 	mov  #0x0003, &DMEM_200
 
 	mov  #0x0204, &TACTL
 	mov  #0xC000, &TACCTL0  ; # Both edges:	 Read -> no overflow
- 	mov  #0x0004, &0x0200
+ 	mov  #0x0004, &DMEM_200
 	nop
 	nop
-	mov &TACCTL0, &0x0202
+	mov &TACCTL0, &DMEM_202
 	mov  &TACCR0, r10       ; # Read
- 	mov  #0x0005, &0x0200
+ 	mov  #0x0005, &DMEM_200
 	nop
 	nop
-	mov &TACCTL0, &0x0204
+	mov &TACCTL0, &DMEM_204
 	mov  #0x0000, &TACCTL0
- 	mov  #0x0006, &0x0200
+ 	mov  #0x0006, &DMEM_200
 
 	                        ; # --------- Comparator 1 ----------
 	mov  #0x0204, &TACTL
 	mov  #0xC000, &TACCTL1  ; # Both edges:	 No read -> overflow
- 	mov  #0x0001, &0x0200
+ 	mov  #0x0001, &DMEM_200
 	nop
 	nop
-	mov &TACCTL1, &0x0202
- 	mov  #0x0002, &0x0200
+	mov &TACCTL1, &DMEM_202
+ 	mov  #0x0002, &DMEM_200
 	nop
 	nop
-	mov &TACCTL1, &0x0204
+	mov &TACCTL1, &DMEM_204
 	mov  #0x0000, &TACCTL1
- 	mov  #0x0003, &0x0200
+ 	mov  #0x0003, &DMEM_200
 
  	mov  #0x0204, &TACTL
  	mov  #0xC000, &TACCTL1  ; # Both edges:	 Read -> no overflow
-  	mov  #0x0004, &0x0200
+  	mov  #0x0004, &DMEM_200
 	nop
 	nop
- 	mov &TACCTL1, &0x0202
+ 	mov &TACCTL1, &DMEM_202
  	mov  &TACCR1, r10       ; # Read
-  	mov  #0x0005, &0x0200
+  	mov  #0x0005, &DMEM_200
 	nop
 	nop
- 	mov &TACCTL1, &0x0204
+ 	mov &TACCTL1, &DMEM_204
  	mov  #0x0000, &TACCTL1
-  	mov  #0x0006, &0x0200
+  	mov  #0x0006, &DMEM_200
 
 	                        ; # --------- Comparator 2 ----------
  	mov  #0x0204, &TACTL
  	mov  #0xC000, &TACCTL2  ; # Both edges:	 No read -> overflow
-  	mov  #0x0001, &0x0200
+  	mov  #0x0001, &DMEM_200
 	nop
 	nop
- 	mov &TACCTL2, &0x0202
-  	mov  #0x0002, &0x0200
+ 	mov &TACCTL2, &DMEM_202
+  	mov  #0x0002, &DMEM_200
 	nop
 	nop
- 	mov &TACCTL2, &0x0204
+ 	mov &TACCTL2, &DMEM_204
  	mov  #0x0000, &TACCTL2
-  	mov  #0x0003, &0x0200
+  	mov  #0x0003, &DMEM_200
 
  	mov  #0x0204, &TACTL
  	mov  #0xC000, &TACCTL2  ; # Both edges:	 Read -> no overflow
-  	mov  #0x0004, &0x0200
+  	mov  #0x0004, &DMEM_200
 	nop
 	nop
- 	mov &TACCTL2, &0x0202
+ 	mov &TACCTL2, &DMEM_202
  	mov  &TACCR2, r10       ; # Read
-  	mov  #0x0005, &0x0200
+  	mov  #0x0005, &DMEM_200
 	nop
 	nop
- 	mov &TACCTL2, &0x0204
+ 	mov &TACCTL2, &DMEM_204
  	mov  #0x0000, &TACCTL2
-  	mov  #0x0006, &0x0200
+  	mov  #0x0006, &DMEM_200
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x3000, r15
 
 		
@@ -492,13 +499,13 @@ end_of_test:
         /* ----------------------      INTERRUPT ROUTINES    --------------- */
 
 TIMERA_CCR0_VECTOR:
-	inc  &0x0200
+	inc  &DMEM_200
 	reti
 
 	
 TIMERA_TAIV_VECTOR:
-	mov     &TAR, &0x0204
-	mov    &TAIV, &0x0206
+	mov     &TAR, &DMEM_204
+	mov    &TAIV, &DMEM_206
 	reti
 
 

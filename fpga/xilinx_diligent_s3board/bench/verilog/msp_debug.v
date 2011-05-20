@@ -53,7 +53,7 @@ module msp_debug (
 
 // INPUTs
     mclk,                          // Main system clock
-    puc                            // Main system reset
+    puc_rst                        // Main system reset
 );
 
 // OUTPUTs
@@ -69,7 +69,7 @@ output  [8*32-1:0] inst_short;     // Currently executed instruction (short vers
 // INPUTs
 //============
 input              mclk;           // Main system clock
-input              puc;            // Main system reset
+input              puc_rst;        // Main system reset
 
 
 //=============================================================================
@@ -171,13 +171,13 @@ always @(e_state_bin)
 //====================================
 
 reg [31:0]  inst_number;
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_number  <= 0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_number  <= 0;
   else if (decode) inst_number  <= inst_number+1;
 
 reg [31:0]  inst_cycle;
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_cycle <= 0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_cycle <= 0;
   else if (decode) inst_cycle <= 0;
   else             inst_cycle <= inst_cycle+1;
 
@@ -187,14 +187,14 @@ always @(posedge mclk or posedge puc)
 
 // Buffer opcode
 reg [15:0]  opcode;
-always @(posedge mclk or posedge puc)
-  if (puc)         opcode  <= 0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     opcode  <= 0;
   else if (decode) opcode  <= ir;
 
 // Interrupts
 reg irq;
-always @(posedge mclk or posedge puc)
-  if (puc)         irq     <= 1'b1;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     irq     <= 1'b1;
   else if (decode) irq     <= irq_detect;
 
 // Instruction type
@@ -438,8 +438,8 @@ always @(inst_type or inst_name or inst_bw or inst_as or inst_ad)
 //================================
 
 reg  [15:0] inst_pc;
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_pc  <=  16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_pc  <=  16'h0000;
   else if (decode) inst_pc  <=  pc;
 
 

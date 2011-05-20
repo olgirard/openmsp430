@@ -120,28 +120,28 @@ initial
       @(r15==16'h4000);
 
 
-      if (r4     !==16'h0211) tb_error("====== MOV.B @Rn+ Rm    =====");
-      if (r5     !==16'h0033) tb_error("====== MOV.B @Rn+ Rm    =====");
-      if (r6     !==16'h0214) tb_error("====== MOV.B @Rn+ Rm    =====");
-      if (r7     !==16'h0044) tb_error("====== MOV.B @Rn+ Rm    =====");
+      if (r4     !==(`PER_SIZE+16'h0011)) tb_error("====== MOV.B @Rn+ Rm    =====");
+      if (r5     !==16'h0033)             tb_error("====== MOV.B @Rn+ Rm    =====");
+      if (r6     !==(`PER_SIZE+16'h0014)) tb_error("====== MOV.B @Rn+ Rm    =====");
+      if (r7     !==16'h0044)             tb_error("====== MOV.B @Rn+ Rm    =====");
 
-      if (mem210 !==16'haa22) tb_error("====== MOV.B @Rn+ x(Rm) =====");
-      if (mem212 !==16'h4455) tb_error("====== MOV.B @Rn+ x(Rm) =====");
-      if (mem214 !==16'h5a55) tb_error("====== MOV.B @Rn+ x(Rm) =====");
-      if (mem216 !==16'h77a5) tb_error("====== MOV.B @Rn+ x(Rm) =====");
-      if (r9     !==16'h0208) tb_error("====== MOV.B @Rn+ x(Rm) =====");
+      if (mem210 !==16'haa22)             tb_error("====== MOV.B @Rn+ x(Rm) =====");
+      if (mem212 !==16'h4455)             tb_error("====== MOV.B @Rn+ x(Rm) =====");
+      if (mem214 !==16'h5a55)             tb_error("====== MOV.B @Rn+ x(Rm) =====");
+      if (mem216 !==16'h77a5)             tb_error("====== MOV.B @Rn+ x(Rm) =====");
+      if (r9     !==(`PER_SIZE+16'h0008)) tb_error("====== MOV.B @Rn+ x(Rm) =====");
 
-      if (mem218 !==16'h11aa) tb_error("====== MOV.B @Rn+ EDE =====");
-      if (mem21A !==16'hccee) tb_error("====== MOV.B @Rn+ EDE =====");
-      if (mem21C !==16'h1edd) tb_error("====== MOV.B @Rn+ EDE =====");
-      if (mem21E !==16'hffe1) tb_error("====== MOV.B @Rn+ EDE =====");
-      if (r10    !==16'h0208) tb_error("====== MOV.B @Rn+ EDE =====");
+      if (mem218 !==16'h11aa)             tb_error("====== MOV.B @Rn+ EDE =====");
+      if (mem21A !==16'hccee)             tb_error("====== MOV.B @Rn+ EDE =====");
+      if (mem21C !==16'h1edd)             tb_error("====== MOV.B @Rn+ EDE =====");
+      if (mem21E !==16'hffe1)             tb_error("====== MOV.B @Rn+ EDE =====");
+      if (r10    !==(`PER_SIZE+16'h0008)) tb_error("====== MOV.B @Rn+ EDE =====");
 
-      if (mem220 !==16'h2233) tb_error("====== MOV.B @Rn+ &EDE  =====");
-      if (mem222 !==16'h55dd) tb_error("====== MOV.B @Rn+ &EDE  =====");
-      if (mem224 !==16'h2d66) tb_error("====== MOV.B @Rn+ &EDE  =====");
-      if (mem226 !==16'h88d2) tb_error("====== MOV.B @Rn+ &EDE  =====");
-      if (r11    !==16'h0208) tb_error("====== MOV.B @Rn+ &EDE  =====");
+      if (mem220 !==16'h2233)             tb_error("====== MOV.B @Rn+ &EDE  =====");
+      if (mem222 !==16'h55dd)             tb_error("====== MOV.B @Rn+ &EDE  =====");
+      if (mem224 !==16'h2d66)             tb_error("====== MOV.B @Rn+ &EDE  =====");
+      if (mem226 !==16'h88d2)             tb_error("====== MOV.B @Rn+ &EDE  =====");
+      if (r11    !==(`PER_SIZE+16'h0008)) tb_error("====== MOV.B @Rn+ &EDE  =====");
 
 
       // MOV.B: Check when source is #N
@@ -291,7 +291,7 @@ initial
 //      if (mem264 !==16'h08ee) tb_error("====== MOV.B #+8 &EDE =====");
 //      if (mem266 !==16'hff33) tb_error("====== MOV.B #-1 &EDE =====");
 
-
+      #100;
 
       stimulus_done = 1;
    end

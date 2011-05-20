@@ -39,6 +39,47 @@
 
 .global main
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_202,  (__data_start+0x02)
+.set   DMEM_204,  (__data_start+0x04)
+.set   DMEM_206,  (__data_start+0x06)
+.set   DMEM_208,  (__data_start+0x08)
+.set   DMEM_20A,  (__data_start+0x0A)
+.set   DMEM_20C,  (__data_start+0x0C)
+.set   DMEM_20E,  (__data_start+0x0E)
+.set   DMEM_210,  (__data_start+0x10)
+.set   DMEM_212,  (__data_start+0x12)
+.set   DMEM_214,  (__data_start+0x14)
+.set   DMEM_216,  (__data_start+0x16)
+.set   DMEM_218,  (__data_start+0x18)
+.set   DMEM_21A,  (__data_start+0x1A)
+.set   DMEM_21E,  (__data_start+0x1E)
+.set   DMEM_220,  (__data_start+0x20)
+.set   DMEM_222,  (__data_start+0x22)
+.set   DMEM_224,  (__data_start+0x24)
+.set   DMEM_226,  (__data_start+0x26)
+.set   DMEM_228,  (__data_start+0x28)
+.set   DMEM_22A,  (__data_start+0x2A)
+.set   DMEM_230,  (__data_start+0x30)
+.set   DMEM_232,  (__data_start+0x32)
+.set   DMEM_234,  (__data_start+0x34)
+.set   DMEM_236,  (__data_start+0x36)
+.set   DMEM_238,  (__data_start+0x38)
+.set   DMEM_23A,  (__data_start+0x3A)
+.set   DMEM_240,  (__data_start+0x40)
+.set   DMEM_242,  (__data_start+0x42)
+.set   DMEM_244,  (__data_start+0x44)
+.set   DMEM_246,  (__data_start+0x46)
+.set   DMEM_248,  (__data_start+0x48)
+.set   DMEM_24A,  (__data_start+0x4A)
+.set   DMEM_250,  (__data_start+0x50)
+.set   DMEM_254,  (__data_start+0x54)
+.set   DMEM_256,  (__data_start+0x56)
+.set   DMEM_262,  (__data_start+0x62)
+.set   DMEM_296,  (__data_start+0x96)
+.set   DMEM_2D6,  (__data_start+0xD6)
+
 .set   TACTL,   0x0160
 .set   TAR,     0x0170
 .set   TACCTL0, 0x0162
@@ -56,75 +97,75 @@ WAIT_FUNC:
 	ret
 	
 main:
- 	mov  #0x0250, r1 	; # Initialize stack pointer
-	mov  #0x0000, &0x0200
+ 	mov  #DMEM_250, r1 	; # Initialize stack pointer
+	mov  #0x0000, &DMEM_200
 	
        /* --------------   TIMER A TEST:  RD/WR ACCESS    --------------- */
 
 	mov  #0xaaaa, &TACTL	; # TACTL
-	mov   &TACTL, &0x0200
+	mov   &TACTL, &DMEM_200
 	mov  #0x5555, &TACTL
-	mov   &TACTL, &0x0202
+	mov   &TACTL, &DMEM_202
 	mov  #0x0000, &TACTL
-	mov   &TACTL, &0x0204
+	mov   &TACTL, &DMEM_204
 	mov  #0x0000, &TACTL
-	mov   &TACTL, &0x0206
+	mov   &TACTL, &DMEM_206
 
 	mov  #0xaaaa, &TAR	; # TAR
-	mov     &TAR, &0x0208
+	mov     &TAR, &DMEM_208
 	mov  #0x5555, &TAR
-	mov     &TAR, &0x020A
+	mov     &TAR, &DMEM_20A
 	mov  #0x0000, &TAR
-	mov     &TAR, &0x020C
+	mov     &TAR, &DMEM_20C
 
 	mov  #0xaaaa, &TACCTL0	; # TACCTL0
-	mov &TACCTL0, &0x0210
+	mov &TACCTL0, &DMEM_210
 	mov  #0x5555, &TACCTL0
-	mov &TACCTL0, &0x0212
+	mov &TACCTL0, &DMEM_212
 	mov  #0x0000, &TACCTL0
-	mov &TACCTL0, &0x0214
+	mov &TACCTL0, &DMEM_214
 
 	mov  #0xaaaa, &TACCR0	; # TACCR0
-	mov  &TACCR0, &0x0216
+	mov  &TACCR0, &DMEM_216
 	mov  #0x5555, &TACCR0
-	mov  &TACCR0, &0x0218
+	mov  &TACCR0, &DMEM_218
 	mov  #0x0000, &TACCR0
-	mov  &TACCR0, &0x021A
+	mov  &TACCR0, &DMEM_21A
 
 	mov  #0xaaaa, &TACCTL1	; # TACCTL1
-	mov &TACCTL1, &0x0220
+	mov &TACCTL1, &DMEM_220
 	mov  #0x5555, &TACCTL1
-	mov &TACCTL1, &0x0222
+	mov &TACCTL1, &DMEM_222
 	mov  #0x0000, &TACCTL1
-	mov &TACCTL1, &0x0224
+	mov &TACCTL1, &DMEM_224
 
 	mov  #0xaaaa, &TACCR1	; # TACCR1
-	mov  &TACCR1, &0x0226
+	mov  &TACCR1, &DMEM_226
 	mov  #0x5555, &TACCR1
-	mov  &TACCR1, &0x0228
+	mov  &TACCR1, &DMEM_228
 	mov  #0x0000, &TACCR1
-	mov  &TACCR1, &0x022A
+	mov  &TACCR1, &DMEM_22A
 
 	mov  #0xaaaa, &TACCTL2	; # TACCTL2
-	mov &TACCTL2, &0x0230
+	mov &TACCTL2, &DMEM_230
 	mov  #0x5555, &TACCTL2
-	mov &TACCTL2, &0x0232
+	mov &TACCTL2, &DMEM_232
 	mov  #0x0000, &TACCTL2
-	mov &TACCTL2, &0x0234
+	mov &TACCTL2, &DMEM_234
 
 	mov  #0xaaaa, &TACCR2	; # TACCR2
-	mov  &TACCR2, &0x0236
+	mov  &TACCR2, &DMEM_236
 	mov  #0x5555, &TACCR2
-	mov  &TACCR2, &0x0238
+	mov  &TACCR2, &DMEM_238
 	mov  #0x0000, &TACCR2
-	mov  &TACCR2, &0x023A
+	mov  &TACCR2, &DMEM_23A
 
 	mov  #0xaaaa, &TAIV	; # TAIV
-	mov    &TAIV, &0x0240
+	mov    &TAIV, &DMEM_240
 	mov  #0x5555, &TAIV
-	mov    &TAIV, &0x0242
+	mov    &TAIV, &DMEM_242
 	mov  #0x0000, &TAIV
-	mov    &TAIV, &0x0244
+	mov    &TAIV, &DMEM_244
 		
 	mov  #0x1000, r15
 
@@ -137,33 +178,33 @@ main:
 	mov  #0x0200, &TACTL
 	mov  #0x0020, &TACCR0
 	mov  #0x0216, &TACTL 	; # /1
-	mov  #0x0001, &0x0200
+	mov  #0x0001, &DMEM_200
 	mov  #0x0010, r14
         call #WAIT_FUNC
 	
 	mov  #0x0200, &TACTL
 	mov  #0x0010, &TACCR0
 	mov  #0x0256, &TACTL 	; # /2
-	mov  #0x0002, &0x0200
+	mov  #0x0002, &DMEM_200
 	mov  #0x0010, r14
         call #WAIT_FUNC
 
 	mov  #0x0200, &TACTL
 	mov  #0x0008, &TACCR0
 	mov  #0x0296, &TACTL 	; # /4
-	mov  #0x0003, &0x0200
+	mov  #0x0003, &DMEM_200
 	mov  #0x0010, r14
         call #WAIT_FUNC
 
 	mov  #0x0200, &TACTL
 	mov  #0x0004, &TACCR0
 	mov  #0x02D6, &TACTL 	; # /8
-	mov  #0x0004, &0x0200
+	mov  #0x0004, &DMEM_200
 	mov  #0x0010, r14
         call #WAIT_FUNC
 
 	dint
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x2000, r15
 
 	
@@ -177,7 +218,7 @@ main:
 	mov  #0x0000, &TACCTL0
 	mov  #0x0012, &TACCR0   ; # Check timing for period = 0x12 +1
 	mov  #0x0256, &TACTL
-	mov  #0x0001, &0x0200
+	mov  #0x0001, &DMEM_200
 	mov  #0x0010, r14
         call #WAIT_FUNC
 
@@ -185,7 +226,7 @@ main:
 	mov  #0x0000, &TACCTL0
 	mov  #0x001E, &TACCR0   ; # Check timing for period = 0x1E +1
 	mov  #0x0256, &TACTL
-	mov  #0x0002, &0x0200
+	mov  #0x0002, &DMEM_200
 	mov  #0x0020, r14
         call #WAIT_FUNC
 
@@ -194,7 +235,7 @@ main:
 	mov  #0x0012, &TACCR0   ; # Check timing for period = 0x12 +1
 	mov  #0x0254, &TACTL
 	mov  #0x0010, &TACCTL0
-	mov  #0x0003, &0x0200
+	mov  #0x0003, &DMEM_200
 	mov  #0x0010, r14
         call #WAIT_FUNC
 
@@ -203,12 +244,12 @@ main:
 	mov  #0x001E, &TACCR0   ; # Check timing for period = 0x1E +1
 	mov  #0x0254, &TACTL
 	mov  #0x0010, &TACCTL0
-	mov  #0x0004, &0x0200
+	mov  #0x0004, &DMEM_200
 	mov  #0x0020, r14
         call #WAIT_FUNC
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x3000, r15
 
 	
@@ -222,12 +263,12 @@ main:
 	mov  #0x0000, &TACCTL0
 	mov  #0xfff0, &TAR      ; # Continuous mode
 	mov  #0x0262, &TACTL
-	mov  #0x0001, &0x0200
+	mov  #0x0001, &DMEM_200
 	mov  #0x0020, r14
         call #WAIT_FUNC
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x4000, r15
 
 	
@@ -243,16 +284,16 @@ main:
 	mov  #0x0000, &TAR
 	mov  #0x0236, &TACTL
 	mov  #0x0010, &TACCTL0
-	mov  #0x0001, &0x0200
+	mov  #0x0001, &DMEM_200
 	mov  #0x0050, r14
         call #WAIT_FUNC
-	mov  #0x0002, &0x0200
+	mov  #0x0002, &DMEM_200
 	
 		
 	dint		
 	mov  #0x0200, &TACTL
 	mov  #0x0000, &TACCTL0
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x5000, r15
 
 	
@@ -266,12 +307,12 @@ end_of_test:
         /* ----------------------      INTERRUPT ROUTINES    --------------- */
 
 TIMERA_CCR0_VECTOR:
-	mov     &TAR, &0x0204
+	mov     &TAR, &DMEM_204
 	reti
 
 	
 TIMERA_TAIV_VECTOR:
-	mov     &TAR, &0x0202
+	mov     &TAR, &DMEM_202
 	bic  #0x0001, &TACTL
 	reti
 

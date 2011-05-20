@@ -37,6 +37,10 @@
 
 .global main
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_250,  (__data_start+0x50)
+
 .set   BCSCTL1, 0x0057
 .set   BCSCTL2, 0x0058
 
@@ -53,7 +57,7 @@ main:
 
         /* -------   WATCHDOG TEST INTERVAL MODE /64 - SMCLK /2      ------ */
 
-	mov   #0x0250, r1	  ;# Initialize stack & Enable interrupts
+	mov   #DMEM_250, r1	  ;# Initialize stack & Enable interrupts
 	eint
 	bis.b   #0x01,   &IE1
 
@@ -69,7 +73,7 @@ main:
 	
         /* -------   WATCHDOG TEST INTERVAL MODE /64 - ACLK        ------ */
 
-	mov   #0x0250, r1	  ;# Initialize stack & Enable interrupts
+	mov   #DMEM_250, r1	  ;# Initialize stack & Enable interrupts
 	eint
 	bis.b   #0x01,   &IE1
 

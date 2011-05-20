@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 106 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -72,7 +72,7 @@ module  omsp_dbg (
     fe_mb_en,                       // Frontend Memory bus enable
     fe_mdb_in,                      // Frontend Memory data bus input
     pc,                             // Program counter
-    puc                             // Main system reset
+    puc_rst                         // Main system reset
 );
 
 // OUTPUTs
@@ -107,7 +107,7 @@ input               exec_done;      // Execution completed
 input               fe_mb_en;       // Frontend Memory bus enable
 input        [15:0] fe_mdb_in;      // Frontend Memory data bus input
 input        [15:0] pc;             // Program counter
-input               puc;            // Main system reset
+input               puc_rst;        // Main system reset
 
 
 //=============================================================================
@@ -212,7 +212,7 @@ parameter           BRK3_ADDR1_D = (64'h1 << BRK3_ADDR1);
 reg  [1:0] puc_sync;
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst) puc_sync <=  2'b11;
-  else         puc_sync <=  {puc_sync[0] , puc};
+  else         puc_sync <=  {puc_sync[0] , puc_rst};
 wire           puc_s     =  puc_sync[1];
 
 
@@ -277,10 +277,39 @@ wire  [63:0] reg_rd    = reg_dec & {64{reg_read}};
 
 // CPU_ID Register
 //-----------------   
+//              -------------------------------------------------------------------
+// CPU_ID_LO:  | 15  14  13  12  11  10  9  |  8  7  6  5  4  |  3   |   2  1  0   |
+//             |----------------------------+-----------------+------+-------------|
+//             |        PER_SPACE           |   USER_VERSION  | ASIC | CPU_VERSION |
+//              --------------------------------------------------------------------
+// CPU_ID_HI:  |   15  14  13  12  11  10   |   9  8  7  6  5  4  3  2  1   |   0  |
+//             |----------------------------+-------------------------------+------|
+//             |         PMEM_SIZE          |            DMEM_SIZE          |  MPY |
+//              -------------------------------------------------------------------
 
-wire [15:0] cpu_id_pmem = `PMEM_SIZE;
-wire [15:0] cpu_id_dmem = `DMEM_SIZE;
-wire [31:0] cpu_id      = {cpu_id_pmem, cpu_id_dmem};
+wire  [2:0] cpu_version  =  `CPU_VERSION;
+`ifdef ASIC
+wire        cpu_asic     =  1'b1;
+`else
+wire        cpu_asic     =  1'b0;
+`endif
+wire  [4:0] user_version =  `USER_VERSION;
+wire  [6:0] per_space    = (`PER_SIZE  >> 9);  // cpu_id_per  *  512 = peripheral space size
+`ifdef MULTIPLIER
+wire        mpy_info     =  1'b1;
+`else
+wire        mpy_info     =  1'b0;
+`endif
+wire  [8:0] dmem_size    = (`DMEM_SIZE >> 7);  // cpu_id_dmem *  128 = data memory size
+wire  [5:0] pmem_size    = (`PMEM_SIZE >> 10); // cpu_id_pmem * 1024 = program memory size
+
+wire [31:0] cpu_id       = {pmem_size,
+			    dmem_size,
+			    mpy_info,
+			    per_space,
+			    user_version,
+			    cpu_asic,
+                            cpu_version};
 
 
 // CPU_CTL Register

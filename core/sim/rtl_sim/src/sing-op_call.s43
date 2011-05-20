@@ -34,6 +34,16 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.set    DMEM_BASE, (__data_start     )
+.set    DMEM_200,  (__data_start+0x00)
+.set    DMEM_212,  (__data_start+0x12)
+.set    DMEM_216,  (__data_start+0x16)
+.set    DMEM_21A,  (__data_start+0x1A)
+.set    DMEM_21E,  (__data_start+0x1E)
+.set    DMEM_220,  (__data_start+0x20)
+.set    DMEM_250,  (__data_start+0x50)
+.set    DMEM_252,  (__data_start+0x52)
+.set    DMEM_300,  (__data_start+0x100)
 
 .global main
 
@@ -41,7 +51,7 @@ main:
         # Initialization
 	#------------------------
 
-	mov     #0x0252, r1        ;# Initialize stack pointer
+	mov   #DMEM_252, r1        ;# Initialize stack pointer
 	mov     #0x0000, r5        ;# Initialize R5
 
 
@@ -62,10 +72,10 @@ main:
         # Addressing mode: @Rn
 	#------------------------
 
-	mov     #0x0212, r4
+	mov   #DMEM_212, r4
 	mov     #0x0000, r5
-	mov   #TEST_ROUTINE_aRN, &0x0212
-	mov     #0x5555, &0x0300
+	mov   #TEST_ROUTINE_aRN, &DMEM_212
+	mov     #0x5555, &DMEM_300
 	call        @r4           ;# CALL TEST_ROUTINE_aRN
 
 	mov     #0x3000, r15
@@ -74,10 +84,10 @@ main:
         # Addressing mode: @Rn+
 	#------------------------
 
-	mov     #0x0216, r4
+	mov     #DMEM_216, r4
 	mov     #0x0000, r5
-	mov   #TEST_ROUTINE_aRNi, &0x0216
-	mov     #0x5555, &0x0300
+	mov   #TEST_ROUTINE_aRNi, &DMEM_216
+	mov     #0x5555, &DMEM_300
 	call       @r4+           ;# CALL TEST_ROUTINE_aRNi
 
 	mov     #0x4000, r15
@@ -87,7 +97,7 @@ main:
 	#------------------------
 
 	mov     #0x0000, r5
-	mov     #0x5555, &0x0300
+	mov     #0x5555, &DMEM_300
 	call    #TEST_ROUTINE_N   ;# CALL TEST_ROUTINE_N
 
 	mov     #0x5000, r15
@@ -96,10 +106,10 @@ main:
         # Addressing mode: X(Rn)
 	#------------------------
 
-	mov     #0x0200, r4
+	mov     #DMEM_200, r4
 	mov     #0x0000, r5
-	mov  #TEST_ROUTINE_xRN, &0x021A
-	mov     #0x5555, &0x0300
+	mov  #TEST_ROUTINE_xRN, &DMEM_21A
+	mov     #0x5555, &DMEM_300
 	call      26(r4)           ;# CALL TEST_ROUTINE_xRN
 
 	mov     #0x6000, r15
@@ -107,11 +117,11 @@ main:
 
         # Addressing mode: EDE
 	#------------------------
-.set   EDE_21E,  (__data_start+0x001E)
+.set   EDE_21E,  DMEM_21E
 
 	mov     #0x0000, r5
-	mov  #TEST_ROUTINE_EDE, &0x021E
-	mov     #0x5555, &0x0300
+	mov  #TEST_ROUTINE_EDE, &DMEM_21E
+	mov     #0x5555, &DMEM_300
 	call    EDE_21E            ;# CALL TEST_ROUTINE_EDE
 
 	mov     #0x7000, r15
@@ -119,11 +129,11 @@ main:
 
         # Addressing mode: &EDE
 	#------------------------
-.set   aEDE_220,  0x0220
+.set   aEDE_220,  DMEM_220
 
 	mov     #0x0000, r5
 	mov  #TEST_ROUTINE_aEDE, &aEDE_220
-	mov     #0x5555, &0x0300
+	mov     #0x5555, &DMEM_300
 	call  &aEDE_220            ;# CALL TEST_ROUTINE_aEDE
 
 	mov     #0x8000, r15

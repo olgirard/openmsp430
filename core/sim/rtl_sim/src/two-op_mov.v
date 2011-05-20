@@ -103,19 +103,19 @@ initial
       //--------------------------------------------------------
       @(r15==16'h4000);
 
-      if (r4     !==16'h0202) tb_error("====== MOV @Rn+ Rm    =====");
-      if (r5     !==16'h1111) tb_error("====== MOV @Rn+ Rm    =====");
+      if (r4     !==(`PER_SIZE+16'h0002)) tb_error("====== MOV @Rn+ Rm    =====");
+      if (r5     !==16'h1111)             tb_error("====== MOV @Rn+ Rm    =====");
 
-      if (r6     !==16'h0206) tb_error("====== MOV @Rn+ PC    =====");
+      if (r6     !==(`PER_SIZE+16'h0006)) tb_error("====== MOV @Rn+ PC    =====");
 
-      if (r7     !==16'h0218) tb_error("====== MOV @Rn+ x(Rm) =====");
-      if (mem220 !==16'hdef0) tb_error("====== MOV @Rn+ x(Rm) =====");
+      if (r7     !==(`PER_SIZE+16'h0018)) tb_error("====== MOV @Rn+ x(Rm) =====");
+      if (mem220 !==16'hdef0)             tb_error("====== MOV @Rn+ x(Rm) =====");
 
-      if (r8     !==16'h0214) tb_error("====== MOV @Rn+ EDE   =====");
-      if (mem200 !==16'h5678) tb_error("====== MOV @Rn+ EDE   =====");
+      if (r8     !==(`PER_SIZE+16'h0014)) tb_error("====== MOV @Rn+ EDE   =====");
+      if (mem200 !==16'h5678)             tb_error("====== MOV @Rn+ EDE   =====");
 
-      if (r9     !==16'h0212) tb_error("====== MOV @Rn+ &EDE  =====");
-      if (mem214 !==16'h1234) tb_error("====== MOV @Rn+ &EDE  =====");
+      if (r9     !==(`PER_SIZE+16'h0012)) tb_error("====== MOV @Rn+ &EDE  =====");
+      if (mem214 !==16'h1234)             tb_error("====== MOV @Rn+ &EDE  =====");
 
 
       // MOV: Check when source is #N

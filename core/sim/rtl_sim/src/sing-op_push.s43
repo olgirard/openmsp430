@@ -34,6 +34,28 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.set    DMEM_BASE, (__data_start     )
+.set    DMEM_200,  (__data_start+0x00)
+.set    DMEM_212,  (__data_start+0x12)
+.set    DMEM_214,  (__data_start+0x14)
+.set    DMEM_215,  (__data_start+0x15)
+.set    DMEM_216,  (__data_start+0x16)
+.set    DMEM_218,  (__data_start+0x18)
+.set    DMEM_21A,  (__data_start+0x1A)
+.set    DMEM_21C,  (__data_start+0x1C)
+.set    DMEM_21E,  (__data_start+0x1E)
+.set    DMEM_220,  (__data_start+0x20)
+.set    DMEM_221,  (__data_start+0x21)
+.set    DMEM_222,  (__data_start+0x22)
+.set    DMEM_224,  (__data_start+0x24)
+.set    DMEM_225,  (__data_start+0x25)
+.set    DMEM_228,  (__data_start+0x28)
+.set    DMEM_22A,  (__data_start+0x2A)
+.set    DMEM_22C,  (__data_start+0x2C)
+.set    DMEM_22E,  (__data_start+0x2E)
+.set    DMEM_250,  (__data_start+0x50)
+.set    DMEM_252,  (__data_start+0x52)
+.set    DMEM_300,  (__data_start+0x100)
 
 .global main
 
@@ -44,7 +66,7 @@ main:
 	#------------------------
 
 	mov     #0x0050, r4        ;# Initialize RAM
-	mov     #0x0200, r5
+	mov   #DMEM_200, r5
 clear_mem_loop:
 	clr    0(r5)
 	incd     r5
@@ -52,7 +74,7 @@ clear_mem_loop:
 	jnz     clear_mem_loop 
 
 
-	mov     #0x0252, r1        ;# Initialize stack pointer
+	mov   #DMEM_252, r1        ;# Initialize stack pointer
 
 
 	mov     #0x1000, r15
@@ -62,11 +84,11 @@ clear_mem_loop:
 	#------------------------
 
 	mov     #0x7524, r4
-	mov     #0x5555, &0x0300
+	mov     #0x5555, &DMEM_300
 	push          r4           ;# PUSH (r4=0x7524  =>  @=0x0250)
 
 	mov     #0x1cb6, r6
-	mov     #0x5555, &0x0300
+	mov     #0x5555, &DMEM_300
 	push          r6           ;# PUSH (r6=0x1cb6  =>  @=0x024E)
 
 	mov     #0x2000, r15
@@ -75,14 +97,14 @@ clear_mem_loop:
         # Addressing mode: @Rn
 	#------------------------
 
-	mov     #0x0212, r4
-	mov     #0x1234, &0x0212
-	mov     #0x5555, &0x0300
+	mov   #DMEM_212, r4
+	mov     #0x1234, &DMEM_212
+	mov     #0x5555, &DMEM_300
 	push        @r4           ;# PUSH (0x1234  =>  @=0x024C)
 
-	mov     #0x0214, r6
-	mov     #0x5678, &0x0214
-	mov     #0x5555, &0x0300
+	mov   #DMEM_214, r6
+	mov     #0x5678, &DMEM_214
+	mov     #0x5555, &DMEM_300
 	push        @r6           ;# PUSH (0x5678  =>  @=0x024A)
 
 	mov     #0x3000, r15
@@ -91,13 +113,13 @@ clear_mem_loop:
         # Addressing mode: @Rn+
 	#------------------------
 
-	mov     #0x0216, r4
-	mov     #0x9abc, &0x0216
-	mov     #0x5555, &0x0300
+	mov   #DMEM_216, r4
+	mov     #0x9abc, &DMEM_216
+	mov     #0x5555, &DMEM_300
 	push       @r4+           ;# PUSH (0x9abc  =>  @=0x0248)
 
-	mov     #0xdef0, &0x0218
-	mov     #0x5555, &0x0300
+	mov     #0xdef0, &DMEM_218
+	mov     #0x5555, &DMEM_300
 	push       @r4+           ;# PUSH (0xdef0  =>  @=0x0246)
 
 	mov     #0x4000, r15
@@ -106,13 +128,13 @@ clear_mem_loop:
         # Addressing mode: X(Rn)
 	#------------------------
 
-	mov     #0x0200, r4
-	mov     #0x0fed, &0x021A
-	mov     #0x5555, &0x0300
+	mov   #DMEM_200, r4
+	mov     #0x0fed, &DMEM_21A
+	mov     #0x5555, &DMEM_300
 	push      26(r4)           ;# PUSH (0x0fed  =>  @=0x0244)
 
-	mov     #0xcba9, &0x021C
-	mov     #0x5555, &0x0300
+	mov     #0xcba9, &DMEM_21C
+	mov     #0x5555, &DMEM_300
 	push      28(r4)           ;# PUSH (0xcba9  =>  @=0x0242)
 
 	mov     #0x5000, r15
@@ -120,16 +142,16 @@ clear_mem_loop:
 
         # Addressing mode: EDE
 	#------------------------
-.set   EDE_21E,  (__data_start+0x001E)
-.set   EDE_220,  (__data_start+0x0020)
+.set   EDE_21E,  DMEM_21E
+.set   EDE_220,  DMEM_220
 
-	mov     #0x0200, r4
-	mov     #0x8765, &0x021E
-	mov     #0x5555, &0x0300
+	mov   #DMEM_200, r4
+	mov     #0x8765, &DMEM_21E
+	mov     #0x5555, &DMEM_300
 	push    EDE_21E            ;# PUSH (0x8765  =>  @=0x0240)
 
-	mov     #0x4321, &0x0220
-	mov     #0x5555, &0x0300
+	mov     #0x4321, &DMEM_220
+	mov     #0x5555, &DMEM_300
 	push    EDE_220            ;# PUSH (0x4321  =>  @=0x023E)
 
 	mov     #0x6000, r15
@@ -137,16 +159,16 @@ clear_mem_loop:
 
         # Addressing mode: &EDE
 	#------------------------
-.set   aEDE_222,  0x0222
-.set   aEDE_224,  0x0224
+.set   aEDE_222,  DMEM_222
+.set   aEDE_224,  DMEM_224
 
-	mov     #0x0200, r4
-	mov     #0x1f2e, &0x0222
-	mov     #0x5555, &0x0300
+	mov   #DMEM_200, r4
+	mov     #0x1f2e, &DMEM_222
+	mov     #0x5555, &DMEM_300
 	push  &aEDE_222            ;# PUSH (0x1f2e  =>  @=0x023C)
 
-	mov     #0x3d4c, &0x0224
-	mov     #0x5555, &0x0300
+	mov     #0x3d4c, &DMEM_224
+	mov     #0x5555, &DMEM_300
 	push  &aEDE_224            ;# PUSH (0x3d4c  =>  @=0x023A)
 
 	mov     #0x7000, r15
@@ -155,10 +177,10 @@ clear_mem_loop:
         # Addressing mode: #N
 	#------------------------
 
-	mov     #0x5555, &0x0300
+	mov     #0x5555, &DMEM_300
 	push    #0x71c8            ;# PUSH (0x71c8  =>  @=0x0238)
 
-	mov     #0x5555, &0x0300
+	mov     #0x5555, &DMEM_300
 	push    #0x178c            ;# PUSH (0x178c  =>  @=0x0236)
 
 	mov     #0x7001, r15
@@ -169,7 +191,7 @@ clear_mem_loop:
         # Initialization
 	#------------------------
 
-	mov     #0x0252, r1        ;# Initialize stack pointer
+	mov   #DMEM_252, r1        ;# Initialize stack pointer
 
 	mov     #0x8000, r15
 
@@ -178,11 +200,11 @@ clear_mem_loop:
 	#------------------------
 
 	mov     #0x1fe2, r4
-	mov     #0x5555, &0x0300
+	mov     #0x5555, &DMEM_300
 	push.b        r4           ;# PUSH (r4=0xe2  =>  @=0x0250)
 
 	mov     #0x3dc4, r6
-	mov     #0x5555, &0x0300
+	mov     #0x5555, &DMEM_300
 	push.b        r6           ;# PUSH (r6=0xc4  =>  @=0x024E)
 
 	mov     #0x9000, r15
@@ -191,14 +213,14 @@ clear_mem_loop:
         # Addressing mode: @Rn
 	#------------------------
 
-	mov     #0x0212, r4
-	mov     #0x5ba6, &0x0212
-	mov     #0x5555, &0x0300
+	mov   #DMEM_212, r4
+	mov     #0x5ba6, &DMEM_212
+	mov     #0x5555, &DMEM_300
 	push.b      @r4           ;# PUSH (0xa6    =>  @=0x024C)
 
-	mov     #0x0215, r6
-	mov     #0x7988, &0x0214
-	mov     #0x5555, &0x0300
+	mov   #DMEM_215, r6
+	mov     #0x7988, &DMEM_214
+	mov     #0x5555, &DMEM_300
 	push.b      @r6           ;# PUSH (0x79    =>  @=0x024A)
 
 	mov     #0xA000, r15
@@ -207,12 +229,12 @@ clear_mem_loop:
         # Addressing mode: @Rn+
 	#------------------------
 
-	mov     #0x0216, r4
-	mov     #0x976a, &0x0216
-	mov     #0x5555, &0x0300
+	mov   #DMEM_216, r4
+	mov     #0x976a, &DMEM_216
+	mov     #0x5555, &DMEM_300
 	push.b     @r4+           ;# PUSH (0x6a  =>  @=0x0248)
 
-	mov     #0x5555, &0x0300
+	mov     #0x5555, &DMEM_300
 	push.b     @r4+           ;# PUSH (0x97  =>  @=0x0246)
 
 	mov     #0xB000, r15
@@ -221,13 +243,13 @@ clear_mem_loop:
         # Addressing mode: X(Rn)
 	#------------------------
 
-	mov     #0x0200, r4
-	mov     #0xb54c, &0x021A
-	mov     #0x5555, &0x0300
+	mov   #DMEM_200, r4
+	mov     #0xb54c, &DMEM_21A
+	mov     #0x5555, &DMEM_300
 	push.b    26(r4)           ;# PUSH (0x4c  =>  @=0x0244)
 
-	mov     #0xc32d, &0x021C
-	mov     #0x5555, &0x0300
+	mov     #0xc32d, &DMEM_21C
+	mov     #0x5555, &DMEM_300
 	push.b    29(r4)           ;# PUSH (0xc3  =>  @=0x0242)
 
 	mov     #0xC000, r15
@@ -235,16 +257,16 @@ clear_mem_loop:
 
         # Addressing mode: EDE
 	#------------------------
-.set   EDE_B_21E,  (__data_start+0x001E)
-.set   EDE_B_221,  (__data_start+0x0021)
+.set   EDE_B_21E,  DMEM_21E
+.set   EDE_B_221,  DMEM_221
 
-	mov     #0x0200, r4
-	mov     #0xd10e, &0x021E
-	mov     #0x5555, &0x0300
+	mov   #DMEM_200, r4
+	mov     #0xd10e, &DMEM_21E
+	mov     #0x5555, &DMEM_300
 	push.b  EDE_B_21E          ;# PUSH (0x0e  =>  @=0x0240)
 
-	mov     #0xfed0, &0x0220
-	mov     #0x5555, &0x0300
+	mov     #0xfed0, &DMEM_220
+	mov     #0x5555, &DMEM_300
 	push.b  EDE_B_221          ;# PUSH (0xfe  =>  @=0x023E)
 
 	mov     #0xD000, r15
@@ -252,16 +274,16 @@ clear_mem_loop:
 
         # Addressing mode: &EDE
 	#------------------------
-.set   aEDE_B_222,  0x0222
-.set   aEDE_B_225,  0x0225
+.set   aEDE_B_222,  DMEM_222
+.set   aEDE_B_225,  DMEM_225
 
-	mov     #0x0200, r4
-	mov     #0x1bc2, &0x0222
-	mov     #0x5555, &0x0300
+	mov   #DMEM_200, r4
+	mov     #0x1bc2, &DMEM_222
+	mov     #0x5555, &DMEM_300
 	push.b &aEDE_B_222         ;# PUSH (0xc2  =>  @=0x023C)
 	
-	mov     #0x3ba4, &0x0224
-	mov     #0x5555, &0x0300
+	mov     #0x3ba4, &DMEM_224
+	mov     #0x5555, &DMEM_300
 	push.b &aEDE_B_225         ;# PUSH (0x3b  =>  @=0x023A)
 
 	mov     #0xE000, r15
@@ -270,10 +292,10 @@ clear_mem_loop:
         # Addressing mode: #N
 	#------------------------
 
-	mov     #0x5555, &0x0300
+	mov     #0x5555, &DMEM_300
 	push.b  #0x82d9            ;# PUSH (0xd9  =>  @=0x0238)
 
-	mov     #0x5555, &0x0300
+	mov     #0x5555, &DMEM_300
 	push.b  #0x288d            ;# PUSH (0x8d  =>  @=0x0236)
 
 	mov     #0xF000, r15
@@ -294,8 +316,8 @@ clear_mem_loop:
         # Addressing mode: @SR
         #------------------------
 
-        mov     #0x1234, &0x022E
-        mov     #0x5678, &0x022C
+        mov     #0x1234, &DMEM_22E
+        mov     #0x5678, &DMEM_22C
 	nop
         push    @r1                ;# PUSH (r1=0x0230  =>  @=0x0230) -> do nothing
         push    @r1                ;# PUSH (r1=0x022E  =>  @=0x022E) -> do nothing
@@ -307,8 +329,8 @@ clear_mem_loop:
         # Addressing mode: @SR+
         #------------------------
 
-        mov     #0x0000, &0x022A
-        mov     #0x0000, &0x0228
+        mov     #0x0000, &DMEM_22A
+        mov     #0x0000, &DMEM_228
 	nop
         push    @r1+               ;# PUSH (r1=0x022C  =>  @=0x022C) -> do nothing
         push    @r1+               ;# PUSH (r1=0x022C  =>  @=0x022C) -> do nothing

@@ -42,6 +42,8 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
+`ifdef DBG_EN
+`ifdef DBG_HWBRK_1
       #1 dbg_en = 1;
       repeat(30) @(posedge mclk);
       stimulus_done = 0;
@@ -154,8 +156,8 @@ initial
 
       
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
-      dbg_uart_wr(BRK1_ADDR0, 16'h0204);
-      dbg_uart_wr(BRK1_ADDR1, 16'h0208);
+      dbg_uart_wr(BRK1_ADDR0, (`PER_SIZE+16'h0004));
+      dbg_uart_wr(BRK1_ADDR1, (`PER_SIZE+16'h0008));
       dbg_uart_wr(BRK1_CTL,   16'h0005);
       dbg_uart_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -213,8 +215,8 @@ initial
 
       
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
-      dbg_uart_wr(BRK1_ADDR0, 16'h0204);
-      dbg_uart_wr(BRK1_ADDR1, 16'h0208);
+      dbg_uart_wr(BRK1_ADDR0, (`PER_SIZE+16'h0004));
+      dbg_uart_wr(BRK1_ADDR1, (`PER_SIZE+16'h0008));
       dbg_uart_wr(BRK1_CTL,   16'h0006);
       dbg_uart_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -302,8 +304,8 @@ initial
 
       
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
-      dbg_uart_wr(BRK1_ADDR0, 16'h0204);
-      dbg_uart_wr(BRK1_ADDR1, 16'h0208);
+      dbg_uart_wr(BRK1_ADDR0, (`PER_SIZE+16'h0004));
+      dbg_uart_wr(BRK1_ADDR1, (`PER_SIZE+16'h0008));
       dbg_uart_wr(BRK1_CTL,   16'h0007);
       dbg_uart_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -408,8 +410,8 @@ initial
 
       
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
-      dbg_uart_wr(BRK1_ADDR0, 16'h0201);
-      dbg_uart_wr(BRK1_ADDR1, 16'h0205);
+      dbg_uart_wr(BRK1_ADDR0, (`PER_SIZE+16'h0001));
+      dbg_uart_wr(BRK1_ADDR1, (`PER_SIZE+16'h0005));
       dbg_uart_wr(BRK1_CTL,   16'h0015);
       dbg_uart_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -455,8 +457,8 @@ initial
 
       
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
-      dbg_uart_wr(BRK1_ADDR0, 16'h0201);
-      dbg_uart_wr(BRK1_ADDR1, 16'h0205);
+      dbg_uart_wr(BRK1_ADDR0, (`PER_SIZE+16'h0001));
+      dbg_uart_wr(BRK1_ADDR1, (`PER_SIZE+16'h0005));
       dbg_uart_wr(BRK1_CTL,   16'h0016);
       dbg_uart_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -546,8 +548,8 @@ initial
 
       
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
-      dbg_uart_wr(BRK1_ADDR0, 16'h0201);
-      dbg_uart_wr(BRK1_ADDR1, 16'h0205);
+      dbg_uart_wr(BRK1_ADDR0, (`PER_SIZE+16'h0001));
+      dbg_uart_wr(BRK1_ADDR1, (`PER_SIZE+16'h0005));
       dbg_uart_wr(BRK1_CTL,   16'h0017);
       dbg_uart_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -647,5 +649,21 @@ initial
 
      
       stimulus_done = 1;
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|   (hardware breakpoint unit 1 not included)   |");
+       $display(" ===============================================");
+       $finish;
+`endif
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|      (serial debug interface not included)    |");
+       $display(" ===============================================");
+       $finish;
+`endif
    end
 

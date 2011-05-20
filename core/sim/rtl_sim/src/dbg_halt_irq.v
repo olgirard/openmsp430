@@ -42,6 +42,7 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
+`ifdef DBG_EN
       #1 dbg_en = 1;
       repeat(30) @(posedge mclk);
       stimulus_done = 0;
@@ -54,8 +55,8 @@ initial
 `endif
 
       // Wait until software initialization is done
-      if (r15!==16'h0200)
-	@(r15==16'h0200);
+      if (r15!==(`PER_SIZE+16'h0000))
+	@(r15==(`PER_SIZE+16'h0000));
 
 
       dbg_uart_wr(CPU_CTL,  16'h0001);  // HALT
@@ -79,5 +80,13 @@ initial
 
       p1_din[1] = 1'b1;     
       stimulus_done = 1;
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|      (serial debug interface not included)    |");
+       $display(" ===============================================");
+       $finish;
+`endif
    end
 

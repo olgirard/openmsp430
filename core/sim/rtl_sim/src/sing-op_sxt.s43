@@ -34,6 +34,34 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.set    DMEM_BASE, (__data_start     )
+.set    DMEM_200,  (__data_start+0x00)
+.set    DMEM_202,  (__data_start+0x02)
+.set    DMEM_204,  (__data_start+0x04)
+.set    DMEM_206,  (__data_start+0x06)
+.set    DMEM_208,  (__data_start+0x08)
+.set    DMEM_209,  (__data_start+0x09)
+.set    DMEM_20A,  (__data_start+0x0A)
+.set    DMEM_20B,  (__data_start+0x0B)
+.set    DMEM_20C,  (__data_start+0x0C)
+.set    DMEM_20D,  (__data_start+0x0D)
+.set    DMEM_20E,  (__data_start+0x0E)
+.set    DMEM_20F,  (__data_start+0x0F)
+.set    DMEM_210,  (__data_start+0x10)
+.set    DMEM_212,  (__data_start+0x12)
+.set    DMEM_214,  (__data_start+0x14)
+.set    DMEM_216,  (__data_start+0x16)
+.set    DMEM_218,  (__data_start+0x18)
+.set    DMEM_219,  (__data_start+0x19)
+.set    DMEM_21A,  (__data_start+0x1A)
+.set    DMEM_21B,  (__data_start+0x1B)
+.set    DMEM_21C,  (__data_start+0x1C)
+.set    DMEM_21D,  (__data_start+0x1D)
+.set    DMEM_21E,  (__data_start+0x1E)
+.set    DMEM_21F,  (__data_start+0x1F)
+.set    DMEM_220,  (__data_start+0x20)
+.set    DMEM_222,  (__data_start+0x22)
+.set    DMEM_224,  (__data_start+0x24)
 
 .global main
 
@@ -61,16 +89,16 @@ main:
 	#------------------------
 
 	mov     #0x0100, r2        ;# Test 1
-	mov     #0x7524, &0x0200
-	mov     #0x0200, r4
-	mov     #0xaaaa, &0x0202
+	mov     #0x7524, &DMEM_200
+	mov   #DMEM_200, r4
+	mov     #0xaaaa, &DMEM_202
 	sxt         @r4            ;# SXT (mem00=0x7524  => {mem00=0x0024)
 	mov          r2, r5
 
 	mov     #0x0100, r2        ;# Test 2
-	mov     #0x1cb6, &0x0202
-	mov     #0x0202, r6
-	mov     #0xaaaa, &0x0204
+	mov     #0x1cb6, &DMEM_202
+	mov   #DMEM_202, r6
+	mov     #0xaaaa, &DMEM_204
 	sxt         @r6            ;# SXT (mem01=0x1cb6  => {mem01=0xffb6)
 	mov          r2, r7
 
@@ -81,16 +109,16 @@ main:
 	#------------------------
 
 	mov     #0x0100, r2        ;# Test 1
-	mov     #0x7524, &0x0208
-	mov     #0x0208, r4
-	mov     #0xaaaa, &0x020A
+	mov     #0x7524, &DMEM_208
+	mov   #DMEM_208, r4
+	mov     #0xaaaa, &DMEM_20A
 	sxt        @r4+            ;# SXT (mem04=0x7524  => {mem04=0x0024)
 	mov          r2, r5
 
 	mov     #0x0100, r2        ;# Test 2
-	mov     #0x1cb6, &0x020A
-	mov     #0x020A, r6
-	mov     #0xaaaa, &0x020C
+	mov     #0x1cb6, &DMEM_20A
+	mov   #DMEM_20A, r6
+	mov     #0xaaaa, &DMEM_20C
 	sxt        @r6+            ;# SXT (mem05=0x1cb6  => {mem05=0xffb6)
 	mov          r2, r7
 
@@ -101,16 +129,16 @@ main:
 	#------------------------
 
 	mov     #0x0100, r2        ;# Test 1
-	mov     #0x7524, &0x0210
-	mov     #0x0200, r4
-	mov     #0xaaaa, &0x0212
+	mov     #0x7524, &DMEM_210
+	mov   #DMEM_200, r4
+	mov     #0xaaaa, &DMEM_212
 	sxt       16(r4)            ;# SXT (mem08=0x7524  => {mem08=0x0024)
 	mov          r2, r5
 
 	mov     #0x0100, r2        ;# Test 2
-	mov     #0x1cb6, &0x0212
-	mov     #0x0200, r6
-	mov     #0xaaaa, &0x0214
+	mov     #0x1cb6, &DMEM_212
+	mov   #DMEM_200, r6
+	mov     #0xaaaa, &DMEM_214
 	sxt       18(r6)            ;# SXT (mem09=0x1cb6  => {mem09=0xffb6)
 	mov          r2, r7
 
@@ -119,20 +147,20 @@ main:
 
         # Addressing mode: EDE
 	#------------------------
-.set   EDE_218,  (__data_start+0x0018)
-.set   EDE_21A,  (__data_start+0x001A)
-.set   EDE_21C,  (__data_start+0x001C)
-.set   EDE_21E,  (__data_start+0x001E)
+.set   EDE_218,  DMEM_218
+.set   EDE_21A,  DMEM_21A
+.set   EDE_21C,  DMEM_21C
+.set   EDE_21E,  DMEM_21E
 
 	mov     #0x0100, r2        ;# Test 1
-	mov     #0x7524, &0x0218
-	mov     #0xaaaa, &0x021A
+	mov     #0x7524, &DMEM_218
+	mov     #0xaaaa, &DMEM_21A
 	sxt     EDE_218            ;# SXT (mem0c=0x7524  => {mem0c=0x0024)
 	mov          r2, r5
 
 	mov     #0x0100, r2        ;# Test 2
-	mov     #0x1cb6, &0x021A
-	mov     #0xaaaa, &0x021C
+	mov     #0x1cb6, &DMEM_21A
+	mov     #0xaaaa, &DMEM_21C
 	sxt     EDE_21A            ;# SXT (mem0d=0x1cb6  => {mem0d=0xffb6)
 	mov          r2, r7
 
@@ -141,20 +169,20 @@ main:
 
         # Addressing mode: &EDE
 	#------------------------
-.set   aEDE_220,  0x0220
-.set   aEDE_222,  0x0222
-.set   aEDE_224,  0x0224
-.set   aEDE_226,  0x0226
+.set   aEDE_220,  DMEM_220
+.set   aEDE_222,  DMEM_222
+.set   aEDE_224,  DMEM_224
+.set   aEDE_226,  DMEM_226
 
 	mov     #0x0100, r2        ;# Test 1
-	mov     #0x7524, &0x0220
-	mov     #0xaaaa, &0x0222
+	mov     #0x7524, &DMEM_220
+	mov     #0xaaaa, &DMEM_222
 	sxt   &aEDE_220            ;# SXT (mem10=0x7524  => {mem10=0x0024)
 	mov          r2, r5
 
 	mov     #0x0100, r2        ;# Test 2
-	mov     #0x1cb6, &0x0222
-	mov     #0xaaaa, &0x0224
+	mov     #0x1cb6, &DMEM_222
+	mov     #0xaaaa, &DMEM_224
 	sxt   &aEDE_222            ;# SXT (mem11=0x1cb6  => {mem11=0xffb6)
 	mov          r2, r7
 

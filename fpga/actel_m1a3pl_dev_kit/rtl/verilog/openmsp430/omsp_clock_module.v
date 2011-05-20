@@ -35,9 +35,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 106 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -55,7 +55,7 @@ module  omsp_clock_module (
     mclk,                         // Main system clock
     per_dout,                     // Peripheral data output
     por,                          // Power-on reset
-    puc,                          // Main system reset
+    puc_rst,                      // Main system reset
     smclk_en,                     // SMCLK enable
 	     
 // INPUTs
@@ -84,7 +84,7 @@ output              dbg_rst;      // Debug unit reset
 output              mclk;         // Main system clock
 output       [15:0] per_dout;     // Peripheral data output
 output              por;          // Power-on reset
-output              puc;          // Main system reset
+output              puc_rst;      // Main system reset
 output              smclk_en;     // SMCLK enable
 
 // INPUTs
@@ -95,7 +95,7 @@ input               dbg_en;       // Debug interface enable (asynchronous)
 input               dco_clk;      // Fast oscillator (fast clock)
 input               lfxt_clk;     // Low frequency oscillator (typ 32kHz)
 input               oscoff;       // Turns off LFXT1 clock input
-input         [7:0] per_addr;     // Peripheral address
+input        [13:0] per_addr;     // Peripheral address
 input        [15:0] per_din;      // Peripheral data input
 input               per_en;       // Peripheral enable (high active)
 input         [1:0] per_we;       // Peripheral write enable (high active)
@@ -108,37 +108,48 @@ input               wdt_reset;    // Watchdog-timer reset
 // 1)  PARAMETER DECLARATION
 //=============================================================================
 
-// Register addresses
-parameter           BCSCTL1    = 9'h057;
-parameter           BCSCTL2    = 9'h058;
+// Register base address (must be aligned to decoder bit width)
+parameter       [14:0] BASE_ADDR   = 15'h0050;
+
+// Decoder bit width (defines how many bits are considered for address decoding)
+parameter              DEC_WD      =  4;
+
+// Register addresses offset
+parameter [DEC_WD-1:0] BCSCTL1     =  'h7,
+                       BCSCTL2     =  'h8;
+
+// Register one-hot decoder utilities
+parameter              DEC_SZ      =  2**DEC_WD;
+parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder
-parameter           BCSCTL1_D  = (256'h1 << (BCSCTL1 /2));
-parameter           BCSCTL2_D  = (256'h1 << (BCSCTL2 /2)); 
+parameter [DEC_SZ-1:0] BCSCTL1_D   = (BASE_REG << BCSCTL1),
+                       BCSCTL2_D   = (BASE_REG << BCSCTL2);
 
 
 //============================================================================
 // 2)  REGISTER DECODER
 //============================================================================
 
+// Local register selection
+wire              reg_sel      =  per_en & (per_addr[13:DEC_WD-1]==BASE_ADDR[14:DEC_WD]);
+
+// Register local address
+wire [DEC_WD-1:0] reg_addr     =  {1'b0, per_addr[DEC_WD-2:0]};
+
 // Register address decode
-reg  [255:0]  reg_dec; 
-always @(per_addr)
-  case (per_addr)
-    (BCSCTL1 /2):     reg_dec  =  BCSCTL1_D;
-    (BCSCTL2 /2):     reg_dec  =  BCSCTL2_D;
-    default     :     reg_dec  =  {256{1'b0}};
-  endcase
+wire [DEC_SZ-1:0] reg_dec      = (BCSCTL1_D  &  {DEC_SZ{(reg_addr==(BCSCTL1 >>1))}}) |
+                                 (BCSCTL2_D  &  {DEC_SZ{(reg_addr==(BCSCTL2 >>1))}});
 
 // Read/Write probes
-wire         reg_lo_write =  per_we[0] & per_en;
-wire         reg_hi_write =  per_we[1] & per_en;
-wire         reg_read     = ~|per_we   & per_en;
+wire              reg_lo_write =  per_we[0] & reg_sel;
+wire              reg_hi_write =  per_we[1] & reg_sel;
+wire              reg_read     = ~|per_we   & reg_sel;
 
 // Read/Write vectors
-wire [255:0] reg_hi_wr    = reg_dec & {256{reg_hi_write}};
-wire [255:0] reg_lo_wr    = reg_dec & {256{reg_lo_write}};
-wire [255:0] reg_rd       = reg_dec & {256{reg_read}};
+wire [DEC_SZ-1:0] reg_hi_wr    = reg_dec & {DEC_SZ{reg_hi_write}};
+wire [DEC_SZ-1:0] reg_lo_wr    = reg_dec & {DEC_SZ{reg_lo_write}};
+wire [DEC_SZ-1:0] reg_rd       = reg_dec & {DEC_SZ{reg_read}};
 
 
 //============================================================================
@@ -148,22 +159,22 @@ wire [255:0] reg_rd       = reg_dec & {256{reg_read}};
 // BCSCTL1 Register
 //--------------
 reg  [7:0] bcsctl1;
-wire       bcsctl1_wr  = BCSCTL1[0] ? reg_hi_wr[BCSCTL1/2] : reg_lo_wr[BCSCTL1/2];
-wire [7:0] bcsctl1_nxt = BCSCTL1[0] ? per_din[15:8]        : per_din[7:0];
+wire       bcsctl1_wr  = BCSCTL1[0] ? reg_hi_wr[BCSCTL1] : reg_lo_wr[BCSCTL1];
+wire [7:0] bcsctl1_nxt = BCSCTL1[0] ? per_din[15:8]      : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)              bcsctl1  <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)          bcsctl1  <=  8'h00;
   else if (bcsctl1_wr)  bcsctl1  <=  bcsctl1_nxt & 8'h30; // Mask unused bits
 
 
 // BCSCTL2 Register
 //--------------
 reg  [7:0] bcsctl2;
-wire       bcsctl2_wr  = BCSCTL2[0] ? reg_hi_wr[BCSCTL2/2] : reg_lo_wr[BCSCTL2/2];
-wire [7:0] bcsctl2_nxt = BCSCTL2[0] ? per_din[15:8]        : per_din[7:0];
+wire       bcsctl2_wr  = BCSCTL2[0] ? reg_hi_wr[BCSCTL2] : reg_lo_wr[BCSCTL2];
+wire [7:0] bcsctl2_nxt = BCSCTL2[0] ? per_din[15:8]      : per_din[7:0];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)              bcsctl2  <=  8'h00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)          bcsctl2  <=  8'h00;
   else if (bcsctl2_wr)  bcsctl2  <=  bcsctl2_nxt & 8'h0e; // Mask unused bits
 
 
@@ -172,8 +183,8 @@ always @ (posedge mclk or posedge puc)
 //============================================================================
 
 // Data output mux
-wire [15:0] bcsctl1_rd   = {8'h00, (bcsctl1  & {8{reg_rd[BCSCTL1/2]}})}  << (8 & {4{BCSCTL1[0]}});
-wire [15:0] bcsctl2_rd   = {8'h00, (bcsctl2  & {8{reg_rd[BCSCTL2/2]}})}  << (8 & {4{BCSCTL2[0]}});
+wire [15:0] bcsctl1_rd   = {8'h00, (bcsctl1  & {8{reg_rd[BCSCTL1]}})}  << (8 & {4{BCSCTL1[0]}});
+wire [15:0] bcsctl2_rd   = {8'h00, (bcsctl2  & {8{reg_rd[BCSCTL2]}})}  << (8 & {4{BCSCTL2[0]}});
 
 wire [15:0] per_dout =  bcsctl1_rd   |
                         bcsctl2_rd;
@@ -185,23 +196,35 @@ wire [15:0] per_dout =  bcsctl1_rd   |
 
 // Synchronize CPU_EN signal
 //---------------------------------------
-reg  [1:0] cpu_en_sync;
-always @ (posedge mclk or posedge por)
-  if (por) cpu_en_sync <=  2'b00;
-  else     cpu_en_sync <=  {cpu_en_sync[0], cpu_en};    
-
-assign     cpu_en_s     =   cpu_en_sync[1];
-   
+`ifdef SYNC_CPU_EN
+omsp_sync_cell sync_cell_cpu_en (
+    .data_out (cpu_en_s),
+    .clk      (mclk),
+    .data_in  (cpu_en),
+    .rst      (por)
+);
+`else
+   assign cpu_en_s = cpu_en;
+`endif
 
 // Synchronize LFXT_CLK & edge detection
 //---------------------------------------
-reg  [2:0] lfxt_clk_s;
+wire lfxt_clk_s;
+
+omsp_sync_cell sync_cell_lfxt_clk (
+    .data_out (lfxt_clk_s),
+    .clk      (mclk),
+    .data_in  (lfxt_clk),
+    .rst      (por)
+);
+
+reg  lfxt_clk_dly;
    
 always @ (posedge mclk or posedge por)
-  if (por) lfxt_clk_s <=  3'b000;
-  else     lfxt_clk_s <=  {lfxt_clk_s[1:0], lfxt_clk};    
+  if (por) lfxt_clk_dly <=  1'b0;
+  else     lfxt_clk_dly <=  lfxt_clk_s;    
 
-wire lfxt_clk_en = (lfxt_clk_s[1] & ~lfxt_clk_s[2]) & ~(oscoff & ~bcsctl2[`SELS]);
+wire lfxt_clk_en = (lfxt_clk_s & ~lfxt_clk_dly) & ~(oscoff & ~bcsctl2[`SELS]);
      
    
 // Generate main system clock
@@ -222,12 +245,12 @@ wire      aclk_en_nxt = lfxt_clk_en & ((bcsctl1[`DIVAx]==2'b00) ?  1'b1         
                                        (bcsctl1[`DIVAx]==2'b10) ? &aclk_div[1:0] :
                                                                   &aclk_div[2:0]);
 
-always @ (posedge mclk or posedge puc)
-  if (puc)  aclk_en <=  1'b0;
-  else      aclk_en <=  aclk_en_nxt & cpu_en_s;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)  aclk_en <=  1'b0;
+  else          aclk_en <=  aclk_en_nxt & cpu_en_s;
 
-always @ (posedge mclk or posedge puc)
-  if (puc)                                         aclk_div <=  3'h0;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)                                     aclk_div <=  3'h0;
   else if ((bcsctl1[`DIVAx]!=2'b00) & lfxt_clk_en) aclk_div <=  aclk_div+3'h1;
 
 
@@ -244,12 +267,12 @@ wire      smclk_en_nxt = smclk_in & ((bcsctl2[`DIVSx]==2'b00) ?  1'b1           
                                      (bcsctl2[`DIVSx]==2'b10) ? &smclk_div[1:0] :
                                                                 &smclk_div[2:0]);
    
-always @ (posedge mclk or posedge puc)
-  if (puc)  smclk_en <=  1'b0;
-  else      smclk_en <=  smclk_en_nxt & cpu_en_s;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)  smclk_en <=  1'b0;
+  else          smclk_en <=  smclk_en_nxt & cpu_en_s;
 
-always @ (posedge mclk or posedge puc)
-  if (puc)                                      smclk_div <=  3'h0;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)                                  smclk_div <=  3'h0;
   else if ((bcsctl2[`DIVSx]!=2'b00) & smclk_in) smclk_div <=  smclk_div+3'h1;
 
 
@@ -264,38 +287,48 @@ assign  dbg_clk = mclk;
 //=============================================================================
 
 // Generate synchronized POR
+wire      por_n;
 wire      por_reset_a  =  !reset_n;
 
-reg [1:0] por_s;
-always @(posedge mclk or posedge por_reset_a)
-  if (por_reset_a) por_s  <=  2'b11;
-  else             por_s  <=  {por_s[0], 1'b0};
-wire   por = por_s[1];
+omsp_sync_cell sync_cell_por (
+    .data_out (por_n),
+    .clk      (mclk),
+    .data_in  (1'b1),
+    .rst      (por_reset_a)
+);
+
+wire   por = ~por_n;
 
 
 // Generate main system reset
-wire      puc_reset  = por | wdt_reset | dbg_cpu_reset;
-
-reg [1:0] puc_s;
-always @(posedge mclk or posedge puc_reset)
-  if (puc_reset) puc_s  <=  2'b11;
-  else           puc_s  <=  {puc_s[0], 1'b0};
-wire   puc = puc_s[1];
+wire      puc_rst_comb = por | wdt_reset | dbg_cpu_reset;
+reg       puc_rst;
+always @(posedge mclk or posedge puc_rst_comb)
+  if (puc_rst_comb) puc_rst  <=  1'b1;
+  else              puc_rst  <=  1'b0;
 
 
 // Generate debug unit reset
-`ifdef DBG_EN   
-reg [1:0] dbg_rst_s;
-always @(posedge mclk or posedge por)
-  if (por) dbg_rst_s  <=  2'b11;
-  else     dbg_rst_s  <=  {dbg_rst_s[0], ~dbg_en};
+`ifdef DBG_EN
+wire   dbg_rst_n;
+
+  `ifdef SYNC_DBG_EN
+     omsp_sync_cell sync_cell_dbg_en (
+        .data_out (dbg_rst_n),
+        .clk      (mclk),
+        .data_in  (dbg_en),
+        .rst      (por)
+    );
+  `else
+assign dbg_rst_n = dbg_en;
+  `endif
 
 `else
-wire [1:0] dbg_rst_s   = 2'b11;
+wire   dbg_rst_n  = 1'b0;
 `endif
 
-wire   dbg_en_s = ~dbg_rst_s[1];
-wire   dbg_rst  =  dbg_rst_s[1];
+wire   dbg_en_s   =  dbg_rst_n;
+wire   dbg_rst    = ~dbg_rst_n;
 
 
 endmodule // omsp_clock_module

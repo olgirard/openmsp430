@@ -187,7 +187,7 @@ initial
       if (smclk_counter !== 75)  tb_error("====== CLOCK GENERATOR: SMCLK - DCO_CLK INPUT (DIV /8) =====");
  
 
-      // SMCLK GENERATION - DCO_CLK INPUT
+      // CPU ENABLE - CPU_EN INPUT
       //--------------------------------------------------------
 
       @(r15 === 16'h3000);
@@ -213,7 +213,27 @@ initial
       if (smclk_counter == 0)    tb_error("====== SMCLK is not running (test 9) =====");
       if (dbg_freeze    == 1'b1) tb_error("====== DBG_FREEZE signal is active (test 10) =====");
 
+
+      // RD/WR ACCESS TO REGISTERS
+      //--------------------------------------------------------
+
+      @(r15 === 16'h5000);
+      if (r4  !== 16'h0000) tb_error("====== BCSCTL1 rd/wr access error (test 1) =====");
+      if (r5  !== 16'h0000) tb_error("====== BCSCTL2 rd/wr access error (test 1) =====");
+
+      if (r6  !== 16'h0030) tb_error("====== BCSCTL1 rd/wr access error (test 2) =====");
+      if (r7  !== 16'h0000) tb_error("====== BCSCTL2 rd/wr access error (test 2) =====");
+
+      if (r8  !== 16'h0000) tb_error("====== BCSCTL1 rd/wr access error (test 3) =====");
+      if (r9  !== 16'h0000) tb_error("====== BCSCTL2 rd/wr access error (test 3) =====");
+
+      if (r10 !== 16'h0000) tb_error("====== BCSCTL1 rd/wr access error (test 4) =====");
+      if (r11 !== 16'h000e) tb_error("====== BCSCTL2 rd/wr access error (test 4) =====");
+
+      if (r12 !== 16'h0000) tb_error("====== BCSCTL1 rd/wr access error (test 5) =====");
+      if (r13 !== 16'h0000) tb_error("====== BCSCTL2 rd/wr access error (test 5) =====");
    
+
       stimulus_done = 1;
    end
 

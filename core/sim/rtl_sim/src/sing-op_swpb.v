@@ -54,24 +54,24 @@ initial
 
       // Addressing mode: @Rn
       @(r15==16'h2000);
-      if (mem200 !==16'h2475) tb_error("====== SWPB (@Rn mode): test 1 (result)  =====");
-      if (r4     !==16'h0200) tb_error("====== SWPB (@Rn mode): test 1 (address) =====");
-      if (r5     !==16'h0102) tb_error("====== SWPB (@Rn mode): test 1 (C flag)  =====");
+      if (mem200 !==16'h2475)             tb_error("====== SWPB (@Rn mode): test 1 (result)  =====");
+      if (r4     !==(`PER_SIZE+16'h0000)) tb_error("====== SWPB (@Rn mode): test 1 (address) =====");
+      if (r5     !==16'h0102)             tb_error("====== SWPB (@Rn mode): test 1 (C flag)  =====");
 
-      if (mem202 !==16'hb61c) tb_error("====== SWPB (@Rn mode): test 2 (result)  =====");
-      if (r6     !==16'h0202) tb_error("====== SWPB (@Rn mode): test 2 (address) =====");
-      if (r7     !==16'h0005) tb_error("====== SWPB (@Rn mode): test 2 (C flag)  =====");
+      if (mem202 !==16'hb61c)             tb_error("====== SWPB (@Rn mode): test 2 (result)  =====");
+      if (r6     !==(`PER_SIZE+16'h0002)) tb_error("====== SWPB (@Rn mode): test 2 (address) =====");
+      if (r7     !==16'h0005)             tb_error("====== SWPB (@Rn mode): test 2 (C flag)  =====");
 
 
       // Addressing mode: @Rn+
       @(r15==16'h3000);
-      if (mem208 !==16'h2475) tb_error("====== SWPB (@Rn+ mode): test 1 (result)  =====");
-      if (r4     !==16'h020A) tb_error("====== SWPB (@Rn+ mode): test 1 (address) =====");
-      if (r5     !==16'h0102) tb_error("====== SWPB (@Rn+ mode): test 1 (C flag)  =====");
+      if (mem208 !==16'h2475)             tb_error("====== SWPB (@Rn+ mode): test 1 (result)  =====");
+      if (r4     !==(`PER_SIZE+16'h000A)) tb_error("====== SWPB (@Rn+ mode): test 1 (address) =====");
+      if (r5     !==16'h0102)             tb_error("====== SWPB (@Rn+ mode): test 1 (C flag)  =====");
 
-      if (mem20A !==16'hb61c) tb_error("====== SWPB (@Rn+ mode): test 2 (result)  =====");
-      if (r6     !==16'h020C) tb_error("====== SWPB (@Rn+ mode): test 2 (address) =====");
-      if (r7     !==16'h0005) tb_error("====== SWPB (@Rn+ mode): test 2 (C flag)  =====");
+      if (mem20A !==16'hb61c)             tb_error("====== SWPB (@Rn+ mode): test 2 (result)  =====");
+      if (r6     !==(`PER_SIZE+16'h000C)) tb_error("====== SWPB (@Rn+ mode): test 2 (address) =====");
+      if (r7     !==16'h0005)             tb_error("====== SWPB (@Rn+ mode): test 2 (C flag)  =====");
 
 
       // Addressing mode: X(Rn)

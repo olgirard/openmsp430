@@ -38,6 +38,12 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_210,  (__data_start+0x10)
+.set   DMEM_212,  (__data_start+0x12)
+.set   DMEM_250,  (__data_start+0x50)
+
 .global main
 
 WAIT_FUNC:
@@ -46,18 +52,18 @@ WAIT_FUNC:
 	ret
 	
 main:
- 	mov  #0x0250, r1 	; # Initialize stack pointer
+ 	mov #DMEM_250, r1 	; # Initialize stack pointer
 
-	mov  #0x1122, &0x0210
-	mov  #0x3344, &0x0212
+	mov   #0x1122, &DMEM_210
+	mov   #0x3344, &DMEM_212
 
-	mov  #0xaaaa, r5
-	mov  #0xbbbb, r6
+	mov   #0xaaaa, r5
+	mov   #0xbbbb, r6
 
-	mov  #0x1000, r14
-        call #WAIT_FUNC
+	mov   #0x1200, r14
+        call  #WAIT_FUNC
 
-	mov  #0x1000, r15
+	mov   #0x1000, r15
 
 		
         /* ----------------------         END OF TEST        --------------- */

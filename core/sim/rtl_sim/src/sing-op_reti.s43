@@ -34,6 +34,11 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.set    DMEM_BASE, (__data_start     )
+.set    DMEM_200,  (__data_start+0x00)
+.set    DMEM_250,  (__data_start+0x50)
+.set    DMEM_252,  (__data_start+0x52)
+.set    DMEM_300,  (__data_start+0x100)
 
 .global main
 
@@ -59,7 +64,7 @@ main:
 	#------------------------
 
 	# Pre-initialize stack
-	mov             #0x0252, r1
+	mov             #DMEM_252, r1
 	push #RETI_ROUTINE
 	push            #0x0145
 	mov     #0x0000, &0x0200

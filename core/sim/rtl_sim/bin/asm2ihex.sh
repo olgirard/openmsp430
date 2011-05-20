@@ -37,11 +37,11 @@
 ###############################################################################
 #                            Parameter Check                                  #
 ###############################################################################
-EXPECTED_ARGS=5
+EXPECTED_ARGS=6
 if [ $# -ne $EXPECTED_ARGS ]; then
   echo "ERROR    : wrong number of arguments"
-  echo "USAGE    : asm2ihex.sh <test name> <test assembler file> <definition file>   <prog mem size> <data mem size>"
-  echo "Example  : asm2ihex.sh c-jump_jge  ../src/c-jump_jge.s43 ../bin/template.def 2048            128"
+  echo "USAGE    : asm2ihex.sh <test name> <test assembler file> <definition file>   <prog mem size> <data mem size> <peripheral addr space size>"
+  echo "Example  : asm2ihex.sh c-jump_jge  ../src/c-jump_jge.s43 ../bin/template.def 2048            128             512"
   exit 1
 fi
 
@@ -64,14 +64,18 @@ fi
 #               Generate the linker definition file                           #
 ###############################################################################
 
+PER_SIZE=$6
 DMEM_SIZE=$5
 PMEM_SIZE=$4
 PMEM_BASE=$((0x10000-$PMEM_SIZE))
+STACK_INIT=$((PER_SIZE+0x0080))
 
 cp  $3  ./pmem.def
-sed -i "s/PMEM_BASE/$PMEM_BASE/g" pmem.def
-sed -i "s/PMEM_SIZE/$PMEM_SIZE/g" pmem.def
-sed -i "s/DMEM_SIZE/$DMEM_SIZE/g" pmem.def
+sed -i "s/PMEM_BASE/$PMEM_BASE/g"    pmem.def
+sed -i "s/PMEM_SIZE/$PMEM_SIZE/g"    pmem.def
+sed -i "s/DMEM_SIZE/$DMEM_SIZE/g"    pmem.def
+sed -i "s/PER_SIZE/$PER_SIZE/g"      pmem.def
+sed -i "s/STACK_INIT/$STACK_INIT/g"  pmem.def
 
 
 ###############################################################################

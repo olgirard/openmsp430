@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 106 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -60,7 +60,7 @@ module  openMSP430 (
     pmem_cen,                      // Program Memory chip enable (low active)
     pmem_din,                      // Program Memory data input (optional)
     pmem_wen,                      // Program Memory write enable (low active) (optional)
-    puc,                           // Main system reset
+    puc_rst,                       // Main system reset
     smclk_en,                      // SMCLK enable
 
 // INPUTs
@@ -88,7 +88,7 @@ output        [15:0] dmem_din;     // Data Memory data input
 output         [1:0] dmem_wen;     // Data Memory write enable (low active)
 output        [13:0] irq_acc;      // Interrupt request accepted (one-hot signal)
 output               mclk;         // Main system clock
-output         [7:0] per_addr;     // Peripheral address
+output        [13:0] per_addr;     // Peripheral address
 output        [15:0] per_din;      // Peripheral data input
 output         [1:0] per_we;       // Peripheral write enable (high active)
 output               per_en;       // Peripheral enable (high active)
@@ -96,7 +96,7 @@ output [`PMEM_MSB:0] pmem_addr;    // Program Memory address
 output               pmem_cen;     // Program Memory chip enable (low active)
 output        [15:0] pmem_din;     // Program Memory data input (optional)
 output         [1:0] pmem_wen;     // Program Memory write enable (low active) (optional)
-output               puc;          // Main system reset
+output               puc_rst;      // Main system reset
 output               smclk_en;     // SMCLK enable
 
 
@@ -124,27 +124,55 @@ wire          [7:0] inst_ad;
 wire          [7:0] inst_as;
 wire         [11:0] inst_alu;
 wire                inst_bw;
+wire                inst_irq_rst;
+wire                inst_mov;
 wire         [15:0] inst_dest;
 wire         [15:0] inst_dext;
 wire         [15:0] inst_sext;
 wire          [7:0] inst_so;
 wire         [15:0] inst_src;
 wire          [2:0] inst_type;
+wire          [7:0] inst_jmp;
 wire          [3:0] e_state;
 wire                exec_done;
+wire                decode_noirq;
+wire                cpu_en_s;
+wire                cpuoff;
+wire                oscoff;
+wire                scg1;
+wire                por;
+wire                gie;
 
 wire         [15:0] eu_mab;
 wire         [15:0] eu_mdb_in;
 wire         [15:0] eu_mdb_out;
 wire          [1:0] eu_mb_wr;
+wire                eu_mb_en;
 wire         [15:0] fe_mab;
 wire         [15:0] fe_mdb_in;
+wire                fe_mb_en;
+wire                fe_pmem_wait;
 
+wire                pc_sw_wr;
 wire         [15:0] pc_sw;
-wire          [7:0] inst_jmp;
 wire         [15:0] pc;
 wire         [15:0] pc_nxt;
 
+wire                nmie;
+wire                nmi_acc;
+wire                nmi_evt;
+
+wire                wdtie;
+wire                wdtifg_set;
+wire                wdtpw_error;
+wire                wdttmsel;
+wire                wdt_irq;
+wire                wdt_reset;
+
+wire                dbg_clk;
+wire                dbg_rst;
+wire                dbg_en_s;
+wire                dbg_halt_st;
 wire                dbg_halt_cmd;
 wire                dbg_mem_en;
 wire                dbg_reg_wr;
@@ -177,7 +205,7 @@ omsp_clock_module clock_module_0 (
     .mclk         (mclk),          // Main system clock
     .per_dout     (per_dout_clk),  // Peripheral data output
     .por          (por),           // Power-on reset
-    .puc          (puc),           // Main system reset
+    .puc_rst      (puc_rst),       // Main system reset
     .smclk_en     (smclk_en),      // SMCLK enable
 	     
 // INPUTs
@@ -241,7 +269,7 @@ omsp_frontend frontend_0 (
     .nmi_evt      (nmi_evt),       // Non-maskable interrupt event
     .pc_sw        (pc_sw),         // Program counter software value
     .pc_sw_wr     (pc_sw_wr),      // Program counter software write
-    .puc          (puc),           // Main system reset
+    .puc_rst      (puc_rst),       // Main system reset
     .wdt_irq      (wdt_irq)        // Watchdog-timer interrupt
 );
 
@@ -288,7 +316,7 @@ omsp_execution_unit execution_unit_0 (
     .mdb_in       (eu_mdb_in),     // Memory data bus input
     .pc           (pc),            // Program counter
     .pc_nxt       (pc_nxt),        // Next PC value (for CALL & IRQ)
-    .puc          (puc)            // Main system reset
+    .puc_rst      (puc_rst)        // Main system reset
 );
 
 
@@ -332,7 +360,7 @@ omsp_mem_backbone mem_backbone_0 (
     .mclk         (mclk),          // Main system clock
     .per_dout     (per_dout_or),   // Peripheral data output
     .pmem_dout    (pmem_dout),     // Program Memory data output
-    .puc          (puc)            // Main system reset
+    .puc_rst      (puc_rst)        // Main system reset
 );
 
 
@@ -357,7 +385,7 @@ omsp_sfr sfr_0 (
     .per_en       (per_en),        // Peripheral enable (high active)
     .per_we       (per_we),        // Peripheral write enable (high active)
     .por          (por),           // Power-on reset
-    .puc          (puc),           // Main system reset
+    .puc_rst      (puc_rst),       // Main system reset
     .wdtifg_clr   (irq_acc[10]),   // Clear Watchdog-timer interrupt flag
     .wdtifg_set   (wdtifg_set),    // Set Watchdog-timer interrupt flag
     .wdtpw_error  (wdtpw_error),   // Watchdog-timer password error
@@ -388,7 +416,7 @@ omsp_watchdog watchdog_0 (
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
     .per_we       (per_we),        // Peripheral write enable (high active)
-    .puc          (puc),           // Main system reset
+    .puc_rst      (puc_rst),       // Main system reset
     .smclk_en     (smclk_en),      // SMCLK enable
     .wdtie        (wdtie)          // Watchdog-timer interrupt enable
 );
@@ -409,7 +437,7 @@ omsp_multiplier multiplier_0 (
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
     .per_we       (per_we),        // Peripheral write enable (high active)
-    .puc          (puc)            // Main system reset
+    .puc_rst      (puc_rst)        // Main system reset
 );
 `else
 assign per_dout_mpy = 16'h0000;
@@ -463,7 +491,7 @@ omsp_dbg dbg_0 (
     .fe_mb_en     (fe_mb_en),      // Frontend Memory bus enable
     .fe_mdb_in    (fe_mdb_in),     // Frontend Memory data bus input
     .pc           (pc),            // Program counter
-    .puc          (puc)            // Main system reset
+    .puc_rst      (puc_rst)        // Main system reset
 );
 
 `else

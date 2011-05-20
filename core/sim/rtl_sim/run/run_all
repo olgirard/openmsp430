@@ -61,6 +61,7 @@ rm -rf *.log
 ../bin/msp430sim dbg_hwbrk2          | tee dbg_hwbrk2.log
 ../bin/msp430sim dbg_hwbrk3          | tee dbg_hwbrk3.log
 ../bin/msp430sim dbg_halt_irq        | tee dbg_halt_irq.log
+../bin/msp430sim dbg_onoff           | tee dbg_onoff.log
 
 # Watchdog test patterns
 ../bin/msp430sim wdt_interval        | tee wdt_interval.log
@@ -87,13 +88,16 @@ rm -rf *.log
 ../bin/msp430sim mpy_basic           | tee  mpy_basic.log
 
 
+grep SKIPPED *.log
 grep FAILED  *.log
 echo ""
 echo " ================================"
-echo -n "| Number of passed patterns: "
+echo -n "| Number of passed patterns : "
 cat *.log | grep -c PASSED
-echo -n "| Number of failed patterns: "
+echo -n "| Number of failed patterns : "
 cat *.log | grep -c FAILED
+echo -n "| Number of skipped patterns: "
+cat *.log | grep -c SKIPPED
 echo "|--------------------------------"
 echo -n "| Number of patterns:        "
 ls -1 *.log | wc -l

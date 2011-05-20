@@ -37,6 +37,10 @@
 
 .global main
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_250,  (__data_start+0x50)
+
 .set   P1IN,  0x0020
 .set   P1OUT, 0x0021
 .set   P1DIR, 0x0022
@@ -53,7 +57,7 @@ main:
 
         /* -------------- PORT 1: TEST INTERRUPT VECTOR  --------------- */
 
-	mov     #0x0250, r1     ; Initialize stack
+	mov   #DMEM_250, r1     ; Initialize stack
 
 	mov.b   #0x0001, &P1IE  ; Enable GPIO interrupt
 
@@ -61,7 +65,7 @@ main:
 
 	mov     #0x0000, r13;
 	mov     #0x0000, r14;
-	mov     #0x0200, r15;
+	mov   #DMEM_200, r15;
 infinite_loop:
 	inc     r13
 	bit     #0x0002, &P1IN

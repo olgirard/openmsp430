@@ -37,12 +37,14 @@
 
 .global main
 
+.set    DMEM_BASE, (__data_start     )
+.set    DMEM_250,  (__data_start+0x50)
 	
 main:
-	mov  #0x0250, r1     ; Initialize stack
- 	mov  #0x0000, r15
- 	mov  #0x0000, r14
-	mov  #0x0000, r13
+	mov  #DMEM_250, r1     ; Initialize stack
+ 	mov    #0x0000, r15
+ 	mov    #0x0000, r14
+	mov    #0x0000, r13
 	nop
 	eint
 	

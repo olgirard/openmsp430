@@ -37,72 +37,10 @@
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-// SYSTEM CONFIGURATION
+// BASIC SYSTEM CONFIGURATION
 //----------------------------------------------------------------------------
 
-// Program Memory Size:
-`ifdef PMEM_AWIDTH
-`undef PMEM_AWIDTH
-`endif
-
-// Data Memory Size:
-`ifdef DMEM_AWIDTH
-`undef DMEM_AWIDTH
-`endif
-
-// Include/Exclude Hardware Multiplier
-`ifdef MULTIPLIER
-`undef MULTIPLIER
-`endif
-
-//----------------------------------------------------------------------------
-// REMOTE DEBUGGING INTERFACE CONFIGURATION
-//----------------------------------------------------------------------------
-
-// Include Debug interface
-`ifdef DBG_EN
-`undef DBG_EN
-`endif
-
-// Debug interface selection
-`ifdef DBG_UART
-`undef DBG_UART
-`endif
-`ifdef DBG_JTAG
-`undef DBG_JTAG
-`endif
-
-// Number of hardware breakpoints
-`ifdef DBG_HWBRK_0
-`undef DBG_HWBRK_0
-`endif
-`ifdef DBG_HWBRK_1
-`undef DBG_HWBRK_1
-`endif
-`ifdef DBG_HWBRK_2
-`undef DBG_HWBRK_2
-`endif
-`ifdef DBG_HWBRK_3
-`undef DBG_HWBRK_3
-`endif
-
-// Let the CPU break after a PUC occurrence by default
-`ifdef DBG_RST_BRK_EN
-`undef DBG_RST_BRK_EN
-`endif
-
-
-//==========================================================================//
-//==========================================================================//
-//==========================================================================//
-//==========================================================================//
-//=====        SYSTEM CONSTANTS --- !!!!!!!! DO NOT EDIT !!!!!!!!      =====//
-//==========================================================================//
-//==========================================================================//
-//==========================================================================//
-//==========================================================================//
-
-// Program and Data Memory sizes
+// Program Memory sizes
 `ifdef PMEM_SIZE_59_KB
 `undef PMEM_SIZE_59_KB
 `endif
@@ -145,6 +83,8 @@
 `ifdef PMEM_SIZE_1_KB
 `undef PMEM_SIZE_1_KB
 `endif
+
+// Data Memory sizes
 `ifdef DMEM_SIZE_32_KB
 `undef DMEM_SIZE_32_KB
 `endif
@@ -184,17 +124,126 @@
 `ifdef DMEM_SIZE_128_B
 `undef DMEM_SIZE_128_B
 `endif
+
+// Include/Exclude Hardware Multiplier
+`ifdef MULTIPLIER
+`undef MULTIPLIER
+`endif
+
+// Include Debug interface
+`ifdef DBG_EN
+`undef DBG_EN
+`endif
+
+
+//----------------------------------------------------------------------------
+// ADVANCED SYSTEM CONFIGURATION (FOR EXPERIENCED USERS)
+//----------------------------------------------------------------------------
+
+// Peripheral Memory Space:
+`ifdef PER_SIZE_32_KB
+`undef PER_SIZE_32_KB
+`endif
+`ifdef PER_SIZE_16_KB
+`undef PER_SIZE_16_KB
+`endif
+`ifdef PER_SIZE_8_KB
+`undef PER_SIZE_8_KB
+`endif
+`ifdef PER_SIZE_4_KB
+`undef PER_SIZE_4_KB
+`endif
+`ifdef PER_SIZE_2_KB
+`undef PER_SIZE_2_KB
+`endif
+`ifdef PER_SIZE_1_KB
+`undef PER_SIZE_1_KB
+`endif
+`ifdef PER_SIZE_512_B
+`undef PER_SIZE_512_B
+`endif
+
+// Let the CPU break after a PUC occurrence by default
+`ifdef DBG_RST_BRK_EN
+`undef DBG_RST_BRK_EN
+`endif
+
+// Custom user version number
+`ifdef USER_VERSION
+`undef USER_VERSION
+`endif
+
+
+//----------------------------------------------------------------------------
+// EXPERT SYSTEM CONFIGURATION ( !!!! EXPERTS ONLY !!!! )
+//----------------------------------------------------------------------------
+
+// Number of hardware breakpoint units
+`ifdef DBG_HWBRK_0
+`undef DBG_HWBRK_0
+`endif
+`ifdef DBG_HWBRK_1
+`undef DBG_HWBRK_1
+`endif
+`ifdef DBG_HWBRK_2
+`undef DBG_HWBRK_2
+`endif
+`ifdef DBG_HWBRK_3
+`undef DBG_HWBRK_3
+`endif
+
+// Enable/Disable the hardware breakpoint RANGE mode
+`ifdef DBG_HWBRK_RANGE
+`undef DBG_HWBRK_RANGE
+`endif
+
+// Input synchronizers
+`ifdef SYNC_CPU_EN
+`undef SYNC_CPU_EN
+`endif
+`ifdef SYNC_DBG_EN
+`undef SYNC_DBG_EN
+`endif
+`ifdef SYNC_DBG_UART_RXD
+`undef SYNC_DBG_UART_RXD
+`endif
+`ifdef SYNC_NMI
+`undef SYNC_NMI
+`endif
+
+
+//==========================================================================//
+//==========================================================================//
+//==========================================================================//
+//==========================================================================//
+//=====        SYSTEM CONSTANTS --- !!!!!!!! DO NOT EDIT !!!!!!!!      =====//
+//==========================================================================//
+//==========================================================================//
+//==========================================================================//
+//==========================================================================//
+
+// Program Memory Size
+`ifdef PMEM_AWIDTH
+`undef PMEM_AWIDTH
+`endif
 `ifdef PMEM_SIZE
 `undef PMEM_SIZE
 `endif
-`ifdef PMEM_AWIDTH
-`undef PMEM_AWIDTH
+
+// Data Memory Size
+`ifdef DMEM_AWIDTH
+`undef DMEM_AWIDTH
 `endif
 `ifdef DMEM_SIZE
 `undef DMEM_SIZE
 `endif
-`ifdef DMEM_AWIDTH
-`undef DMEM_AWIDTH
+
+// Peripheral Memory Size
+`ifdef PER_AWIDTH
+`undef PER_AWIDTH
+`endif
+`ifdef PER_SIZE
+`undef PER_SIZE
 `endif
 
 // Data Memory Base Adresses
@@ -209,7 +258,9 @@
 `ifdef DMEM_MSB
 `undef DMEM_MSB
 `endif
-
+`ifdef PER_MSB
+`undef PER_MSB
+`endif
 
 // Instructions type
 `ifdef INST_SO
@@ -336,6 +387,26 @@
 `endif
 `ifdef CONST
 `undef CONST
+`endif
+
+// Instruction state machine
+`ifdef I_IRQ_FETCH
+`undef I_IRQ_FETCH
+`endif
+`ifdef I_IRQ_DONE
+`undef I_IRQ_DONE
+`endif
+`ifdef I_DEC
+`undef I_DEC
+`endif
+`ifdef I_EXT1
+`undef I_EXT1
+`endif
+`ifdef I_EXT2
+`undef I_EXT2
+`endif
+`ifdef I_IDLE
+`undef I_IDLE
 `endif
 
 // Execution state machine
@@ -509,6 +580,11 @@
 // DEBUG INTERFACE EXTRA CONFIGURATION
 //======================================
 
+// Debug interface: CPU version
+`ifdef CPU_VERSION
+`undef CPU_VERSION
+`endif
+
 // Debug interface: Software breakpoint opcode
 `ifdef DBG_SWBRK_OP
 `undef DBG_SWBRK_OP
@@ -528,6 +604,14 @@
 `endif
 `ifdef DBG_UART_CNT
 `undef DBG_UART_CNT
+`endif
+
+// Debug interface selection
+`ifdef DBG_UART
+`undef DBG_UART
+`endif
+`ifdef DBG_JTAG
+`undef DBG_JTAG
 `endif
 
 // Enable/Disable the hardware breakpoint RANGE mode

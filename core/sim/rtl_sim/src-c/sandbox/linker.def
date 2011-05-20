@@ -3,8 +3,8 @@ OUTPUT_FORMAT("elf32-msp430","elf32-msp430","elf32-msp430")
 OUTPUT_ARCH(msp:110)
 MEMORY
 {
-  text   (rx)   	: ORIGIN = PMEM_BASE,   LENGTH = PMEM_SIZE
-  data   (rwx)  	: ORIGIN = PER_SIZE, 	LENGTH = DMEM_SIZE
+  text   (rx)   	: ORIGIN = 0xF800,      LENGTH = 0x800
+  data   (rwx)  	: ORIGIN = 0x0200, 	LENGTH = 0x080
   vectors (rw)   	: ORIGIN = 0xffe0,      LENGTH = 0x20
 }
 SECTIONS
@@ -115,6 +115,8 @@ SECTIONS
     . = ALIGN(2);
      _edata = . ;
   }  > data
+    PROVIDE (__data_load_start = LOADADDR(.data) );
+    PROVIDE (__data_size = SIZEOF(.data) );
   .bss  SIZEOF(.data) + ADDR(.data) :
   {
      PROVIDE (__bss_start = .) ;
@@ -123,6 +125,7 @@ SECTIONS
      PROVIDE (__bss_end = .) ;
      _end = . ;
   }  > data
+    PROVIDE (__bss_size = SIZEOF(.bss) );
   .noinit  SIZEOF(.bss) + ADDR(.bss) :
   {
      PROVIDE (__noinit_start = .) ;
@@ -165,7 +168,7 @@ SECTIONS
   .debug_str      0 : { *(.debug_str) }
   .debug_loc      0 : { *(.debug_loc) }
   .debug_macinfo  0 : { *(.debug_macinfo) }
-  PROVIDE (__stack = STACK_INIT) ;
+  PROVIDE (__stack = 0x280) ;
   PROVIDE (__data_start_rom = _etext) ;
   PROVIDE (__data_end_rom   = _etext + SIZEOF (.data)) ;
   PROVIDE (__noinit_start_rom = _etext + SIZEOF (.data)) ;

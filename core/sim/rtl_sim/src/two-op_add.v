@@ -105,19 +105,19 @@ initial
       //--------------------------------------------------------
       @(r15==16'h4000);
 
-      if (r4     !==16'h0202) tb_error("====== ADD @Rn+ Rm    =====");
-      if (r5     !==16'haaaa) tb_error("====== ADD @Rn+ Rm    =====");
+      if (r4     !==(`PER_SIZE+16'h0002)) tb_error("====== ADD @Rn+ Rm    =====");
+      if (r5     !==16'haaaa)             tb_error("====== ADD @Rn+ Rm    =====");
 
-      if (r6     !==16'h0206) tb_error("====== ADD @Rn+ PC    =====");
+      if (r6     !==(`PER_SIZE+16'h0006)) tb_error("====== ADD @Rn+ PC    =====");
 
-      if (r7     !==16'h0210) tb_error("====== ADD @Rn+ x(Rm) =====");
-      if (mem210 !==16'h6666) tb_error("====== ADD @Rn+ x(Rm) =====");
+      if (r7     !==(`PER_SIZE+16'h0010)) tb_error("====== ADD @Rn+ x(Rm) =====");
+      if (mem210 !==16'h6666)             tb_error("====== ADD @Rn+ x(Rm) =====");
 
-      if (r8     !==16'h0208) tb_error("====== ADD @Rn+ EDE =====");
-      if (mem212 !==16'hed2e) tb_error("====== ADD @Rn+ EDE   =====");
+      if (r8     !==(`PER_SIZE+16'h0008)) tb_error("====== ADD @Rn+ EDE =====");
+      if (mem212 !==16'hed2e)             tb_error("====== ADD @Rn+ EDE   =====");
 
-      if (r9     !==16'h0204) tb_error("====== ADD @Rn+ &EDE =====");
-      if (mem214 !==16'h4653) tb_error("====== ADD @Rn+ &EDE  =====");
+      if (r9     !==(`PER_SIZE+16'h0004)) tb_error("====== ADD @Rn+ &EDE =====");
+      if (mem214 !==16'h4653)             tb_error("====== ADD @Rn+ &EDE  =====");
 
       // ADD: Check when source is #N
       //--------------------------------------------------------

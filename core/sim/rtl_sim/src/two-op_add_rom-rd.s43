@@ -35,13 +35,32 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.set    DMEM_BASE, (__data_start     )
+.set    DMEM_200,  (__data_start+0x00)
+.set    DMEM_202,  (__data_start+0x02)
+.set    DMEM_204,  (__data_start+0x04)
+.set    DMEM_206,  (__data_start+0x06)
+.set    DMEM_208,  (__data_start+0x08)
+.set    DMEM_20A,  (__data_start+0x0A)
+.set    DMEM_20C,  (__data_start+0x0C)
+.set    DMEM_20E,  (__data_start+0x0E)
+.set    DMEM_210,  (__data_start+0x10)
+.set    DMEM_212,  (__data_start+0x12)
+.set    DMEM_214,  (__data_start+0x14)
+.set    DMEM_216,  (__data_start+0x16)
+.set    DMEM_218,  (__data_start+0x18)
+.set    DMEM_21A,  (__data_start+0x1A)
+.set    DMEM_21C,  (__data_start+0x1C)
+.set    DMEM_21E,  (__data_start+0x1E)
+.set    DMEM_220,  (__data_start+0x20)
 
+	
 .global main
 
 main:
         /* ---------------------- TEST WHEN SOURCE IS @Rn ------------------ */
-.set   aRn_EDE,  (__data_start+0x0012)
-.set   aRn_TONY, 0x0214
+.set   aRn_EDE,  DMEM_212
+.set   aRn_TONY, DMEM_214
 
 	
 	mov   #data_aRn_0x1111, r4
@@ -56,16 +75,16 @@ main:
         mov            #0x1234, r4         ;# Make sure the jump is taken
 test_aRn_PC:
 
-        mov            #0x5432, &0x0210
-	mov            #0x0200, r6
+        mov            #0x5432, &DMEM_210
+	mov          #DMEM_200, r6
 	mov   #data_aRn_0x1234, r7
 	add                @r7, 16(r6)     ;# Write 0x1234+0x5432=0x6666 to memory @0x0210
 
-        mov            #0x8e1c, &0x0212
+        mov            #0x8e1c, &DMEM_212
 	mov   #data_aRn_0x5f12, r7
 	add                @r7, aRn_EDE    ;# Write 0x5f12+0x8e1c=0xed2e to memory @0x0212
 
-        mov            #0x1541, &0x0214
+        mov            #0x1541, &DMEM_214
 	mov   #data_aRn_0x3112, r8
 	add                @r8, &aRn_TONY  ;# Write 0x3112+0x1541=0x4653 to memory @0x0214
 
@@ -74,8 +93,8 @@ test_aRn_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS @Rn+ ----------------- */
-.set   aRni_EDE,  (__data_start+0x0012)
-.set   aRni_TONY, 0x0214
+.set   aRni_EDE,  DMEM_212
+.set   aRni_TONY, DMEM_214
 
 	mov   #data_aRni_0x2222, r4
 	mov             #0x8888, r5
@@ -99,18 +118,18 @@ test_aRni_PC1:
         mov             #0x1234, r7        ;# Make sure the jump is taken
 test_aRni_PC2:
 
-        mov             #0x5432, &0x0210
-	mov             #0x0200, r8
+        mov             #0x5432, &DMEM_210
+	mov           #DMEM_200, r8
 	mov   #data_aRni_0x1234, r10
 	add               @r10+, 16(r8)    ;# Write 0x1234+0x5432=0x6666 to memory @0x0210
 	add               @r10+, 16(r8)    ;# Write 0x2345+0x6666=0x89AB to memory @0x0210
 
-        mov             #0x8e1c, &0x0212
+        mov             #0x8e1c, &DMEM_212
 	mov   #data_aRni_0x5f12, r8
 	add                @r8+, aRni_EDE   ;# Write 0x5f12+0x8e1c=0xed2e to memory @0x0212
 	add                @r8+, aRni_EDE   ;# Write 0x6345+0xed2e=0x5073 to memory @0x0212
 
-        mov             #0x1541, &0x0214
+        mov             #0x1541, &DMEM_214
 	mov   #data_aRni_0x3112, r9
 	add                @r9+, &aRni_TONY ;# Write 0x3112+0x1541=0x4653 to memory @0x0214
 	add                @r9+, &aRni_TONY ;# Write 0x1123+0x4653=0x5776 to memory @0x0214
@@ -119,8 +138,8 @@ test_aRni_PC2:
 
 
         /* ---------------------- TEST WHEN SOURCE IS x(Rn) ---------------- */
-.set   xRn_EDE,  (__data_start+0x0020)
-.set   xRn_TONY, 0x0208
+.set   xRn_EDE,  DMEM_220
+.set   xRn_TONY, DMEM_208
 
 	mov            #0x1234, r5
 	mov   #data_xRn_0x8347, r4
@@ -136,16 +155,16 @@ test_aRni_PC2:
 	mov            #0x0000, r6         ;# Make sure the jump is taken
 test_xRn_PC:
 
-	mov            #0x1535, &0x0214
+	mov            #0x1535, &DMEM_214
 	mov   #data_xRn_0x4241, r7
-        mov            #0x0202, r8
+        mov          #DMEM_202, r8
 	add             16(r7), 18(r8)     ;# Write 0x4241+0x1535=0x5776 to memory @0x214
 
-	mov            #0x2143, &0x0220
+	mov            #0x2143, &DMEM_220
 	mov   #data_xRn_0x7238, r7
 	add              4(r7), xRn_EDE    ;# Write 0x7238+0x2143=0x937b to memory @0x220
 
-	mov            #0x1432, &0x0208
+	mov            #0x1432, &DMEM_208
 	mov   #data_xRn_0x98b2, r4
 	add             22(r4), &xRn_TONY  ;# Write 0x0x98b2+0x1432=0xace4 to memory @0x208
 
@@ -153,8 +172,8 @@ test_xRn_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS 'EDE' ---------------- */
-.set   EDE_EDE,  (__data_start+0x0016)
-.set   EDE_TONY, 0x0212
+.set   EDE_EDE,  DMEM_216
+.set   EDE_TONY, DMEM_212
 
 
 	mov              #0x4321, r4
@@ -169,17 +188,17 @@ test_xRn_PC:
 	mov              #0x0000, r6          ;# Make sure the jump is taken
 test_EDE_PC:
 
-        mov              #0x0202, r8
-	mov              #0x1234, &0x0214
-	mov              #0x0000, &0x0208
+        mov            #DMEM_202, r8
+	mov              #0x1234, &DMEM_214
+	mov              #0x0000, &DMEM_208
 	add      data_EDE_0xf712, 18(r8)      ;# Write 0xf712+0x1234=0x0946 to memory @0x214
 
-	mov              #0x058a, &0x0216
-	mov              #0x1234, &0x0208
+	mov              #0x058a, &DMEM_216
+	mov              #0x1234, &DMEM_208
 	add      data_EDE_0xb3a9, EDE_EDE     ;# Write 0xb3a9+0x058a=0xb933 to memory @0x216
 
-	mov              #0xA738, &0x0212
-	mov              #0x1234, &0x020A
+	mov              #0xA738, &DMEM_212
+	mov              #0x1234, &DMEM_20A
 	add      data_EDE_0x837a, &EDE_TONY   ;# Write 0x837A+0xA738=0x2ab2 to memory @0x212
 
 	mov              #0x4000, r15
@@ -187,8 +206,8 @@ test_EDE_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS '&EDE' --------------- */
-.set   aEDE_EDE,  (__data_start+0x0018)
-.set   aEDE_TONY, 0x0202
+.set   aEDE_EDE,  DMEM_218
+.set   aEDE_TONY, DMEM_202
 
 	mov                #0x4321, r4
 	add      &data_aEDE_0x23d4, r4          ;# Write 0x23d4+0x4321=0x66f5 to R4
@@ -202,17 +221,17 @@ test_EDE_PC:
 	mov                #0x0000, r6          ;# Make sure the jump is taken
 test_aEDE_PC:
 
-        mov                #0x0202, r7
-	mov                #0x3ab5, &0x0214
-	mov                #0x1234, &0x0206
+        mov              #DMEM_202, r7
+	mov                #0x3ab5, &DMEM_214
+	mov                #0x1234, &DMEM_206
 	add      &data_aEDE_0x481c, 18(r7)      ;# Write 0x481c+0x3ab5=0x82d1 to memory @0x214
 
-	mov                #0x6e2f, &0x0218
-	mov                #0x1234, &0x0208
+	mov                #0x6e2f, &DMEM_218
+	mov                #0x1234, &DMEM_208
 	add      &data_aEDE_0x5c1f, aEDE_EDE    ;# Write 0x5c1f+0x6e2f=0xca4e to memory @0x218
 
-	mov                #0x51ca, &0x0202
-	mov                #0x1234, &0x020A
+	mov                #0x51ca, &DMEM_202
+	mov                #0x1234, &DMEM_20A
 	add      &data_aEDE_0xc16e, &aEDE_TONY  ;# Write 0xc16e+0x51ca=0x1338 to memory @0x202
 
 	mov                #0x5000, r15

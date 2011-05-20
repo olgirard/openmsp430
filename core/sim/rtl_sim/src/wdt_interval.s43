@@ -37,6 +37,10 @@
 
 .global main
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_250,  (__data_start+0x50)
+
 .set   IE1,    0x0000
 .set   IFG1,   0x0002
 .set   WDTCTL, 0x0120
@@ -61,7 +65,7 @@ main:
 		
         /* --------------   WATCHDOG TEST:  INTERVAL MODE /64  ------------ */
 
-	mov   #0x0250, r1	  ;# Initialize stack & Enable interrupts
+	mov   #DMEM_250, r1	  ;# Initialize stack & Enable interrupts
 	eint
 	bis.b #0x01,   &IE1
 
@@ -149,7 +153,7 @@ wait_loop_64_no_irq_clear3:
 
         /* --------------   WATCHDOG TEST:  INTERVAL MODE /512  ------------ */
 
-	mov   #0x0250, r1	  ;# Initialize stack & Enable interrupts
+	mov   #DMEM_250, r1	  ;# Initialize stack & Enable interrupts
 	eint
 	bis.b #0x01,   &IE1
 
@@ -167,7 +171,7 @@ wait_loop_512:
 	
         /* --------------   WATCHDOG TEST:  INTERVAL MODE /8192  ------------ */
 
-	mov   #0x0250, r1	  ;# Initialize stack & Enable interrupts
+	mov   #DMEM_250, r1	  ;# Initialize stack & Enable interrupts
 	eint
 	bis.b #0x01,   &IE1
 
@@ -186,7 +190,7 @@ wait_loop_8192:
 	
         /* --------------   WATCHDOG TEST:  INTERVAL MODE /32768  ------------ */
 
-	mov   #0x0250, r1	  ;# Initialize stack & Enable interrupts
+	mov   #DMEM_250, r1	  ;# Initialize stack & Enable interrupts
 	eint
 	bis.b #0x01,   &IE1
 

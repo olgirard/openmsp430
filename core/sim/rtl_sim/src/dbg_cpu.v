@@ -45,6 +45,7 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
+`ifdef DBG_EN
       #1 dbg_en = 1;
       repeat(30) @(posedge mclk);
       stimulus_done = 0;
@@ -114,11 +115,11 @@ initial
       dbg_uart_wr(CPU_CTL,  16'h0040); // RESET CPU
       dbg_uart_rd(CPU_STAT);           // READ STATUS
       if (dbg_uart_buf !== 16'h0004)      tb_error("====== RESET / BREAK ON RESET: RESET error- test 1 =====");
-      if (puc      !== 1'b1)              tb_error("====== RESET / BREAK ON RESET: RESET error- test 2 =====");
+      if (puc_rst      !== 1'b1)          tb_error("====== RESET / BREAK ON RESET: RESET error- test 2 =====");
       dbg_uart_wr(CPU_CTL,  16'h0000); // RELEASE RESET
       dbg_uart_rd(CPU_STAT);           // READ STATUS
       if (dbg_uart_buf !== 16'h0004)      tb_error("====== RESET / BREAK ON RESET: RESET error- test 3 =====");
-      if (puc      !== 1'b0)              tb_error("====== RESET / BREAK ON RESET: RESET error- test 4 =====");
+      if (puc_rst      !== 1'b0)          tb_error("====== RESET / BREAK ON RESET: RESET error- test 4 =====");
       if (test_var >= r14)                tb_error("====== RESET / BREAK ON RESET: RESET error- test 5 =====");
       dbg_uart_wr(CPU_STAT,  16'h0004); // CLEAR STATUS
       dbg_uart_rd(CPU_STAT);            // READ STATUS
@@ -129,11 +130,11 @@ initial
       dbg_uart_wr(CPU_CTL,  16'h0060); // RESET & BREAK ON RESET
       dbg_uart_rd(CPU_STAT);           // READ STATUS
       if (dbg_uart_buf !== 16'h0004)      tb_error("====== RESET / BREAK ON RESET: BREAK ON RESET error- test 1 =====");
-      if (puc      !== 1'b1)              tb_error("====== RESET / BREAK ON RESET: BREAK ON RESET error- test 2 =====");
+      if (puc_rst      !== 1'b1)          tb_error("====== RESET / BREAK ON RESET: BREAK ON RESET error- test 2 =====");
       dbg_uart_wr(CPU_CTL,  16'h0020); // RELEASE RESET
       dbg_uart_rd(CPU_STAT);           // READ STATUS
       if (dbg_uart_buf !== 16'h0005)      tb_error("====== RESET / BREAK ON RESET: BREAK ON RESET error- test 3 =====");
-      if (puc      !== 1'b0)              tb_error("====== RESET / BREAK ON RESET: BREAK ON RESET error- test 4 =====");
+      if (puc_rst      !== 1'b0)          tb_error("====== RESET / BREAK ON RESET: BREAK ON RESET error- test 4 =====");
       repeat(10) @(posedge mclk);
       test_var = inst_number;
       repeat(50) @(posedge mclk);
@@ -201,5 +202,13 @@ initial
  
 
       stimulus_done = 1;
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|      (serial debug interface not included)    |");
+       $display(" ===============================================");
+       $finish;
+`endif
    end
 

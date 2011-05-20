@@ -82,5 +82,6 @@
 ../../../rtl/verilog/openmsp430/omsp_dbg_uart.v
 ../../../rtl/verilog/openmsp430/omsp_watchdog.v
 ../../../rtl/verilog/openmsp430/omsp_multiplier.v
+../../../rtl/verilog/openmsp430/omsp_sync_cell.v
 ../../../rtl/verilog/openmsp430/periph/omsp_gpio.v
 ../../../rtl/verilog/openmsp430/periph/omsp_timerA.v

@@ -37,6 +37,13 @@
 
 .global main
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_202,  (__data_start+0x02)
+.set   DMEM_204,  (__data_start+0x04)
+.set   DMEM_206,  (__data_start+0x06)
+.set   DMEM_250,  (__data_start+0x50)
+
 .set   BCSCTL1, 0x0057
 .set   BCSCTL2, 0x0058
 
@@ -57,8 +64,8 @@ WAIT_FUNC:
 	ret
 	
 main:
- 	mov  #0x0250, r1 	; # Initialize stack pointer
-	mov  #0x0000, &0x0200
+ 	mov  #DMEM_250, r1 	; # Initialize stack pointer
+	mov  #0x0000, &DMEM_200
 	mov  #0x0000, r15
 
 	mov.b  #0x00, &BCSCTL1  ; # ACLK /1
@@ -80,7 +87,7 @@ main:
         call #WAIT_FUNC
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x1000, r15
 
 
@@ -99,7 +106,7 @@ main:
         call #WAIT_FUNC
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x2000, r15
 
 
@@ -118,7 +125,7 @@ main:
         call #WAIT_FUNC
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x3000, r15
 
 	
@@ -137,7 +144,7 @@ main:
         call #WAIT_FUNC
 
 	dint		
-	mov  #0x0000, &0x0200
+	mov  #0x0000, &DMEM_200
 	mov  #0x4000, r15
 
 		
@@ -150,13 +157,13 @@ end_of_test:
         /* ----------------------      INTERRUPT ROUTINES    --------------- */
 
 TIMERA_CCR0_VECTOR:
-	inc  &0x0200
+	inc  &DMEM_200
 	reti
 
 	
 TIMERA_TAIV_VECTOR:
-	mov     &TAR, &0x0204
-	mov    &TAIV, &0x0206
+	mov     &TAR, &DMEM_204
+	mov    &TAIV, &DMEM_206
 	reti
 
 

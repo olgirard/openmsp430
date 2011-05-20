@@ -94,7 +94,7 @@ wire         [15:0] pmem_din;
 wire          [1:0] pmem_wen;
 wire         [15:0] pmem_dout;
 
-wire          [7:0] per_addr;
+wire         [13:0] per_addr;
 wire         [15:0] per_din;
 wire                per_en;
 wire          [1:0] per_we;
@@ -108,7 +108,7 @@ wire                reset_n;
 
 wire                dco_clk;
 wire                mclk;
-wire                puc;
+wire                puc_rst;
 
 wire          [7:0] p1_din;
 wire          [7:0] p1_dout;
@@ -290,11 +290,11 @@ PLL #(.VCOFREQUENCY(FVCO))  pll_0 (
 // 3)  PROGRAM AND DATA MEMORIES
 //=============================================================================
 
-dmem_128B dmem_hi (.WD(dmem_din[15:8]), .RD(dmem_dout[15:8]), .WEN(dmem_wen[1] | dmem_cen), .REN(~dmem_wen[1] | dmem_cen), .WADDR(dmem_addr) , .RADDR(dmem_addr), .RWCLK(mclk), .RESET(~puc));
-dmem_128B dmem_lo (.WD(dmem_din[7:0]),  .RD(dmem_dout[7:0]),  .WEN(dmem_wen[0] | dmem_cen), .REN(~dmem_wen[0] | dmem_cen), .WADDR(dmem_addr) , .RADDR(dmem_addr), .RWCLK(mclk), .RESET(~puc));
+dmem_128B dmem_hi (.WD(dmem_din[15:8]), .RD(dmem_dout[15:8]), .WEN(dmem_wen[1] | dmem_cen), .REN(~dmem_wen[1] | dmem_cen), .WADDR(dmem_addr) , .RADDR(dmem_addr), .RWCLK(mclk), .RESET(~puc_rst));
+dmem_128B dmem_lo (.WD(dmem_din[7:0]),  .RD(dmem_dout[7:0]),  .WEN(dmem_wen[0] | dmem_cen), .REN(~dmem_wen[0] | dmem_cen), .WADDR(dmem_addr) , .RADDR(dmem_addr), .RWCLK(mclk), .RESET(~puc_rst));
 
-pmem_2kB  pmem_hi (.WD(pmem_din[15:8]), .RD(pmem_dout[15:8]), .WEN(pmem_wen[1] | pmem_cen), .REN(~pmem_wen[1] | pmem_cen), .WADDR(pmem_addr) , .RADDR(pmem_addr), .RWCLK(mclk), .RESET(~puc));
-pmem_2kB  pmem_lo (.WD(pmem_din[7:0]),  .RD(pmem_dout[7:0]),  .WEN(pmem_wen[0] | pmem_cen), .REN(~pmem_wen[0] | pmem_cen), .WADDR(pmem_addr) , .RADDR(pmem_addr), .RWCLK(mclk), .RESET(~puc));
+pmem_2kB  pmem_hi (.WD(pmem_din[15:8]), .RD(pmem_dout[15:8]), .WEN(pmem_wen[1] | pmem_cen), .REN(~pmem_wen[1] | pmem_cen), .WADDR(pmem_addr) , .RADDR(pmem_addr), .RWCLK(mclk), .RESET(~puc_rst));
+pmem_2kB  pmem_lo (.WD(pmem_din[7:0]),  .RD(pmem_dout[7:0]),  .WEN(pmem_wen[0] | pmem_cen), .REN(~pmem_wen[0] | pmem_cen), .WADDR(pmem_addr) , .RADDR(pmem_addr), .RWCLK(mclk), .RESET(~puc_rst));
 
   
 //=============================================================================
@@ -321,7 +321,7 @@ openMSP430 openMSP430_0 (
     .pmem_cen     (pmem_cen),     // Program Memory chip enable (low active)
     .pmem_din     (pmem_din),     // Program Memory data input (optional)
     .pmem_wen     (pmem_wen),     // Program Memory write enable (low active) (optional)
-    .puc          (puc),          // Main system reset
+    .puc_rst      (puc_rst),      // Main system reset
     .smclk_en     (smclk_en),     // SMCLK enable
 
 // INPUTs
@@ -363,7 +363,7 @@ dac_spi_if #(1, 9'h190) dac_spi_if_x (
     .per_din      (per_din),        // Peripheral data input
     .per_en       (per_en),         // Peripheral enable (high active)
     .per_we       (per_we),         // Peripheral write enable (high active)
-    .puc          (puc)             // Main system reset
+    .puc_rst      (puc_rst)         // Main system reset
 );
 
 dac_spi_if #(1, 9'h1A0) dac_spi_if_y (
@@ -382,7 +382,7 @@ dac_spi_if #(1, 9'h1A0) dac_spi_if_y (
     .per_din      (per_din),        // Peripheral data input
     .per_en       (per_en),         // Peripheral enable (high active)
     .per_we       (per_we),         // Peripheral write enable (high active)
-    .puc          (puc)             // Main system reset
+    .puc_rst      (puc_rst)         // Main system reset
 );
 
 //
@@ -431,7 +431,7 @@ omsp_gpio #(.P1_EN(1),
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
     .per_we       (per_we),        // Peripheral write enable (high active)
-    .puc          (puc)            // Main system reset
+    .puc_rst      (puc_rst)        // Main system reset
 );
 
 //
@@ -461,7 +461,7 @@ omsp_timerA timerA_0 (
     .per_din      (per_din),       // Peripheral data input
     .per_en       (per_en),        // Peripheral enable (high active)
     .per_we       (per_we),        // Peripheral write enable (high active)
-    .puc          (puc),           // Main system reset
+    .puc_rst      (puc_rst),       // Main system reset
     .smclk_en     (smclk_en),      // SMCLK enable (from CPU)
     .ta_cci0a     (1'b0),          // Timer A capture 0 input A
     .ta_cci0b     (1'b0),          // Timer A capture 0 input B

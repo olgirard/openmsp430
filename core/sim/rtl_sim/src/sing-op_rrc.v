@@ -63,40 +63,40 @@ initial
 
       // Addressing mode: @Rn
       @(r15==16'h2000);
-      if (mem200 !==16'h1999) tb_error("====== RRC (@Rn mode): test 1 (result)  =====");
-      if (r4     !==16'h0200) tb_error("====== RRC (@Rn mode): test 1 (address) =====");
-      if (r5     !==16'h0000) tb_error("====== RRC (@Rn mode): test 1 (C flag)  =====");
+      if (mem200 !==16'h1999)             tb_error("====== RRC (@Rn mode): test 1 (result)  =====");
+      if (r4     !==(`PER_SIZE+16'h0000)) tb_error("====== RRC (@Rn mode): test 1 (address) =====");
+      if (r5     !==16'h0000)             tb_error("====== RRC (@Rn mode): test 1 (C flag)  =====");
 
-      if (mem202 !==16'h1999) tb_error("====== RRC (@Rn mode): test 2 (result)  =====");
-      if (r6     !==16'h0202) tb_error("====== RRC (@Rn mode): test 2 (address) =====");
-      if (r7     !==16'h0001) tb_error("====== RRC (@Rn mode): test 2 (C flag)  =====");
+      if (mem202 !==16'h1999)             tb_error("====== RRC (@Rn mode): test 2 (result)  =====");
+      if (r6     !==(`PER_SIZE+16'h0002)) tb_error("====== RRC (@Rn mode): test 2 (address) =====");
+      if (r7     !==16'h0001)             tb_error("====== RRC (@Rn mode): test 2 (C flag)  =====");
 
-      if (mem204 !==16'h9999) tb_error("====== RRC (@Rn mode): test 3 (result)  =====");
-      if (r8     !==16'h0204) tb_error("====== RRC (@Rn mode): test 3 (address) =====");
-      if (r9     !==16'h0004) tb_error("====== RRC (@Rn mode): test 3 (C flag)  =====");
+      if (mem204 !==16'h9999)             tb_error("====== RRC (@Rn mode): test 3 (result)  =====");
+      if (r8     !==(`PER_SIZE+16'h0004)) tb_error("====== RRC (@Rn mode): test 3 (address) =====");
+      if (r9     !==16'h0004)             tb_error("====== RRC (@Rn mode): test 3 (C flag)  =====");
 
-      if (mem206 !==16'h9999) tb_error("====== RRC (@Rn mode): test 4 (result)  =====");
-      if (r10    !==16'h0206) tb_error("====== RRC (@Rn mode): test 4 (address) =====");
-      if (r11    !==16'h0005) tb_error("====== RRC (@Rn mode): test 4 (C flag)  =====");
+      if (mem206 !==16'h9999)             tb_error("====== RRC (@Rn mode): test 4 (result)  =====");
+      if (r10    !==(`PER_SIZE+16'h0006)) tb_error("====== RRC (@Rn mode): test 4 (address) =====");
+      if (r11    !==16'h0005)             tb_error("====== RRC (@Rn mode): test 4 (C flag)  =====");
 
 
       // Addressing mode: @Rn+
       @(r15==16'h3000);
-      if (mem208 !==16'h1999) tb_error("====== RRC (@Rn+ mode): test 1 (result)  =====");
-      if (r4     !==16'h020A) tb_error("====== RRC (@Rn+ mode): test 1 (address) =====");
-      if (r5     !==16'h0000) tb_error("====== RRC (@Rn+ mode): test 1 (C flag)  =====");
+      if (mem208 !==16'h1999)             tb_error("====== RRC (@Rn+ mode): test 1 (result)  =====");
+      if (r4     !==(`PER_SIZE+16'h000A)) tb_error("====== RRC (@Rn+ mode): test 1 (address) =====");
+      if (r5     !==16'h0000)             tb_error("====== RRC (@Rn+ mode): test 1 (C flag)  =====");
 
-      if (mem20A !==16'h1999) tb_error("====== RRC (@Rn+ mode): test 2 (result)  =====");
-      if (r6     !==16'h020C) tb_error("====== RRC (@Rn+ mode): test 2 (address) =====");
-      if (r7     !==16'h0001) tb_error("====== RRC (@Rn+ mode): test 2 (C flag)  =====");
+      if (mem20A !==16'h1999)             tb_error("====== RRC (@Rn+ mode): test 2 (result)  =====");
+      if (r6     !==(`PER_SIZE+16'h000C)) tb_error("====== RRC (@Rn+ mode): test 2 (address) =====");
+      if (r7     !==16'h0001)             tb_error("====== RRC (@Rn+ mode): test 2 (C flag)  =====");
 
-      if (mem20C !==16'h9999) tb_error("====== RRC (@Rn+ mode): test 3 (result)  =====");
-      if (r8     !==16'h020E) tb_error("====== RRC (@Rn+ mode): test 3 (address) =====");
-      if (r9     !==16'h0004) tb_error("====== RRC (@Rn+ mode): test 3 (C flag)  =====");
+      if (mem20C !==16'h9999)             tb_error("====== RRC (@Rn+ mode): test 3 (result)  =====");
+      if (r8     !==(`PER_SIZE+16'h000E)) tb_error("====== RRC (@Rn+ mode): test 3 (address) =====");
+      if (r9     !==16'h0004)             tb_error("====== RRC (@Rn+ mode): test 3 (C flag)  =====");
 
-      if (mem20E !==16'h9999) tb_error("====== RRC (@Rn+ mode): test 4 (result)  =====");
-      if (r10    !==16'h0210) tb_error("====== RRC (@Rn+ mode): test 4 (address) =====");
-      if (r11    !==16'h0005) tb_error("====== RRC (@Rn+ mode): test 4 (C flag)  =====");
+      if (mem20E !==16'h9999)             tb_error("====== RRC (@Rn+ mode): test 4 (result)  =====");
+      if (r10    !==(`PER_SIZE+16'h0010)) tb_error("====== RRC (@Rn+ mode): test 4 (address) =====");
+      if (r11    !==16'h0005)             tb_error("====== RRC (@Rn+ mode): test 4 (C flag)  =====");
 
 
       // Addressing mode: X(Rn)
@@ -169,76 +169,76 @@ initial
 
       // Addressing mode: @Rn (low byte)
       @(r15==16'h9000);
-      if (mem200 !==16'h2519) tb_error("====== RRC.B (@Rn mode): test 1, low byte (result)  =====");
-      if (r4     !==16'h0200) tb_error("====== RRC.B (@Rn mode): test 1, low byte (address) =====");
-      if (r5     !==16'h0000) tb_error("====== RRC.B (@Rn mode): test 1, low byte (C flag)  =====");
+      if (mem200 !==16'h2519)             tb_error("====== RRC.B (@Rn mode): test 1, low byte (result)  =====");
+      if (r4     !==(`PER_SIZE+16'h0000)) tb_error("====== RRC.B (@Rn mode): test 1, low byte (address) =====");
+      if (r5     !==16'h0000)             tb_error("====== RRC.B (@Rn mode): test 1, low byte (C flag)  =====");
 
-      if (mem202 !==16'h2519) tb_error("====== RRC.B (@Rn mode): test 2, low byte (result)  =====");
-      if (r6     !==16'h0202) tb_error("====== RRC.B (@Rn mode): test 2, low byte (address) =====");
-      if (r7     !==16'h0001) tb_error("====== RRC.B (@Rn mode): test 2, low byte (C flag)  =====");
+      if (mem202 !==16'h2519)             tb_error("====== RRC.B (@Rn mode): test 2, low byte (result)  =====");
+      if (r6     !==(`PER_SIZE+16'h0002)) tb_error("====== RRC.B (@Rn mode): test 2, low byte (address) =====");
+      if (r7     !==16'h0001)             tb_error("====== RRC.B (@Rn mode): test 2, low byte (C flag)  =====");
 
-      if (mem204 !==16'h2599) tb_error("====== RRC.B (@Rn mode): test 3, low byte (result)  =====");
-      if (r8     !==16'h0204) tb_error("====== RRC.B (@Rn mode): test 3, low byte (address) =====");
-      if (r9     !==16'h0004) tb_error("====== RRC.B (@Rn mode): test 3, low byte (C flag)  =====");
+      if (mem204 !==16'h2599)             tb_error("====== RRC.B (@Rn mode): test 3, low byte (result)  =====");
+      if (r8     !==(`PER_SIZE+16'h0004)) tb_error("====== RRC.B (@Rn mode): test 3, low byte (address) =====");
+      if (r9     !==16'h0004)             tb_error("====== RRC.B (@Rn mode): test 3, low byte (C flag)  =====");
 
-      if (mem206 !==16'h2599) tb_error("====== RRC.B (@Rn mode): test 4, low byte (result)  =====");
-      if (r10    !==16'h0206) tb_error("====== RRC.B (@Rn mode): test 4, low byte (address) =====");
-      if (r11    !==16'h0005) tb_error("====== RRC.B (@Rn mode): test 4, low byte (C flag)  =====");
+      if (mem206 !==16'h2599)             tb_error("====== RRC.B (@Rn mode): test 4, low byte (result)  =====");
+      if (r10    !==(`PER_SIZE+16'h0006)) tb_error("====== RRC.B (@Rn mode): test 4, low byte (address) =====");
+      if (r11    !==16'h0005)             tb_error("====== RRC.B (@Rn mode): test 4, low byte (C flag)  =====");
 
       // Addressing mode: @Rn (high byte)
       @(r15==16'h9001);
-      if (mem208 !==16'h1925) tb_error("====== RRC.B (@Rn mode): test 1, high byte (result)  =====");
-      if (r4     !==16'h0209) tb_error("====== RRC.B (@Rn mode): test 1, high byte (address) =====");
-      if (r5     !==16'h0000) tb_error("====== RRC.B (@Rn mode): test 1, high byte (C flag)  =====");
+      if (mem208 !==16'h1925)             tb_error("====== RRC.B (@Rn mode): test 1, high byte (result)  =====");
+      if (r4     !==(`PER_SIZE+16'h0009)) tb_error("====== RRC.B (@Rn mode): test 1, high byte (address) =====");
+      if (r5     !==16'h0000)             tb_error("====== RRC.B (@Rn mode): test 1, high byte (C flag)  =====");
 
-      if (mem20A !==16'h1925) tb_error("====== RRC.B (@Rn mode): test 2, high byte (result)  =====");
-      if (r6     !==16'h020B) tb_error("====== RRC.B (@Rn mode): test 2, high byte (address) =====");
-      if (r7     !==16'h0001) tb_error("====== RRC.B (@Rn mode): test 2, high byte (C flag)  =====");
+      if (mem20A !==16'h1925)             tb_error("====== RRC.B (@Rn mode): test 2, high byte (result)  =====");
+      if (r6     !==(`PER_SIZE+16'h000B)) tb_error("====== RRC.B (@Rn mode): test 2, high byte (address) =====");
+      if (r7     !==16'h0001)             tb_error("====== RRC.B (@Rn mode): test 2, high byte (C flag)  =====");
 
-      if (mem20C !==16'h9925) tb_error("====== RRC.B (@Rn mode): test 3, high byte (result)  =====");
-      if (r8     !==16'h020D) tb_error("====== RRC.B (@Rn mode): test 3, high byte (address) =====");
-      if (r9     !==16'h0004) tb_error("====== RRC.B (@Rn mode): test 3, high byte (C flag)  =====");
+      if (mem20C !==16'h9925)             tb_error("====== RRC.B (@Rn mode): test 3, high byte (result)  =====");
+      if (r8     !==(`PER_SIZE+16'h000D)) tb_error("====== RRC.B (@Rn mode): test 3, high byte (address) =====");
+      if (r9     !==16'h0004)             tb_error("====== RRC.B (@Rn mode): test 3, high byte (C flag)  =====");
 
-      if (mem20E !==16'h9925) tb_error("====== RRC.B (@Rn mode): test 4, high byte (result)  =====");
-      if (r10    !==16'h020F) tb_error("====== RRC.B (@Rn mode): test 4, high byte (address) =====");
-      if (r11    !==16'h0005) tb_error("====== RRC.B (@Rn mode): test 4, high byte (C flag)  =====");
+      if (mem20E !==16'h9925)             tb_error("====== RRC.B (@Rn mode): test 4, high byte (result)  =====");
+      if (r10    !==(`PER_SIZE+16'h000F)) tb_error("====== RRC.B (@Rn mode): test 4, high byte (address) =====");
+      if (r11    !==16'h0005)             tb_error("====== RRC.B (@Rn mode): test 4, high byte (C flag)  =====");
 
 
       // Addressing mode: @Rn+ (low byte)
       @(r15==16'hA000);
-      if (mem210 !==16'h2519) tb_error("====== RRC.B (@Rn+ mode): test 1, low byte (result)  =====");
-      if (r4     !==16'h0211) tb_error("====== RRC.B (@Rn+ mode): test 1, low byte (address) =====");
-      if (r5     !==16'h0000) tb_error("====== RRC.B (@Rn+ mode): test 1, low byte (C flag)  =====");
+      if (mem210 !==16'h2519)             tb_error("====== RRC.B (@Rn+ mode): test 1, low byte (result)  =====");
+      if (r4     !==(`PER_SIZE+16'h0011)) tb_error("====== RRC.B (@Rn+ mode): test 1, low byte (address) =====");
+      if (r5     !==16'h0000)             tb_error("====== RRC.B (@Rn+ mode): test 1, low byte (C flag)  =====");
 
-      if (mem212 !==16'h2519) tb_error("====== RRC.B (@Rn+ mode): test 2, low byte (result)  =====");
-      if (r6     !==16'h0213) tb_error("====== RRC.B (@Rn+ mode): test 2, low byte (address) =====");
-      if (r7     !==16'h0001) tb_error("====== RRC.B (@Rn+ mode): test 2, low byte (C flag)  =====");
+      if (mem212 !==16'h2519)             tb_error("====== RRC.B (@Rn+ mode): test 2, low byte (result)  =====");
+      if (r6     !==(`PER_SIZE+16'h0013)) tb_error("====== RRC.B (@Rn+ mode): test 2, low byte (address) =====");
+      if (r7     !==16'h0001)             tb_error("====== RRC.B (@Rn+ mode): test 2, low byte (C flag)  =====");
 
-      if (mem214 !==16'h2599) tb_error("====== RRC.B (@Rn+ mode): test 3, low byte (result)  =====");
-      if (r8     !==16'h0215) tb_error("====== RRC.B (@Rn+ mode): test 3, low byte (address) =====");
-      if (r9     !==16'h0004) tb_error("====== RRC.B (@Rn+ mode): test 3, low byte (C flag)  =====");
+      if (mem214 !==16'h2599)             tb_error("====== RRC.B (@Rn+ mode): test 3, low byte (result)  =====");
+      if (r8     !==(`PER_SIZE+16'h0015)) tb_error("====== RRC.B (@Rn+ mode): test 3, low byte (address) =====");
+      if (r9     !==16'h0004)             tb_error("====== RRC.B (@Rn+ mode): test 3, low byte (C flag)  =====");
 
-      if (mem216 !==16'h2599) tb_error("====== RRC.B (@Rn+ mode): test 4, low byte (result)  =====");
-      if (r10    !==16'h0217) tb_error("====== RRC.B (@Rn+ mode): test 4, low byte (address) =====");
-      if (r11    !==16'h0005) tb_error("====== RRC.B (@Rn+ mode): test 4, low byte (C flag)  =====");
+      if (mem216 !==16'h2599)             tb_error("====== RRC.B (@Rn+ mode): test 4, low byte (result)  =====");
+      if (r10    !==(`PER_SIZE+16'h0017)) tb_error("====== RRC.B (@Rn+ mode): test 4, low byte (address) =====");
+      if (r11    !==16'h0005)             tb_error("====== RRC.B (@Rn+ mode): test 4, low byte (C flag)  =====");
 
       // Addressing mode: @Rn+ (high byte)
       @(r15==16'hA001);
-      if (mem218 !==16'h1925) tb_error("====== RRC.B (@Rn+ mode): test 1, high byte (result)  =====");
-      if (r4     !==16'h021A) tb_error("====== RRC.B (@Rn+ mode): test 1, high byte (address) =====");
-      if (r5     !==16'h0000) tb_error("====== RRC.B (@Rn+ mode): test 1, high byte (C flag)  =====");
+      if (mem218 !==16'h1925)             tb_error("====== RRC.B (@Rn+ mode): test 1, high byte (result)  =====");
+      if (r4     !==(`PER_SIZE+16'h001A)) tb_error("====== RRC.B (@Rn+ mode): test 1, high byte (address) =====");
+      if (r5     !==16'h0000)             tb_error("====== RRC.B (@Rn+ mode): test 1, high byte (C flag)  =====");
 
-      if (mem21A !==16'h1925) tb_error("====== RRC.B (@Rn+ mode): test 2, high byte (result)  =====");
-      if (r6     !==16'h021C) tb_error("====== RRC.B (@Rn+ mode): test 2, high byte (address) =====");
-      if (r7     !==16'h0001) tb_error("====== RRC.B (@Rn+ mode): test 2, high byte (C flag)  =====");
+      if (mem21A !==16'h1925)             tb_error("====== RRC.B (@Rn+ mode): test 2, high byte (result)  =====");
+      if (r6     !==(`PER_SIZE+16'h001C)) tb_error("====== RRC.B (@Rn+ mode): test 2, high byte (address) =====");
+      if (r7     !==16'h0001)             tb_error("====== RRC.B (@Rn+ mode): test 2, high byte (C flag)  =====");
 
-      if (mem21C !==16'h9925) tb_error("====== RRC.B (@Rn+ mode): test 3, high byte (result)  =====");
-      if (r8     !==16'h021E) tb_error("====== RRC.B (@Rn+ mode): test 3, high byte (address) =====");
-      if (r9     !==16'h0004) tb_error("====== RRC.B (@Rn+ mode): test 3, high byte (C flag)  =====");
+      if (mem21C !==16'h9925)             tb_error("====== RRC.B (@Rn+ mode): test 3, high byte (result)  =====");
+      if (r8     !==(`PER_SIZE+16'h001E)) tb_error("====== RRC.B (@Rn+ mode): test 3, high byte (address) =====");
+      if (r9     !==16'h0004)             tb_error("====== RRC.B (@Rn+ mode): test 3, high byte (C flag)  =====");
 
-      if (mem21E !==16'h9925) tb_error("====== RRC.B (@Rn+ mode): test 4, high byte (result)  =====");
-      if (r10    !==16'h0220) tb_error("====== RRC.B (@Rn+ mode): test 4, high byte (address) =====");
-      if (r11    !==16'h0005) tb_error("====== RRC.B (@Rn+ mode): test 4, high byte (C flag)  =====");
+      if (mem21E !==16'h9925)             tb_error("====== RRC.B (@Rn+ mode): test 4, high byte (result)  =====");
+      if (r10    !==(`PER_SIZE+16'h0020)) tb_error("====== RRC.B (@Rn+ mode): test 4, high byte (address) =====");
+      if (r11    !==16'h0005)             tb_error("====== RRC.B (@Rn+ mode): test 4, high byte (C flag)  =====");
 
 
       // Addressing mode: X(Rn) (low byte)

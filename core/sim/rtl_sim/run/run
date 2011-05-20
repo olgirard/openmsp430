@@ -4,4 +4,4 @@
 OMSP_NODUMP=0
 export OMSP_NODUMP
 
-../bin/msp430sim dbg_onoff
+../bin/msp430sim two-op_mov

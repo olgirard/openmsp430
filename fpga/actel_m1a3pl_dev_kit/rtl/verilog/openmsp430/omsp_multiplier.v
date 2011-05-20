@@ -52,7 +52,7 @@ module  omsp_multiplier (
     per_din,                        // Peripheral data input
     per_en,                         // Peripheral enable (high active)
     per_we,                         // Peripheral write enable (high active)
-    puc                             // Main system reset
+    puc_rst                         // Main system reset
 );
 
 // OUTPUTs
@@ -62,37 +62,46 @@ output       [15:0] per_dout;       // Peripheral data output
 // INPUTs
 //=========
 input               mclk;           // Main system clock
-input         [7:0] per_addr;       // Peripheral address
+input        [13:0] per_addr;       // Peripheral address
 input        [15:0] per_din;        // Peripheral data input
 input               per_en;         // Peripheral enable (high active)
 input         [1:0] per_we;         // Peripheral write enable (high active)
-input               puc;            // Main system reset
+input               puc_rst;        // Main system reset
 
 
 //=============================================================================
 // 1)  PARAMETER/REGISTERS & WIRE DECLARATION
 //=============================================================================
 
-// Register addresses
-parameter           OP1_MPY    = 9'h130;
-parameter           OP1_MPYS   = 9'h132;
-parameter           OP1_MAC    = 9'h134;
-parameter           OP1_MACS   = 9'h136;
-parameter           OP2        = 9'h138;
-parameter           RESLO      = 9'h13A;
-parameter           RESHI      = 9'h13C;
-parameter           SUMEXT     = 9'h13E;
+// Register base address (must be aligned to decoder bit width)
+parameter       [14:0] BASE_ADDR   = 15'h0130;
 
+// Decoder bit width (defines how many bits are considered for address decoding)
+parameter              DEC_WD      =  4;
+
+// Register addresses offset
+parameter [DEC_WD-1:0] OP1_MPY     = 'h0,
+                       OP1_MPYS    = 'h2,
+                       OP1_MAC     = 'h4,
+                       OP1_MACS    = 'h6,
+                       OP2         = 'h8,
+                       RESLO       = 'hA,
+                       RESHI       = 'hC,
+                       SUMEXT      = 'hE;
+
+// Register one-hot decoder utilities
+parameter              DEC_SZ      =  2**DEC_WD;
+parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder
-parameter           OP1_MPY_D  = (512'h1 << OP1_MPY);
-parameter           OP1_MPYS_D = (512'h1 << OP1_MPYS);
-parameter           OP1_MAC_D  = (512'h1 << OP1_MAC);
-parameter           OP1_MACS_D = (512'h1 << OP1_MACS);
-parameter           OP2_D      = (512'h1 << OP2);
-parameter           RESLO_D    = (512'h1 << RESLO);
-parameter           RESHI_D    = (512'h1 << RESHI);
-parameter           SUMEXT_D   = (512'h1 << SUMEXT);
+parameter [DEC_SZ-1:0] OP1_MPY_D   = (BASE_REG << OP1_MPY),
+                       OP1_MPYS_D  = (BASE_REG << OP1_MPYS),
+                       OP1_MAC_D   = (BASE_REG << OP1_MAC),
+                       OP1_MACS_D  = (BASE_REG << OP1_MACS),
+                       OP2_D       = (BASE_REG << OP2),
+                       RESLO_D     = (BASE_REG << RESLO),
+                       RESHI_D     = (BASE_REG << RESHI),
+                       SUMEXT_D    = (BASE_REG << SUMEXT);
 
 
 // Wire pre-declarations
@@ -105,28 +114,29 @@ wire  early_read;
 // 2)  REGISTER DECODER
 //============================================================================
 
-// Register address decode
-reg  [511:0]  reg_dec; 
-always @(per_addr)
-  case ({per_addr,1'b0})
-    OP1_MPY  :  reg_dec  =  OP1_MPY_D;
-    OP1_MPYS :  reg_dec  =  OP1_MPYS_D;
-    OP1_MAC  :  reg_dec  =  OP1_MAC_D;
-    OP1_MACS :  reg_dec  =  OP1_MACS_D;
-    OP2      :  reg_dec  =  OP2_D;
-    RESLO    :  reg_dec  =  RESLO_D;
-    RESHI    :  reg_dec  =  RESHI_D;
-    SUMEXT   :  reg_dec  =  SUMEXT_D;
-    default  :  reg_dec  =  {512{1'b0}};
-  endcase
+// Local register selection
+wire              reg_sel   =  per_en & (per_addr[13:DEC_WD-1]==BASE_ADDR[14:DEC_WD]);
 
+// Register local address
+wire [DEC_WD-1:0] reg_addr  =  {per_addr[DEC_WD-2:0], 1'b0};
+
+// Register address decode
+wire [DEC_SZ-1:0] reg_dec   =  (OP1_MPY_D   &  {DEC_SZ{(reg_addr == OP1_MPY  )}})  |
+                               (OP1_MPYS_D  &  {DEC_SZ{(reg_addr == OP1_MPYS )}})  |
+                               (OP1_MAC_D   &  {DEC_SZ{(reg_addr == OP1_MAC  )}})  |
+                               (OP1_MACS_D  &  {DEC_SZ{(reg_addr == OP1_MACS )}})  |
+                               (OP2_D       &  {DEC_SZ{(reg_addr == OP2      )}})  |
+                               (RESLO_D     &  {DEC_SZ{(reg_addr == RESLO    )}})  |
+                               (RESHI_D     &  {DEC_SZ{(reg_addr == RESHI    )}})  |
+                               (SUMEXT_D    &  {DEC_SZ{(reg_addr == SUMEXT   )}});
+		   
 // Read/Write probes
-wire         reg_write =  |per_we & per_en;
-wire         reg_read  = ~|per_we & per_en;
+wire              reg_write =  |per_we & reg_sel;
+wire              reg_read  = ~|per_we & reg_sel;
 
 // Read/Write vectors
-wire [511:0] reg_wr    = reg_dec & {512{reg_write}};
-wire [511:0] reg_rd    = reg_dec & {512{reg_read}};
+wire [DEC_SZ-1:0] reg_wr    = reg_dec & {DEC_SZ{reg_write}};
+wire [DEC_SZ-1:0] reg_rd    = reg_dec & {DEC_SZ{reg_read}};
 
 
 //============================================================================
@@ -142,8 +152,8 @@ wire        op1_wr = reg_wr[OP1_MPY]  |
                      reg_wr[OP1_MAC]  |
                      reg_wr[OP1_MACS];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)          op1 <=  16'h0000;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)      op1 <=  16'h0000;
   else if (op1_wr)  op1 <=  per_din;
    
 wire [15:0] op1_rd  = op1;
@@ -155,8 +165,8 @@ reg  [15:0] op2;
 
 wire        op2_wr = reg_wr[OP2];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)          op2 <=  16'h0000;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)      op2 <=  16'h0000;
   else if (op2_wr)  op2 <=  per_din;
 
 wire [15:0] op2_rd  = op2;
@@ -169,8 +179,8 @@ reg  [15:0] reslo;
 wire [15:0] reslo_nxt;
 wire        reslo_wr = reg_wr[RESLO];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)             reslo <=  16'h0000;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)         reslo <=  16'h0000;
   else if (reslo_wr)   reslo <=  per_din;
   else if (result_clr) reslo <=  16'h0000;
   else if (result_wr)  reslo <=  reslo_nxt;
@@ -185,8 +195,8 @@ reg  [15:0] reshi;
 wire [15:0] reshi_nxt;
 wire        reshi_wr = reg_wr[RESHI];
 
-always @ (posedge mclk or posedge puc)
-  if (puc)             reshi <=  16'h0000;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)         reshi <=  16'h0000;
   else if (reshi_wr)   reshi <=  per_din;
   else if (result_clr) reshi <=  16'h0000;
   else if (result_wr)  reshi <=  reshi_nxt;
@@ -200,8 +210,8 @@ reg  [1:0] sumext_s;
 
 wire [1:0] sumext_s_nxt;
 
-always @ (posedge mclk or posedge puc)
-  if (puc)             sumext_s <=  2'b00;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)         sumext_s <=  2'b00;
   else if (op2_wr)     sumext_s <=  2'b00;
   else if (result_wr)  sumext_s <=  sumext_s_nxt;
 
@@ -240,15 +250,15 @@ wire [15:0] per_dout   = op1_mux    |
 
 // Detect signed mode
 reg sign_sel;
-always @ (posedge mclk or posedge puc)
-  if (puc)         sign_sel <=  1'b0;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)     sign_sel <=  1'b0;
   else if (op1_wr) sign_sel <=  reg_wr[OP1_MPYS] | reg_wr[OP1_MACS];
 
 
 // Detect accumulate mode
 reg acc_sel;
-always @ (posedge mclk or posedge puc)
-  if (puc)         acc_sel  <=  1'b0;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)     acc_sel  <=  1'b0;
   else if (op1_wr) acc_sel  <=  reg_wr[OP1_MAC]  | reg_wr[OP1_MACS];
 
 
@@ -265,9 +275,9 @@ wire [31:0] result     = {reshi, reslo};
 
 // Detect start of a multiplication
 reg cycle;
-always @ (posedge mclk or posedge puc)
-  if (puc) cycle <=  1'b0;
-  else     cycle <=  op2_wr;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst) cycle <=  1'b0;
+  else         cycle <=  op2_wr;
 
 assign result_wr = cycle;
 
@@ -301,9 +311,9 @@ assign early_read   = 1'b0;
   
 // Detect start of a multiplication
 reg [1:0] cycle;
-always @ (posedge mclk or posedge puc)
-  if (puc) cycle <=  2'b00;
-  else     cycle <=  {cycle[0], op2_wr};
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst) cycle <=  2'b00;
+  else         cycle <=  {cycle[0], op2_wr};
 
 assign result_wr = |cycle;
 

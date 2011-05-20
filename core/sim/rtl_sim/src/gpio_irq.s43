@@ -37,6 +37,21 @@
 
 .global main
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_208,  (__data_start+0x08)
+.set   DMEM_210,  (__data_start+0x10)
+.set   DMEM_218,  (__data_start+0x18)
+.set   DMEM_220,  (__data_start+0x20)
+.set   DMEM_228,  (__data_start+0x28)
+.set   DMEM_230,  (__data_start+0x30)
+.set   DMEM_238,  (__data_start+0x38)
+.set   DMEM_240,  (__data_start+0x40)
+.set   DMEM_248,  (__data_start+0x48)
+.set   DMEM_250,  (__data_start+0x50)
+.set   DMEM_258,  (__data_start+0x58)
+.set   DMEM_260,  (__data_start+0x60)
+
 .set   P1IN,  0x0020
 .set   P1OUT, 0x0021
 .set   P1DIR, 0x0022
@@ -64,33 +79,33 @@ main:
 	
 	mov.b   #0x00, &P1IES       ;# TEST IF RISING EDGE ENABLED
 
-	mov     #0x0200, r15        ;# Make sure rising edge is detected test 1
+	mov     #DMEM_200, r15        ;# Make sure rising edge is detected test 1
 p1ifg_re_loop1:
 	nop
 	nop
 	mov.b &P1IFG,  0(r15)
 	mov.b   #0x00, &P1IFG
 	inc      r15
-	cmp     #0x0208, r15
+	cmp     #DMEM_208, r15
 	jne     p1ifg_re_loop1
 
-	mov     #0x0210, r15        ;# Make sure falling edge is ignored
+	mov     #DMEM_210, r15        ;# Make sure falling edge is ignored
 p1ifg_fe_loop1:
 	nop
 	nop
 	mov.b &P1IFG,  0(r15)
 	mov.b   #0x00, &P1IFG
 	inc      r15
-	cmp     #0x0218, r15
+	cmp     #DMEM_218, r15
 	jne     p1ifg_fe_loop1
 
-	mov     #0x0220, r15        ;# Make sure rising edge is detected test 2
+	mov     #DMEM_220, r15        ;# Make sure rising edge is detected test 2
 p1ifg_re_loop2:
 	nop
 	nop
 	mov.b &P1IFG,  0(r15)
 	inc      r15
-	cmp     #0x0228, r15
+	cmp     #DMEM_228, r15
 	jne     p1ifg_re_loop2
 	mov.b   #0x00, &P1IFG
 
@@ -98,33 +113,33 @@ p1ifg_re_loop2:
 
 	mov.b   #0xff, &P1IES       ;# TEST IF FALLING EDGE ENABLED
 
-	mov     #0x0230, r15        ;# Make sure falling edge is detected test 1
+	mov     #DMEM_230, r15        ;# Make sure falling edge is detected test 1
 p1ifg_fe_loop2:
 	nop
 	nop
 	mov.b &P1IFG,  0(r15)
 	mov.b   #0x00, &P1IFG
 	inc      r15
-	cmp     #0x0238, r15
+	cmp     #DMEM_238, r15
 	jne     p1ifg_fe_loop2
 
-	mov     #0x0240, r15        ;# Make sure rising edge is ignored
+	mov     #DMEM_240, r15        ;# Make sure rising edge is ignored
 p1ifg_re_loop3:
 	nop
 	nop
 	mov.b &P1IFG,  0(r15)
 	mov.b   #0x00, &P1IFG
 	inc      r15
-	cmp     #0x0248, r15
+	cmp     #DMEM_248, r15
 	jne     p1ifg_re_loop3
 
-	mov     #0x0250, r15        ;# Make sure falling edge is detected test 2
+	mov     #DMEM_250, r15        ;# Make sure falling edge is detected test 2
 p1ifg_fe_loop3:
 	nop
 	nop
 	mov.b &P1IFG,  0(r15)
 	inc      r15
-	cmp     #0x0258, r15
+	cmp     #DMEM_258, r15
 	jne     p1ifg_fe_loop3
 	mov.b   #0x00, &P1IFG
 
@@ -134,33 +149,33 @@ p1ifg_fe_loop3:
 	
 	mov.b   #0x00, &P2IES       ;# TEST IF RISING EDGE ENABLED
 
-	mov     #0x0200, r15        ;# Make sure rising edge is detected test 1
+	mov     #DMEM_200, r15        ;# Make sure rising edge is detected test 1
 p2ifg_re_loop1:
 	nop
 	nop
 	mov.b &P2IFG,  0(r15)
 	mov.b   #0x00, &P2IFG
 	inc      r15
-	cmp     #0x0208, r15
+	cmp     #DMEM_208, r15
 	jne     p2ifg_re_loop1
 
-	mov     #0x0210, r15        ;# Make sure falling edge is ignored
+	mov     #DMEM_210, r15        ;# Make sure falling edge is ignored
 p2ifg_fe_loop1:
 	nop
 	nop
 	mov.b &P2IFG,  0(r15)
 	mov.b   #0x00, &P2IFG
 	inc      r15
-	cmp     #0x0218, r15
+	cmp     #DMEM_218, r15
 	jne     p2ifg_fe_loop1
 
-	mov     #0x0220, r15        ;# Make sure rising edge is detected test 2
+	mov     #DMEM_220, r15        ;# Make sure rising edge is detected test 2
 p2ifg_re_loop2:
 	nop
 	nop
 	mov.b &P2IFG,  0(r15)
 	inc      r15
-	cmp     #0x0228, r15
+	cmp     #DMEM_228, r15
 	jne     p2ifg_re_loop2
 	mov.b   #0x00, &P2IFG
 
@@ -168,55 +183,55 @@ p2ifg_re_loop2:
 
 	mov.b   #0xff, &P2IES       ;# TEST IF FALLING EDGE ENABLED
 
-	mov     #0x0230, r15        ;# Make sure falling edge is detected test 1
+	mov     #DMEM_230, r15        ;# Make sure falling edge is detected test 1
 p2ifg_fe_loop2:
 	nop
 	nop
 	mov.b &P2IFG,  0(r15)
 	mov.b   #0x00, &P2IFG
 	inc      r15
-	cmp     #0x0238, r15
+	cmp     #DMEM_238, r15
 	jne     p2ifg_fe_loop2
 
-	mov     #0x0240, r15        ;# Make sure rising edge is ignored
+	mov     #DMEM_240, r15        ;# Make sure rising edge is ignored
 p2ifg_re_loop3:
 	nop
 	nop
 	mov.b &P2IFG,  0(r15)
 	mov.b   #0x00, &P2IFG
 	inc      r15
-	cmp     #0x0248, r15
+	cmp     #DMEM_248, r15
 	jne     p2ifg_re_loop3
 
-	mov     #0x0250, r15        ;# Make sure falling edge is detected test 2
+	mov     #DMEM_250, r15        ;# Make sure falling edge is detected test 2
 p2ifg_fe_loop3:
 	nop
 	nop
 	mov.b &P2IFG,  0(r15)
 	inc      r15
-	cmp     #0x0258, r15
+	cmp     #DMEM_258, r15
 	jne     p2ifg_fe_loop3
 	mov.b   #0x00, &P2IFG
 
 
         /* --------------            CLEAR MEMORY        --------------- */
 
-	mov     #0x0200, r5
+	mov     #DMEM_200, r5
 mem_clear_loop:
 	mov     #0x00,  0(r5)
 	incd      r5
-	cmp     #0x0260, r5
+	cmp     #DMEM_260, r5
 	jne     mem_clear_loop
 
 
         /* -------------- PORT 1: TEST INTERRUPT VECTOR  --------------- */
 
-	mov     #0x0250, r1     ; Initialize stack
+	mov     #DMEM_250, r1     ; Initialize stack
 	eint                    ; Enable interrupts
 
 	mov.b   #0x0001, r6
 	mov.b        r6, &P1IE
-	mov     #0x0200, r15;
+	mov     #DMEM_200, r15;
 p1_irq_loop:
 	mov.b        r6, &P1IFG ; Generate soft interrupt
 	nop
@@ -225,18 +240,18 @@ p1_irq_loop:
 	rla          r6
 	mov.b        r6, &P1IE
 	inc         r15
-	cmp     #0x0208, r15
+	cmp     #DMEM_208, r15
 	jne     p1_irq_loop
 
 
         /* -------------- PORT 2: TEST INTERRUPT VECTOR  --------------- */
 
-	mov     #0x0250, r1     ; Initialize stack
+	mov     #DMEM_250, r1     ; Initialize stack
 	eint                    ; Enable interrupts
 
 	mov.b   #0x0001, r6
 	mov.b        r6, &P2IE
-	mov     #0x0210, r15;
+	mov     #DMEM_210, r15;
 p2_irq_loop:
 	mov.b        r6, &P2IFG ; Generate soft interrupt
 	nop
@@ -245,7 +260,7 @@ p2_irq_loop:
 	rla          r6
 	mov.b        r6, &P2IE
 	inc         r15
-	cmp     #0x0218, r15
+	cmp     #DMEM_218, r15
 	jne     p2_irq_loop
 
 

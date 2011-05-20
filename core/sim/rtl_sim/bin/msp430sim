@@ -129,10 +129,18 @@ if [ $dmemunit == "KB" ]
     dmemsize=`echo "dmemsize=$dmemsize * 1024; dmemsize /= 1; dmemsize" | bc`
 fi
 
+# Get Peripheral Address space size
+perunit=`grep PER_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f4`
+persize=`grep PER_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f3`
+persize=${persize/p/.}
+if [ $perunit == "KB" ]
+  then
+    persize=`echo "persize=$persize * 1024; persize /= 1; persize" | bc`
+fi
 
 # Compile assembler code
-echo "Compile, link & generate IHEX file (Program Memory: $pmemsize B, Data Memory: $dmemsize B)..."
-../bin/asm2ihex.sh  pmem pmem.s43 $deffile $pmemsize $dmemsize
+echo "Compile, link & generate IHEX file (Program Memory: $pmemsize B, Data Memory: $dmemsize B, Peripheral Space: $persize B)..."
+../bin/asm2ihex.sh  pmem pmem.s43 $deffile $pmemsize $dmemsize $persize
 
 # Generate Program memory file
 echo "Convert IHEX file to Verilog MEMH format..."

@@ -55,6 +55,7 @@
 `include "../src/omsp_clock_module.v"
 `include "../src/omsp_sfr.v"
 `include "../src/omsp_watchdog.v"
+`include "../src/omsp_sync_cell.v"
 
 `include "../src/openMSP430_defines.v"
 `ifdef DBG_EN

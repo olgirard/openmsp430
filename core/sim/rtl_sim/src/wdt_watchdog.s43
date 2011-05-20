@@ -37,6 +37,14 @@
 
 .global main
 
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_202,  (__data_start+0x02)
+.set   DMEM_204,  (__data_start+0x04)
+.set   DMEM_206,  (__data_start+0x06)
+.set   DMEM_208,  (__data_start+0x08)
+.set   DMEM_250,  (__data_start+0x50)
+
 .set   IE1,    0x0000
 .set   IFG1,   0x0002
 .set   WDTCTL, 0x0120
@@ -50,7 +58,7 @@ main:
 	cmp #0x0000, r4
 	jeq   RD_WR_ACCESS
 
-	mov &0x0250, r15        ;# If yes, check RAM variable to see where to go next
+	mov &DMEM_250, r15        ;# If yes, check RAM variable to see where to go next
 
  	cmp #0x0000, r15
 	jeq   RESET_64
@@ -68,17 +76,17 @@ main:
 	
         /* --------------   WATCHDOG TEST:  RD/WR ACCESS    --------------- */
 RD_WR_ACCESS:
-	mov  #0x0000, &0x0250
+	mov  #0x0000, &DMEM_250
 
-	mov  &WDTCTL, &0x0200
+	mov  &WDTCTL, &DMEM_200
 	mov  #0x5aff, &WDTCTL
-	mov  &WDTCTL, &0x0202
+	mov  &WDTCTL, &DMEM_202
 	mov  #0x5a55, &WDTCTL
-	mov  &WDTCTL, &0x0204
+	mov  &WDTCTL, &DMEM_204
 	mov  #0x5aaa, &WDTCTL
-	mov  &WDTCTL, &0x0206
+	mov  &WDTCTL, &DMEM_206
 	mov  #0x5a00, &WDTCTL
-	mov  &WDTCTL, &0x0208
+	mov  &WDTCTL, &DMEM_208
 
 	mov  #0xDEAD, &WDTCTL	 ;# Generate reset through wrong password 
 	
@@ -89,13 +97,13 @@ RD_WR_ACCESS:
         /* --------------   WATCHDOG TEST:  WATCHODG MODE /64  ------------ */
 RESET_64:
 	bic.b #0x01,   &IFG1
-	mov   #0x1000, &0x0250
+	mov   #0x1000, &DMEM_250
 	
 	mov   #0x5a0b, &WDTCTL	 ;# Enable watchdog mode /64 & clear counter
 
-	mov   #0x0000, &0x0200
+	mov   #0x0000, &DMEM_200
 wait_loop_64:
-	inc   &0x0200
+	inc   &DMEM_200
 	jmp   wait_loop_64
 
 	jmp   end_of_test        ;# Force end of test if watchdog reset don't happen
@@ -105,13 +113,13 @@ wait_loop_64:
         /* --------------   WATCHDOG TEST:  INTERVAL MODE /512  ------------ */
 RESET_512:
 	bic.b #0x01,   &IFG1
-	mov   #0x2000, &0x0250
+	mov   #0x2000, &DMEM_250
 
 	mov   #0x5a0a, &WDTCTL	  ;# Enable watchdog mode /512 & clear counter
 
-	mov   #0x0000, &0x0202
+	mov   #0x0000, &DMEM_202
 wait_loop_512:
-	inc   &0x0202
+	inc   &DMEM_202
 	jmp   wait_loop_512
 	
 	jmp   end_of_test         ;# Force end of test if watchdog reset don't happen
@@ -121,13 +129,13 @@ wait_loop_512:
         /* --------------   WATCHDOG TEST:  INTERVAL MODE /8192  ------------ */
 RESET_8192:
 	bic.b #0x01,   &IFG1
-	mov   #0x3000, &0x0250
+	mov   #0x3000, &DMEM_250
 
 	mov   #0x5a09, &WDTCTL	  ;# Enable watchdog mode /8192 & clear counter
 
-	mov   #0x0000, &0x0204
+	mov   #0x0000, &DMEM_204
 wait_loop_8192:
-	inc   &0x0204
+	inc   &DMEM_204
 	jmp   wait_loop_8192
 	
 	jmp   end_of_test         ;# Force end of test if watchdog reset don't happen
@@ -137,13 +145,13 @@ wait_loop_8192:
         /* --------------   WATCHDOG TEST:  INTERVAL MODE /32768  ------------ */
 RESET_32768:
 	bic.b #0x01,   &IFG1
-	mov   #0x4000, &0x0250
+	mov   #0x4000, &DMEM_250
 
 	mov   #0x5a08, &WDTCTL	  ;# Enable interval mode /32768 & clear counter
 
-	mov   #0x0000, &0x0206
+	mov   #0x0000, &DMEM_206
 wait_loop_32768:
-	inc   &0x0206
+	inc   &DMEM_206
 	jmp   wait_loop_32768
 	
 	jmp   end_of_test         ;# Force end of test if watchdog reset don't happen
@@ -151,7 +159,7 @@ wait_loop_32768:
 	
 CHECK_32768:
 	bic.b #0x01,   &IFG1
-	mov   #0x5000, &0x0250
+	mov   #0x5000, &DMEM_250
 	
 
         /* ----------------------         END OF TEST        --------------- */

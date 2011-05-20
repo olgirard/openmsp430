@@ -148,14 +148,14 @@ set_output_delay 0                          -min -clock "dco_clk"             [g
 set_output_delay $PER_DIN_DLY    -add_delay -max -clock "dco_clk"             [get_ports per_din]
 set_output_delay 0                          -min -clock "dco_clk"             [get_ports per_din]
 
-set_output_delay $PER_WEN_DLY    -add_delay -max -clock "dco_clk"             [get_ports per_wen]
-set_output_delay 0                          -min -clock "dco_clk"             [get_ports per_wen]
+set_output_delay $PER_WEN_DLY    -add_delay -max -clock "dco_clk"             [get_ports per_we]
+set_output_delay 0                          -min -clock "dco_clk"             [get_ports per_we]
 
 set_output_delay $PER_EN_DLY     -add_delay -max -clock "dco_clk"             [get_ports per_en]
 set_output_delay 0                          -min -clock "dco_clk"             [get_ports per_en]
 
-set_output_delay $PUC_DLY        -add_delay -max -clock "dco_clk" -clock_fall [get_ports puc]
-set_output_delay 0                          -min -clock "dco_clk" -clock_fall [get_ports puc]
+set_output_delay $PUC_DLY        -add_delay -max -clock "dco_clk"             [get_ports puc_rst]
+set_output_delay 0                          -min -clock "dco_clk"             [get_ports puc_rst]
 
 
 #========================#
@@ -180,3 +180,6 @@ set_false_path -to   dbg_uart_txd
 set_false_path -from nmi
 set_false_path -from lfxt_clk
 set_false_path -from reset_n
+
+set_false_path -from cpu_en
+set_false_path -from dbg_en

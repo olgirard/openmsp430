@@ -153,5 +153,5 @@ wire  [15:0] irq_vect_00 = pmem[(1<<(`PMEM_MSB+1))-16]; // IRQ  0
 // CPU internals
 //======================
 
-wire mclk = dut.openMSP430_0.mclk;
-wire puc  = dut.openMSP430_0.puc;
+wire mclk     = dut.openMSP430_0.mclk;
+wire puc_rst  = dut.openMSP430_0.puc_rst;

@@ -62,6 +62,7 @@
 ../../../rtl/verilog/omsp_dbg_uart.v
 ../../../rtl/verilog/omsp_watchdog.v
 ../../../rtl/verilog/omsp_multiplier.v
+../../../rtl/verilog/omsp_sync_cell.v
 ../../../rtl/verilog/periph/omsp_gpio.v
 ../../../rtl/verilog/periph/omsp_timerA.v
 ../../../rtl/verilog/periph/template_periph_8b.v

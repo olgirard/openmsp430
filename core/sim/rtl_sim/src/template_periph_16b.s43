@@ -37,34 +37,59 @@
 
 .global main
 
-.set   CNTRL1, 0x0190
-.set   CNTRL2, 0x0192
-.set   CNTRL3, 0x0194
-.set   CNTRL4, 0x0196
+.set   DMEM_BASE, (__data_start     )
+.set   DMEM_200,  (__data_start+0x00)
+.set   DMEM_202,  (__data_start+0x02)
+.set   DMEM_204,  (__data_start+0x04)
+.set   DMEM_206,  (__data_start+0x06)
+.set   DMEM_208,  (__data_start+0x08)
+.set   DMEM_20A,  (__data_start+0x0A)
+.set   DMEM_20C,  (__data_start+0x0C)
+.set   DMEM_20E,  (__data_start+0x0E)
+.set   DMEM_210,  (__data_start+0x10)
+.set   DMEM_212,  (__data_start+0x12)
+.set   DMEM_214,  (__data_start+0x14)
+.set   DMEM_216,  (__data_start+0x16)
+
+.set   UNUSED_0,  (DMEM_BASE-0x0070-0x0002)
+.set   CNTRL1,    (DMEM_BASE-0x0070+0x0000)
+.set   CNTRL2,    (DMEM_BASE-0x0070+0x0002)
+.set   CNTRL3,    (DMEM_BASE-0x0070+0x0004)
+.set   CNTRL4,    (DMEM_BASE-0x0070+0x0006)
+.set   UNUSED_1,  (DMEM_BASE-0x0070-0x0008)
 
 main:
         /* --------------     TEST RD/WR REGISTER ACCESS     --------------- */
 
+	mov   #0x1234,  &UNUSED_0       ; UNUSED 0
+	mov &UNUSED_0,  &DMEM_200
+	mov   #0x5678,  &UNUSED_0
+	mov &UNUSED_0,  &DMEM_202
+
 	mov   #0x5555,  &CNTRL1         ; CNTRL1
-	mov   &CNTRL1,  &0x0200
+	mov   &CNTRL1,  &DMEM_204
 	mov   #0xaaaa,  &CNTRL1
-	mov   &CNTRL1,  &0x0202
+	mov   &CNTRL1,  &DMEM_206
 
 	mov   #0xaaaa,  &CNTRL2         ; CNTRL2
-	mov   &CNTRL2,  &0x0204
+	mov   &CNTRL2,  &DMEM_208
 	mov   #0x5555,  &CNTRL2
-	mov   &CNTRL2,  &0x0206
+	mov   &CNTRL2,  &DMEM_20A
 
 	mov   #0x55aa,  &CNTRL3         ; CNTRL3
-	mov   &CNTRL3,  &0x0208
+	mov   &CNTRL3,  &DMEM_20C
 	mov   #0xaa55,  &CNTRL3
-	mov   &CNTRL3,  &0x020A
+	mov   &CNTRL3,  &DMEM_20E
 
 	mov   #0xaa55,  &CNTRL4         ; CNTRL4
-	mov   &CNTRL4,  &0x020C
+	mov   &CNTRL4,  &DMEM_210
 	mov   #0x55aa,  &CNTRL4
-	mov   &CNTRL4,  &0x020E
+	mov   &CNTRL4,  &DMEM_212
 
+	mov   #0x8765,  &UNUSED_1       ; UNUSED 1
+	mov &UNUSED_1,  &DMEM_214
+	mov   #0x4321,  &UNUSED_1
+	mov &UNUSED_1,  &DMEM_216
 	
 	mov   #0x0001, r15
 

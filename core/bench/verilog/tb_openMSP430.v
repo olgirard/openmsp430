@@ -62,7 +62,7 @@ wire         [1:0] pmem_wen;
 wire        [15:0] pmem_dout;
 
 // Peripherals interface
-wire         [7:0] per_addr;
+wire        [13:0] per_addr;
 wire        [15:0] per_din;
 wire        [15:0] per_dout;
 wire         [1:0] per_we;
@@ -127,7 +127,7 @@ wire               mclk;
 wire               aclk_en;
 wire               smclk_en;
 reg                reset_n;
-wire               puc;
+wire               puc_rst;
 reg                nmi;
 reg         [13:0] irq;
 wire        [13:0] irq_acc;
@@ -287,7 +287,7 @@ openMSP430 dut (
     .pmem_cen     (pmem_cen),          // Program Memory chip enable (low active)
     .pmem_din     (pmem_din),          // Program Memory data input (optional)
     .pmem_wen     (pmem_wen),          // Program Memory write enable (low active) (optional)
-    .puc          (puc),               // Main system reset
+    .puc_rst      (puc_rst),           // Main system reset
     .smclk_en     (smclk_en),          // SMCLK enable
 
 // INPUTs
@@ -359,7 +359,7 @@ omsp_gpio #(.P1_EN(1),
     .per_din      (per_din),           // Peripheral data input
     .per_en       (per_en),            // Peripheral enable (high active)
     .per_we       (per_we),            // Peripheral write enable (high active)
-    .puc          (puc)                // Main system reset
+    .puc_rst      (puc_rst)            // Main system reset
 );
 
 //
@@ -389,7 +389,7 @@ omsp_timerA timerA_0 (
     .per_din      (per_din),           // Peripheral data input
     .per_en       (per_en),            // Peripheral enable (high active)
     .per_we       (per_we),            // Peripheral write enable (high active)
-    .puc          (puc),               // Main system reset
+    .puc_rst      (puc_rst),           // Main system reset
     .smclk_en     (smclk_en),          // SMCLK enable (from CPU)
     .ta_cci0a     (ta_cci0a),          // Timer A compare 0 input A
     .ta_cci0b     (ta_cci0b),          // Timer A compare 0 input B
@@ -415,11 +415,14 @@ template_periph_8b template_periph_8b_0 (
     .per_din      (per_din),           // Peripheral data input
     .per_en       (per_en),            // Peripheral enable (high active)
     .per_we       (per_we),            // Peripheral write enable (high active)
-    .puc          (puc)                // Main system reset
+    .puc_rst      (puc_rst)            // Main system reset
 );
 
-template_periph_16b template_periph_16b_0 (
-
+`ifdef CVER
+template_periph_16b #(15'h0190)             template_periph_16b_0 (
+`else
+template_periph_16b #(.BASE_ADDR(15'd`PER_SIZE-15'h0070)) template_periph_16b_0 (
+`endif
 // OUTPUTs
     .per_dout     (per_dout_temp_16b), // Peripheral data output
 
@@ -429,7 +432,7 @@ template_periph_16b template_periph_16b_0 (
     .per_din      (per_din),           // Peripheral data input
     .per_en       (per_en),            // Peripheral enable (high active)
     .per_we       (per_we),            // Peripheral write enable (high active)
-    .puc          (puc)                // Main system reset
+    .puc_rst      (puc_rst)            // Main system reset
 );
 
 
@@ -479,7 +482,7 @@ msp_debug msp_debug_0 (
 
 // INPUTs
     .mclk         (mclk),              // Main system clock
-    .puc          (puc)                // Main system reset
+    .puc_rst      (puc_rst)            // Main system reset
 );
 
 

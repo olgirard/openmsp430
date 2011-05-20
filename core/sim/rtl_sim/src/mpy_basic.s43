@@ -637,7 +637,67 @@ main:
 	nop
 	nop
 
+        /* --------------         RD/WR ACCESS OPERANDS     --------------- */
 
+	mov #0x1234,   &MPY
+	mov #0x5678,   &OP2
+	nop
+	mov    &MPY,   r10
+	mov   &MPYS,   r11
+	mov    &MAC,   r12
+	mov   &MACS,   r13
+	mov    &OP2,   r14
+	nop
+	mov #0x0001,   r15
+	nop
+	nop
+	nop
+	nop
+
+	mov #0x4321,   &MPYS
+	mov #0x8765,   &OP2
+	nop
+	mov    &MPY,   r10
+	mov   &MPYS,   r11
+	mov    &MAC,   r12
+	mov   &MACS,   r13
+	mov    &OP2,   r14
+	nop
+	mov #0x0002,   r15
+	nop
+	nop
+	nop
+	nop
+
+	mov #0x9ABC,   &MAC
+	mov #0xDEF0,   &OP2
+	nop
+	mov    &MPY,   r10
+	mov   &MPYS,   r11
+	mov    &MAC,   r12
+	mov   &MACS,   r13
+	mov    &OP2,   r14
+	nop
+	mov #0x0003,   r15
+	nop
+	nop
+	nop
+	nop
+
+	mov #0xCBA9,   &MACS
+	mov #0x0FED,   &OP2
+	nop
+	mov    &MPY,   r10
+	mov   &MPYS,   r11
+	mov    &MAC,   r12
+	mov   &MACS,   r13
+	mov    &OP2,   r14
+	nop
+	mov #0x0004,   r15
+	nop
+	nop
+	nop
+	nop
 
         /* ----------------------         END OF TEST        --------------- */
 end_of_test:

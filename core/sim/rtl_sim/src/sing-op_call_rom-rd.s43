@@ -35,13 +35,24 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.set    DMEM_BASE, (__data_start     )
+.set    DMEM_200,  (__data_start+0x00)
+.set    DMEM_212,  (__data_start+0x12)
+.set    DMEM_216,  (__data_start+0x16)
+.set    DMEM_21A,  (__data_start+0x1A)
+.set    DMEM_21E,  (__data_start+0x1E)
+.set    DMEM_220,  (__data_start+0x20)
+.set    DMEM_250,  (__data_start+0x50)
+.set    DMEM_252,  (__data_start+0x52)
+.set    DMEM_300,  (__data_start+0x100)
+
 .global main
 
 main:
         # Initialization
 	#------------------------
 
-	mov     #0x0252, r1        ;# Initialize stack pointer
+	mov   #DMEM_252, r1        ;# Initialize stack pointer
 	mov     #0x0000, r5        ;# Initialize R5
 
 
@@ -80,7 +91,7 @@ main:
 
         # Addressing mode: EDE
 	#------------------------
-.set   EDE_21E,  (__data_start+0x001E)
+.set   EDE_21E,  DMEM_21E
 
 	mov     #0x0000, r5
 	call    data_EDE_call               ;# CALL TEST_ROUTINE_EDE
@@ -90,7 +101,7 @@ main:
 
         # Addressing mode: &EDE
 	#------------------------
-.set   aEDE_220,  0x0220
+.set   aEDE_220,  DMEM_220
 
 	mov     #0x0000, r5
 	call  &data_aEDE_call               ;# CALL TEST_ROUTINE_aEDE

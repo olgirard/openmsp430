@@ -59,6 +59,7 @@
 `include "../../../rtl/verilog/openmsp430/omsp_dbg_uart.v"
 `include "../../../rtl/verilog/openmsp430/omsp_dbg_hwbrk.v"
 `include "../../../rtl/verilog/openmsp430/omsp_multiplier.v"
+`include "../../../rtl/verilog/openmsp430/omsp_sync_cell.v"
 `include "../../../rtl/verilog/openmsp430/periph/omsp_gpio.v"
 `include "../../../rtl/verilog/openmsp430/periph/omsp_timerA.v"
 

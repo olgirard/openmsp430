@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 106 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-25 23:01:03 +0100 (Fri, 25 Mar 2011) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -80,7 +80,7 @@ module  omsp_frontend (
     nmi_evt,                       // Non-maskable interrupt event
     pc_sw,                         // Program counter software value
     pc_sw_wr,                      // Program counter software write
-    puc,                           // Main system reset
+    puc_rst,                       // Main system reset
     wdt_irq                        // Watchdog-timer interrupt
 );
 
@@ -124,12 +124,12 @@ input        [15:0] mdb_in;        // Frontend Memory data bus input
 input 	            nmi_evt;       // Non-maskable interrupt event
 input        [15:0] pc_sw;         // Program counter software value
 input               pc_sw_wr;      // Program counter software write
-input               puc;           // Main system reset
+input               puc_rst;       // Main system reset
 input               wdt_irq;       // Watchdog-timer interrupt
 
 
 //=============================================================================
-// 0)  UTILITY FUNCTIONS
+// 1)  UTILITY FUNCTIONS
 //=============================================================================
 
 // 16 bits one-hot decoder
@@ -152,7 +152,42 @@ endfunction
    
 
 //=============================================================================
-// 1)  FRONTEND STATE MACHINE
+// 2)  Parameter definitions
+//=============================================================================
+
+//
+// 2.1) Instruction State machine definitons
+//-------------------------------------------
+
+parameter I_IRQ_FETCH = `I_IRQ_FETCH;
+parameter I_IRQ_DONE  = `I_IRQ_DONE;
+parameter I_DEC       = `I_DEC;        // New instruction ready for decode
+parameter I_EXT1      = `I_EXT1;       // 1st Extension word
+parameter I_EXT2      = `I_EXT2;       // 2nd Extension word
+parameter I_IDLE      = `I_IDLE;       // CPU is in IDLE mode
+
+//
+// 2.2) Execution State machine definitons
+//-------------------------------------------
+
+parameter E_IRQ_0     = `E_IRQ_0;
+parameter E_IRQ_1     = `E_IRQ_1;
+parameter E_IRQ_2     = `E_IRQ_2;
+parameter E_IRQ_3     = `E_IRQ_3;
+parameter E_IRQ_4     = `E_IRQ_4;
+parameter E_SRC_AD    = `E_SRC_AD;
+parameter E_SRC_RD    = `E_SRC_RD;
+parameter E_SRC_WR    = `E_SRC_WR;
+parameter E_DST_AD    = `E_DST_AD;
+parameter E_DST_RD    = `E_DST_RD;
+parameter E_DST_WR    = `E_DST_WR;
+parameter E_EXEC      = `E_EXEC;
+parameter E_JUMP      = `E_JUMP;
+parameter E_IDLE      = `E_IDLE;
+
+
+//=============================================================================
+// 3)  FRONTEND STATE MACHINE
 //=============================================================================
 
 // The wire "conv" is used as state bits to calculate the next response
@@ -167,20 +202,12 @@ wire       is_const;
 reg [15:0] sconst_nxt;
 reg  [3:0] e_state_nxt;
 	   
-// State machine definitons
-parameter I_IRQ_FETCH = 3'h0;
-parameter I_IRQ_DONE  = 3'h1;
-parameter I_DEC       = 3'h2; // New instruction ready for decode
-parameter I_EXT1      = 3'h3; // 1st Extension word
-parameter I_EXT2      = 3'h4; // 2nd Extension word
-parameter I_IDLE      = 3'h5; // CPU is in IDLE mode
-
 // CPU on/off through the debug interface or cpu_en port
 wire   cpu_halt_cmd = dbg_halt_cmd | ~cpu_en_s;
    
 // States Transitions
-always @(i_state   or inst_sz    or inst_sz_nxt or pc_sw_wr     or exec_done or
-         exec_done or irq_detect or cpuoff      or cpu_halt_cmd or e_state)
+always @(i_state    or inst_sz  or inst_sz_nxt  or pc_sw_wr or exec_done or
+         irq_detect or cpuoff   or cpu_halt_cmd or e_state)
     case(i_state)
       I_IDLE     : i_state_nxt = (irq_detect & ~cpu_halt_cmd) ? I_IRQ_FETCH :
                                  (~cpuoff    & ~cpu_halt_cmd) ? I_DEC       : I_IDLE;
@@ -188,9 +215,9 @@ always @(i_state   or inst_sz    or inst_sz_nxt or pc_sw_wr     or exec_done or
       I_IRQ_DONE : i_state_nxt =  I_DEC;
       I_DEC      : i_state_nxt =  irq_detect                  ? I_IRQ_FETCH :
                           (cpuoff | cpu_halt_cmd) & exec_done ? I_IDLE      :
-                            cpu_halt_cmd & (e_state==`E_IDLE) ? I_IDLE      :
+                            cpu_halt_cmd & (e_state==E_IDLE)  ? I_IDLE      :
                                   pc_sw_wr                    ? I_DEC       :
-		             ~exec_done & ~(e_state==`E_IDLE) ? I_DEC       :        // Wait in decode state
+		             ~exec_done & ~(e_state==E_IDLE)  ? I_DEC       :        // Wait in decode state
                                   (inst_sz_nxt!=2'b00)        ? I_EXT1      : I_DEC; // until execution is completed
       I_EXT1     : i_state_nxt =  irq_detect                  ? I_IRQ_FETCH :
                                   pc_sw_wr                    ? I_DEC       : 
@@ -200,38 +227,38 @@ always @(i_state   or inst_sz    or inst_sz_nxt or pc_sw_wr     or exec_done or
     endcase
 
 // State machine
-always @(posedge mclk or posedge puc)
-  if (puc) i_state  <= I_IRQ_FETCH;
-  else     i_state  <= i_state_nxt;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst) i_state  <= I_IRQ_FETCH;
+  else         i_state  <= i_state_nxt;
 
 // Utility signals
-wire   decode_noirq =  ((i_state==I_DEC) &  (exec_done | (e_state==`E_IDLE)));
+wire   decode_noirq =  ((i_state==I_DEC) &  (exec_done | (e_state==E_IDLE)));
 wire   decode       =  decode_noirq | irq_detect;
-wire   fetch        = ~((i_state==I_DEC) & ~(exec_done | (e_state==`E_IDLE))) & ~(e_state_nxt==`E_IDLE);
+wire   fetch        = ~((i_state==I_DEC) & ~(exec_done | (e_state==E_IDLE))) & ~(e_state_nxt==E_IDLE);
 
 // Debug interface cpu status
 reg    dbg_halt_st;
-always @(posedge mclk or posedge puc)
-  if (puc)  dbg_halt_st <= 1'b0;
-  else      dbg_halt_st <= cpu_halt_cmd & (i_state_nxt==I_IDLE);
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)  dbg_halt_st <= 1'b0;
+  else          dbg_halt_st <= cpu_halt_cmd & (i_state_nxt==I_IDLE);
 
 
 //=============================================================================
-// 2)  INTERRUPT HANDLING
+// 4)  INTERRUPT HANDLING
 //=============================================================================
 
 // Detect nmi interrupt
 reg         inst_nmi;
-always @(posedge mclk or posedge puc)
-  if (puc)                      inst_nmi <= 1'b0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)                  inst_nmi <= 1'b0;
   else if (nmi_evt)             inst_nmi <= 1'b1;
   else if (i_state==I_IRQ_DONE) inst_nmi <= 1'b0;
 
 
 // Detect reset interrupt
 reg         inst_irq_rst;
-always @(posedge mclk or posedge puc)
-  if (puc)                      inst_irq_rst <= 1'b1;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)                  inst_irq_rst <= 1'b1;
   else if (exec_done)           inst_irq_rst <= 1'b0;
 
 //  Detect other interrupts
@@ -239,8 +266,8 @@ assign  irq_detect = (inst_nmi | ((|irq | wdt_irq) & gie)) & ~cpu_halt_cmd & ~db
 
 // Select interrupt vector
 reg  [3:0] irq_num;
-always @(posedge mclk or posedge puc)
-  if (puc)             irq_num <= 4'hf;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)         irq_num <= 4'hf;
   else if (irq_detect) irq_num <= inst_nmi           ?  4'he :
                                   irq[13]            ?  4'hd :
                                   irq[12]            ?  4'hc :
@@ -266,11 +293,11 @@ wire        nmi_acc     = irq_acc_all[14];
 
 
 //=============================================================================
-// 3)  FETCH INSTRUCTION
+// 5)  FETCH INSTRUCTION
 //=============================================================================
 
 //
-// 3.1) PROGRAM COUNTER & MEMORY INTERFACE
+// 5.1) PROGRAM COUNTER & MEMORY INTERFACE
 //-----------------------------------------
 
 // Program counter
@@ -282,15 +309,15 @@ wire [15:0] pc_nxt  = pc_sw_wr               ? pc_sw    :
                       (i_state==I_IRQ_FETCH) ? irq_addr :
                       (i_state==I_IRQ_DONE)  ? mdb_in   :  pc_incr;
 
-always @(posedge mclk or posedge puc)
-  if (puc)  pc <= 16'h0000;
-  else      pc <= pc_nxt;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)  pc <= 16'h0000;
+  else          pc <= pc_nxt;
 
 // Check if ROM has been busy in order to retry ROM access
 reg pmem_busy;
-always @(posedge mclk or posedge puc)
-  if (puc)  pmem_busy <= 1'b0;
-  else      pmem_busy <= fe_pmem_wait;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)  pmem_busy <= 1'b0;
+  else          pmem_busy <= fe_pmem_wait;
    
 // Memory interface
 wire [15:0] mab      = pc_nxt;
@@ -298,7 +325,7 @@ wire        mb_en    = fetch | pc_sw_wr | (i_state==I_IRQ_FETCH) | pmem_busy | (
 
 
 //
-// 3.2) INSTRUCTION REGISTER
+// 5.2) INSTRUCTION REGISTER
 //--------------------------------
 
 // Instruction register
@@ -321,8 +348,8 @@ wire [15:0] ext_nxt  = ir + ext_incr;
 
 // Store source extension word
 reg [15:0] inst_sext;
-always @(posedge mclk or posedge puc)
-  if (puc)                                     inst_sext <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)                                 inst_sext <= 16'h0000;
   else if (decode & is_const)                  inst_sext <= sconst_nxt;
   else if (decode & inst_type_nxt[`INST_JMP])  inst_sext <= {{5{ir[9]}},ir[9:0],1'b0};
   else if ((i_state==I_EXT1) & is_sext)        inst_sext <= ext_nxt;
@@ -333,8 +360,8 @@ wire inst_sext_rdy = (i_state==I_EXT1) & is_sext;
 
 // Store destination extension word
 reg [15:0] inst_dext;
-always @(posedge mclk or posedge puc)
-  if (puc)                               inst_dext <= 16'h0000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)                           inst_dext <= 16'h0000;
   else if ((i_state==I_EXT1) & ~is_sext) inst_dext <= ext_nxt;
   else if  (i_state==I_EXT2)             inst_dext <= ext_nxt;
 
@@ -343,11 +370,11 @@ wire inst_dext_rdy = (((i_state==I_EXT1) & ~is_sext) | (i_state==I_EXT2));
 
 
 //=============================================================================
-// 4)  DECODE INSTRUCTION
+// 6)  DECODE INSTRUCTION
 //=============================================================================
 
 //
-// 4.1) OPCODE: INSTRUCTION TYPE
+// 6.1) OPCODE: INSTRUCTION TYPE
 //----------------------------------------
 // Instructions type is encoded in a one hot fashion as following:
 //
@@ -360,12 +387,12 @@ assign     inst_type_nxt = {(ir[15:14]!=2'b00),
                             (ir[15:13]==3'b001),
                             (ir[15:13]==3'b000)} & {3{~irq_detect}};
    
-always @(posedge mclk or posedge puc)
-  if (puc)                      inst_type <= 3'b000;
-  else if (decode)              inst_type <= inst_type_nxt;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)      inst_type <= 3'b000;
+  else if (decode)  inst_type <= inst_type_nxt;
 
 //
-// 4.2) OPCODE: SINGLE-OPERAND ARITHMETIC
+// 6.2) OPCODE: SINGLE-OPERAND ARITHMETIC
 //----------------------------------------
 // Instructions are encoded in a one hot fashion as following:
 //
@@ -381,12 +408,12 @@ always @(posedge mclk or posedge puc)
 reg   [7:0] inst_so;
 wire  [7:0] inst_so_nxt = irq_detect ? 8'h80 : (one_hot8(ir[9:7]) & {8{inst_type_nxt[`INST_SO]}});
 
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_so <= 8'h00;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_so <= 8'h00;
   else if (decode) inst_so <= inst_so_nxt;
 
 //
-// 4.3) OPCODE: CONDITIONAL JUMP
+// 6.3) OPCODE: CONDITIONAL JUMP
 //--------------------------------
 // Instructions are encoded in a one hot fashion as following:
 //
@@ -400,15 +427,15 @@ always @(posedge mclk or posedge puc)
 // 8'b10000000: JMP
 
 reg   [2:0] inst_jmp_bin;
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_jmp_bin <= 3'h0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_jmp_bin <= 3'h0;
   else if (decode) inst_jmp_bin <= ir[12:10];
 
 wire [7:0] inst_jmp = one_hot8(inst_jmp_bin) & {8{inst_type[`INST_JMP]}};
 
 
 //
-// 4.4) OPCODE: TWO-OPERAND ARITHMETIC
+// 6.4) OPCODE: TWO-OPERAND ARITHMETIC
 //-------------------------------------
 // Instructions are encoded in a one hot fashion as following:
 //
@@ -429,19 +456,19 @@ wire [15:0] inst_to_1hot = one_hot16(ir[15:12]) & {16{inst_type_nxt[`INST_TO]}};
 wire [11:0] inst_to_nxt  = inst_to_1hot[15:4];
 
 reg         inst_mov;
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_mov <= 1'b0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_mov <= 1'b0;
   else if (decode) inst_mov <= inst_to_nxt[`MOV];
 
 
 //
-// 4.5) SOURCE AND DESTINATION REGISTERS
+// 6.5) SOURCE AND DESTINATION REGISTERS
 //---------------------------------------
 
 // Destination register
 reg [3:0] inst_dest_bin;
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_dest_bin <= 4'h0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_dest_bin <= 4'h0;
   else if (decode) inst_dest_bin <= ir[3:0];
 
 wire  [15:0] inst_dest = dbg_halt_st          ? one_hot16(dbg_reg_sel) :
@@ -454,8 +481,8 @@ wire  [15:0] inst_dest = dbg_halt_st          ? one_hot16(dbg_reg_sel) :
 
 // Source register
 reg [3:0] inst_src_bin;
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_src_bin <= 4'h0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_src_bin <= 4'h0;
   else if (decode) inst_src_bin <= ir[11:8];
 
 wire  [15:0] inst_src = inst_type[`INST_TO] ? one_hot16(inst_src_bin)  :
@@ -465,7 +492,7 @@ wire  [15:0] inst_src = inst_type[`INST_TO] ? one_hot16(inst_src_bin)  :
 
 
 //
-// 4.6) SOURCE ADDRESSING MODES
+// 6.6) SOURCE ADDRESSING MODES
 //--------------------------------
 // Source addressing modes are encoded in a one hot fashion as following:
 //
@@ -523,8 +550,8 @@ always @(src_reg or ir or inst_type_nxt)
 assign    is_const = |inst_as_nxt[12:7];
 
 reg [7:0] inst_as;
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_as <= 8'h00;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_as <= 8'h00;
   else if (decode) inst_as <= {is_const, inst_as_nxt[6:0]};
 
 
@@ -547,7 +574,7 @@ always @(inst_as_nxt)
 
 
 //
-// 4.7) DESTINATION ADDRESSING MODES
+// 6.7) DESTINATION ADDRESSING MODES
 //-----------------------------------
 // Destination addressing modes are encoded in a one hot fashion as following:
 //
@@ -582,31 +609,31 @@ always @(dest_reg or ir or inst_type_nxt)
   end
 
 reg [7:0] inst_ad;
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_ad <= 8'h00;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_ad <= 8'h00;
   else if (decode) inst_ad <= inst_ad_nxt;
 
 
 //
-// 4.8) REMAINING INSTRUCTION DECODING
+// 6.8) REMAINING INSTRUCTION DECODING
 //-------------------------------------
 
 // Operation size
 reg       inst_bw;
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_bw     <= 1'b0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_bw     <= 1'b0;
   else if (decode) inst_bw     <= ir[6] & ~inst_type_nxt[`INST_JMP] & ~irq_detect & ~cpu_halt_cmd;
 
 // Extended instruction size
 assign    inst_sz_nxt = {1'b0,  (inst_as_nxt[`IDX] | inst_as_nxt[`SYMB] | inst_as_nxt[`ABS] | inst_as_nxt[`IMM])} +
                         {1'b0, ((inst_ad_nxt[`IDX] | inst_ad_nxt[`SYMB] | inst_ad_nxt[`ABS]) & ~inst_type_nxt[`INST_SO])};
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_sz     <= 2'b00;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_sz     <= 2'b00;
   else if (decode) inst_sz     <= inst_sz_nxt;
 
 
 //=============================================================================
-// 5)  EXECUTION-UNIT STATE MACHINE
+// 7)  EXECUTION-UNIT STATE MACHINE
 //=============================================================================
 
 // State machine registers
@@ -626,37 +653,37 @@ wire dst_rd        =  inst_ad[`IDX]       | inst_so[`PUSH]        | inst_so[`CAL
 wire inst_branch   =  (inst_ad_nxt[`DIR] & (ir[3:0]==4'h0)) | inst_type_nxt[`INST_JMP] | inst_so_nxt[`RETI];
 
 reg exec_jmp;
-always @(posedge mclk or posedge puc)
-  if (puc)                       exec_jmp <= 1'b0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)                   exec_jmp <= 1'b0;
   else if (inst_branch & decode) exec_jmp <= 1'b1;
-  else if (e_state==`E_JUMP)     exec_jmp <= 1'b0;
+  else if (e_state==E_JUMP)      exec_jmp <= 1'b0;
 
 reg exec_dst_wr;
-always @(posedge mclk or posedge puc)
-  if (puc)                     exec_dst_wr <= 1'b0;
-  else if (e_state==`E_DST_RD) exec_dst_wr <= 1'b1;
-  else if (e_state==`E_DST_WR) exec_dst_wr <= 1'b0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)                exec_dst_wr <= 1'b0;
+  else if (e_state==E_DST_RD) exec_dst_wr <= 1'b1;
+  else if (e_state==E_DST_WR) exec_dst_wr <= 1'b0;
 
 reg exec_src_wr;
-always @(posedge mclk or posedge puc)
-  if (puc)                                               exec_src_wr <= 1'b0;
-  else if (inst_type[`INST_SO] & (e_state==`E_SRC_RD))   exec_src_wr <= 1'b1;
-  else if ((e_state==`E_SRC_WR) || (e_state==`E_DST_WR)) exec_src_wr <= 1'b0;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)                                         exec_src_wr <= 1'b0;
+  else if (inst_type[`INST_SO] & (e_state==E_SRC_RD))  exec_src_wr <= 1'b1;
+  else if ((e_state==E_SRC_WR) || (e_state==E_DST_WR)) exec_src_wr <= 1'b0;
 
 reg exec_dext_rdy;
-always @(posedge mclk or posedge puc)
-  if (puc)                     exec_dext_rdy <= 1'b0;
-  else if (e_state==`E_DST_RD) exec_dext_rdy <= 1'b0;
-  else if (inst_dext_rdy)      exec_dext_rdy <= 1'b1;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)                exec_dext_rdy <= 1'b0;
+  else if (e_state==E_DST_RD) exec_dext_rdy <= 1'b0;
+  else if (inst_dext_rdy)     exec_dext_rdy <= 1'b1;
 
 // Execution first state
-wire [3:0] e_first_state = ~dbg_halt_st  & inst_so_nxt[`IRQ] ? `E_IRQ_0  :
-                            cpu_halt_cmd | (i_state==I_IDLE) ? `E_IDLE   :
-                            cpuoff                           ? `E_IDLE   :
-                            src_acalc_pre                    ? `E_SRC_AD :
-                            src_rd_pre                       ? `E_SRC_RD :
-                            dst_acalc_pre                    ? `E_DST_AD :
-                            dst_rd_pre                       ? `E_DST_RD : `E_EXEC;
+wire [3:0] e_first_state = ~dbg_halt_st  & inst_so_nxt[`IRQ] ? E_IRQ_0  :
+                            cpu_halt_cmd | (i_state==I_IDLE) ? E_IDLE   :
+                            cpuoff                           ? E_IDLE   :
+                            src_acalc_pre                    ? E_SRC_AD :
+                            src_rd_pre                       ? E_SRC_RD :
+                            dst_acalc_pre                    ? E_DST_AD :
+                            dst_rd_pre                       ? E_DST_RD : E_EXEC;
 
 
 // State machine
@@ -667,53 +694,53 @@ always @(e_state       or dst_acalc     or dst_rd   or inst_sext_rdy or
          inst_dext_rdy or exec_dext_rdy or exec_jmp or exec_dst_wr   or
          e_first_state or exec_src_wr)
     case(e_state)
-      `E_IDLE   : e_state_nxt =  e_first_state;
-      `E_IRQ_0  : e_state_nxt =  `E_IRQ_1;
-      `E_IRQ_1  : e_state_nxt =  `E_IRQ_2;
-      `E_IRQ_2  : e_state_nxt =  `E_IRQ_3;
-      `E_IRQ_3  : e_state_nxt =  `E_IRQ_4;
-      `E_IRQ_4  : e_state_nxt =  `E_EXEC;
+      E_IDLE   : e_state_nxt =  e_first_state;
+      E_IRQ_0  : e_state_nxt =  E_IRQ_1;
+      E_IRQ_1  : e_state_nxt =  E_IRQ_2;
+      E_IRQ_2  : e_state_nxt =  E_IRQ_3;
+      E_IRQ_3  : e_state_nxt =  E_IRQ_4;
+      E_IRQ_4  : e_state_nxt =  E_EXEC;
 
-      `E_SRC_AD : e_state_nxt =  inst_sext_rdy     ? `E_SRC_RD : `E_SRC_AD;
+      E_SRC_AD : e_state_nxt =  inst_sext_rdy     ? E_SRC_RD : E_SRC_AD;
 
-      `E_SRC_RD : e_state_nxt =  dst_acalc         ? `E_DST_AD : 
-                                 dst_rd            ? `E_DST_RD : `E_EXEC;
+      E_SRC_RD : e_state_nxt =  dst_acalc         ? E_DST_AD : 
+                                 dst_rd           ? E_DST_RD : E_EXEC;
 
-      `E_DST_AD : e_state_nxt =  (inst_dext_rdy |
-                                 exec_dext_rdy)    ? `E_DST_RD : `E_DST_AD;
+      E_DST_AD : e_state_nxt =  (inst_dext_rdy |
+                                 exec_dext_rdy)   ? E_DST_RD : E_DST_AD;
 
-      `E_DST_RD : e_state_nxt =  `E_EXEC;
+      E_DST_RD : e_state_nxt =  E_EXEC;
 
-      `E_EXEC   : e_state_nxt =  exec_dst_wr       ? `E_DST_WR :
-                                exec_jmp           ? `E_JUMP   :
-                                exec_src_wr        ? `E_SRC_WR : e_first_state;
+      E_EXEC   : e_state_nxt =  exec_dst_wr       ? E_DST_WR :
+                                exec_jmp          ? E_JUMP   :
+                                exec_src_wr       ? E_SRC_WR : e_first_state;
 
-      `E_JUMP   : e_state_nxt =  e_first_state;
-      `E_DST_WR : e_state_nxt =  exec_jmp           ? `E_JUMP   : e_first_state;
-      `E_SRC_WR : e_state_nxt =  e_first_state;
-      default  : e_state_nxt =  `E_IRQ_0;
+      E_JUMP   : e_state_nxt =  e_first_state;
+      E_DST_WR : e_state_nxt =  exec_jmp          ? E_JUMP   : e_first_state;
+      E_SRC_WR : e_state_nxt =  e_first_state;
+      default  : e_state_nxt =  E_IRQ_0;
     endcase
 
 // State machine
-always @(posedge mclk or posedge puc)
-  if (puc)     e_state  <= `E_IRQ_1;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst) e_state  <= E_IRQ_1;
   else         e_state  <= e_state_nxt;
 
 
 // Frontend State machine control signals
 //----------------------------------------
 
-wire exec_done = exec_jmp        ? (e_state==`E_JUMP)   :
-                 exec_dst_wr     ? (e_state==`E_DST_WR) :
-                 exec_src_wr     ? (e_state==`E_SRC_WR) : (e_state==`E_EXEC);
+wire exec_done = exec_jmp        ? (e_state==E_JUMP)   :
+                 exec_dst_wr     ? (e_state==E_DST_WR) :
+                 exec_src_wr     ? (e_state==E_SRC_WR) : (e_state==E_EXEC);
 
 
 //=============================================================================
-// 6)  EXECUTION-UNIT STATE CONTROL
+// 8)  EXECUTION-UNIT STATE CONTROL
 //=============================================================================
 
 //
-// 6.1) ALU CONTROL SIGNALS
+// 8.1) ALU CONTROL SIGNALS
 //-------------------------------------
 //
 // 12'b000000000001: Enable ALU source inverter
@@ -769,8 +796,8 @@ wire        alu_shift     = inst_so_nxt[`RRC]  | inst_so_nxt[`RRA];
 
 wire        exec_no_wr    = inst_to_nxt[`CMP] | inst_to_nxt[`BIT];
 
-always @(posedge mclk or posedge puc)
-  if (puc)         inst_alu <= 12'h000;
+always @(posedge mclk or posedge puc_rst)
+  if (puc_rst)     inst_alu <= 12'h000;
   else if (decode) inst_alu <= {exec_no_wr,
                                 alu_shift,
                                 alu_stat_f,

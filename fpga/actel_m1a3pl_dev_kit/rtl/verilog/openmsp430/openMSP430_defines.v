@@ -41,11 +41,14 @@
 `include "openMSP430_undefines.v"
 `endif
 
-//----------------------------------------------------------------------------
-// SYSTEM CONFIGURATION
-//----------------------------------------------------------------------------
+//============================================================================
+//============================================================================
+// BASIC SYSTEM CONFIGURATION
+//============================================================================
+//============================================================================
 //
-// Note: the sum of both program and data memories should not exceed 63.5 kB
+// Note: the sum of program, data and peripheral memory spaces must not
+//      exceed 64 kB
 //
 
 // Program Memory Size:
@@ -66,6 +69,7 @@
 //`define PMEM_SIZE_2_KB
 //`define PMEM_SIZE_1_KB
 
+
 // Data Memory Size:
 //                     Uncomment the required memory size
 //-------------------------------------------------------
@@ -83,44 +87,127 @@
 `define DMEM_SIZE_256_B
 //`define DMEM_SIZE_128_B
 
-  
+
 // Include/Exclude Hardware Multiplier
 //`define MULTIPLIER
 
 
-//----------------------------------------------------------------------------
-// REMOTE DEBUGGING INTERFACE CONFIGURATION
-//----------------------------------------------------------------------------
-
-// Include Debug interface
+// Include/Exclude Serial Debug interface
 `define DBG_EN
 
-// Debug interface selection
-//             `define DBG_UART -> Enable UART (8N1) debug interface
-//             `define DBG_JTAG -> DON'T UNCOMMENT, NOT SUPPORTED
-//
-`define DBG_UART
-//`define DBG_JTAG
 
-// Number of hardware breakpoints (each unit contains 2 hw address breakpoints)
-//             `define DBG_HWBRK_0 -> Include hardware breakpoints unit 0
-//             `define DBG_HWBRK_1 -> Include hardware breakpoints unit 1
-//             `define DBG_HWBRK_2 -> Include hardware breakpoints unit 2
-//             `define DBG_HWBRK_3 -> Include hardware breakpoints unit 3
+//============================================================================
+//============================================================================
+// ADVANCED SYSTEM CONFIGURATION (FOR EXPERIENCED USERS)
+//============================================================================
+//============================================================================
+
+//-------------------------------------------------------
+// Peripheral Memory Space:
+//-------------------------------------------------------
+// The original MSP430 architecture map the peripherals
+// from 0x0000 to 0x01FF (i.e. 512B of the memory space).
+// The following defines allow you to expand this space
+// up to 32 kB (i.e. from 0x0000 to 0x7fff).
+// As a consequence, the data memory mapping will be
+// shifted up and a custom linker script will therefore
+// be required by the GCC compiler.
+//-------------------------------------------------------
+//`define PER_SIZE_32_KB
+//`define PER_SIZE_16_KB
+//`define PER_SIZE_8_KB
+//`define PER_SIZE_4_KB
+//`define PER_SIZE_2_KB
+//`define PER_SIZE_1_KB
+`define PER_SIZE_512_B
+
+
+//-------------------------------------------------------
+// Defines the debugger CPU_CTL.RST_BRK_EN reset value
+// (CPU break on PUC reset)
+//-------------------------------------------------------
+// When defined, the CPU will automatically break after
+// a PUC occurrence by default. This is typically usefull
+// when the program memory can only be initialized through
+// the serial debug interface.
+//-------------------------------------------------------
+//`define DBG_RST_BRK_EN
+
+
+//-------------------------------------------------------
+// Custom user version number
+//-------------------------------------------------------
+// This 5 bit field can be freely used in order to allow
+// custom identification of the system where the openMSP430
+// is included through the debug interface.
+// (see CPU_ID.USER_VERSION field in the documentation)
+//-------------------------------------------------------
+`define USER_VERSION 5'b00011
+
+
+//============================================================================
+//============================================================================
+// EXPERT SYSTEM CONFIGURATION ( !!!! EXPERTS ONLY !!!! )
+//============================================================================
+//============================================================================
 //
-`define  DBG_HWBRK_0
+// IMPORTANT NOTE:  Please update following configuration options ONLY if
+//                 you have a good reason to do so... and if you know what
+//                 you are doing :-P
+//
+//============================================================================
+
+//-------------------------------------------------------
+// Number of hardware breakpoint units (each unit contains
+// two hardware address breakpoints):
+//   - DBG_HWBRK_0 -> Include hardware breakpoints unit 0
+//   - DBG_HWBRK_1 -> Include hardware breakpoints unit 1
+//   - DBG_HWBRK_2 -> Include hardware breakpoints unit 2
+//   - DBG_HWBRK_3 -> Include hardware breakpoints unit 3
+//-------------------------------------------------------
+// Please keep in mind that hardware breakpoints only
+// make sense whenever the program memory is not an SRAM
+// (i.e. Flash/OTP/ROM/...) or when you are interested
+// in data breakpoints (btw. not supported by GDB).
+//-------------------------------------------------------
+//`define  DBG_HWBRK_0
 //`define  DBG_HWBRK_1
 //`define  DBG_HWBRK_2
 //`define  DBG_HWBRK_3
 
 
-// Defines the debugger CPU_CTL.RST_BRK_EN reset value (CPU break on PUC reset)
+//-------------------------------------------------------
+// Enable/Disable the hardware breakpoint RANGE mode
+//-------------------------------------------------------
+// When enabled this feature allows the hardware breakpoint
+// units to stop the cpu whenever an instruction or data
+// access lays within an address range.
+// Note that this feature is not supported by GDB.
+//-------------------------------------------------------
+//`define DBG_HWBRK_RANGE
+
+
+//-------------------------------------------------------
+// Input synchronizers
+//-------------------------------------------------------
+// In some cases, the asynchronous input ports might
+// already be synchronized externally.
+// If an extensive CDC design review showed that this
+// is really the case,  the individual synchronizers
+// can be disabled with the following defines.
 //
-// When defined, this concretely bring the CPU to break after a PUC
-// occurrence by default. This is typically usefull when the program
-// memory can only be initialized through the serial debug interface.
+// Notes:
+//        - the dbg_en signal will reset the debug interface
+//         when 0. Therefore make sure it is glitch free.
 //
-`define DBG_RST_BRK_EN
+//        - the dbg_uart_rxd synchronizer must be set to 1
+//          when its reset is active.
+//-------------------------------------------------------
+`define SYNC_CPU_EN
+`define SYNC_DBG_EN
+`define SYNC_DBG_UART_RXD
+`define SYNC_NMI
+
 
 
 //==========================================================================//
@@ -134,8 +221,8 @@
 //==========================================================================//
 
 //
-// PROGRAM & DATA MEMORY CONFIGURATION
-//======================================
+// PROGRAM, DATA & PERIPHERAL MEMORY CONFIGURATION
+//==================================================
 
 // Program Memory Size
 `ifdef PMEM_SIZE_59_KB
@@ -249,12 +336,43 @@
   `define DMEM_SIZE        128
 `endif
 
+// Peripheral Memory Size
+`ifdef PER_SIZE_32_KB
+  `define PER_AWIDTH        14
+  `define PER_SIZE       32768
+`endif
+`ifdef PER_SIZE_16_KB
+  `define PER_AWIDTH        13
+  `define PER_SIZE       16384
+`endif
+`ifdef PER_SIZE_8_KB
+  `define PER_AWIDTH        12
+  `define PER_SIZE        8192
+`endif
+`ifdef PER_SIZE_4_KB
+  `define PER_AWIDTH        11
+  `define PER_SIZE        4096
+`endif
+`ifdef PER_SIZE_2_KB
+  `define PER_AWIDTH        10
+  `define PER_SIZE        2048
+`endif
+`ifdef PER_SIZE_1_KB
+  `define PER_AWIDTH         9
+  `define PER_SIZE        1024
+`endif
+`ifdef PER_SIZE_512_B
+  `define PER_AWIDTH         8
+  `define PER_SIZE         512
+`endif
+
 // Data Memory Base Adresses
-`define DMEM_BASE  16'h0200
+`define DMEM_BASE  `PER_SIZE
 
 // Program & Data Memory most significant address bit (for 16 bit words)
 `define PMEM_MSB   `PMEM_AWIDTH-1
 `define DMEM_MSB   `DMEM_AWIDTH-1
+`define PER_MSB    `PER_AWIDTH-1
 
 //
 // STATES, REGISTER FIELDS, ...
@@ -309,21 +427,29 @@
 `define ABS      6
 `define CONST    7
 
+// Instruction state machine
+`define I_IRQ_FETCH 3'h0
+`define I_IRQ_DONE  3'h1
+`define I_DEC       3'h2
+`define I_EXT1      3'h3
+`define I_EXT2      3'h4
+`define I_IDLE      3'h5
+
 // Execution state machine
-`define E_IRQ_0    4'h0
-`define E_IRQ_1    4'h1
-`define E_IRQ_2    4'h2
-`define E_IRQ_3    4'h3
-`define E_IRQ_4    4'h4
-`define E_SRC_AD   4'h5
-`define E_SRC_RD   4'h6
-`define E_SRC_WR   4'h7
-`define E_DST_AD   4'h8
-`define E_DST_RD   4'h9
-`define E_DST_WR   4'hA
-`define E_EXEC     4'hB
-`define E_JUMP     4'hC
-`define E_IDLE     4'hD
+`define E_IRQ_0     4'h0
+`define E_IRQ_1     4'h1
+`define E_IRQ_2     4'h2
+`define E_IRQ_3     4'h3
+`define E_IRQ_4     4'h4
+`define E_SRC_AD    4'h5
+`define E_SRC_RD    4'h6
+`define E_SRC_WR    4'h7
+`define E_DST_AD    4'h8
+`define E_DST_RD    4'h9
+`define E_DST_WR    4'hA
+`define E_EXEC      4'hB
+`define E_JUMP      4'hC
+`define E_IDLE      4'hD
 
 // ALU control signals
 `define ALU_SRC_INV   0
@@ -380,6 +506,9 @@
 // DEBUG INTERFACE EXTRA CONFIGURATION
 //======================================
 
+// Debug interface: CPU version
+`define CPU_VERSION   3'h1
+
 // Debug interface: Software breakpoint opcode
 `define DBG_SWBRK_OP 16'h4343
 
@@ -407,8 +536,19 @@
 `define DBG_DCO_FREQ  20000000
 `define DBG_UART_CNT ((`DBG_DCO_FREQ/`DBG_UART_BAUD)-1)
 
+// Debug interface selection
+//             `define DBG_UART -> Enable UART (8N1) debug interface
+//             `define DBG_JTAG -> DON'T UNCOMMENT, NOT SUPPORTED
+//
+`define DBG_UART
+//`define DBG_JTAG
+
 // Enable/Disable the hardware breakpoint RANGE mode
-`define HWBRK_RANGE 1'b0
+`ifdef DBG_HWBRK_RANGE
+ `define HWBRK_RANGE 1'b1
+`else
+ `define HWBRK_RANGE 1'b0
+`endif
 
 // Counter width for the debug interface UART
 `define DBG_UART_XFER_CNT_W 16

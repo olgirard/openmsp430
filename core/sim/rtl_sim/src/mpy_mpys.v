@@ -47,6 +47,7 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
+`ifdef MULTIPLIER
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
       i = 0;
@@ -85,5 +86,13 @@ initial
 
 
       stimulus_done = 1;
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|      (hardware multiplier not included)       |");
+       $display(" ===============================================");
+       $finish;
+`endif
    end
 
