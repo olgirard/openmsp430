@@ -138,8 +138,8 @@
 // Custom user version number
 //-------------------------------------------------------
 // This 5 bit field can be freely used in order to allow
-// custom identification of the system where the openMSP430
-// is included through the debug interface.
+// custom identification of the system through the debug
+// interface.
 // (see CPU_ID.USER_VERSION field in the documentation)
 //-------------------------------------------------------
 `define USER_VERSION 5'b00010
