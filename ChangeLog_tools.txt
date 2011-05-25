@@ -1,0 +1,79 @@
+2011-05-19 [r110]  
+
+	* Rework of the GUI for the software development tools. Added
+	  possibility to give custom information through the omsp_alias.xml
+	  file.
+
+2011-02-27 [r97]  
+
+	* Update Tools' Windows executables with EraseROM command fix.
+
+2011-02-27 [r96]  
+
+	* Fixed EraseROM command in the TCL library of the Software
+	  development tools.
+
+2011-02-20 [r93]  
+
+	* Update Tools' Windows executables.
+
+2011-02-20 [r92]  
+
+	* Fixed bug where the openmsp430-minidebug application shows data
+	  memory size instead of program memory size and program memory
+	  size instead of data memory size. Thanks to "dir" for reporting
+	  the bug :-)
+
+2011-02-05 [r89-90]  
+
+	* Update windows executables for the tools.
+
+	* Update the loader tool to support Intel-HEX format.
+
+2011-02-05 [r88]  
+
+	* Update windows executables for the tools.
+
+2011-02-05 [r87]  
+
+	* Minor update of gdbproxy to allow sourcing some custom tcl
+	  scripts. Major update of the minidebugger (complete re-work of
+	  the GUI).
+
+2010-11-21 [r78]  
+
+	* update windows executable files
+
+2010-11-21 [r77]  
+
+	* Tool script update with additional checks: - execution of the
+	  "msp430-objcopy" ran properly - add a timeout delay to wait for
+	  the generated bin file - check if the size of the ELF file
+	  program section is the same as the available program memory.
+
+2010-08-28 [r75]  
+
+	* Update development tools windows executable to support memories
+	  whose size are not a power of 2.
+
+2010-08-28 [r74]  
+
+	* Update serial debug interface to support memories with a size
+	  which is not a power of 2. Update the software tools accordingly.
+
+2009-12-29 [r35]  
+
+	* Update documentation to reflect the latest Verilog changes.
+
+2009-08-04 [r15]  
+
+	* Updated headers with SVN info
+
+2009-08-04 [r14]  
+
+	* Updated headers with SVN info
+
+2009-06-30 [r2]  
+
+	* Upload complete openMSP430 project to the SVN repository
+
