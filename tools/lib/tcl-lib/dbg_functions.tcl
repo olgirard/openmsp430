@@ -523,10 +523,21 @@ proc GetCPU_ID_SIZE {} {
 #=============================================================================#
 proc VerifyCPU_ID {} {
 
+    global omsp_info
+
     set cpu_id_full [GetCPU_ID]
 
     if {[string eq "0x00000000" $cpu_id_full] |
-	([string length $cpu_id_full]!=10)} {
+	([string length $cpu_id_full]!=10)    |
+        ($omsp_info(cpu_ver) >2)              } {
+	puts "\n"
+	puts "ERROR: cpu_id not valid: $cpu_id_full"
+	puts ""
+	puts "         -------------------------------------------------------------"
+	puts "       !!!! Make sure that you are properly connectec to the board  !!!!"
+	puts "       !!!! or try reseting the serial debug interface (or CPU).    !!!!"
+	puts "         -------------------------------------------------------------"
+	puts ""
 	set result 0
     } else {
 	set result 1
