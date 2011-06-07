@@ -92,12 +92,17 @@ The following table summarize the complete debug register set accessible through
 <tr align="center">
 <td><font size="-1"><a href="#2.2.1 CPU_ID">CPU_ID_LO</a></font></td>
 <td><font size="-1">0x00</font></td>
-<td colspan="16"><font size="-5">DMEM_AWIDTH</font></td>
+<td colspan="7"><font size="-5">PER_SPACE</font></td>
+<td colspan="5"><font size="-5">USER_VERSION</font></td>
+<td colspan="1"><font size="-5">ASIC</font></td>
+<td colspan="3"><font size="-5">CPU_VERSION</font></td>
 </tr>
 <tr align="center">
 <td><font size="-1"><a href="#2.2.1 CPU_ID">CPU_ID_HI</a></font></td>
 <td><font size="-1">0x01</font></td>
-<td colspan="16"><font size="-5">PMEM_AWIDTH</font></td>
+<td colspan="6"><font size="-5">PMEM_SIZE</font></td>
+<td colspan="9"><font size="-5">DMEM_SIZE</font></td>
+<td colspan="1"><font size="-5">MPY</font></td>
 </tr>
 <tr align="center">
 <td><font size="-1"><a href="#2.2.2 CPU_CTL">CPU_CTL</a></font></td>
@@ -297,23 +302,48 @@ This 32 bit read-only register holds the program and data memory size informatio
 <tr align="center">
 <td><font size="-1">CPU_ID_LO</font></td>
 <td><font size="-1">0x00</font></td>
-<td colspan="16"><font size="-5">DMEM_AWIDTH</font></td>
+<td colspan="7"><font size="-5">PER_SPACE</font></td>
+<td colspan="5"><font size="-5">USER_VERSION</font></td>
+<td colspan="1"><font size="-5">ASIC</font></td>
+<td colspan="3"><font size="-5">CPU_VERSION</font></td>
 </tr>
 <tr align="center">
 <td><font size="-1">CPU_ID_HI</font></td>
 <td><font size="-1">0x01</font></td>
-<td colspan="16"><font size="-5">PMEM_AWIDTH</font></td>
+<td colspan="6"><font size="-5">PMEM_SIZE</font></td>
+<td colspan="9"><font size="-5">DMEM_SIZE</font></td>
+<td colspan="1"><font size="-5">MPY</font></td>
 </tr>
 </table>
 <br />
 <table border="0">
 <tr>
-   <td>&nbsp;</td><td valign="top"><li><b>PMEM_AWIDTH</b></li></td>
-   <td>: Program memory size in byte for the current implementation</td>
+   <td>&nbsp;</td><td valign="top"><li><b>CPU_VERSION</b></li></td>
+   <td>: Current CPU version (currently 1)</td>
 </tr>
 <tr>
-   <td>&nbsp;</td><td valign="top"><li><b>DMEM_AWIDTH</b></li></td>
-   <td>: Data memory size in byte for the current implementation.</td>
+   <td>&nbsp;</td><td valign="top"><li><b>ASIC</b></li></td>
+   <td>: Defines if the ASIC specific features are enabled in the current openMSP430 implementation.</td>
+</tr>
+<tr>
+   <td>&nbsp;</td><td valign="top"><li><b>USER_VERSION</b></li></td>
+   <td>: Reflects the value defined in the <b>openMSP430_defines.v</b> file.</td>
+</tr>
+<tr>
+   <td>&nbsp;</td><td valign="top"><li><b>PER_SPACE</b></li></td>
+   <td>: Peripheral address space for the current implementation (byte size = PER_SPACE*512)</td>
+</tr>
+<tr>
+   <td>&nbsp;</td><td valign="top"><li><b>MPY</b></li></td>
+   <td>: This bit is set if the hardware multiplier is included in the current implementation</td>
+</tr>
+<tr>
+   <td>&nbsp;</td><td valign="top"><li><b>DMEM_SIZE</b></li></td>
+   <td>: Data memory size for the current implementation (byte size = DMEM_SIZE*128)</td>
+</tr>
+<tr>
+   <td>&nbsp;</td><td valign="top"><li><b>PMEM_SIZE</b></li></td>
+   <td>: Progam memory size for the current implementation (byte size = PMEM_SIZE*1024)</td>
 </tr>
 </table>
 
@@ -692,7 +722,7 @@ This 8 bit read-write register controls the hardware breakpoint unit x. After a 
 <tr>
    <td>&nbsp;</td><td>&nbsp;</td>
    <td>&nbsp;&nbsp;1 - Address match on BRK_ADDR0&rarr;BRK_ADDR1 range (range mode)
-   <br /><font color="red"><b>Note</b>: range mode is not supported by the core unless the `HWBRK_RANGE define is set to 1'b1 in the <i>openMSP430_define.v</i> file.</font></td>
+   <br /><font color="red"><b>Note</b>: range mode is not supported by the core unless the `DBG_HWBRK_RANGE define is set to 1'b1 in the <i>openMSP430_define.v</i> file.</font></td>
 </td>
 </tr>
 <tr>
@@ -764,7 +794,7 @@ This 8 bit read-write register gives the status of the hardware breakpoint unit 
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>RANGE_RD</b></li></td>
    <td>: This bit is set whenever the CPU performs a read access within the BRKx_ADDR0&rarr;BRKx_ADDR1 range (valid if RANGE_MODE=1 and ACCESS_MODE[0]=1).
-   <br /><font color="red"><b>Note</b>: range mode is not supported by the core unless the `HWBRK_RANGE define is set to 1'b1 in the <i>openMSP430_define.v</i> file.</font></td>
+   <br /><font color="red"><b>Note</b>: range mode is not supported by the core unless the `DBG_HWBRK_RANGE define is set to 1'b1 in the <i>openMSP430_define.v</i> file.</font></td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>ADDR1_WR</b></li></td>

@@ -26,20 +26,24 @@ To simplify the integration of this IP, the directory structure is based on the 
 
 <table border="1">
 	<tbody><tr><td colspan="5"><b>core</b></td>                                                                           <td><i><b>openMSP430 Core top level directory</b></i></td></tr>
-	<tr><td rowspan="80" valign="bottom"><font color="white">abcd</font></td> <td colspan="4"><b>bench</b></td>    <td><i><b>Top level testbench directory</b></i></td></tr>
-	<tr><td rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="3"><b>verilog</b></td>  <td><i></i><br>
+	<tr><td rowspan="87" valign="bottom"><font color="white">abcd</font></td> <td colspan="4"><b>bench</b></td>    <td><i><b>Top level testbench directory</b></i></td></tr>
+	<tr><td rowspan="7" valign="bottom"><font color="white">abcd</font></td> <td colspan="3"><b>verilog</b></td>  <td><i></i><br>
 </td></tr>
-	<tr><td rowspan="5" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">tb_openMSP430.v</td> <td><i>Testbench top level module</i></td></tr>
+	<tr><td rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">tb_openMSP430.v</td> <td><i>Testbench top level module</i></td></tr>
 	<tr><td colspan="2">ram.v</td>                                                                                 <td><i>RAM verilog model</i></td></tr>
 	<tr><td colspan="2">registers.v</td>                                                                           <td><i>Connections to Core internals for easy debugging</i></td></tr>
 	<tr><td colspan="2">dbg_uart_tasks.v</td>                                                                      <td><i>UART tasks for the serial debug interface</i></td></tr>
-	<tr><td colspan="2">msp_debug.v</td>                                                                           <td><i>Testbench instruction decoder and ASCII chain generator for easy debugging</i></td></tr>
+	<tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">msp_debug.v</td>
+      <td style="vertical-align: top;"><i>Testbench instruction decoder and ASCII chain generator for easy debugging</i></td>
+    </tr>
+<tr><td colspan="2">timescale.v</td>                                                                           <td><i>Global time scale definition for simulation.</i></td></tr>
 	<tr><td colspan="4"><b>doc</b></td>                                                                            <td><i><b>Diverse documentation</b></i></td></tr>
 	<tr><td><font color="white">abcd</font></td> <td colspan="3">slau049f.pdf</td>                                 <td><i>MSP430x1xx Family User's Guide</i></td></tr>
 	<tr><td colspan="4"><b>rtl</b></td>                                                                            <td><i><b>RTL sources</b></i></td></tr>
-	<tr><td rowspan="22" valign="bottom"><font color="white">abcd</font></td><td colspan="3"><b>verilog</b></td>   <td><i></i><br>
+	<tr><td rowspan="24" valign="bottom"><font color="white">abcd</font></td><td colspan="3"><b>verilog</b></td>   <td><i></i><br>
 </td></tr>
-	<tr><td rowspan="21" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">openMSP430_defines.v</td>  <td><i>openMSP430 core configuration file (Program and Data memory size definition, Debug Interface configuration)</i></td></tr>
+	<tr><td rowspan="23" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">openMSP430_defines.v</td>  <td><i>openMSP430 core configuration file (Program and Data memory size definition, Debug Interface configuration, ...)</i></td></tr>
 	<tr><td colspan="2">openMSP430_undefines.v</td>                                                                <td><i>openMSP430 Verilog `undef file</i></td></tr>
 	<tr><td colspan="2">openMSP430.v</td>                                                                          <td><i>openMSP430 top level</i></td></tr>
 	<tr><td colspan="2">omsp_frontend.v</td>                                                                       <td><i>Instruction fetch and decode</i></td></tr>
@@ -54,28 +58,61 @@ To simplify the integration of this IP, the directory structure is based on the 
 	<tr><td colspan="2">omsp_dbg.v</td>                                                                            <td><i>Serial Debug Interface main block</i></td></tr>
 	<tr><td colspan="2">omsp_dbg_hwbrk.v</td>                                                                      <td><i>Serial Debug Interface hardware breakpoint unit</i></td></tr>
 	<tr><td colspan="2">omsp_dbg_uart.v</td>                                                                       <td><i>Serial Debug Interface UART communication block</i></td></tr>
-	<tr><td colspan="2">timescale.v</td>                                                                           <td><i>Global time scale definition for simulation.</i></td></tr>
+	<tr><td colspan="2">omsp_sync_cell.v<br>
+</td>                                                                           <td><i>Simple synchronization module (double flip-flop).</i></td></tr>
 	<tr><td colspan="2"><b>periph</b></td>                                                                         <td><i><b>Peripherals directory</b></i></td></tr>
-	<tr><td rowspan="4"><font color="white">abcd</font></td> <td>omsp_gpio.v</td>                                  <td><i>Digital I/O (Port 1 to 6)</i></td></tr>
-	<tr><td colspan="1">omsp_timerA.v</td>                                                                         <td><i>Timer A</i></td></tr>
+	<tr><td rowspan="6"><font color="white">abcd</font></td> <td>omsp_gpio.v</td>                                  <td><i>Digital I/O (Port 1 to 6)</i></td></tr>
+	<tr>
+      <td style="vertical-align: top;">omsp_timerA_defines.v<br>
+      </td>
+      <td style="vertical-align: top;"><i>Timer A configuration file</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">omsp_timerA_undefines.v<br>
+      </td>
+      <td style="vertical-align: top;"><i>Timer A Verilog `undef file</i></td>
+    </tr>
+<tr><td colspan="1">omsp_timerA.v</td>                                                                         <td><i>Timer A</i></td></tr>
 	<tr><td colspan="1">template_periph_16b.v</td>                                                                 <td><i>Verilog template for 16 bit peripherals</i></td></tr>
 	<tr><td colspan="1">template_periph_8b.v</td>                                                                  <td><i>Verilog template for 8 bit peripherals</i></td></tr>
 	<tr><td colspan="4"><b>sim</b></td>                                                                            <td><i><b>Top level simulations directory</b></i></td></tr>
-	<tr><td rowspan="36" valign="bottom"><font color="white">abcd</font></td> <td colspan="3"><b>rtl_sim</b></td>  <td><i><b>RTL simulations</b></i></td></tr>
-	<tr><td rowspan="35" valign="bottom"><font color="white">abcd</font></td> <td colspan="2"><b>bin</b></td>      <td><i><b>RTL simulation scripts</b></i></td></tr>
-	<tr><td rowspan="5" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">msp430sim</td>       <td><i>Main simulation script</i></td></tr>
-	<tr><td colspan="1">asm2ihex.sh</td>                                                                           <td><i>Assembly file compilation (Intel HEX file generation)</i></td></tr>
+	<tr><td rowspan="40" valign="bottom"><font color="white">abcd</font></td> <td colspan="3"><b>rtl_sim</b></td>  <td><i><b>RTL simulations</b></i></td></tr>
+	<tr><td rowspan="39" valign="bottom"><font color="white">abcd</font></td> <td colspan="2"><b>bin</b></td>      <td><i><b>RTL simulation scripts</b></i></td></tr>
+	<tr><td rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">msp430sim</td>       <td><i>Main simulation script for assembler vector sources (located in the <span style="font-weight: bold;">src</span> directory)<br>
+</i></td></tr>
+	<tr>
+      <td style="vertical-align: top;">msp430sim_c<br>
+      </td>
+      <td style="vertical-align: top;"><i>Main simulation script for C vector sources</i><i> (located in the <span style="font-weight: bold;">src-c</span> directory)</i></td>
+    </tr>
+<tr><td colspan="1">asm2ihex.sh</td>                                                                           <td><i>Assembly file compilation (Intel HEX file generation)</i></td></tr>
 	<tr><td colspan="1">ihex2mem.tcl</td>                                                                          <td><i>Verilog program memory file generation</i></td></tr>
 	<tr><td colspan="1">rtlsim.sh</td>                                                                             <td><i>Verilog Icarus simulation script</i></td></tr>
 	<tr><td colspan="1">template.def</td>                                                                          <td><i>ASM linker definition file template</i></td></tr>
 	<tr><td colspan="2"><b>run</b></td>                                                                            <td><i><b>For running RTL simulations</b></i></td></tr>
-	<tr><td rowspan="4" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">run</td>             <td><i>Run single simulation of a given vector</i></td></tr>
-	<tr><td colspan="1">run_all</td>                                                                               <td><i>Run regression of all vectors</i></td></tr>
-	<tr><td colspan="1">run_disassemble</td>                                                                       <td><i>Disassemble the program memory content of the latest simulation</i></td></tr>
+	<tr><td rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">run</td>             <td><i>Run single simulation of a given assembler vector</i></td></tr>
+	<tr>
+      <td style="vertical-align: top;">run_c<br>
+      </td>
+      <td style="vertical-align: top;"><i>Run single simulation of a given C vector</i></td>
+    </tr>
+<tr><td colspan="1">run_all</td>                                                                               <td><i>Run regression of all vectors</i></td></tr>
+	<tr>
+      <td style="vertical-align: top;">run_all_mpy<br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic;">Run regression of all hardware multiplier vectors (!!! very long simulation time !!!)</span><br>
+      </td>
+    </tr>
+<tr><td colspan="1">run_disassemble</td>                                                                       <td><i>Disassemble the program memory content of the latest simulation</i></td></tr>
 	<tr><td colspan="1">load_waveform.sav</td>                                                                     <td><i>SAV file for gtkWave</i></td></tr>
 	<tr><td colspan="2"><b>src</b></td>                                                                            <td><i><b>RTL simulation vectors sources</b></i></td></tr>
-	<tr><td rowspan="23" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">submit.f</td>        <td><i>Verilog simulator command file</i></td></tr>
-	<tr><td colspan="1">sing-op_*.s43</td>                                                                         <td><i>Single-operand assembler vector files</i></td></tr>
+	<tr><td rowspan="24" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">ldscript_example.x<br>
+</td>        <td><i>MSPGCC toolchain linker script example</i></td></tr>
+	<tr>
+      <td style="vertical-align: top;">submit.f</td>
+      <td style="vertical-align: top;"><i>Verilog simulator command file</i></td>
+    </tr>
+<tr><td colspan="1">sing-op_*.s43</td>                                                                         <td><i>Single-operand assembler vector files</i></td></tr>
 	<tr><td colspan="1">sing-op_*.v</td>                                                                           <td><i>Single-operand verilog stimulus vector files</i></td></tr>
 	<tr><td colspan="1">two-op_*.s43</td>                                                                          <td><i>Two-operand assembler vector files</i></td></tr>
 	<tr><td colspan="1">two-op_*.v</td>                                                                            <td><i>Two-operand verilog stimulus vector files</i></td></tr>
@@ -119,20 +156,24 @@ To simplify the integration of this IP, the directory structure is based on the 
 
 <table border="1">
 	<tbody><tr><td colspan="7"><b>fpga</b></td>                                                                                    <td><i><b>openMSP430 FPGA Projects top level directory</b></i></td></tr>
-	<tr><td rowspan="52" valign="bottom"><font color="white">abcd</font></td> <td colspan="6"><b>xilinx_diligent_s3_board</b></td>  <td><i><b>Xilinx FPGA Project based on the Diligent Spartan-3 board</b></i></td></tr>
-	<tr><td rowspan="51" valign="bottom"><font color="white">abcd</font></td> <td colspan="5"><b>bench</b></td>             <td><i><b>Top level testbench directory</b></i></td></tr>
-	<tr><td rowspan="5" valign="bottom"><font color="white">abcd</font></td> <td colspan="4"><b>verilog</b></td>           <td><i></i><br>
+	<tr><td rowspan="53" valign="bottom"><font color="white">abcd</font></td> <td colspan="6"><b>xilinx_diligent_s3_board</b></td>  <td><i><b>Xilinx FPGA Project based on the Diligent Spartan-3 board</b></i></td></tr>
+	<tr><td rowspan="52" valign="bottom"><font color="white">abcd</font></td> <td colspan="5"><b>bench</b></td>             <td><i><b>Top level testbench directory</b></i></td></tr>
+	<tr><td colspan="1" rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="4"><b>verilog</b></td>           <td><i></i><br>
 </td></tr>
-	<tr><td rowspan="4" valign="bottom"><font color="white">abcd</font></td> <td colspan="3">tb_openMSP430_fpga.v</td>     <td><i>FPGA testbench top level module</i></td></tr>
+	<tr><td colspan="1" rowspan="5" valign="bottom"><font color="white">abcd</font></td> <td colspan="3">tb_openMSP430_fpga.v</td>     <td><i>FPGA testbench top level module</i></td></tr>
 	<tr><td colspan="3">registers.v</td>                                                                                    <td><i>Connections to Core internals for easy debugging</i></td></tr>
 	<tr><td colspan="3">msp_debug.v</td>                                                                                    <td><i>Testbench instruction decoder and ASCII chain generator for easy debugging</i></td></tr>
 	<tr><td colspan="3">glbl.v</td>                                                                                         <td><i>Xilinx "glbl.v" file</i></td></tr>
-	<tr><td colspan="5"><b>doc</b></td>                                                                                     <td><i><b>Diverse documentation</b></i></td></tr>
+	<tr>
+      <td colspan="3">timescale.v<br>
+</td>      <td>   <i>Global time scale definition for simulation.</i>  </td>
+    </tr>
+<tr><td colspan="5"><b>doc</b></td>                                                                                     <td><i><b>Diverse documentation</b></i></td></tr>
 	<tr><td rowspan="3"><font color="white">abcd</font></td> <td colspan="4">board_user_guide.pdf</td>                      <td><i>Spartan-3 FPGA Starter Kit Board User Guide</i></td></tr>
 	<tr><td colspan="4">msp430f1121a.pdf</td>                                                                               <td><i>msp430f1121a Specification</i></td></tr>
 	<tr><td colspan="4">xapp462.pdf</td>                                                                                    <td><i>Xilinx Digital Clock Managers (DCMs) user guide</i></td></tr>
 	<tr><td colspan="5"><b>rtl</b></td>                                                                                     <td><i><b>RTL sources</b></i></td></tr>
-	<tr><td rowspan="10" valign="bottom"><font color="white">abcd</font></td><td colspan="4"><b>verilog</b></td>            <td><i></i><br>
+	<tr><td rowspan="10" valign="bottom"><font color="white">abcd</font></td><td colspan="4"><b>verilog</b></td>            <td><br>
 </td></tr>
 	<tr><td rowspan="9" valign="bottom"><font color="white">abcd</font></td> <td colspan="3">openMSP430_fpga.v</td>         <td><i>FPGA top level file</i></td></tr>
 	<tr><td colspan="3">driver_7segment.v</td>                                                                              <td><i>Four-Digit, Seven-Segment LED Display driver</i></td></tr>
@@ -189,21 +230,27 @@ To simplify the integration of this IP, the directory structure is based on the 
 
 <table border="1">
 	<tbody><tr><td colspan="7"><b>fpga</b></td>                                                                                    <td><i><b>openMSP430 FPGA Projects top level directory</b></i></td></tr>
-	<tr><td rowspan="49" valign="bottom"><font color="white">abcd</font></td> <td colspan="6"><b>altera_de1_board</b></td> <td><i><b>Altera FPGA Project based on Cyclone II Starter Development Board</b></i></td></tr>
-	<tr><td rowspan="48" valign="bottom"><font color="white">abcd</font></td> <td colspan="5">README</td>                   <td><i>README file</i></td></tr>
+	<tr><td rowspan="50" valign="bottom"><font color="white">abcd</font></td> <td colspan="6"><b>altera_de1_board</b></td> <td><i><b>Altera FPGA Project based on Cyclone II Starter Development Board</b></i></td></tr>
+	<tr><td rowspan="49" valign="bottom"><font color="white">abcd</font></td> <td colspan="5">README</td>                   <td><i>README file</i></td></tr>
 	<tr><td colspan="5"><b>bench</b></td>                                                                                     <td><i><b>Top level testbench directory</b></i></td></tr>
-	<tr><td rowspan="5" valign="bottom"><font color="white">abcd</font></td> <td colspan="4"><b>verilog</b></td>           <td><i></i><br>
+	<tr><td colspan="1" rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="4"><b>verilog</b></td>           <td><i></i><br>
 </td></tr>
-	<tr><td rowspan="4" valign="bottom"><font color="white">abcd</font></td> <td colspan="3">tb_openMSP430_fpga.v</td>     <td><i>FPGA testbench top level module</i></td></tr>
+	<tr><td colspan="1" rowspan="5" valign="bottom"><font color="white">abcd</font></td> <td colspan="3">tb_openMSP430_fpga.v</td>     <td><i>FPGA testbench top level module</i></td></tr>
 	<tr><td colspan="3">registers.v</td>                                                                                    <td><i>Connections to Core internals for easy debugging</i></td></tr>
 	<tr><td colspan="3">msp_debug.v</td>                                                                                    <td><i>Testbench instruction decoder and ASCII chain generator for easy debugging</i></td></tr>
 	<tr><td colspan="3">altsyncram.v</td>                                                                                   <td><i>Altera verilog model of the altsyncram module.</i></td></tr>
-	<tr><td colspan="5"><b>doc</b></td>                                                                                     <td><i><b>Diverse documentation</b></i></td></tr>
+	<tr>
+      <td colspan="3" rowspan="1" style="vertical-align: top;">timescale.v<br>
+      </td>
+      <td style="vertical-align: top;"><i>Global time scale definition for simulation.</i>
+      </td>
+    </tr>
+<tr><td colspan="5"><b>doc</b></td>                                                                                     <td><i><b>Diverse documentation</b></i></td></tr>
 	<tr><td rowspan="3"><font color="white">abcd</font></td> <td colspan="4">DE1_Board_Schematic.pdf</td>                   <td><i>Cyclone II FPGA Starter Development Board Schematics</i></td></tr>
 	<tr><td colspan="4">DE1_Reference_Manual.pdf</td>                                                                       <td><i>Cyclone II FPGA Starter Development Board Reference Manual</i></td></tr>
 	<tr><td colspan="4">DE1_User_Guide.pdf</td>                                                                             <td><i>Cyclone II FPGA Starter Development Board User Guide</i></td></tr>
 	<tr><td colspan="5"><b>rtl</b></td>                                                                                     <td><i><b>RTL sources</b></i></td></tr>
-	<tr><td rowspan="8" valign="bottom"><font color="white">abcd</font></td><td colspan="4"><b>verilog</b></td>             <td><i></i><br>
+	<tr><td rowspan="8" valign="bottom"><font color="white">abcd</font></td><td colspan="4"><b>verilog</b></td>             <td><br>
 </td></tr>
 	<tr><td rowspan="7" valign="bottom"><font color="white">abcd</font></td> <td colspan="3">OpenMSP430_fpga.v</td>         <td><i>FPGA top level file</i></td></tr>
 	<tr><td colspan="3">driver_7segment.v</td>                                                                              <td><i>Four-Digit, Seven-Segment LED Display driver</i></td></tr>
@@ -249,20 +296,30 @@ changed to satisfy quartus6.1 *.mif eating engine.</i></td></tr>
 
 <table border="1">
 	<tbody><tr><td colspan="6"><b>fpga</b></td>                                                                                    <td><i><b>openMSP430 FPGA Projects top level directory</b></i></td></tr>
-	<tr><td rowspan="43" valign="bottom"><font color="white">abcd</font></td> <td colspan="5"><b>actel_m1a3pl_dev_kit</b></td> <td><i><b>Actel FPGA Project based on the ProASIC3 M1A3PL development kit<br>
+	<tr><td rowspan="45" valign="bottom"><font color="white">abcd</font></td> <td colspan="5"><b>actel_m1a3pl_dev_kit</b></td> <td><i><b>Actel FPGA Project based on the ProASIC3 M1A3PL development kit<br>
 </b></i></td></tr>
 	
-	<tr><td rowspan="42" style="vertical-align: top;"><font color="white">abcd</font></td>
+	<tr><td rowspan="44" style="vertical-align: top;"><font color="white">abcd</font></td>
 <td colspan="4"><b>bench</b></td>                                                                                     <td><i><b>Top level testbench directory</b></i></td></tr>
-	<tr><td colspan="1" rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="3"><b>verilog</b></td>           <td><i></i><br>
+	<tr><td colspan="1" rowspan="8" valign="bottom"><font color="white">abcd</font></td> <td colspan="3"><b>verilog</b></td>           <td><i></i><br>
 </td></tr>
-	<tr><td colspan="1" rowspan="5" valign="bottom"><font color="white">abcd</font></td> <td colspan="2" rowspan="1" style="vertical-align: top;">tb_openMSP430_fpga.v</td>
+	<tr><td colspan="1" rowspan="7" valign="bottom"><font color="white">abcd</font></td> <td colspan="2" rowspan="1" style="vertical-align: top;">tb_openMSP430_fpga.v</td>
      <td><i>FPGA testbench top level module</i></td></tr>
 	<tr><td colspan="2" rowspan="1" style="vertical-align: top;">registers.v</td>
                                                                                     <td><i>Connections to Core internals for easy debugging</i></td></tr>
 	<tr><td colspan="2" rowspan="1" style="vertical-align: top;">msp_debug.v</td>
                                                                                     <td><i>Testbench instruction decoder and ASCII chain generator for easy debugging</i></td></tr>
-	<tr><td colspan="2" rowspan="1" style="vertical-align: top;">proasic3l.v</td>
+	<tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">dbg_uart_tasks.v<br>
+      </td>
+      <td style="vertical-align: top;"><i>UART tasks for the serial debug interface.</i></td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">timescale.v<br>
+      </td>
+      <td style="vertical-align: top;"><i>Global time scale definition for simulation.</i></td>
+    </tr>
+<tr><td colspan="2" rowspan="1" style="vertical-align: top;">proasic3l.v</td>
                                                                                    <td><i>Actel ProASIC3L library file.<br>
 </i></td></tr>
 	<tr>
@@ -367,7 +424,7 @@ changed to satisfy quartus6.1 *.mif eating engine.</i></td></tr>
 	<tr>
       <td style="vertical-align: top;"><br>
       </td>
-      <td colspan="3" rowspan="1" style="vertical-align: top; text-align: center;"><img src="usercontent,img,1299013492" alt="Spacewar" title="Spacewar" width="25%"/><br>
+      <td colspan="3" rowspan="1" style="vertical-align: top; text-align: center;"><img src="usercontent,img,1299013492" alt="Spacewar" title="Spacewar" width="25%"><br>
       </td>
     </tr>
 <tr><td colspan="4"><b>synthesis</b></td>                                                                               <td><i><b>Top level synthesis directory</b></i></td></tr>
@@ -415,31 +472,58 @@ changed to satisfy quartus6.1 *.mif eating engine.</i></td></tr>
 <h1>4. Directory structure: Software Development Tools</h1>
 
 <table border="1">
-	<tbody><tr><td colspan="5"><b>tools</b></td>                                                                                   <td><i><b>openMSP430 Software Development Tools top level directory</b></i></td></tr>
-	<tr><td rowspan="72" valign="bottom"><font color="white">abcd</font></td> <td colspan="4"><b>bin</b></td>               <td><i><b>Contains the executable files</b></i></td></tr>
-	<tr><td rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="3">openmsp430-loader.tcl</td>    <td><i>Simple command line boot loader: TCL Script</i></td></tr>
-	<tr><td colspan="3">openmsp430-loader.exe</td>                                                                          <td><i>Simple command line boot loader: Windows executable</i></td></tr>
-	<tr><td colspan="3">openmsp430-minidebug.tcl</td>                                                                       <td><i>Minimalistic debugger with simple GUI: TCL Script</i></td></tr>
-	<tr><td colspan="3">openmsp430-minidebug.exe</td>                                                                       <td><i>Minimalistic debugger with simple GUI: Windows executable</i></td></tr>
-	<tr><td colspan="3">openmsp430-gdbproxy.tcl</td>                                                                        <td><i>GDB Proxy server to be used together with MSP430-GDB and the Eclipse, DDD, or Insight graphical front-ends: TCL Script</i></td></tr>
-	<tr><td colspan="3">openmsp430-gdbproxy.exe</td>                                                                        <td><i>GDB Proxy server to be used together with MSP430-GDB and the Eclipse, DDD, or Insight graphical front-ends: Windows executable</i></td></tr>
-	<tr><td colspan="4"><b>lib</b></td>                                                                                     <td><i><b>Common library</b></i></td></tr>
-	<tr><td rowspan="4" valign="bottom"><font color="white">abcd</font></td><td colspan="3"><b>tcl-lib</b></td>             <td><i><b>Common TCL library</b></i></td></tr>
-	<tr><td rowspan="3" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">dbg_uart.tcl</td>              <td><i>Low level UART communication functions</i></td></tr>
-	<tr><td colspan="2">dbg_functions.tcl</td>                                                                              <td><i>Main utility functions for the openMSP430 serial debug interface</i></td></tr>
-	<tr><td colspan="2">combobox.tcl</td>                                                                                   <td><i>A combobox listbox widget written in pure tcl (from Bryan Oakley)</i></td></tr>
-	<tr><td colspan="4"><b>openmsp430-gdbproxy</b></td>                                                                     <td><i><b>GDB Proxy server main project directory</b></i></td></tr>
-	<tr><td rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="3">openmsp430-gdbproxy.tcl</td>  <td><i>GDB Proxy server main TCL Script (symbolic link with the script in the <b>bin</b> directory)</i></td></tr>
-	<tr><td colspan="3">server.tcl</td>                                                                                     <td><i>TCP/IP Server utility functions. Send/Receive RSP packets from GDB.</i></td></tr>	
-	<tr><td colspan="3">commands.tcl</td>                                                                                   <td><i>RSP command execution functions.</i></td></tr>	
-	<tr><td colspan="3"><b>doc</b></td>                                                                                     <td><i><b>Some documentation regarding GDB and the RSP protocol.</b></i></td></tr>
-	<tr><td rowspan="2"><font color="white">abcd</font></td> <td colspan="2">ew_GDB_RSP.pdf</td>                            <td><i>Document from Bill Gatliff: Embedding with GNU: the gdb Remote Serial Protocol</i></td></tr>
-	<tr><td colspan="2">Howto-GDB_Remote_Serial_Protocol.pdf</td>                                                           <td><i>Document from Jeremy Bennett (Embecosm): Howto: GDB Remote Serial Protocol - Writing a RSP Server</i></td></tr>
-	<tr><td colspan="4"><b>freewrap642</b></td>                                                                             <td><i><b>The freeWrap program turns TCL/TK scripts into single-file binary executable programs for Windows.</b></i></td></tr>
-	<tr><td rowspan="4" valign="bottom"><font color="white">abcd</font></td> <td colspan="3">freewrap.exe</td>             <td><i>freeWrap executable to run on TCL/TK scripts (i.e. with GUI)</i></td></tr>
-	<tr><td colspan="3">freewrapTCLSH.exe</td>                                                                              <td><i>freeWrap executable to run on pure TCL scripts (i.e. command line)</i></td></tr>
-	<tr><td colspan="3">tclpip85s.dll</td>                                                                                  <td><i>freeWrap mandatory DLL</i></td></tr>
-	<tr><td colspan="3">generate_exec.bat</td>                                                                              <td><i>Simple Batch file for auto generation of the tools' windows executables</i></td></tr>
+	<tbody><tr><td colspan="4"><b>tools</b></td>                                                                                   <td><i><b>openMSP430 Software Development Tools top level directory</b></i></td></tr>
+	<tr>
+      <td colspan="1" rowspan="24" style="vertical-align: top;"><font color="white">abcd</font></td>
+      <td colspan="3" rowspan="1" style="vertical-align: top;">omsp_alias.xml<br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic;">This
+XML file allows the software development tools to identify a openMSP430
+implementation, and add customized extra information (Alias, URL, ...).</span><br>
+      </td>
+    </tr>
+<tr> <td colspan="3"><b>bin</b></td>               <td><i><b>Contains the main TCL scripts (and the windows executable files if generated)<br>
+</b></i></td></tr>
+	<tr><td rowspan="4" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">openmsp430-loader.tcl</td>    <td><i>Simple command line boot loader</i></td></tr>
+	
+	<tr><td colspan="2">openmsp430-minidebug.tcl</td>                                                                       <td><i>Minimalistic debugger with simple GUI</i></td></tr>
+	
+	<tr><td colspan="2">openmsp430-gdbproxy.tcl</td>                                                                        <td><i>GDB Proxy server to be used together with MSP430-GDB and the Eclipse, DDD, or Insight graphical front-ends<br>
+</i></td></tr>
+	<tr><td colspan="2">README.TXT</td>                                                                                     <td><i>README file regarding the use of TCL scripts in a Windows environment.</i></td></tr>
+	
+	<tr><td colspan="3"><b>lib</b></td>                                                                                     <td><i><b>Common library</b></i></td></tr>
+	<tr><td colspan="1" rowspan="5" valign="bottom"><font color="white">abcd</font></td><td colspan="2"><b>tcl-lib</b></td>             <td><i><b>Common TCL library</b></i></td></tr>
+	<tr><td colspan="1" rowspan="4" valign="bottom"><font color="white">abcd</font></td> <td rowspan="1" colspan="1">dbg_uart.tcl<i><br>
+      </i></td>              <td style="vertical-align: top;"><i>Low level UART communication functions</i></td>
+</tr>
+	<tr><td rowspan="1" colspan="1">dbg_functions.tcl<i><br>
+      </i></td>                                                                              <td style="vertical-align: top;"><i>Main utility functions for the openMSP430 serial debug interface</i></td>
+</tr>
+	<tr><td rowspan="1" colspan="1">combobox.tcl<i><br>
+      </i></td>                                                                                   <td style="vertical-align: top;"><i>A combobox listbox widget written in pure tcl (from Bryan Oakley)</i></td>
+</tr>
+	<tr><td colspan="1">xml.tcl</td>                                                                                        <td style="vertical-align: top;"><i>Simple XML parser (from Keith Vetter)</i></td>
+</tr>
+	<tr><td colspan="3"><b>openmsp430-gdbproxy</b></td>                                                                     <td><i><b>GDB Proxy server main project directory</b></i></td></tr>
+	<tr><td rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">openmsp430-gdbproxy.tcl</td>  <td><i>GDB Proxy server main TCL Script (symbolic link with the script in the <b>bin</b> directory)</i></td></tr>
+	<tr><td colspan="2">server.tcl</td>                                                                                     <td><i>TCP/IP Server utility functions. Send/Receive RSP packets from GDB.</i></td></tr>	
+	<tr><td colspan="2">commands.tcl</td>                                                                                   <td><i>RSP command execution functions.</i></td></tr>	
+	<tr><td colspan="2"><b>doc</b></td>                                                                                     <td><i><b>Some documentation regarding GDB and the RSP protocol.</b></i></td></tr>
+	<tr><td rowspan="2"><font color="white">abcd</font></td> <td rowspan="1" colspan="1">ew_GDB_RSP.pdf<i><br>
+      </i></td>                            <td style="vertical-align: top;"><i>Document from Bill Gatliff: Embedding with GNU: the gdb Remote Serial Protocol</i></td>
+</tr>
+	<tr><td rowspan="1" colspan="1">Howto-GDB_Remote_Serial_Protocol.pdf<i><br>
+      </i></td>                                                           <td style="vertical-align: top;"><i>Document from Jeremy Bennett (Embecosm): Howto: GDB Remote Serial Protocol - Writing a RSP Server</i></td>
+</tr>
+	<tr><td colspan="3"><b>freewrap642</b></td>                                                                             <td><i><b>The freeWrap program turns TCL/TK scripts into single-file binary executable programs for Windows.</b></i></td></tr>
+	<tr><td rowspan="4" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">freewrap.exe</td>             <td><i>freeWrap executable to run on TCL/TK scripts (i.e. with GUI)</i></td></tr>
+	<tr><td colspan="2">freewrapTCLSH.exe</td>                                                                              <td><i>freeWrap executable to run on pure TCL scripts (i.e. command line)</i></td></tr>
+	<tr><td colspan="2">tclpip85s.dll</td>                                                                                  <td><i>freeWrap mandatory DLL</i></td></tr>
+	<tr><td rowspan="1" colspan="2" style="vertical-align: top;">generate_exec.bat<i><br>
+      </i></td>
+                                                                              <td style="vertical-align: top;"><i>Simple Batch file for auto generation of the tools' windows executables</i></td>
+</tr>
 </tbody></table> 
 <br>
 <div style="text-align: right;"><a href="#TOC">Top</a></div>

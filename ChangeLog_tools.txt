@@ -1,3 +1,7 @@
+2011-05-26 [r114]  
+
+	* Improved the VerifyCPU_ID procedure.
+
 2011-05-19 [r110]  
 
 	* Rework of the GUI for the software development tools. Added

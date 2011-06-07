@@ -1,3 +1,7 @@
+2011-05-29 [r115]  
+
+	* Add linker script example.
+
 2011-05-21 [r112]  
 
 	* Modified comment.

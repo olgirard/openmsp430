@@ -14,9 +14,15 @@
    	   <li><a href="#2.1.1 Design structure">              2.1.1 Design structure</a></li>
    	   <li><a href="#2.1.2 Limitations">                   2.1.2 Limitations</a></li>
    	   <li><a href="#2.1.3 Configuration">                 2.1.3 Configuration</a></li>
-   	   <li><a href="#2.1.4 Pinout">                        2.1.4 Pinout</a></li>
-   	   <li><a href="#2.1.5 Instruction Cycles and Lengths">2.1.5 Instruction Cycles and Lengths</a></li>
-   	   <li><a href="#2.1.6 Serial Debug Interface">        2.1.6 Serial Debug Interface</a></li>
+   	   <ul>
+   	        <li><a href="#2.1.3.1 Basic System Configuration">    2.1.3.1 Basic System Configuration</a></li>
+   	        <li><a href="#2.1.3.2 Advanced System Configuration"> 2.1.3.2 Advanced System Configuration</a></li>
+   	        <li><a href="#2.1.3.3 Expert System Configuration">   2.1.3.3 Expert System Configuration</a></li>
+   	   </ul>
+   	   <li><a href="#2.1.4 Memory mapping">                2.1.4 Memory mapping</a></li>
+   	   <li><a href="#2.1.5 Pinout">                        2.1.5 Pinout</a></li>
+   	   <li><a href="#2.1.6 Instruction Cycles and Lengths">2.1.6 Instruction Cycles and Lengths</a></li>
+   	   <li><a href="#2.1.7 Serial Debug Interface">        2.1.7 Serial Debug Interface</a></li>
 		</ul>
   	   </li>	
       <li><a href="#2.2 Peripherals">        2.2 Peripherals</a>
@@ -35,11 +41,11 @@
 <a name="1. Introduction"></a>
 <h1>1. Introduction</h1>
 
-The openMSP430 is a 16-bit microcontroller core compatible with TI's MSP430 family (note that the extended version of the architecture, the MSP430X, isn't supported by this IP). It is based on a Von Neumann architecture, with a single address space for instructions and data.
+The openMSP430 is a 16-bit microcontroller core compatible with <b><a href="http://www.ti.com/litv/pdf/slau049f">TI's MSP430 family</a></b> (note that the extended version of the architecture, the MSP430X, isn't supported by this IP). It is based on a Von Neumann architecture, with a single address space for instructions and data.
 <br /><br />
 This design has been implemented to be FPGA friendly. Therefore, the core doesn't contain any clock gate and has only a single clock domain. As a consequence, the clock management block has a few limitations.
 <br /><br />
-This IP doesn't contain the instruction and data memory blocks internally (these are technology dependent hard macros which are connected to the IP during chip integration).
+It is to be noted that this IP doesn't contain the instruction and data memory blocks internally (these are technology dependent hard macros which are connected to the IP during chip integration).
 However the core is fully configurable in regard to the supported RAM and/or ROM sizes.
 <br /><br />
 In addition to the CPU core itself, several peripherals are also provided and can be easily connected to the core during integration.
@@ -66,6 +72,7 @@ The following diagram shows the openMSP430 design structure:
    <li><b>Basic Clock Module</b>: Generates the ACLK and SMCLK enable signals.</li>
    <li><b>SFRs</b>: The <b>S</b>pecial <b>F</b>unction <b>R</b>egister<b>s</b> block contain diverse configuration registers (NMI, Watchdog, ...).</li>
    <li><b>Watchdog</b>: Although it is a peripheral, the watchdog is permanently included in the core because of its tight links with the NMI interrupts and the PUC reset generation.</li>
+   <li><b>16x16 Multiplier</b>: The hardware multiplier peripheral is transparently supported by the GCC compiler and is also located in the core. It can be included or excluded at will through a Verilog define.</li>
 </ul>
 
 <a name="2.1.2 Limitations"></a>
@@ -82,8 +89,13 @@ The known core limitations are the following:
 <a name="2.1.3 Configuration"></a>
 <h3>2.1.3 Configuration</h3>
 
-It is possible to configure the openMSP430 core through the "openMSP430_defines.v" file located in the "rtl" directory (see <a href="http://www.opencores.org/project,openmsp430,file%20and%20directory%20description">file and directory description</a>).<br />
-Two sets of parameters can be adjusted by the user in order to define the program and data memory sizes:
+It is possible to configure the openMSP430 core through the <b><i>openMSP430_defines.v</i></b> file located in the <b><i>rtl</i></b> directory (see <a href="http://www.opencores.org/project,openmsp430,file%20and%20directory%20description">file and directory description</a>).<br />
+Three sets of parameters can be adjusted by the user in order to fully customize the core. 
+
+<a name="2.1.3.1 Basic System Configuration"></a>
+<h4>2.1.3.1 Basic System Configuration</h4>
+
+The basic system can be adjusted with the following set of defines in order to match the target system requirements.
 <br /><br />
 <table border="0" cellspacing="4" cellpadding="0">
 <tr>
@@ -92,7 +104,17 @@ Two sets of parameters can be adjusted by the user in order to define the progra
 <td width="15"></td>
 <td>
 	<code>
-            // Program Memory Size:
+             //============================================================================
+		<br />//============================================================================
+		<br />// BASIC SYSTEM CONFIGURATION
+		<br />//============================================================================
+		<br />//============================================================================
+		<br />//
+		<br />// Note: the sum of program, data and peripheral memory spaces must not
+		<br />//      exceed 64 kB
+		<br />//
+		<br />
+      <br />// Program Memory Size:
 		<br />//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uncomment the required memory size
 		<br />//-------------------------------------------------------
 		<br />//`define PMEM_SIZE_59_KB
@@ -126,74 +148,195 @@ Two sets of parameters can be adjusted by the user in order to define the progra
 		<br />//`define DMEM_SIZE_512_B
 		<br />//`define DMEM_SIZE_256_B
 		<br />`define DMEM_SIZE_128_B
-	</code>
-</td>
-</tr>
-</table>
-<br /><br />
-<b>Note:</b> The sum of both program and data memories <b>SHOULD NOT</b> exceed 63.5 kB.
-<br /><br /><br />
-The following parameters define if the debug interface should be included or not and how many hardware breakpoint units should be included.
-
-<br /><br />
-<table border="0" cellspacing="4" cellpadding="0">
-<tr>
-<td width="35"></td>
-<td bgcolor="#d0d0d0" width="3"></td>
-<td width="15"></td>
-<td>
-	<code>
-            //----------------------------------------------------------------------------
-		<br />// REMOTE DEBUGGING INTERFACE CONFIGURATION
-		<br />//----------------------------------------------------------------------------
 		<br />
-		<br />// Include Debug interface
-		<br />`define DBG_EN
-		<br />
-		<br />// Debug interface selection
-		<br />//             `define DBG_UART -> Enable UART (8N1) debug interface
-		<br />//             `define DBG_JTAG -> DON'T UNCOMMENT, NOT SUPPORTED
-		<br />//
-		<br />`define DBG_UART
-		<br />//`define DBG_JTAG
-		<br />
-		<br />// Number of hardware breakpoints (each unit contains 2 hw address breakpoints)
-		<br />//             `define DBG_HWBRK_0 -> Include hardware breakpoints unit 0
-		<br />//             `define DBG_HWBRK_1 -> Include hardware breakpoints unit 1
-		<br />//             `define DBG_HWBRK_2 -> Include hardware breakpoints unit 2
-		<br />//             `define DBG_HWBRK_3 -> Include hardware breakpoints unit 3
-		<br />//
-		<br />`define  DBG_HWBRK_0
-		<br />`define  DBG_HWBRK_1
-		<br />`define  DBG_HWBRK_2
-		<br />`define  DBG_HWBRK_3
-	</code>
-</td>
-</tr>
-</table>
-<br /><br />
-<b>Note:</b> Since the hardware breakpoint units are relatively big, it is recommended to include as many as you plan to use. These units are particularly useful if your instruction memory is a ROM (i.e. when you can't use software breakpoints) or if you want to be able to stop the CPU whenever some particular data addresses are accessed.
-<br /><br /><br />
-At last, this parameter controls if the hardware multiplier is included or not.
-<br /><br />
-<table border="0" cellspacing="4" cellpadding="0">
-<tr>
-<td width="35"></td>
-<td bgcolor="#d0d0d0" width="3"></td>
-<td width="15"></td>
-<td>
-	<code>
-            // Include/Exclude Hardware Multiplier
+		<br />// Include/Exclude Hardware Multiplier
 		<br />`define MULTIPLIER
+		<br />
+		<br />// Include/Exclude Serial Debug interface
+		<br />`define DBG_EN
 	</code>
 </td>
 </tr>
 </table>
-<br /><br /><br />
-All remaining defines located in this file are system constants and should not be edited.
+<br /><br />
+The only design considerations at this stage are:
+<ul>
+	<li>Make sure that the program and data memories have the correct size :-P</li>
+	<li>The sum of program, data and peripheral memory space <b>MUST NOT</b> exceed 64 kB</li>
+</ul>
+<br /> 
 
-<a name="2.1.4 Pinout"></a>
-<h3>2.1.4 Pinout</h3>
+<a name="2.1.3.2 Advanced System Configuration"></a>
+<h4>2.1.3.2 Advanced System Configuration</h4>
+
+In this section, some additional features are available in order to match the needs of more experienced users.
+<br /><br />
+<table border="0" cellspacing="4" cellpadding="0">
+<tr>
+<td width="35"></td>
+<td bgcolor="#d0d0d0" width="3"></td>
+<td width="15"></td>
+<td>
+	<code>
+             //============================================================================
+		<br />//============================================================================
+		<br />// ADVANCED SYSTEM CONFIGURATION (FOR EXPERIENCED USERS)
+		<br />//============================================================================
+		<br />//============================================================================
+		<br />
+		<br />//-------------------------------------------------------
+		<br />// Peripheral Memory Space:
+		<br />//-------------------------------------------------------
+		<br />// The original MSP430 architecture map the peripherals
+		<br />// from 0x0000 to 0x01FF (i.e. 512B of the memory space).
+		<br />// The following defines allow you to expand this space
+		<br />// up to 32 kB (i.e. from 0x0000 to 0x7fff).
+		<br />// As a consequence, the data memory mapping will be
+		<br />// shifted up and a custom linker script will therefore
+		<br />// be required by the GCC compiler.
+		<br />//-------------------------------------------------------
+		<br />//`define PER_SIZE_32_KB
+		<br />//`define PER_SIZE_16_KB
+		<br />//`define PER_SIZE_8_KB
+		<br />//`define PER_SIZE_4_KB
+		<br />//`define PER_SIZE_2_KB
+		<br />//`define PER_SIZE_1_KB
+		<br />`define PER_SIZE_512_B
+		<br />
+		<br />
+		<br />//-------------------------------------------------------
+		<br />// Defines the debugger CPU_CTL.RST_BRK_EN reset value
+		<br />// (CPU break on PUC reset)
+		<br />//-------------------------------------------------------
+		<br />// When defined, the CPU will automatically break after
+		<br />// a PUC occurrence by default. This is typically usefull
+		<br />// when the program memory can only be initialized through
+		<br />// the serial debug interface.
+		<br />//-------------------------------------------------------
+		<br />//`define DBG_RST_BRK_EN
+		<br />
+		<br />
+		<br />//-------------------------------------------------------
+		<br />// Custom user version number
+		<br />//-------------------------------------------------------
+		<br />// This 5 bit field can be freely used in order to allow
+		<br />// custom identification of the system through the debug
+		<br />// interface.
+		<br />// (see CPU_ID.USER_VERSION field in the documentation)
+		<br />//-------------------------------------------------------
+		<br />`define USER_VERSION 5'b00000
+		<br />
+	</code>
+</td>
+</tr>
+</table>
+<br /><br />
+Design consideration at this stage are:
+<ul>
+	<li>Setting a peripheral memory space to something else than 512B will shift the data memory mapping up, which in turn will require the use of a custom linker script. If you don't know what a linker script is and if you don't want to know what it is, you should probably not modify this section.</li>
+	<li>The sum of program, data and peripheral memory space <b>MUST NOT</b> exceed 64 kB</li>
+</ul>
+<br />
+<a name="2.1.3.3 Expert System Configuration"></a>
+<h4>2.1.3.3 Expert System Configuration</h4>
+
+In this section, you will find configuration options which will be relevant for roughly 0.01% of the users (according to an highly reliable market analysis ;-) ).
+<br /><br />
+<table border="0" cellspacing="4" cellpadding="0">
+<tr>
+<td width="35"></td>
+<td bgcolor="#d0d0d0" width="3"></td>
+<td width="15"></td>
+<td>
+	<code>
+		       //============================================================================
+		<br />//============================================================================
+		<br />// EXPERT SYSTEM CONFIGURATION ( !!!! EXPERTS ONLY !!!! )
+		<br />//============================================================================
+		<br />//============================================================================
+		<br />//
+		<br />// IMPORTANT NOTE:  Please update following configuration options ONLY if
+		<br />//                 you have a good reason to do so... and if you know what
+		<br />//                 you are doing :-P
+		<br />//
+		<br />//============================================================================
+		<br />
+		<br />//-------------------------------------------------------
+		<br />// Number of hardware breakpoint units (each unit contains
+		<br />// two hardware address breakpoints):
+		<br />//   - DBG_HWBRK_0 -> Include hardware breakpoints unit 0
+		<br />//   - DBG_HWBRK_1 -> Include hardware breakpoints unit 1
+		<br />//   - DBG_HWBRK_2 -> Include hardware breakpoints unit 2
+		<br />//   - DBG_HWBRK_3 -> Include hardware breakpoints unit 3
+		<br />//-------------------------------------------------------
+		<br />// Please keep in mind that hardware breakpoints only
+		<br />// make sense whenever the program memory is not an SRAM
+		<br />// (i.e. Flash/OTP/ROM/...) or when you are interested
+		<br />// in data breakpoints (btw. not supported by GDB).
+		<br />//-------------------------------------------------------
+		<br />//`define  DBG_HWBRK_0
+		<br />//`define  DBG_HWBRK_1
+		<br />//`define  DBG_HWBRK_2
+		<br />//`define  DBG_HWBRK_3
+		<br />
+		<br />//-------------------------------------------------------
+		<br />// Enable/Disable the hardware breakpoint RANGE mode
+		<br />//-------------------------------------------------------
+		<br />// When enabled this feature allows the hardware breakpoint
+		<br />// units to stop the cpu whenever an instruction or data
+		<br />// access lays within an address range.
+		<br />// Note that this feature is not supported by GDB.
+		<br />//-------------------------------------------------------
+		<br />//`define DBG_HWBRK_RANGE
+		<br />
+		<br />//-------------------------------------------------------
+		<br />// Input synchronizers
+		<br />//-------------------------------------------------------
+		<br />// In some cases, the asynchronous input ports might
+		<br />// already be synchronized externally.
+		<br />// If an extensive CDC design review showed that this
+		<br />// is really the case,  the individual synchronizers
+		<br />// can be disabled with the following defines.
+		<br />//
+		<br />// Notes:
+		<br />//        - the dbg_en signal will reset the debug interface
+		<br />//         when 0. Therefore make sure it is glitch free.
+		<br />//
+		<br />//        - the dbg_uart_rxd synchronizer must be set to 1
+		<br />//          when its reset is active.
+		<br />//-------------------------------------------------------
+		<br />`define SYNC_CPU_EN
+		<br />`define SYNC_DBG_EN
+		<br />`define SYNC_DBG_UART_RXD
+		<br />`define SYNC_NMI
+		<br />
+	</code>
+</td>
+</tr>
+</table>
+<br /><br />
+Design consideration at this stage are:
+<ul>
+	<li>This is the expert section... so you know what your are doing anyway right ;-)</li>
+</ul>
+<br />
+All remaining defines located in the <b><i>openMSP430_defines.v</i></b> file are system constants and <b>MUST NOT</b> be edited.
+<br /><br />
+
+<a name="2.1.4 Memory mapping"></a>
+<h3>2.1.4 Memory mapping</h3>
+
+As discussed in the earlier section, the openMSP430 memory mapping is fully configurable.<br />
+The basic system configuration section allows to adjust program and data memory sizes while keeping 100% compatibility with the pre-existing linker scripts provided by MSPGCC4 (or any other toolchain for that matter).<br />
+However, an increasing number of users saw the 512B space available for peripherals in the standard MSP430 architecture as a limitation. Therefore, the advanced system configuration section give the possibility to up-scale the reserved peripheral address space anywhere between 512B and 32kB. As a consequence, the data memory space will be shifted up, which means that the linker script of your favorite toolchain will have to be modified accordingly.<br />
+The following schematic should hopefully summarize this:<br />
+<br /><br />
+<img src="usercontent,img,1306066277" width="100%" alt="Memory mapping" title="Memory mapping" />
+<br />
+
+<br /><br />
+<a name="2.1.5 Pinout"></a>
+<h3>2.1.5 Pinout</h3>
 
 The full pinout of the openMSP430 core is provided in the following table:
 <br /><br />
@@ -201,6 +344,12 @@ The full pinout of the openMSP430 core is provided in the following table:
 	<tr> <td align="center"><b>Port Name</b></td> <td align="center"><b>Direction</b></td> <td align="center"><b>Width</b>    </td> <td align="center"><b>Description</b></td> </tr>
 	
 	<tr> <td colspan="4" align="center"> <b><i>Clocks</i></b>                         </td></tr>
+	<tr>
+	     <td> cpu_en                                                           </td>
+	     <td> Input                                                            </td>
+	     <td> 1                                                                </td>
+	     <td> Enable CPU code execution (asynchronous) - set to 1 if unused    </td>
+	</tr> 
 	<tr>
 	     <td> dco_clk                                                          </td>
 	     <td> Input                                                            </td>
@@ -234,7 +383,7 @@ The full pinout of the openMSP430 core is provided in the following table:
 
 	<tr> <td colspan="4" align="center"> <b><i>Resets</i></b>                         </td></tr>
 	<tr>
-	     <td> puc                                                              </td>
+	     <td> puc_rst                                                          </td>
 	     <td> Output                                                           </td>
 	     <td> 1                                                                </td>
 	     <td> Main system reset                                                </td>
@@ -243,7 +392,7 @@ The full pinout of the openMSP430 core is provided in the following table:
 	     <td> reset_n                                                          </td>
 	     <td> Input                                                            </td>
 	     <td> 1                                                                </td>
-	     <td> Reset Pin (low active)                                           </td>
+	     <td> Reset Pin (active low, asynchronous)                             </td>
 	</tr>
 
 
@@ -251,7 +400,7 @@ The full pinout of the openMSP430 core is provided in the following table:
 	<tr> 
 	     <td> pmem_addr                                                        </td>
 	     <td> Output                                                           </td>
-	     <td> `PMEM_AWIDTH<sup>1</sup>                                        </td>
+	     <td> `PMEM_AWIDTH <b><sup><font color="#FF0000">1</font></sup></b> </td>
 	     <td> Program Memory address                                           </td>
 	</tr>
 	<tr> 
@@ -264,7 +413,7 @@ The full pinout of the openMSP430 core is provided in the following table:
 	     <td> pmem_din                                                         </td>
 	     <td> Output                                                           </td>
 	     <td> 16                                                               </td>
-	     <td> Program Memory data input (optional<sup>2</sup>)                </td>
+	     <td> Program Memory data input (optional <b><sup><font color="#FF0000">2</font></sup></b>)</td>
 	</tr>
 	<tr> 
 	     <td> pmem_dout                                                        </td>
@@ -276,14 +425,14 @@ The full pinout of the openMSP430 core is provided in the following table:
 	     <td> pmem_wen                                                         </td>
 	     <td> Output                                                           </td>
 	     <td> 2                                                                </td>
-	     <td> Program Memory write enable (low active) (optional<sup>2</sup>) </td>
+	     <td> Program Memory write byte enable (low active) (optional <b><sup><font color="#FF0000">2</font></sup></b>) </td>
 	</tr>
 
 	<tr> <td colspan="4" align="center"> <b><i>Data Memory interface</i></b>          </td></tr>
 	<tr>
 	     <td> dmem_addr                                                        </td>
 	     <td> Output                                                           </td>
-	     <td> `DMEM_AWIDTH<sup>1</sup>                                        </td>
+	     <td> `DMEM_AWIDTH <b><sup><font color="#FF0000">1</font></sup></b></td>
 	     <td> Data Memory address                                              </td>
 	</tr>
 	<tr>
@@ -308,14 +457,14 @@ The full pinout of the openMSP430 core is provided in the following table:
 	     <td> dmem_wen                                                         </td>
 	     <td> Output                                                           </td>
 	     <td> 2                                                                </td>
-	     <td> Data Memory write enable (low active)                            </td>
+	     <td> Data Memory write byte enable (low active)                       </td>
 	</tr>
 
 	<tr> <td colspan="4" align="center"> <b><i>External Peripherals interface</i></b> </td></tr>
 	<tr>
 	     <td> per_addr                                                         </td>
 	     <td> Output                                                           </td>
-	     <td> 8                                                                </td>
+	     <td> 14                                                                </td>
 	     <td> Peripheral address                                               </td>
 	</tr>
 	<tr>
@@ -337,7 +486,7 @@ The full pinout of the openMSP430 core is provided in the following table:
 	     <td> Peripheral enable (high active)                                  </td>
 	</tr>
 	<tr>
-	     <td> per_wen                                                          </td>
+	     <td> per_we                                                           </td>
 	     <td> Output                                                           </td>
 	     <td> 2                                                                </td>
 	     <td> Peripheral write enable (high active)                            </td>
@@ -365,6 +514,12 @@ The full pinout of the openMSP430 core is provided in the following table:
 
 	<tr> <td colspan="4" align="center"> <b><i>Serial Debug interface</i></b>         </td></tr>
 	<tr> 
+	     <td> dbg_en                                                           </td>
+	     <td> Input                                                            </td>
+	     <td> 1                                                                </td>
+	     <td> Debug interface enable (asynchronous) <b><sup><font color="#FF0000">3</font></sup></b> </td>
+	</tr>
+	<tr> 
 	     <td> dbg_freeze                                                       </td>
 	     <td> Output                                                           </td>
 	     <td> 1                                                                </td>
@@ -380,19 +535,21 @@ The full pinout of the openMSP430 core is provided in the following table:
 	     <td> dbg_uart_rxd                                                     </td>
 	     <td> Input                                                            </td>
 	     <td> 1                                                                </td>
-	     <td> Debug interface: UART RXD                                        </td>
+	     <td> Debug interface: UART RXD (asynchronous)                         </td>
 	</tr>
 </table> 
 <br />
-<sup>1</sup>: This parameter is declared in the "openMSP430_defines.v" file and defines the RAM/ROM size.<br />
-<sup>2</sup>: These two optional ports can be connected whenever the program memory is a RAM. This will allow the user to load a program through the serial debug interface and to use software breakpoints.
-<br /><br />
+<b><sup><font color="#FF0000">1</font></sup></b>: This parameter is declared in the "openMSP430_defines.v" file and defines the RAM/ROM size.<br />
+<b><sup><font color="#FF0000">2</font></sup></b>: These two optional ports can be connected whenever the program memory is a RAM. This will allow the user to load a program through the serial debug interface and to use software breakpoints.<br />
+<b><sup><font color="#FF0000">3</font></sup></b>: When disabled, the debug interface is hold into reset. As a consequence, the <b><i>dbg_en</i></b> port can be used to reset the debug interface without disrupting the CPU execution.<br />
+<br />
 
-<a name="2.1.5 Instruction Cycles and Lengths"></a>
-<h3>2.1.5 Instruction Cycles and Lengths</h3>
+<a name="2.1.6 Instruction Cycles and Lengths"></a>
+<h3>2.1.6 Instruction Cycles and Lengths</h3>
 
-The number of CPU clock cycles required for an instruction depends on the instruction format and the addressing modes used, not the instruction itself.
-<br />In the following tables, the number of clock cycles refers to the main clock (<i>MCLK</i>).
+Please note that a detailed description of the instruction and addressing modes can be found in the <b><a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a></b> (Chapter 3).<br /><br />
+The number of CPU clock cycles required for an instruction depends on the instruction format and the addressing modes used, not the instruction itself.<br />
+In the following tables, the number of clock cycles refers to the main clock (<i>MCLK</i>).
 Differences with the original MSP430 are highlighted in green (the original value being red).
 <ul>
 	<li><b>Interrupt and Reset Cycles</b></li>
@@ -470,8 +627,8 @@ All jump instructions require one code word, and take two CPU cycles to execute,
 	<tr>                                             <td align="center"> &EDE  </td> <td align="center"> 6 </td> <td align="center"> 3 </td> </tr>
 </table>
 
-<a name="2.1.6 Serial Debug Interface"></a>
-<h3>2.1.6 Serial Debug Interface</h3>
+<a name="2.1.7 Serial Debug Interface"></a>
+<h3>2.1.7 Serial Debug Interface</h3>
 
 All the details about the Serial Debug Interface are located <a href="http://www.opencores.org/project/openmsp430/serial%20debug%20interface">here</a>.
 <a name="2.2 Peripherals"></a>
@@ -506,8 +663,8 @@ The following Verilog code would implement a counter clocked with SMCLK:
 	<code>
 		      reg  [7:0] test_cnt;
 		<br />
-		<br />always @ (posedge mclk or posedge puc)
-		<br />  if (puc)           test_cnt <=  8'h00;
+		<br />always @ (posedge mclk or posedge puc_rst)
+		<br />  if (puc_rst)       test_cnt <=  8'h00;
 		<br />  else if (smclk_en) test_cnt <=  test_cnt + 8'h01;
 	</code>
 </td>
@@ -590,7 +747,7 @@ The full pinout of the GPIO module is provided in the following table:
 	<tr> <td align="center"><b>Port Name</b></td> <td align="center"><b>Direction</b></td> <td align="center"><b>Width</b>    </td> <td align="center"><b>Description</b></td> </tr>
 	<tr> <td colspan="4" align="center"> <b><i>Clocks & Resets</i></b>  </td></tr>
 	<tr> <td> mclk           </td> <td>  Input         </td> <td>       1        </td> <td> Main system clock                           </td> </tr>
-	<tr> <td> puc            </td> <td>  Input         </td> <td>       1        </td> <td> Main system reset                           </td> </tr>
+	<tr> <td> puc_rst        </td> <td>  Input         </td> <td>       1        </td> <td> Main system reset                           </td> </tr>
 	<tr> <td colspan="4" align="center"> <b><i>Interrupts</i></b>  </td></tr>
 	<tr> <td> irq_port1      </td> <td>  Output        </td> <td>       1        </td> <td> Port 1 interrupt                            </td> </tr>
 	<tr> <td> irq_port2      </td> <td>  Output        </td> <td>       1        </td> <td> Port 2 interrupt                            </td> </tr>
@@ -647,7 +804,7 @@ The full pinout of the Timer A module is provided in the following table:
 	<tr> <td> smclk_en       </td> <td>  Input         </td> <td>       1        </td> <td> SMCLK enable (from CPU)                    </td> </tr>
 	<tr> <td> inclk          </td> <td>  Input         </td> <td>       1        </td> <td> INCLK external timer clock (SLOW)          </td> </tr>
 	<tr> <td> taclk          </td> <td>  Input         </td> <td>       1        </td> <td> TACLK external timer clock (SLOW)          </td> </tr>
-	<tr> <td> puc            </td> <td>  Input         </td> <td>       1        </td> <td> Main system reset                          </td> </tr>
+	<tr> <td> puc_rst        </td> <td>  Input         </td> <td>       1        </td> <td> Main system reset                          </td> </tr>
 	<tr> <td> dbg_freeze     </td> <td>  Input         </td> <td>       1        </td> <td> Freeze Timer A counter                     </td> </tr>
 	<tr> <td colspan="4" align="center"> <b><i>Interrupts</i></b>  </td></tr>
 	<tr> <td> irq_ta0        </td> <td>  Output        </td> <td>       1        </td> <td> Timer A interrupt: TACCR0                  </td> </tr>

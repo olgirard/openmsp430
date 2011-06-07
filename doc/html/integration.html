@@ -23,7 +23,7 @@
 This chapter aims to give a comprehensive description of all openMSP430 core interfaces in order to facilitates its integration within an ASIC or FPGA.<br /><br />
 
 The following diagram shows an overview of the openMSP430 core connectivity:<br /><br />
-<img src="getimg.php?1264010073" width="100%" alt="Core Integration - 23 Jan 2010" title="Core Integration - 23 Jan 2010" />
+<img src="usercontent,img,1306268589" width="100%" alt="Core Integration - 24 May 2011" title="Core Integration - 24 May 2011" />
 <br /><br />
 The full pinout of the core is summarized in the following table.<br />
 <br />
@@ -31,6 +31,12 @@ The full pinout of the core is summarized in the following table.<br />
 	<tr> <td align="center"><b>Port Name</b></td> <td align="center"><b>Direction</b></td> <td align="center"><b>Width</b>    </td> <td align="center"><b>Description</b></td> </tr>
 	
 	<tr> <td colspan="4" align="center"> <b><i>Clocks</i></b>                         </td></tr>
+	<tr> 
+	     <td> <a href="#2. Clocks">cpu_en</a>                                 </td>
+	     <td> Input                                                            </td>
+	     <td> 1                                                                </td>
+	     <td> Enable CPU code execution (asynchronous)                         </td>
+	</tr>
 	<tr>
 	     <td> <a href="#2. Clocks">dco_clk</a>                                </td>
 	     <td> Input                                                            </td>
@@ -64,7 +70,7 @@ The full pinout of the core is summarized in the following table.<br />
 
 	<tr> <td colspan="4" align="center"> <b><i>Resets</i></b>                         </td></tr>
 	<tr>
-	     <td> <a href="#3. Resets">puc</a>                                    </td>
+	     <td> <a href="#3. Resets">puc_rst</a>                                </td>
 	     <td> Output                                                           </td>
 	     <td> 1                                                                </td>
 	     <td> Main system reset                                                </td>
@@ -73,7 +79,7 @@ The full pinout of the core is summarized in the following table.<br />
 	     <td> <a href="#3. Resets">reset_n</a>                                </td>
 	     <td> Input                                                            </td>
 	     <td> 1                                                                </td>
-	     <td> Reset Pin (low active)                                           </td>
+	     <td> Reset Pin (low active, asynchronous)                             </td>
 	</tr>
 
 
@@ -106,7 +112,7 @@ The full pinout of the core is summarized in the following table.<br />
 	     <td> <a href="#4. Program Memory">pmem_wen</a>                       </td>
 	     <td> Output                                                           </td>
 	     <td> 2                                                                </td>
-	     <td> Program Memory write enable (low active)                         </td>
+	     <td> Program Memory write byte enable (low active)                    </td>
 	</tr>
 
 	<tr> <td colspan="4" align="center"> <b><i>Data Memory interface</i></b>          </td></tr>
@@ -138,14 +144,14 @@ The full pinout of the core is summarized in the following table.<br />
 	     <td> <a href="#5. Data Memory">dmem_wen</a>                          </td>
 	     <td> Output                                                           </td>
 	     <td> 2                                                                </td>
-	     <td> Data Memory write enable (low active)                            </td>
+	     <td> Data Memory write byte enable (low active)                       </td>
 	</tr>
 
 	<tr> <td colspan="4" align="center"> <b><i>External Peripherals interface</i></b> </td></tr>
 	<tr>
 	     <td> <a href="#6. Peripherals">per_addr</a>                          </td>
 	     <td> Output                                                           </td>
-	     <td> 8                                                                </td>
+	     <td> 14                                                               </td>
 	     <td> Peripheral address                                               </td>
 	</tr>
 	<tr>
@@ -167,10 +173,10 @@ The full pinout of the core is summarized in the following table.<br />
 	     <td> Peripheral enable (high active)                                  </td>
 	</tr>
 	<tr>
-	     <td> <a href="#6. Peripherals">per_wen</a>                           </td>
+	     <td> <a href="#6. Peripherals">per_we</a>                            </td>
 	     <td> Output                                                           </td>
 	     <td> 2                                                                </td>
-	     <td> Peripheral write enable (high active)                            </td>
+	     <td> Peripheral write byte enable (high active)                       </td>
 	</tr>
 
 	<tr> <td colspan="4" align="center"> <b><i>Interrupts</i></b>                     </td></tr>
@@ -195,6 +201,12 @@ The full pinout of the core is summarized in the following table.<br />
 
 	<tr> <td colspan="4" align="center"> <b><i>Serial Debug interface</i></b>         </td></tr>
 	<tr> 
+	     <td> <a href="#8. Serial Debug Interface">dbg_en</a>                 </td>
+	     <td> Input                                                            </td>
+	     <td> 1                                                                </td>
+	     <td> Debug interface enable (asynchronous)                            </td>
+	</tr>
+	<tr> 
 	     <td> <a href="#8. Serial Debug Interface">dbg_freeze</a>             </td>
 	     <td> Output                                                           </td>
 	     <td> 1                                                                </td>
@@ -210,7 +222,7 @@ The full pinout of the core is summarized in the following table.<br />
 	     <td> <a href="#8. Serial Debug Interface">dbg_uart_rxd</a>           </td>
 	     <td> Input                                                            </td>
 	     <td> 1                                                                </td>
-	     <td> Debug interface: UART RXD                                        </td>
+	     <td> Debug interface: UART RXD (asynchronous)                         </td>
 	</tr>
 </table> 
 <br />
@@ -227,20 +239,25 @@ The different clocks in the design are managed by the Basic Clock Module:
 <img src="getimg.php?1246434498" width="75%" alt="Clock structure diagram" title="Clock structure diagram" />
 <br />
 <ul>
-	<li><b><font color="#0000b0">DCO_CLK</font></b>: this input port is typically connected to a PLL, RC oscillator or any clock resource the target FPGA might provide.<br />
+	<li>
+	     <b><font color="#0000b0">CPU_EN</font></b>: this input port provide a hardware mean to stop or resume CPU execution. When unused, this port should be set to 1. 
+	     <br /><br />
+	</li>
+	<li>
+	     <b><font color="#0000b0">DCO_CLK</font></b>: this input port is typically connected to a PLL, RC oscillator or any clock resource the target FPGA might provide.<br />
 	 From a synthesis tool perspective (ISE, Quartus, Libero, Design Compiler...), this the only port where a clock needs to be declared. 
 	     <br /><br />
 	</li>
 	<li>
-	    <b><font color="#0000b0">LFXT_CLK</font></b>: if ACLK_EN or SMCLK_EN are going to be used in the project (for example through the Watchdog or TimerA peripherals), then this port needs to be connected to a clock running at least two time slower as DCO_CLK (typically 32kHz). It can be connected to 0 or 1 otherwise.
+	     <b><font color="#0000b0">LFXT_CLK</font></b>: if ACLK_EN or SMCLK_EN are going to be used in the project (for example through the Watchdog or TimerA peripherals), then this port needs to be connected to a clock running at least two time slower as DCO_CLK (typically 32kHz). It can be connected to 0 or 1 otherwise.
 	     <br /><br />
 	</li>
 	<li>
-	    <b><font color="#00b000">MCLK</font></b>: the main system clock drives the complete openMSP430 clock domain, including program/data memories and the peripheral interfaces.
+        <b><font color="#00b000">MCLK</font></b>: the main system clock drives the complete openMSP430 clock domain, including program/data memories and the peripheral interfaces.
 	     <br /><br />
 	</li>
 	<li>
-	    <b><font color="#00b000">ACLK_EN / SMCLK_EN</font></b>: these two clock enable signals can be used in order to emulate the original ACLK and SMCLK from the MSP430 specification.<br />
+	     <b><font color="#00b000">ACLK_EN / SMCLK_EN</font></b>: these two clock enable signals can be used in order to emulate the original ACLK and SMCLK from the MSP430 specification.<br />
 	    An example of this can be found in the Watchdog and TimerA modules, where it is implemented as following:<br /><br />
 <img src="getimg.php?1246434793" alt="Clock implementation example" title="Clock implementation example" />
 	     <br /><br />
@@ -260,7 +277,7 @@ As an illustration, the following waveform shows the different clocks where the 
 	     <br /><br />
 	</li>
 	<li>
-	    <b><font color="#00b000">PUC</font></b>: the Power-Up-Clear signal is asynchronously set with the reset pin (<i>RESET_N</i>), the watchdog reset or the serial debug interface reset. In order to get clean timings, it is synchronously cleared with MCLK's falling edge. As a general rule, this signal should be used as the reset of the <i>MCLK</i> clock domain.
+	    <b><font color="#00b000">PUC_RST</font></b>: the Power-Up-Clear signal is asynchronously set with the reset pin (<i>RESET_N</i>), the watchdog reset or the serial debug interface reset. In order to get clean timings, it is synchronously cleared with MCLK's falling edge. As a general rule, this signal should be used as the reset of the <i>MCLK</i> clock domain.
 	     <br /><br />
 	</li>
 </ul>
@@ -352,7 +369,7 @@ The signal description therefore goes as following:
 	     <br /><br />
 	</li>
 	<li>
-	    <b><font color="#00b000">PER_ADDR</font></b>: peripheral register address of the 16 bit word which is going to be accessed.<br />
+	    <b><font color="#00b000">PER_ADDR</font></b>: peripheral register address of the 16 bit word which is currently accessed. It is to be noted that a 14 bit address will always be provided from the openMSP430 to the peripheral in order to accommodate the biggest possible PER_SIZE Verilog configuration option (i.e. 32kB as opposed to 512B by default).<br />
 	    <b>Note:</b> in order to calculate the core logical address from the peripheral register physical address, the formula goes as following: <i>LOGICAL@=2*PHYSICAL@</i>
 	     <br /><br />
 	</li>
@@ -361,7 +378,7 @@ The signal description therefore goes as following:
 	     <br /><br />
 	</li>
 	<li>
-	    <b><font color="#00b000">PER_WE</font></b>: this signal selects which byte should be written during a valid access. PER_WEN[0] will activate a write on the lower byte, PER_WEN[1] a write on the upper byte. Note that these signals are HIGH ACTIVE.
+	    <b><font color="#00b000">PER_WE</font></b>: this signal selects which byte should be written during a valid access. PER_WE[0] will activate a write on the lower byte, PER_WE[1] a write on the upper byte. Note that these signals are HIGH ACTIVE.
 	     <br /><br />
 	</li>
 	<li>
@@ -499,6 +516,10 @@ The following waveform illustrates a TAIV interrupt issued by the Timer-A, which
 The serial debug interface module provides a two-wires communication bus for remote debugging and an additional freeze signal which might be useful for some peripherals.<br />
 <br />
 <ul>
+	<li>
+	    <b><font color="#0000b0">DBG_EN</font></b>: this signal allows the user to enable or disable the serial debug interface without interfering with the CPU execution. It is to be noted that when disabled (i.e. DBG_EN=0), the debug interface is held into reset.
+	    <br /><br />
+	</li>
 	<li>
 	    <b><font color="#00b000">DBG_FREEZE</font></b>: this signal will be set whenever the debug interface stops the CPU (and if the <i>FRZ_BRK_EN</i> field of the <a href="http://www.opencores.org/project,openmsp430,serial%20debug%20interface#2.2.2%20CPU_CTL">CPU_CTL</a> debug register is set). As its name implies, the purpose of <i>DBG_FREEZE</i> is to freeze a peripheral whenever the CPU is stopped by the software debugger.<br />
 For example, it is used by the Watchdog timer in order to stop its free-running counter. This prevents the CPU from being reseted by the watchdog every times the user stops the CPU during a debugging session.
