@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------
-// Copyright (C) 2009 Authors
+// Copyright (C) 2009 , Olivier Girard
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
