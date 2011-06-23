@@ -1,3 +1,8 @@
+2011-06-23 [r117]  
+
+	* To facilitate commercial adoption of the openMSP430, the core has
+	  moved to a modified BSD license.
+
 2011-05-29 [r115]  
 
 	* Add linker script example.
