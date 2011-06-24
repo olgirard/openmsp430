@@ -162,7 +162,12 @@ proc rsp_M {cmd} {
     }
 
     # Write memory
-    WriteMemQuick8  "0x$addr" $mem_val
+    if {$length==2} {
+	regexp {(..)(..)} $data match data_lo data_hi
+        WriteMem      0 "0x$addr" "0x${data_hi}${data_lo}"
+    } else {
+	WriteMemQuick8  "0x$addr" $mem_val
+    }
 
     # Eventually re-set the software breakpoints in case they have been overwritten
     set addr_start [format %d "0x$addr"]
@@ -193,6 +198,7 @@ proc rsp_m {cmd} {
 
     # Read memory
     set data [ReadMemQuick8  "0x$addr" $length]
+    
 
     # Eventually replace read data by the original software breakpoint value
     set addr_start [format %d "0x$addr"]
