@@ -1,3 +1,8 @@
+2011-06-24 [r119]  
+
+	* Slight improvement of the gdbproxy to improve the support of the
+	  EMBSYSREGVIEW Eclipse plugin.
+
 2011-05-26 [r114]  
 
 	* Improved the VerifyCPU_ID procedure.
