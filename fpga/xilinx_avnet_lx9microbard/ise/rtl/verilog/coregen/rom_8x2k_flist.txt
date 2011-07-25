@@ -1,0 +1,23 @@
+# Output products list for <rom_8x2k>
+blk_mem_gen_ds512.pdf
+blk_mem_gen_v6_2_readme.txt
+rom_8x2k.asy
+rom_8x2k.gise
+rom_8x2k.ngc
+rom_8x2k.v
+rom_8x2k.veo
+rom_8x2k.xco
+rom_8x2k.xise
+rom_8x2k_flist.txt
+rom_8x2k_ste/example_design/bmg_wrapper.vhd
+rom_8x2k_ste/example_design/rom_8x2k_top.ucf
+rom_8x2k_ste/example_design/rom_8x2k_top.vhd
+rom_8x2k_ste/example_design/rom_8x2k_top.xdc
+rom_8x2k_ste/implement/implement.sh
+rom_8x2k_ste/implement/planAhead_rdn.bat
+rom_8x2k_ste/implement/planAhead_rdn.sh
+rom_8x2k_ste/implement/planAhead_rdn.tcl
+rom_8x2k_ste/implement/xst.prj
+rom_8x2k_ste/implement/xst.scr
+rom_8x2k_xmdf.tcl
+summary.log

@@ -1,0 +1,10 @@
+Welcome to Xilinx CORE Generator.
+Help system initialized.
+CoreGen has not been configured with any user repositories.
+CoreGen has been configured with the following Xilinx repositories:
+ - '/opt/xilinx/13.2/ISE_DS/ISE/coregen/' [using existing xil_index.xml]
+The IP Catalog has been reloaded.
+Opening project file
+/home/ricardo/hacking/lx9-micro/openmsp430/fpga/xilinx_avnet_lx9microbard/ise/rt
+l/verilog/coregen/coregen.cgp.
+Closed project file.

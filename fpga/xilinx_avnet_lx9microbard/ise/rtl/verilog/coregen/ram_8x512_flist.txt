@@ -1,0 +1,25 @@
+# Output products list for <ram_8x512>
+_dbg/xil_257.in
+_dbg/xil_257.out
+blk_mem_gen_ds512.pdf
+blk_mem_gen_v6_2_readme.txt
+ram_8x512.asy
+ram_8x512.gise
+ram_8x512.ngc
+ram_8x512.v
+ram_8x512.veo
+ram_8x512.xco
+ram_8x512.xise
+ram_8x512_flist.txt
+ram_8x512_ste/example_design/bmg_wrapper.vhd
+ram_8x512_ste/example_design/ram_8x512_top.ucf
+ram_8x512_ste/example_design/ram_8x512_top.vhd
+ram_8x512_ste/example_design/ram_8x512_top.xdc
+ram_8x512_ste/implement/implement.sh
+ram_8x512_ste/implement/planAhead_rdn.bat
+ram_8x512_ste/implement/planAhead_rdn.sh
+ram_8x512_ste/implement/planAhead_rdn.tcl
+ram_8x512_ste/implement/xst.prj
+ram_8x512_ste/implement/xst.scr
+ram_8x512_xmdf.tcl
+summary.log
