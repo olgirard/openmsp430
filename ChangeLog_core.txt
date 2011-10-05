@@ -1,3 +1,8 @@
+2011-10-05 [r122]  
+
+	* Add coverage report generation (NCVERILOG only) Add support for
+	  the ISIM Xilinx simulator.
+
 2011-06-23 [r117]  
 
 	* To facilitate commercial adoption of the openMSP430, the core has
