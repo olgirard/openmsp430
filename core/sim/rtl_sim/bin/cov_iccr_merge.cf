@@ -1,0 +1,10 @@
+set mytests_ucd [glob cov_work/design/*/icc.ucd]
+
+set mytests ""
+foreach ucd_file $mytests_ucd {
+	lappend mytests [file dirname $ucd_file]
+}
+
+eval load_test $mytests
+eval merge     $mytests -output merged_coverage
+quit

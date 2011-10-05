@@ -4,103 +4,115 @@
 OMSP_NODUMP=1
 export OMSP_NODUMP
 
-rm -rf *.log
+# Choose simulator:
+#                   - iverilog  : Icarus Verilog  (default)
+#                   - cver      : CVer
+#                   - verilog   : Verilog-XL
+#                   - ncverilog : NC-Verilog
+#                   - vcs       : VCS
+#                   - vsim      : Modelsim
+#                   - isim      : Xilinx simulator
+OMSP_SIMULATOR=iverilog
+export OMSP_SIMULATOR
+
+rm -rf ./log/*.log
+mkdir  ./log
 
 # Two-Operand Arithmetic test patterns
-../bin/msp430sim two-op_mov          | tee two-op_mov.log
-../bin/msp430sim two-op_mov-b        | tee two-op_mov-b.log
-../bin/msp430sim two-op_add          | tee two-op_add.log
-../bin/msp430sim two-op_add-b        | tee two-op_add-b.log
-../bin/msp430sim two-op_addc         | tee two-op_addc.log
-../bin/msp430sim two-op_sub          | tee two-op_sub.log
-../bin/msp430sim two-op_subc         | tee two-op_subc.log
-../bin/msp430sim two-op_cmp          | tee two-op_cmp.log
-../bin/msp430sim two-op_bit          | tee two-op_bit.log
-../bin/msp430sim two-op_bic          | tee two-op_bic.log
-../bin/msp430sim two-op_bis          | tee two-op_bis.log
-../bin/msp430sim two-op_xor          | tee two-op_xor.log
-../bin/msp430sim two-op_and          | tee two-op_and.log
-../bin/msp430sim two-op_dadd         | tee two-op_dadd.log
+../bin/msp430sim two-op_mov          | tee ./log/two-op_mov.log
+../bin/msp430sim two-op_mov-b        | tee ./log/two-op_mov-b.log
+../bin/msp430sim two-op_add          | tee ./log/two-op_add.log
+../bin/msp430sim two-op_add-b        | tee ./log/two-op_add-b.log
+../bin/msp430sim two-op_addc         | tee ./log/two-op_addc.log
+../bin/msp430sim two-op_sub          | tee ./log/two-op_sub.log
+../bin/msp430sim two-op_subc         | tee ./log/two-op_subc.log
+../bin/msp430sim two-op_cmp          | tee ./log/two-op_cmp.log
+../bin/msp430sim two-op_bit          | tee ./log/two-op_bit.log
+../bin/msp430sim two-op_bic          | tee ./log/two-op_bic.log
+../bin/msp430sim two-op_bis          | tee ./log/two-op_bis.log
+../bin/msp430sim two-op_xor          | tee ./log/two-op_xor.log
+../bin/msp430sim two-op_and          | tee ./log/two-op_and.log
+../bin/msp430sim two-op_dadd         | tee ./log/two-op_dadd.log
 
 # Conditional Jump test patterns
-../bin/msp430sim c-jump_jeq          | tee c-jump_jeq.log
-../bin/msp430sim c-jump_jne          | tee c-jump_jne.log
-../bin/msp430sim c-jump_jc           | tee c-jump_jc.log
-../bin/msp430sim c-jump_jnc          | tee c-jump_jnc.log
-../bin/msp430sim c-jump_jn           | tee c-jump_jn.log
-../bin/msp430sim c-jump_jge          | tee c-jump_jge.log
-../bin/msp430sim c-jump_jl           | tee c-jump_jl.log
-../bin/msp430sim c-jump_jmp          | tee c-jump_jmp.log
+../bin/msp430sim c-jump_jeq          | tee ./log/c-jump_jeq.log
+../bin/msp430sim c-jump_jne          | tee ./log/c-jump_jne.log
+../bin/msp430sim c-jump_jc           | tee ./log/c-jump_jc.log
+../bin/msp430sim c-jump_jnc          | tee ./log/c-jump_jnc.log
+../bin/msp430sim c-jump_jn           | tee ./log/c-jump_jn.log
+../bin/msp430sim c-jump_jge          | tee ./log/c-jump_jge.log
+../bin/msp430sim c-jump_jl           | tee ./log/c-jump_jl.log
+../bin/msp430sim c-jump_jmp          | tee ./log/c-jump_jmp.log
 
 # Single-Operand Arithmetic test patterns
-../bin/msp430sim sing-op_rrc         | tee sing-op_rrc.log
-../bin/msp430sim sing-op_rra         | tee sing-op_rra.log
-../bin/msp430sim sing-op_swpb        | tee sing-op_swpb.log
-../bin/msp430sim sing-op_sxt         | tee sing-op_sxt.log
-../bin/msp430sim sing-op_push        | tee sing-op_push.log
-../bin/msp430sim sing-op_call        | tee sing-op_call.log
-../bin/msp430sim sing-op_reti        | tee sing-op_reti.log
+../bin/msp430sim sing-op_rrc         | tee ./log/sing-op_rrc.log
+../bin/msp430sim sing-op_rra         | tee ./log/sing-op_rra.log
+../bin/msp430sim sing-op_swpb        | tee ./log/sing-op_swpb.log
+../bin/msp430sim sing-op_sxt         | tee ./log/sing-op_sxt.log
+../bin/msp430sim sing-op_push        | tee ./log/sing-op_push.log
+../bin/msp430sim sing-op_call        | tee ./log/sing-op_call.log
+../bin/msp430sim sing-op_reti        | tee ./log/sing-op_reti.log
 
 # ROM Data Read access
-../bin/msp430sim two-op_add_rom-rd   | tee two-op_add_rom-rd.log
-../bin/msp430sim sing-op_push_rom-rd | tee sing-op_push_rom-rd.log
-../bin/msp430sim sing-op_call_rom-rd | tee sing-op_call_rom-rd.log
+../bin/msp430sim two-op_add_rom-rd   | tee ./log/two-op_add_rom-rd.log
+../bin/msp430sim sing-op_push_rom-rd | tee ./log/sing-op_push_rom-rd.log
+../bin/msp430sim sing-op_call_rom-rd | tee ./log/sing-op_call_rom-rd.log
 
 # Power saving modes (CPUOFF, OSCOFF, SCG1)
-../bin/msp430sim op_modes            | tee op_modes.log
+../bin/msp430sim op_modes            | tee ./log/op_modes.log
 
 # Basic clock module
-../bin/msp430sim clock_module        | tee clock_module.log
+../bin/msp430sim clock_module        | tee ./log/clock_module.log
 
 # Serial Debug Interface
-../bin/msp430sim dbg_uart            | tee dbg_uart.log
-../bin/msp430sim dbg_cpu             | tee dbg_cpu.log
-../bin/msp430sim dbg_mem             | tee dbg_mem.log
-../bin/msp430sim dbg_hwbrk0          | tee dbg_hwbrk0.log
-../bin/msp430sim dbg_hwbrk1          | tee dbg_hwbrk1.log
-../bin/msp430sim dbg_hwbrk2          | tee dbg_hwbrk2.log
-../bin/msp430sim dbg_hwbrk3          | tee dbg_hwbrk3.log
-../bin/msp430sim dbg_halt_irq        | tee dbg_halt_irq.log
-../bin/msp430sim dbg_onoff           | tee dbg_onoff.log
+../bin/msp430sim dbg_uart            | tee ./log/dbg_uart.log
+../bin/msp430sim dbg_cpu             | tee ./log/dbg_cpu.log
+../bin/msp430sim dbg_mem             | tee ./log/dbg_mem.log
+../bin/msp430sim dbg_hwbrk0          | tee ./log/dbg_hwbrk0.log
+../bin/msp430sim dbg_hwbrk1          | tee ./log/dbg_hwbrk1.log
+../bin/msp430sim dbg_hwbrk2          | tee ./log/dbg_hwbrk2.log
+../bin/msp430sim dbg_hwbrk3          | tee ./log/dbg_hwbrk3.log
+../bin/msp430sim dbg_halt_irq        | tee ./log/dbg_halt_irq.log
+../bin/msp430sim dbg_onoff           | tee ./log/dbg_onoff.log
 
 # Watchdog test patterns
-../bin/msp430sim wdt_interval        | tee wdt_interval.log
-../bin/msp430sim wdt_watchdog        | tee wdt_watchdog.log
-../bin/msp430sim wdt_clkmux          | tee wdt_clkmux.log
+../bin/msp430sim wdt_interval        | tee ./log/wdt_interval.log
+../bin/msp430sim wdt_watchdog        | tee ./log/wdt_watchdog.log
+../bin/msp430sim wdt_clkmux          | tee ./log/wdt_clkmux.log
 
 # GPIO test patterns
-../bin/msp430sim gpio_rdwr           | tee gpio_rdwr.log
-../bin/msp430sim gpio_irq            | tee gpio_irq.log
+../bin/msp430sim gpio_rdwr           | tee ./log/gpio_rdwr.log
+../bin/msp430sim gpio_irq            | tee ./log/gpio_irq.log
 
 # Peripheral templates test patterns
-../bin/msp430sim template_periph_8b  | tee template_periph_8b.log
-../bin/msp430sim template_periph_16b | tee template_periph_16b.log
+../bin/msp430sim template_periph_8b  | tee ./log/template_periph_8b.log
+../bin/msp430sim template_periph_16b | tee ./log/template_periph_16b.log
 
 # Timer A patterns
-../bin/msp430sim tA_modes            | tee tA_modes.log
-../bin/msp430sim tA_compare          | tee tA_compare.log
-../bin/msp430sim tA_output           | tee tA_output.log
-../bin/msp430sim tA_capture          | tee tA_capture.log
-../bin/msp430sim tA_clkmux           | tee tA_clkmux.log
+../bin/msp430sim tA_modes            | tee ./log/tA_modes.log
+../bin/msp430sim tA_compare          | tee ./log/tA_compare.log
+../bin/msp430sim tA_output           | tee ./log/tA_output.log
+../bin/msp430sim tA_capture          | tee ./log/tA_capture.log
+../bin/msp430sim tA_clkmux           | tee ./log/tA_clkmux.log
 
 
 # Hardware multiplier test patterns
-../bin/msp430sim mpy_basic           | tee  mpy_basic.log
+../bin/msp430sim mpy_basic           | tee ./log/mpy_basic.log
 
 
-grep SKIPPED *.log
-grep FAILED  *.log
+grep SKIPPED ./log/*.log
+grep FAILED  ./log/*.log
 echo ""
 echo " ================================"
 echo -n "| Number of passed patterns : "
-cat *.log | grep -c PASSED
+cat ./log/*.log | grep -c PASSED
 echo -n "| Number of failed patterns : "
-cat *.log | grep -c FAILED
+cat ./log/*.log | grep -c FAILED
 echo -n "| Number of skipped patterns: "
-cat *.log | grep -c SKIPPED
+cat ./log/*.log | grep -c SKIPPED
 echo "|--------------------------------"
 echo -n "| Number of patterns:        "
-ls -1 *.log | wc -l
+ls -1 ./log/*.log | wc -l
 echo " ================================"
 echo " Make sure passed == total"
 echo ""

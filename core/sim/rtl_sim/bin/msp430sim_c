@@ -43,7 +43,7 @@ if [ $# -ne $EXPECTED_ARGS ]; then
   echo "USAGE    : msp430sim_c <test name>"
   echo "Example  : msp430sim_c sandbox"
   echo ""
-  echo "In order to switch the verilog simulator, the MYVLOG environment"
+  echo "In order to switch the verilog simulator, the OMSP_SIMULATOR environment"
   echo "variable can be set to the following values:"
   echo ""
   echo "                  - iverilog  : Icarus Verilog  (default)"
@@ -52,6 +52,7 @@ if [ $# -ne $EXPECTED_ARGS ]; then
   echo "                  - ncverilog : NC-Verilog"
   echo "                  - vcs       : VCS"
   echo "                  - vsim      : Modelsim"
+  echo "                  - isim      : Xilinx simulator"
   echo ""
   exit 1
 fi
@@ -63,8 +64,11 @@ fi
 softdir=../src-c/$1;
 elffile=../src-c/$1/$1.elf;
 verfile=../src-c/$1/$1.v;
-submitfile=../src/submit.f;
 incfile=../../../rtl/verilog/openMSP430_defines.v;
+submitfile=../src/submit.f;
+if [ $OMSP_SIMULATOR == "isim" ]; then
+    submitfile=../src/submit.prj;
+fi
 
 if [ ! -e $softdir ]; then
     echo "Software directory doesn't exist: $softdir"
