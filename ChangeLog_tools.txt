@@ -1,3 +1,9 @@
+2011-10-27 [r124]  
+
+	* Improved gdbproxy robustness. Create a workaround to prevent GDB
+	  from freezing when single-stepping on a LPMx or a "JMP $-0"
+	  instruction.
+
 2011-06-24 [r119]  
 
 	* Slight improvement of the gdbproxy to improve the support of the
