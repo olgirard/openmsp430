@@ -108,14 +108,14 @@ proc ExecutePOR {} {
 
     # Check CPU ID
     if {![VerifyCPU_ID]} {
-	return 0
+    return 0
     }
 
     # Check status: make sure a PUC occured
     set cpu_stat_val [dbg_uart_rd CPU_STAT]
     set puc_pnd      [expr 0x04 & $cpu_stat_val]
     if {![string eq $puc_pnd 4]} {
-	return 0
+    return 0
     }
 
     # Clear PUC pending flag
@@ -157,7 +157,7 @@ proc HaltCPU {} {
     set cpu_stat_val [dbg_uart_rd CPU_STAT]
     set halted       [expr 0x01 & $cpu_stat_val]
     if {![string eq $halted 1]} {
-	set result 0
+    set result 0
     }
 
     return $result
@@ -184,7 +184,7 @@ proc ReleaseCPU {} {
     set cpu_stat_val [dbg_uart_rd CPU_STAT]
     set halted       [expr 0x01 & $cpu_stat_val]
     if {![string eq $halted 0]} {
-	set result 0
+    set result 0
     }
 
     return $result
@@ -207,34 +207,34 @@ proc GetDevice {} {
 
     # Set UART global variables
     if {![info exists ::serial_baudrate]} {
-	set ::serial_baudrate 9600
+    set ::serial_baudrate 9600
     }
     if {![info exists ::serial_device]} {
-	set ::serial_device   /dev/ttyUSB0
+    set ::serial_device   /dev/ttyUSB0
     }
 
     # Open connection
     if {![dbg_uart_connect $::serial_device $::serial_baudrate]} {
-	return 0
+    return 0
     }
 
     if {[VerifyCPU_ID]} {
 
-	# Enable auto-freeze & software breakpoints
-	dbg_uart_wr CPU_CTL 0x0018
+    # Enable auto-freeze & software breakpoints
+    dbg_uart_wr CPU_CTL 0x0018
 
-	# Initialize the omsp_info global variable
-	GetCPU_ID
-	set omsp_info(connected) 1
+    # Initialize the omsp_info global variable
+    GetCPU_ID
+    set omsp_info(connected) 1
 
-	# Get number of hardware breakpoints
-	set hw_break(num)       [InitBreakUnits]
-	set omsp_info(hw_break) $hw_break(num)
-	
+    # Get number of hardware breakpoints
+    set hw_break(num)       [InitBreakUnits]
+    set omsp_info(hw_break) $hw_break(num)
+    
 
-	return 1
+    return 1
     } else {
-	return 0
+    return 0
     }
 }
 
@@ -250,20 +250,20 @@ proc GetDevice {} {
 proc ReleaseDevice {Addr} {
 
     if {[expr $Addr]==[expr 0xfffe]} {
-	set result 1
-	set result [expr $result+[ExecutePOR]]
-	set result [expr $result+[ReleaseCPU]]
+    set result 1
+    set result [expr $result+[ExecutePOR]]
+    set result [expr $result+[ReleaseCPU]]
     } else {
-	set result 0
-	set result [expr $result+[HaltCPU]]
-	set result [expr $result+[SetPC $Addr]]
-	set result [expr $result+[ReleaseCPU]]
+    set result 0
+    set result [expr $result+[HaltCPU]]
+    set result [expr $result+[SetPC $Addr]]
+    set result [expr $result+[ReleaseCPU]]
     }
 
     if {$result==3} {
-	return 1
+    return 1
     } else {
-	return 0
+    return 0
     }
 }
 
@@ -284,9 +284,9 @@ proc WriteMem {Format Addr Data} {
     dbg_uart_wr MEM_DATA $Data
 
     if {$Format==0} {
-	dbg_uart_wr MEM_CTL  0x0003
+    dbg_uart_wr MEM_CTL  0x0003
     } else {
-	dbg_uart_wr MEM_CTL  0x000b
+    dbg_uart_wr MEM_CTL  0x000b
     }
 
     return 1
@@ -304,22 +304,22 @@ proc WriteMem {Format Addr Data} {
 proc WriteMemQuick {StartAddr DataArray} {
 
     if {[llength $DataArray]==1} {
-	WriteMem 0 $StartAddr $DataArray
+    WriteMem 0 $StartAddr $DataArray
     } else {
 
-	dbg_uart_wr MEM_CNT  [expr [llength $DataArray]-1]
-	dbg_uart_wr MEM_ADDR $StartAddr
-	dbg_uart_wr MEM_CTL  0x0003
+    dbg_uart_wr MEM_CNT  [expr [llength $DataArray]-1]
+    dbg_uart_wr MEM_ADDR $StartAddr
+    dbg_uart_wr MEM_CTL  0x0003
 
-	foreach data [split $DataArray] {
+    foreach data [split $DataArray] {
 
-	    # Format data
-	    set data [format %04x $data]
-	    regexp {(..)(..)} $data match data_msb data_lsb
+        # Format data
+        set data [format %04x $data]
+        regexp {(..)(..)} $data match data_msb data_lsb
 
-	    # Send data
-	    dbg_uart_tx "0x$data_lsb 0x$data_msb"
-	}
+        # Send data
+        dbg_uart_tx "0x$data_lsb 0x$data_msb"
+    }
     }
     return 1
 }
@@ -338,12 +338,12 @@ proc ReadMem {Format Addr} {
     dbg_uart_wr MEM_ADDR $Addr
 
     if {$Format==0} {
-	dbg_uart_wr MEM_CTL  0x0001
-	set mem_val [dbg_uart_rd MEM_DATA]
+    dbg_uart_wr MEM_CTL  0x0001
+    set mem_val [dbg_uart_rd MEM_DATA]
     } else {
-	dbg_uart_wr MEM_CTL  0x0009
-	set mem_val [dbg_uart_rd MEM_DATA]
-	set mem_val [format "0x%02x" $mem_val]
+    dbg_uart_wr MEM_CTL  0x0009
+    set mem_val [dbg_uart_rd MEM_DATA]
+    set mem_val [format "0x%02x" $mem_val]
     }
 
     return $mem_val
@@ -360,14 +360,14 @@ proc ReadMem {Format Addr} {
 proc ReadMemQuick {StartAddr Length} {
 
     if {$Length==1} {
-	set mem_val [ReadMem 0 $StartAddr]
+    set mem_val [ReadMem 0 $StartAddr]
     } else {
 
-	dbg_uart_wr MEM_CNT  [expr $Length-1]
-	dbg_uart_wr MEM_ADDR $StartAddr
-	dbg_uart_wr MEM_CTL  0x0001
+    dbg_uart_wr MEM_CNT  [expr $Length-1]
+    dbg_uart_wr MEM_ADDR $StartAddr
+    dbg_uart_wr MEM_CTL  0x0001
 
-	set mem_val [dbg_uart_rx 0 [expr $Length*2]]
+    set mem_val [dbg_uart_rx 0 [expr $Length*2]]
     }
     return $mem_val
 }
@@ -391,18 +391,18 @@ proc VerifyMem {StartAddr DataArray {DumpOnError 0}} {
     set    return_val [string equal $DataArray $mem_val]
 
     if {($return_val==0) && ($DumpOnError==1)} {
-	file delete -force openmsp430-verifymem-debug-original.mem
-	file delete -force openmsp430-verifymem-debug-dumped.mem
-	set fileId [open openmsp430-verifymem-debug-original.mem "w"]
-	foreach hexCode $DataArray {
-	    puts $fileId $hexCode
-	}
-	close $fileId
-	set fileId [open openmsp430-verifymem-debug-dumped.mem "w"]
-	foreach hexCode $mem_val {
-	    puts $fileId $hexCode
-	}
-	close $fileId
+    file delete -force openmsp430-verifymem-debug-original.mem
+    file delete -force openmsp430-verifymem-debug-dumped.mem
+    set fileId [open openmsp430-verifymem-debug-original.mem "w"]
+    foreach hexCode $DataArray {
+        puts $fileId $hexCode
+    }
+    close $fileId
+    set fileId [open openmsp430-verifymem-debug-dumped.mem "w"]
+    foreach hexCode $mem_val {
+        puts $fileId $hexCode
+    }
+    close $fileId
     }
 
     return $return_val
@@ -428,14 +428,14 @@ proc ExecutePOR_Halt {} {
 
     # Check CPU ID
     if {![VerifyCPU_ID]} {
-	set result 0
+    set result 0
     }
 
     # Check status: make sure a PUC occured and that the CPU is halted
     set cpu_stat_val [dbg_uart_rd CPU_STAT]
     set puc_pnd      [expr 0x05 & $cpu_stat_val]
     if {![string eq $puc_pnd 5]} {
-	set result 0
+    set result 0
     }
 
     # Clear PUC pending flag
@@ -455,10 +455,22 @@ proc ExecutePOR_Halt {} {
 proc GetCPU_ID { } {
 
     global omsp_info
-
+   
     # Retreive CPU_ID values
-    regsub {0x} [dbg_uart_rd CPU_ID_LO] {} cpu_id_lo
-    regsub {0x} [dbg_uart_rd CPU_ID_HI] {} cpu_id_hi
+    set cpu_id_lo [dbg_uart_rd CPU_ID_LO]
+    set cpu_id_hi [dbg_uart_rd CPU_ID_HI]
+    
+    # Check if value is valid
+    if {[string eq "0x" $cpu_id_lo]} {
+        set cpu_id_lo "0x0000"
+    }
+    if {[string eq "0x" $cpu_id_hi]} {
+        set cpu_id_hi "0x0000"
+    }
+    
+    # Remove the "0x" prefix
+    regsub {0x} $cpu_id_lo {} cpu_id_lo
+    regsub {0x} $cpu_id_hi {} cpu_id_hi
 
     set cpu_id    "0x$cpu_id_hi$cpu_id_lo"
     set cpu_id_lo "0x$cpu_id_lo"
@@ -468,19 +480,19 @@ proc GetCPU_ID { } {
     # Extract the omsp info depending on the CPU version
     set omsp_info(cpu_ver) [expr ($cpu_id_lo & 0x0007)+1]
     if {$omsp_info(cpu_ver)==1} {
-	set omsp_info(asic)         0
-	set omsp_info(user_ver)    --
-	set omsp_info(per_size)   512
-	set omsp_info(mpy)         --
-	set omsp_info(dmem_size)  [expr $cpu_id_lo]
-	set omsp_info(pmem_size)  [expr $cpu_id_hi]
+    set omsp_info(asic)         0
+    set omsp_info(user_ver)    --
+    set omsp_info(per_size)   512
+    set omsp_info(mpy)         --
+    set omsp_info(dmem_size)  [expr $cpu_id_lo]
+    set omsp_info(pmem_size)  [expr $cpu_id_hi]
     } else {
-	set omsp_info(asic)       [expr  ($cpu_id_lo & 0x0008)/8]
-	set omsp_info(user_ver)   [expr  ($cpu_id_lo & 0x01f0)/9]
-	set omsp_info(per_size)   [expr (($cpu_id_lo & 0xfe00)/512)  * 512]
-	set omsp_info(mpy)        [expr  ($cpu_id_hi & 0x0001)/1]
-	set omsp_info(dmem_size)  [expr (($cpu_id_hi & 0x03fe)/2)    * 128]
-	set omsp_info(pmem_size)  [expr (($cpu_id_hi & 0xfc00)/1024) * 1024]
+    set omsp_info(asic)       [expr  ($cpu_id_lo & 0x0008)/8]
+    set omsp_info(user_ver)   [expr  ($cpu_id_lo & 0x01f0)/9]
+    set omsp_info(per_size)   [expr (($cpu_id_lo & 0xfe00)/512)  * 512]
+    set omsp_info(mpy)        [expr  ($cpu_id_hi & 0x0001)/1]
+    set omsp_info(dmem_size)  [expr (($cpu_id_hi & 0x03fe)/2)    * 128]
+    set omsp_info(pmem_size)  [expr (($cpu_id_hi & 0xfc00)/1024) * 1024]
     }
 
     set omsp_info(alias) [GetChipAlias]
@@ -501,12 +513,12 @@ proc GetCPU_ID_SIZE {} {
     global omsp_info
 
     if {[info exists omsp_info(pmem_size)]} {
-	set pmem_size $omsp_info(pmem_size)
+    set pmem_size $omsp_info(pmem_size)
     } else {
         set pmem_size -1
     }
     if {[info exists omsp_info(dmem_size)]} {
-	set dmem_size $omsp_info(dmem_size)
+    set dmem_size $omsp_info(dmem_size)
     } else {
         set dmem_size -1
     }
@@ -528,19 +540,19 @@ proc VerifyCPU_ID {} {
     set cpu_id_full [GetCPU_ID]
 
     if {[string eq "0x00000000" $cpu_id_full] |
-	([string length $cpu_id_full]!=10)    |
+    ([string length $cpu_id_full]!=10)    |
         ($omsp_info(cpu_ver) >2)              } {
-	puts "\n"
-	puts "ERROR: cpu_id not valid: $cpu_id_full"
-	puts ""
-	puts "         -------------------------------------------------------------"
-	puts "       !!!! Make sure that you are properly connectec to the board  !!!!"
-	puts "       !!!! or try reseting the serial debug interface (or CPU).    !!!!"
-	puts "         -------------------------------------------------------------"
-	puts ""
-	set result 0
+    puts "\n"
+    puts "ERROR: cpu_id not valid: $cpu_id_full"
+    puts ""
+    puts "         -------------------------------------------------------------"
+    puts "       !!!! Make sure that you are properly connected to the board  !!!!"
+    puts "       !!!! or try reseting the serial debug interface (or CPU).    !!!!"
+    puts "         -------------------------------------------------------------"
+    puts ""
+    set result 0
     } else {
-	set result 1
+    set result 1
     }
     return $result
 }
@@ -579,12 +591,12 @@ proc WriteRegAll {DataArray} {
 
     foreach data [split $DataArray] {
 
-	# Format data
-	set data [format %04x $data]
-	regexp {(..)(..)} $data match data_msb data_lsb
+    # Format data
+    set data [format %04x $data]
+    regexp {(..)(..)} $data match data_msb data_lsb
 
-	# Send data
-	dbg_uart_tx "0x$data_lsb 0x$data_msb"
+    # Send data
+    dbg_uart_tx "0x$data_lsb 0x$data_msb"
     }
 
     return 1
@@ -638,21 +650,21 @@ proc ReadRegAll {} {
 proc WriteMemQuick8 {StartAddr DataArray} {
 
     if {[llength $DataArray]==1} {
-	WriteMem 1 $StartAddr $DataArray
+    WriteMem 1 $StartAddr $DataArray
     } else {
 
-	dbg_uart_wr MEM_CNT  [expr [llength $DataArray]-1]
-	dbg_uart_wr MEM_ADDR $StartAddr
-	dbg_uart_wr MEM_CTL  0x000b
+    dbg_uart_wr MEM_CNT  [expr [llength $DataArray]-1]
+    dbg_uart_wr MEM_ADDR $StartAddr
+    dbg_uart_wr MEM_CTL  0x000b
 
-	foreach data [split $DataArray] {
+    foreach data [split $DataArray] {
 
-	    # Format data
-	    set data [format %02x $data]
+        # Format data
+        set data [format %02x $data]
 
-	    # Send data
-	    dbg_uart_tx "0x$data"
-	}
+        # Send data
+        dbg_uart_tx "0x$data"
+    }
     }
     return 1
 }
@@ -668,13 +680,13 @@ proc WriteMemQuick8 {StartAddr DataArray} {
 proc ReadMemQuick8 {StartAddr Length} {
 
     if {$Length==1} {
-	set mem_val [ReadMem 1 $StartAddr]
+    set mem_val [ReadMem 1 $StartAddr]
     } else {
-	dbg_uart_wr MEM_CNT  [expr $Length-1]
-	dbg_uart_wr MEM_ADDR $StartAddr
-	dbg_uart_wr MEM_CTL  0x0009
+    dbg_uart_wr MEM_CNT  [expr $Length-1]
+    dbg_uart_wr MEM_ADDR $StartAddr
+    dbg_uart_wr MEM_CTL  0x0009
 
-	set mem_val [dbg_uart_rx 1 [expr $Length]]
+    set mem_val [dbg_uart_rx 1 [expr $Length]]
     }
 
     return $mem_val
@@ -709,14 +721,14 @@ proc EraseRAM {} {
     set ram_size [lindex [GetCPU_ID_SIZE] 1]
 
     if {$ram_size!=-1} {
-	set DataArray ""
-	for {set i 0} {$i<$ram_size} {incr i} {
-	    lappend DataArray 0x00
-	}
+    set DataArray ""
+    for {set i 0} {$i<$ram_size} {incr i} {
+        lappend DataArray 0x00
+    }
 
-	WriteMemQuick8 $0x0200 $DataArray
+    WriteMemQuick8 $0x0200 $DataArray
 
-	return 1
+    return 1
     }
     return 0
 }
@@ -734,14 +746,14 @@ proc EraseROM {} {
     set rom_start [expr 0x10000-$rom_size]
 
     if {$rom_size!=-1} {   
-	set DataArray ""
-	for {set i 0} {$i<$rom_size} {incr i} {
-	    lappend DataArray 0x00
-	}
+    set DataArray ""
+    for {set i 0} {$i<$rom_size} {incr i} {
+        lappend DataArray 0x00
+    }
 
-	WriteMemQuick8 $rom_start $DataArray
+    WriteMemQuick8 $rom_start $DataArray
 
-	return 1
+    return 1
     }
     return 0
 }
@@ -758,15 +770,15 @@ proc InitBreakUnits {} {
     set num_brk_units 0
     for {set i 0} {$i<4} {incr i} {
 
-	dbg_uart_wr "BRK$i\_ADDR0" 0x1234
-	set new_val [dbg_uart_rd "BRK$i\_ADDR0"]
-	if {$new_val=="0x1234"} {
-	    incr num_brk_units
-	    dbg_uart_wr "BRK$i\_CTL"   0x00
-	    dbg_uart_wr "BRK$i\_STAT"  0xff
-	    dbg_uart_wr "BRK$i\_ADDR0" 0x0000
-	    dbg_uart_wr "BRK$i\_ADDR1" 0x0000
-	}
+    dbg_uart_wr "BRK$i\_ADDR0" 0x1234
+    set new_val [dbg_uart_rd "BRK$i\_ADDR0"]
+    if {$new_val=="0x1234"} {
+        incr num_brk_units
+        dbg_uart_wr "BRK$i\_CTL"   0x00
+        dbg_uart_wr "BRK$i\_STAT"  0xff
+        dbg_uart_wr "BRK$i\_ADDR0" 0x0000
+        dbg_uart_wr "BRK$i\_ADDR1" 0x0000
+    }
     }
     return $num_brk_units
 }
@@ -789,25 +801,25 @@ proc SetHWBreak {Type Addr Rd Wr} {
 
     # First look for utilized units with correct BRKx_CTL attributes
     for {set i 0} {$i<$hw_break(num)} {incr i} {
-	if {[string eq [dbg_uart_rd "BRK$i\_CTL"] $brk_ctl_ref]} {
-	    # Look if there is an address free
-	    set brk_addr0 [dbg_uart_rd "BRK$i\_ADDR0"]
-	    set brk_addr1 [dbg_uart_rd "BRK$i\_ADDR1"]
-	    if {[string eq $brk_addr0 $brk_addr1]} {
-		dbg_uart_wr "BRK$i\_ADDR1" $Addr
-		return 1
-	    }
-	}
+    if {[string eq [dbg_uart_rd "BRK$i\_CTL"] $brk_ctl_ref]} {
+        # Look if there is an address free
+        set brk_addr0 [dbg_uart_rd "BRK$i\_ADDR0"]
+        set brk_addr1 [dbg_uart_rd "BRK$i\_ADDR1"]
+        if {[string eq $brk_addr0 $brk_addr1]} {
+        dbg_uart_wr "BRK$i\_ADDR1" $Addr
+        return 1
+        }
+    }
     }
 
     # Then look for a free unit
     for {set i 0} {$i<$hw_break(num)} {incr i} {
-	if {[string eq [dbg_uart_rd "BRK$i\_CTL"] 0x00]} {
-	    dbg_uart_wr "BRK$i\_ADDR0" $Addr
-	    dbg_uart_wr "BRK$i\_ADDR1" $Addr
-	    dbg_uart_wr "BRK$i\_CTL"   $brk_ctl_ref
-	    return 1
-	}
+    if {[string eq [dbg_uart_rd "BRK$i\_CTL"] 0x00]} {
+        dbg_uart_wr "BRK$i\_ADDR0" $Addr
+        dbg_uart_wr "BRK$i\_ADDR1" $Addr
+        dbg_uart_wr "BRK$i\_CTL"   $brk_ctl_ref
+        return 1
+    }
     }
 
     return 0
@@ -826,30 +838,30 @@ proc ClearHWBreak {Type Addr} {
     global hw_break
 
     for {set i 0} {$i<$hw_break(num)} {incr i} {
-	# Check if the unit works on Data or Instructions)
-	set brk_ctl [dbg_uart_rd "BRK$i\_CTL"]
-	if {[expr $brk_ctl & 0x08]==[expr 8*$Type]} {
+    # Check if the unit works on Data or Instructions)
+    set brk_ctl [dbg_uart_rd "BRK$i\_CTL"]
+    if {[expr $brk_ctl & 0x08]==[expr 8*$Type]} {
 
-	    # Look for the matching address
-	    set brk_addr0 [dbg_uart_rd "BRK$i\_ADDR0"]
-	    set brk_addr1 [dbg_uart_rd "BRK$i\_ADDR1"]
+        # Look for the matching address
+        set brk_addr0 [dbg_uart_rd "BRK$i\_ADDR0"]
+        set brk_addr1 [dbg_uart_rd "BRK$i\_ADDR1"]
 
-	    if {[string eq $brk_addr0 $brk_addr1] && [string eq $brk_addr0 $Addr]} {
-		dbg_uart_wr "BRK$i\_CTL"   0x00
-		dbg_uart_wr "BRK$i\_STAT"  0xff
-		dbg_uart_wr "BRK$i\_ADDR0" 0x0000
-		dbg_uart_wr "BRK$i\_ADDR1" 0x0000
-		return 1
-	    }
-	    if {[string eq $brk_addr0 $Addr]} {
-		dbg_uart_wr "BRK$i\_ADDR0" $brk_addr1
-		return 1
-	    }
-	    if {[string eq $brk_addr1 $Addr]} {
-		dbg_uart_wr "BRK$i\_ADDR1" $brk_addr0
-		return 1
-	    }
-	}
+        if {[string eq $brk_addr0 $brk_addr1] && [string eq $brk_addr0 $Addr]} {
+        dbg_uart_wr "BRK$i\_CTL"   0x00
+        dbg_uart_wr "BRK$i\_STAT"  0xff
+        dbg_uart_wr "BRK$i\_ADDR0" 0x0000
+        dbg_uart_wr "BRK$i\_ADDR1" 0x0000
+        return 1
+        }
+        if {[string eq $brk_addr0 $Addr]} {
+        dbg_uart_wr "BRK$i\_ADDR0" $brk_addr1
+        return 1
+        }
+        if {[string eq $brk_addr1 $Addr]} {
+        dbg_uart_wr "BRK$i\_ADDR1" $brk_addr0
+        return 1
+        }
+    }
     }
     return 1
 }
@@ -902,27 +914,27 @@ proc GetChipAlias {} {
 
     # Set XML file name
     if {[info exists  ::env(OMSP_XML_FILE)]} {
-	set xmlFile $::env(OMSP_XML_FILE)
+    set xmlFile $::env(OMSP_XML_FILE)
     } else {
-	set xmlFile [file normalize "$::scriptDir/../../omsp_alias.xml"]
+    set xmlFile [file normalize "$::scriptDir/../../omsp_alias.xml"]
     }
 
     # Read XML file
     if {[file exists $xmlFile]} {
-	set fp [open $xmlFile r]
-	set xmlData [read $fp]
-	close $fp
+    set fp [open $xmlFile r]
+    set xmlData [read $fp]
+    close $fp
     } else {
-	puts "WARNING: the XML alias file was not found - $xmlFile"
-	return ""
+    puts "WARNING: the XML alias file was not found - $xmlFile"
+    return ""
     }
 
     # Analyze XML file
     ::XML::Init $xmlData
     set wellFormed [::XML::IsWellFormed]
     if {$wellFormed ne ""} {
-	puts "WARNING: the XML alias file is not well-formed - $xmlFile \n $wellFormed"
-	return ""
+    puts "WARNING: the XML alias file is not well-formed - $xmlFile \n $wellFormed"
+    return ""
     }
 
     #========================================================================#
@@ -933,90 +945,90 @@ proc GetChipAlias {} {
     set currentTYPE  ""
     set currentTAG   ""
     while {1} {
-	foreach {type val attr etype} [::XML::NextToken] break
-	if {$type == "EOF"} break
+    foreach {type val attr etype} [::XML::NextToken] break
+    if {$type == "EOF"} break
 
-	# Detect the start of a new alias description
-	if {($type == "XML") & ($val == "omsp:alias") & ($etype == "START")} {
-	    set aliasName ""
-	    regexp {val=\"(.*)\"} $attr whole_match aliasName
-	    lappend aliasList $aliasName
-	    set currentALIAS $aliasName
-	}
+    # Detect the start of a new alias description
+    if {($type == "XML") & ($val == "omsp:alias") & ($etype == "START")} {
+        set aliasName ""
+        regexp {val=\"(.*)\"} $attr whole_match aliasName
+        lappend aliasList $aliasName
+        set currentALIAS $aliasName
+    }
 
-	# Detect start and end of the configuration field
-	if {($type == "XML") & ($val == "omsp:configuration")} {
+    # Detect start and end of the configuration field
+    if {($type == "XML") & ($val == "omsp:configuration")} {
 
-	    if {($etype == "START")} {
-		set currentTYPE  "config"
+        if {($etype == "START")} {
+        set currentTYPE  "config"
 
-	    } elseif {($etype == "END")} {
-		set currentTYPE  ""
-	    }
-	}
+        } elseif {($etype == "END")} {
+        set currentTYPE  ""
+        }
+    }
 
-	# Detect start and end of the extra_info field
-	if {($type == "XML") & ($val == "omsp:extra_info")} {
+    # Detect start and end of the extra_info field
+    if {($type == "XML") & ($val == "omsp:extra_info")} {
 
-	    if {($etype == "START")} {
-		set currentTYPE  "extra_info"
-		set idx 0
+        if {($etype == "START")} {
+        set currentTYPE  "extra_info"
+        set idx 0
 
-	    } elseif {($etype == "END")} {
-		set currentTYPE  ""
-	    }
-	}
+        } elseif {($etype == "END")} {
+        set currentTYPE  ""
+        }
+    }
 
-	# Detect the current TAG
-	if {($type == "XML") & ($etype == "START")} {
-	    regsub {omsp:} $val {} val
-	    set currentTAG $val
-	}
+    # Detect the current TAG
+    if {($type == "XML") & ($etype == "START")} {
+        regsub {omsp:} $val {} val
+        set currentTAG $val
+    }
 
-	if {($type == "TXT")} {
-	    if {$currentTYPE=="extra_info"} {
-		set alias($currentALIAS,$currentTYPE,$idx,$currentTAG) $val
-		incr idx
-	    } else {
-		set alias($currentALIAS,$currentTYPE,$currentTAG) $val
-	    }
-	}
+    if {($type == "TXT")} {
+        if {$currentTYPE=="extra_info"} {
+        set alias($currentALIAS,$currentTYPE,$idx,$currentTAG) $val
+        incr idx
+        } else {
+        set alias($currentALIAS,$currentTYPE,$currentTAG) $val
+        }
+    }
     }
 
     #========================================================================#
     # Check if the current OMSP_INFO has an alias match                      #
     #========================================================================#
     foreach currentALIAS $aliasList {
-	set aliasCONFIG [array names alias -glob "$currentALIAS,config,*"]
-	set aliasEXTRA  [lsort -increasing [array names alias -glob "$currentALIAS,extra_info,*"]]
+    set aliasCONFIG [array names alias -glob "$currentALIAS,config,*"]
+    set aliasEXTRA  [lsort -increasing [array names alias -glob "$currentALIAS,extra_info,*"]]
 
-	#----------------------------------#
-	# Is current alias matching ?      #
-	#----------------------------------#
-	set match       1
-	set description ""
-	foreach currentCONFIG $aliasCONFIG {
+    #----------------------------------#
+    # Is current alias matching ?      #
+    #----------------------------------#
+    set match       1
+    set description ""
+    foreach currentCONFIG $aliasCONFIG {
 
-	    regsub "$currentALIAS,config," $currentCONFIG {} configName
+        regsub "$currentALIAS,config," $currentCONFIG {} configName
 
-	    if {![string eq $omsp_info($configName) $alias($currentCONFIG)]} {
-		set match 0
-	    }
-	}
+        if {![string eq $omsp_info($configName) $alias($currentCONFIG)]} {
+        set match 0
+        }
+    }
 
-	#----------------------------------#
-	# If matching, get the extra infos #
-	#----------------------------------#
-	if {$match} {
+    #----------------------------------#
+    # If matching, get the extra infos #
+    #----------------------------------#
+    if {$match} {
 
-	    set idx 0
-	    foreach currentEXTRA $aliasEXTRA {
-		regsub "$currentALIAS,extra_info," $currentEXTRA {} extraName
-		set omsp_info(extra,$idx,$extraName) $alias($currentEXTRA)
-		incr idx
-	    }
-	    return $currentALIAS
-	}
+        set idx 0
+        foreach currentEXTRA $aliasEXTRA {
+        regsub "$currentALIAS,extra_info," $currentEXTRA {} extraName
+        set omsp_info(extra,$idx,$extraName) $alias($currentEXTRA)
+        incr idx
+        }
+        return $currentALIAS
+    }
     }
 
     return ""

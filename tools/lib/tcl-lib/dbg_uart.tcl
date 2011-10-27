@@ -123,14 +123,17 @@ proc dbg_uart_rx {Format Length} {
 
     global serial
 
-    set rx_data [read $::serial $Length]
-
-    set hex_data ""
-    foreach char [split $rx_data {}] {
-	binary scan $char H* hex_char
-	lappend hex_data $hex_char
-    }
-
+	if { [catch {read $::serial $Length} rx_data] } {
+	
+		set hex_data "0000"
+	} else {
+		set hex_data ""
+		foreach char [split $rx_data {}] {
+			binary scan $char H* hex_char
+			lappend hex_data $hex_char
+		}
+	}
+	
     # Format data
     if {$Format==0} {
 	set num_byte 2

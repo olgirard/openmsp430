@@ -353,10 +353,13 @@ proc rsp_s {sock cmd} {
     # Clear status
     ClrStatus
 
+    # Read current PC value
+    set pc [ReadReg 0]
+
     # Incremental step
     StepCPU
 
-    return [rsp_stop_reply $sock "s"]
+    return [rsp_stop_reply $sock "s" $pc]
 }
 
 
@@ -365,7 +368,7 @@ proc rsp_s {sock cmd} {
 # packets can receive any of the below as a reply. Except for `?' and         #
 # `vStopped', that reply is only returned when the target halts.              #
 #-----------------------------------------------------------------------------#
-proc rsp_stop_reply {sock cmd} {
+proc rsp_stop_reply {sock cmd {opt_val "0"}} {
 
     # Wait until halted
     while {![IsHalted]} {
@@ -391,8 +394,16 @@ proc rsp_stop_reply {sock cmd} {
     set r4 [ReadReg 4]
     regexp {0x(..)(..)} $r4 match r4_hi r4_lo
 
-#    return "S05"
-    return "T0500:$pc_lo$pc_hi;04:$r4_lo$r4_hi;"
+	# In case of a single step command, make sure that the PC
+	# value changes. If not, return an error otherwise GDB will
+	# end-up in an infinite loop.
+	if {$cmd == "s"} {
+		if {$opt_val == $pc} {
+			return "E05"
+		}
+	}
+	#return "S05"
+	return "T0500:$pc_lo$pc_hi;04:$r4_lo$r4_hi;"
 }
 
 

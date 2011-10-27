@@ -98,7 +98,17 @@ proc startServerGUI { } {
     # Connect to device
     if {![GetDevice]} {
 	.info.cpu.con   configure -text "Connection problem" -fg red
-	putsLog "ERROR: Could not open $serial_device"
+	putsLog "ERROR: Could not open \"$serial_device\""
+    putsLog ""
+    putsLog "         -------------------------------------------------------------"
+    putsLog "       !!!! Please consider the following options:                  !!!!"
+	putsLog "       !!!!                                                         !!!!"
+	putsLog "       !!!!      - check the physical connection to the board.      !!!!"
+	putsLog "       !!!!      - adjust the serial connection baudrate.           !!!!"
+    putsLog "       !!!!      - don't forget to reset the serial debug interface !!!!"
+    putsLog "       !!!!        between each attempt.                            !!!!"
+    putsLog "         -------------------------------------------------------------"
+    putsLog ""
 	return 0
     }
 
@@ -127,7 +137,7 @@ proc startServerGUI { } {
     putsLog "INFO: Program Memory Size      - $omsp_info(pmem_size) B"
     putsLog "INFO: Data Memory Size         - $omsp_info(dmem_size) B"
     putsLog "INFO: Peripheral Address Space - $omsp_info(per_size) B"
-    putsLog "INFO: $hw_break(num) Hardware Brea/Watch-point unit(s) detected"
+    putsLog "INFO: $hw_break(num) Hardware Break/Watch-point unit(s) detected"
     putsLog ""
 
     # Activate Load TCL script section
