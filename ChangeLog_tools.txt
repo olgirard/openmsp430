@@ -1,3 +1,8 @@
+2011-11-10 [r126]  
+
+	* Remove freewrap642 directory. Tools users now have to install
+	  TCL/TK instead.
+
 2011-10-27 [r124]  
 
 	* Improved gdbproxy robustness. Create a workaround to prevent GDB
