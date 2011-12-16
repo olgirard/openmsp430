@@ -1,3 +1,8 @@
+2011-12-16 [r128]  
+
+	* Fixed CALL x(SR) bug (see Bugtracker
+	  http://opencores.org/bug,view,2111 )
+
 2011-10-05 [r122]  
 
 	* Add coverage report generation (NCVERILOG only) Add support for
