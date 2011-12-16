@@ -41,6 +41,8 @@ initial
       $display(" ===============================================");
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
+   
+      /* -------------- TEST INSTRUCTION WITH STANDARD REGISTERS AS ARGUMENT ------------------- */
 
       // Initialization
       @(r15==16'h1000);
@@ -91,6 +93,30 @@ initial
       if (r5    !==16'h6789)             tb_error("====== CALL (&EDE mode): R5 value      =====");
 
 
+      /* -------------- TEST INSTRUCTION WITH SR AS ARGUMENT ------------------- */
+
+
+      // Addressing mode: SR
+      @(r15==16'h9000);
+      //  --> not tested because it would require the cpu to execute from the data memory
+
+
+      // Addressing mode: @SR
+      @(r15==16'hA000);
+      if (r5    !==16'habcd)             tb_error("====== CALL @SR  : R5 value      =====");
+   
+
+      // Addressing mode: @SR+
+      @(r15==16'hB000);
+      if (r5    !==16'h159a)             tb_error("====== CALL @SR+ : R5 value      =====");
+   
+
+      // Addressing mode: x(SR)
+      @(r15==16'hC000);
+      if (r5    !==16'h9abc)             tb_error("====== CALL x(SR) : R5 value      =====");
+      if (r6    !==16'hef01)             tb_error("====== CALL x(SR) : R6 value      =====");
+      if (r7    !==16'h2345)             tb_error("====== CALL x(SR) : R7 value      =====");
+   
       stimulus_done = 1;
    end
 

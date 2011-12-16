@@ -1,24 +1,29 @@
 //----------------------------------------------------------------------------
-// Copyright (C) 2001 Authors
+// Copyright (C) 2009 , Olivier Girard
 //
-// This source file may be used and distributed without restriction provided
-// that this copyright statement is not removed from the file and that any
-// derivative work contains the original copyright notice and the associated
-// disclaimer.
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the authors nor the names of its contributors
+//       may be used to endorse or promote products derived from this software
+//       without specific prior written permission.
 //
-// This source file is free software; you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published
-// by the Free Software Foundation; either version 2.1 of the License, or
-// (at your option) any later version.
-//
-// This source is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-// FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-// License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with this source; if not, write to the Free Software Foundation,
-// Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+// OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
 //
@@ -31,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
+// $Rev: 117 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $LastChangedDate: 2011-06-23 21:30:51 +0200 (Thu, 23 Jun 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -149,11 +154,9 @@ wire reg_dest_wr  = ((e_state==`E_EXEC) & (
                       inst_type[`INST_JMP])) | dbg_reg_wr;
 
 wire reg_sp_wr    = (((e_state==`E_IRQ_1) | (e_state==`E_IRQ_3)) & ~inst_irq_rst) |
-                     ((e_state==`E_DST_RD) & ((inst_so[`PUSH] &  ~inst_as[`IDX] &
-                                                                ~((inst_as[`INDIR] | inst_as[`INDIR_I]) & inst_src[1])) |
-                                               inst_so[`CALL])) |
-                     ((e_state==`E_SRC_AD) &  (inst_so[`PUSH] &  inst_as[`IDX])) |
-                     ((e_state==`E_SRC_RD) &  (inst_so[`PUSH] &  ((inst_as[`INDIR] | inst_as[`INDIR_I]) & inst_src[1])));
+                     ((e_state==`E_DST_RD) & ((inst_so[`PUSH] | inst_so[`CALL]) &  ~inst_as[`IDX] & ~((inst_as[`INDIR] | inst_as[`INDIR_I]) & inst_src[1]))) |
+                     ((e_state==`E_SRC_AD) & ((inst_so[`PUSH] | inst_so[`CALL]) &  inst_as[`IDX])) |
+                     ((e_state==`E_SRC_RD) & ((inst_so[`PUSH] | inst_so[`CALL]) &  ((inst_as[`INDIR] | inst_as[`INDIR_I]) & inst_src[1])));
 
 wire reg_sr_wr    =  (e_state==`E_DST_RD) & inst_so[`RETI];
 
@@ -223,7 +226,7 @@ wire src_reg_src_sel    =  (e_state==`E_IRQ_0)                    |
 wire src_reg_dest_sel   =  (e_state==`E_IRQ_1)                    |
                            (e_state==`E_IRQ_3)                    |
                           ((e_state==`E_DST_RD) & (inst_so[`PUSH] | inst_so[`CALL])) |
-                          ((e_state==`E_SRC_AD) &  inst_so[`PUSH] & inst_as[`IDX]);
+                          ((e_state==`E_SRC_AD) & (inst_so[`PUSH] | inst_so[`CALL]) & inst_as[`IDX]);
 
 wire src_mdb_in_val_sel = ((e_state==`E_DST_RD) &  inst_so[`RETI])                     |
                           ((e_state==`E_EXEC)   & (inst_as[`INDIR] | inst_as[`INDIR_I] |
@@ -267,8 +270,8 @@ wire dst_fffe_sel       =  (e_state==`E_IRQ_0)  |
                            (e_state==`E_IRQ_1)  |
                            (e_state==`E_IRQ_3)  |
                           ((e_state==`E_DST_RD) & (inst_so[`PUSH] | inst_so[`CALL]) & ~inst_so[`RETI]) |
-                          ((e_state==`E_SRC_AD) &  inst_so[`PUSH] & inst_as[`IDX]) |
-                          ((e_state==`E_SRC_RD) &  inst_so[`PUSH] & (inst_as[`INDIR] | inst_as[`INDIR_I]) & inst_src[1]);
+                          ((e_state==`E_SRC_AD) & (inst_so[`PUSH] | inst_so[`CALL]) & inst_as[`IDX]) |
+                          ((e_state==`E_SRC_RD) & (inst_so[`PUSH] | inst_so[`CALL]) & (inst_as[`INDIR] | inst_as[`INDIR_I]) & inst_src[1]);
 
 wire dst_reg_dest_sel   = ((e_state==`E_DST_RD) & ~(inst_so[`PUSH] | inst_so[`CALL] | inst_ad[`ABS] | inst_so[`RETI])) |
                           ((e_state==`E_DST_WR) &  ~inst_ad[`ABS]) |

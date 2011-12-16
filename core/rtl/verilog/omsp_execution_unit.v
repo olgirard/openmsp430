@@ -154,11 +154,9 @@ wire reg_dest_wr  = ((e_state==`E_EXEC) & (
                       inst_type[`INST_JMP])) | dbg_reg_wr;
 
 wire reg_sp_wr    = (((e_state==`E_IRQ_1) | (e_state==`E_IRQ_3)) & ~inst_irq_rst) |
-                     ((e_state==`E_DST_RD) & ((inst_so[`PUSH] &  ~inst_as[`IDX] &
-                                                                ~((inst_as[`INDIR] | inst_as[`INDIR_I]) & inst_src[1])) |
-                                               inst_so[`CALL])) |
-                     ((e_state==`E_SRC_AD) &  (inst_so[`PUSH] &  inst_as[`IDX])) |
-                     ((e_state==`E_SRC_RD) &  (inst_so[`PUSH] &  ((inst_as[`INDIR] | inst_as[`INDIR_I]) & inst_src[1])));
+                     ((e_state==`E_DST_RD) & ((inst_so[`PUSH] | inst_so[`CALL]) &  ~inst_as[`IDX] & ~((inst_as[`INDIR] | inst_as[`INDIR_I]) & inst_src[1]))) |
+                     ((e_state==`E_SRC_AD) & ((inst_so[`PUSH] | inst_so[`CALL]) &  inst_as[`IDX])) |
+                     ((e_state==`E_SRC_RD) & ((inst_so[`PUSH] | inst_so[`CALL]) &  ((inst_as[`INDIR] | inst_as[`INDIR_I]) & inst_src[1])));
 
 wire reg_sr_wr    =  (e_state==`E_DST_RD) & inst_so[`RETI];
 
@@ -228,7 +226,7 @@ wire src_reg_src_sel    =  (e_state==`E_IRQ_0)                    |
 wire src_reg_dest_sel   =  (e_state==`E_IRQ_1)                    |
                            (e_state==`E_IRQ_3)                    |
                           ((e_state==`E_DST_RD) & (inst_so[`PUSH] | inst_so[`CALL])) |
-                          ((e_state==`E_SRC_AD) &  inst_so[`PUSH] & inst_as[`IDX]);
+                          ((e_state==`E_SRC_AD) & (inst_so[`PUSH] | inst_so[`CALL]) & inst_as[`IDX]);
 
 wire src_mdb_in_val_sel = ((e_state==`E_DST_RD) &  inst_so[`RETI])                     |
                           ((e_state==`E_EXEC)   & (inst_as[`INDIR] | inst_as[`INDIR_I] |
@@ -272,8 +270,8 @@ wire dst_fffe_sel       =  (e_state==`E_IRQ_0)  |
                            (e_state==`E_IRQ_1)  |
                            (e_state==`E_IRQ_3)  |
                           ((e_state==`E_DST_RD) & (inst_so[`PUSH] | inst_so[`CALL]) & ~inst_so[`RETI]) |
-                          ((e_state==`E_SRC_AD) &  inst_so[`PUSH] & inst_as[`IDX]) |
-                          ((e_state==`E_SRC_RD) &  inst_so[`PUSH] & (inst_as[`INDIR] | inst_as[`INDIR_I]) & inst_src[1]);
+                          ((e_state==`E_SRC_AD) & (inst_so[`PUSH] | inst_so[`CALL]) & inst_as[`IDX]) |
+                          ((e_state==`E_SRC_RD) & (inst_so[`PUSH] | inst_so[`CALL]) & (inst_as[`INDIR] | inst_as[`INDIR_I]) & inst_src[1]);
 
 wire dst_reg_dest_sel   = ((e_state==`E_DST_RD) & ~(inst_so[`PUSH] | inst_so[`CALL] | inst_ad[`ABS] | inst_so[`RETI])) |
                           ((e_state==`E_DST_WR) &  ~inst_ad[`ABS]) |

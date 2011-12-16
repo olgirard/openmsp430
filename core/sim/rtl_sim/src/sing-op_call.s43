@@ -48,6 +48,8 @@
 .global main
 
 main:
+        /* -------------- TEST INSTRUCTION WITH STANDARD REGISTERS AS ARGUMENT ------------------- */
+
         # Initialization
 	#------------------------
 
@@ -139,6 +141,95 @@ main:
 	mov     #0x8000, r15
 
 
+        /* -------------- TEST INSTRUCTION WITH SR AS ARGUMENT ------------------- */
+ 
+
+        # Addressing mode: SR
+        #------------------------
+
+        mov #0x0000, r5
+	nop
+        #call    r1                 ;# NOT VALID BECAUSE IT JUMPS IN THE DATA MEMORY
+	nop			    ;# WHICH IS NOT EXECUTABLE 
+
+        mov     #0x9000, r15
+
+
+        # Addressing mode: @SR
+        #------------------------
+
+	mov  #DMEM_252, r1        ;# Initialize stack pointer
+	push #TEST_ROUTINE_RN
+	push #TEST_ROUTINE_aRN
+	push #TEST_ROUTINE_aRNi
+        mov  r1, r13		  ; backup stack for later
+	push #TEST_ROUTINE_N
+	push #TEST_ROUTINE_xRN
+	push #TEST_ROUTINE_EDE
+	push #TEST_ROUTINE_aEDE
+
+	nop
+        mov     r13, r1
+        mov #0x0000, r5
+ 	nop
+        call    @r1                ;# CALL #TEST_ROUTINE_N (r5 = 0xabcd)
+	nop
+
+        mov     #0xa000, r15
+
+
+        # Addressing mode: @SR+
+        #------------------------
+
+	mov  #DMEM_252, r1        ;# Initialize stack pointer
+	push #TEST_ROUTINE_SPECIAL_aRNi
+	push #TEST_ROUTINE_RN
+	push #TEST_ROUTINE_aRN
+	push #TEST_ROUTINE_aRNi
+        mov  r1, r13		  ; backup stack for later
+	push #TEST_ROUTINE_N
+	push #TEST_ROUTINE_xRN
+	push #TEST_ROUTINE_EDE
+	push #TEST_ROUTINE_aEDE
+
+ 	nop
+	mov     r13, r1
+        mov #0x0000, r5
+	nop
+        call    @r1+               ;# CALL #TEST_ROUTINE_N (this has a funny behavior of nested call backward until SPECIAL_aRNi is reached)
+	nop
+
+        mov     #0xb000, r15
+
+
+        # Addressing mode: x(SR)
+        #------------------------
+			
+	mov  #DMEM_252, r1        ;# Initialize stack pointer
+	push #TEST_ROUTINE_RN
+	push #TEST_ROUTINE_aRN
+	push #TEST_ROUTINE_aRNi
+	push #TEST_ROUTINE_N
+	push #TEST_ROUTINE_xRN
+	push #TEST_ROUTINE_EDE
+	push #TEST_ROUTINE_aEDE
+	nop
+        mov #0x0000, r5
+        mov #0x0000, r6
+        mov #0x0000, r7
+	call   4(r1)            ;# CALL #TEST_ROUTINE_EDE  (r7 = 0x2345)
+        mov      r5, r7
+        mov #0x0000, r5
+	call   6(r1)            ;# CALL #TEST_ROUTINE_xRN  (r6 = 0xef01)
+        mov      r5, r6
+        mov #0x0000, r5
+	call  10(r1)            ;# CALL #TEST_ROUTINE_aRNi (r5 = 0x9abc)
+	nop
+	
+	mov     #0xc000, r15
+
+
+	
         /* ----------------------         END OF TEST        --------------- */
 end_of_test:
 	nop
@@ -174,6 +265,11 @@ TEST_ROUTINE_EDE:
 
 TEST_ROUTINE_aEDE:
         mov #0x6789, r5
+	ret
+
+TEST_ROUTINE_SPECIAL_aRNi:
+        mov #0x159a, r5
+	sub #0x000a, r1
 	ret
 
 
