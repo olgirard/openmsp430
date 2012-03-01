@@ -1,3 +1,8 @@
+2012-03-01 [r130]  
+
+	* Fixed POP.B bug (see Bugtracker
+	  http://opencores.org/bug,assign,2137 )
+
 2011-12-16 [r128]  
 
 	* Fixed CALL x(SR) bug (see Bugtracker
