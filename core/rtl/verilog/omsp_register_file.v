@@ -113,7 +113,7 @@ input               reg_incr;     // Increment source register
 // 1)  AUTOINCREMENT UNIT
 //=============================================================================
 
-wire [15:0] incr_op         = inst_bw ? 16'h0001 : 16'h0002;
+wire [15:0] incr_op         = (inst_bw & ~inst_src_in[1]) ? 16'h0001 : 16'h0002;
 wire [15:0] reg_incr_val    = reg_src+incr_op;
 
 wire [15:0] reg_dest_val_in = inst_bw ? {8'h00,reg_dest_val[7:0]} : reg_dest_val;
