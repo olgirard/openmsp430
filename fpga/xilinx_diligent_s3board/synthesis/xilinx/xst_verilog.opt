@@ -5,8 +5,8 @@ FLOWTYPE = FPGA_SYNTHESIS;
 ## Verilog Option File for XST targeted for speed
 ## This works for FPGA devices.
 ##
-## Version: 11.1
-## $Header: /devl/xcs/repo/env/Jobs/Xflow/data/optionfiles/fpga_xst_verilog_speed.opt,v 1.14 2008/10/20 23:47:14 rvklair Exp $
+## Version: 13.1
+## $Header: /devl/xcs/repo/env/Jobs/Xflow/data/optionfiles/fpga_xst_verilog_speed.opt,v 1.15.4.1 2011/01/11 22:40:31 rvklair Exp $
 #########################################################
 #
 # Options for XST
@@ -28,11 +28,11 @@ ParamFile: <design>_xst.scr
 "-ifn <synthdesign>";             # Input/Project File Name
 "-ifmt Verilog";                  # Input Format
 "-ofn <design>";                  # Output File Name 
-"-ofmt ngc";	         	  # Output File Format
+"-ofmt ngc";	                  # Output File Format
 "-p <partname>";                  # Target Device
 "-verilog2001 YES";               # Enables the use of Verilog 2001 Constructs
                                   # YES, NO
-
+"-top       openMSP430_fpga";
 "-vlgincdir ../../../rtl/verilog/openmsp430/";
 
 "-opt_mode SPEED";                # Optimization Criteria

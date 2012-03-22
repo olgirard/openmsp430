@@ -1,24 +1,29 @@
 //----------------------------------------------------------------------------
-// Copyright (C) 2001 Authors
+// Copyright (C) 2009 , Olivier Girard
 //
-// This source file may be used and distributed without restriction provided
-// that this copyright statement is not removed from the file and that any
-// derivative work contains the original copyright notice and the associated
-// disclaimer.
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the authors nor the names of its contributors
+//       may be used to endorse or promote products derived from this software
+//       without specific prior written permission.
 //
-// This source file is free software; you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published
-// by the Free Software Foundation; either version 2.1 of the License, or
-// (at your option) any later version.
-//
-// This source is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-// FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-// License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with this source; if not, write to the Free Software Foundation,
-// Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+// OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
 //
@@ -95,10 +100,10 @@ input               mem_bw;         // Burst byte width
     wire uart_rxd_n;
 
     omsp_sync_cell sync_cell_uart_rxd (
-        .data_out (uart_rxd_n),
-        .clk      (dbg_clk),
-        .data_in  (~dbg_uart_rxd),
-        .rst      (dbg_rst)
+        .data_out  (uart_rxd_n),
+        .data_in   (~dbg_uart_rxd),
+        .clk       (dbg_clk),
+        .rst       (dbg_rst)
     );
     wire uart_rxd = ~uart_rxd_n;
 `else
@@ -116,19 +121,18 @@ always @ (posedge dbg_clk or posedge dbg_rst)
 //------------------------
 reg        rxd_maj;
 
-wire [1:0] rxd_maj_cnt = {1'b0, uart_rxd}   +
-                         {1'b0, rxd_buf[0]} +
-                         {1'b0, rxd_buf[1]};
-wire       rxd_maj_nxt = (rxd_maj_cnt>=2'b10);
+wire       rxd_maj_nxt = (uart_rxd   & rxd_buf[0]) |
+			 (uart_rxd   & rxd_buf[1]) |
+			 (rxd_buf[0] & rxd_buf[1]);
    
 always @ (posedge dbg_clk or posedge dbg_rst)
-  if (dbg_rst) rxd_maj <=  1'b0;
+  if (dbg_rst) rxd_maj <=  1'b1;
   else         rxd_maj <=  rxd_maj_nxt;
 
-wire rxd_s  =  rxd_maj;
-wire rxd_fe =  rxd_maj & ~rxd_maj_nxt;
-wire rxd_re = ~rxd_maj &  rxd_maj_nxt;
-
+wire rxd_s    =  rxd_maj;
+wire rxd_fe   =  rxd_maj & ~rxd_maj_nxt;
+wire rxd_re   = ~rxd_maj &  rxd_maj_nxt;
+wire rxd_edge =  rxd_maj ^  rxd_maj_nxt;
    
 //=============================================================================
 // 2)  UART STATE MACHINE
@@ -136,12 +140,13 @@ wire rxd_re = ~rxd_maj &  rxd_maj_nxt;
 
 // Receive state
 //------------------------
-reg  [2:0] uart_state;
-reg  [2:0] uart_state_nxt;
+reg   [2:0] uart_state;
+reg   [2:0] uart_state_nxt;
 
-wire       sync_done;
-wire       xfer_done;
-reg [19:0] xfer_buf;
+wire        sync_done;
+wire        xfer_done;
+reg  [19:0] xfer_buf;
+wire [19:0] xfer_buf_nxt;
 
 // State machine definition
 parameter  RX_SYNC  = 3'h0;
@@ -152,16 +157,16 @@ parameter  TX_DATA1 = 3'h4;
 parameter  TX_DATA2 = 3'h5;
 
 // State transition
-always @(uart_state or xfer_buf or mem_burst or mem_burst_wr or mem_burst_rd or mem_burst_end or mem_bw)
+always @(uart_state or xfer_buf_nxt or mem_burst or mem_burst_wr or mem_burst_rd or mem_burst_end or mem_bw)
   case (uart_state)
     RX_SYNC  : uart_state_nxt =  RX_CMD;
     RX_CMD   : uart_state_nxt =  mem_burst_wr                ?
                                 (mem_bw                      ? RX_DATA2 : RX_DATA1) :
                                  mem_burst_rd                ?
                                 (mem_bw                      ? TX_DATA2 : TX_DATA1) :
-                                (xfer_buf[`DBG_UART_WR]      ?
-                                (xfer_buf[`DBG_UART_BW]      ? RX_DATA2 : RX_DATA1) :
-                                (xfer_buf[`DBG_UART_BW]      ? TX_DATA2 : TX_DATA1));
+                                (xfer_buf_nxt[`DBG_UART_WR]  ?
+                                (xfer_buf_nxt[`DBG_UART_BW]  ? RX_DATA2 : RX_DATA1) :
+                                (xfer_buf_nxt[`DBG_UART_BW]  ? TX_DATA2 : TX_DATA1));
     RX_DATA1 : uart_state_nxt =  RX_DATA2;
     RX_DATA2 : uart_state_nxt = (mem_burst & ~mem_burst_end) ?
                                 (mem_bw                      ? RX_DATA2 : RX_DATA1) :
@@ -170,7 +175,9 @@ always @(uart_state or xfer_buf or mem_burst or mem_burst_wr or mem_burst_rd or 
     TX_DATA2 : uart_state_nxt = (mem_burst & ~mem_burst_end) ?
                                 (mem_bw                      ? TX_DATA2 : TX_DATA1) :
                                  RX_CMD;
+  // pragma coverage off
     default  : uart_state_nxt =  RX_CMD;
+  // pragma coverage on
   endcase
    
 // State machine
@@ -181,6 +188,7 @@ always @(posedge dbg_clk or posedge dbg_rst)
 
 // Utility signals
 wire cmd_valid = (uart_state==RX_CMD) & xfer_done;
+wire rx_active = (uart_state==RX_DATA1) | (uart_state==RX_DATA2) | (uart_state==RX_CMD);
 wire tx_active = (uart_state==TX_DATA1) | (uart_state==TX_DATA2);
 
    
@@ -203,8 +211,8 @@ assign sync_done =  (uart_state==RX_SYNC) & rxd_re & sync_busy;
 
 reg [`DBG_UART_XFER_CNT_W+2:0] sync_cnt;
 always @ (posedge dbg_clk or posedge dbg_rst)
-  if (dbg_rst)        sync_cnt <=  {{`DBG_UART_XFER_CNT_W{1'b1}}, 3'b000};
-  else if (sync_busy) sync_cnt <=  sync_cnt+{{`DBG_UART_XFER_CNT_W+2{1'b0}}, 1'b1};
+  if (dbg_rst)                                     sync_cnt <=  {{`DBG_UART_XFER_CNT_W{1'b1}}, 3'b000};
+  else if (sync_busy | (~sync_busy & sync_cnt[2])) sync_cnt <=  sync_cnt+{{`DBG_UART_XFER_CNT_W+2{1'b0}}, 1'b1};
 
 wire [`DBG_UART_XFER_CNT_W-1:0] bit_cnt_max = sync_cnt[`DBG_UART_XFER_CNT_W+2:3];
 `else
@@ -224,7 +232,7 @@ reg [`DBG_UART_XFER_CNT_W-1:0] xfer_cnt;
 wire       txd_start    = dbg_rd_rdy | (xfer_done & (uart_state==TX_DATA1));
 wire       rxd_start    = (xfer_bit==4'h0) & rxd_fe & ((uart_state!=RX_SYNC));
 wire       xfer_bit_inc = (xfer_bit!=4'h0) & (xfer_cnt=={`DBG_UART_XFER_CNT_W{1'b0}});
-assign     xfer_done    = (xfer_bit==4'hb);
+assign     xfer_done    = rx_active ? (xfer_bit==4'ha) : (xfer_bit==4'hb);
    
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)                       xfer_bit <=  4'h0;
@@ -234,14 +242,14 @@ always @ (posedge dbg_clk or posedge dbg_rst)
 
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)                       xfer_cnt <=  {`DBG_UART_XFER_CNT_W{1'b0}};
-  else if (rxd_start)                xfer_cnt <=  {1'b0, bit_cnt_max[`DBG_UART_XFER_CNT_W-1:1]};
+  else if (rx_active & rxd_edge)     xfer_cnt <=  {1'b0, bit_cnt_max[`DBG_UART_XFER_CNT_W-1:1]};
   else if (txd_start | xfer_bit_inc) xfer_cnt <=  bit_cnt_max;
-  else                               xfer_cnt <=  xfer_cnt+{`DBG_UART_XFER_CNT_W{1'b1}};
+  else if (|xfer_cnt)                xfer_cnt <=  xfer_cnt+{`DBG_UART_XFER_CNT_W{1'b1}};
 
 
 // Receive/Transmit buffer
 //-------------------------
-wire [19:0] xfer_buf_nxt =  {rxd_s, xfer_buf[19:1]};
+assign xfer_buf_nxt =  {rxd_s, xfer_buf[19:1]};
 
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)           xfer_buf <=  20'h00000;
@@ -265,20 +273,20 @@ always @ (posedge dbg_clk or posedge dbg_rst)
 reg [5:0] dbg_addr;
  always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)        dbg_addr <=  6'h00;
-  else if (cmd_valid) dbg_addr <=  xfer_buf[`DBG_UART_ADDR];
+  else if (cmd_valid) dbg_addr <=  xfer_buf_nxt[`DBG_UART_ADDR];
 
 reg       dbg_bw;
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)        dbg_bw   <=  1'b0;
-  else if (cmd_valid) dbg_bw   <=  xfer_buf[`DBG_UART_BW];
+  else if (cmd_valid) dbg_bw   <=  xfer_buf_nxt[`DBG_UART_BW];
 
 wire        dbg_din_bw =  mem_burst  ? mem_bw : dbg_bw;
 
-wire [15:0] dbg_din    =  dbg_din_bw ? {8'h00,           xfer_buf[18:11]} :
-                                       {xfer_buf[18:11], xfer_buf[8:1]};
+wire [15:0] dbg_din    =  dbg_din_bw ? {8'h00,           xfer_buf_nxt[18:11]} :
+                                       {xfer_buf_nxt[18:11], xfer_buf_nxt[9:2]};
 wire        dbg_wr     = (xfer_done & (uart_state==RX_DATA2));
 wire        dbg_rd     = mem_burst ? (xfer_done & (uart_state==TX_DATA2)) :
-                                     (cmd_valid & ~xfer_buf[`DBG_UART_WR]) | mem_burst_rd;
+                                     (cmd_valid & ~xfer_buf_nxt[`DBG_UART_WR]) | mem_burst_rd;
 
 	    
    

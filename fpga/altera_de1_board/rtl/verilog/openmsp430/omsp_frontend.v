@@ -1,24 +1,29 @@
 //----------------------------------------------------------------------------
-// Copyright (C) 2001 Authors
+// Copyright (C) 2009 , Olivier Girard
 //
-// This source file may be used and distributed without restriction provided
-// that this copyright statement is not removed from the file and that any
-// derivative work contains the original copyright notice and the associated
-// disclaimer.
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the authors nor the names of its contributors
+//       may be used to endorse or promote products derived from this software
+//       without specific prior written permission.
 //
-// This source file is free software; you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published
-// by the Free Software Foundation; either version 2.1 of the License, or
-// (at your option) any later version.
-//
-// This source is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-// FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-// License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with this source; if not, write to the Free Software Foundation,
-// Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+// OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
 //
@@ -63,6 +68,8 @@ module  omsp_frontend (
     irq_acc,                       // Interrupt request accepted (one-hot signal)
     mab,                           // Frontend Memory address bus
     mb_en,                         // Frontend Memory bus enable
+    mclk_enable,                   // Main System Clock enable
+    mclk_wkup,                     // Main System Clock wake-up (asynchronous)
     nmi_acc,                       // Non-Maskable interrupt request accepted
     pc,                            // Program counter
     pc_nxt,                        // Next PC value (for CALL & IRQ)
@@ -77,11 +84,15 @@ module  omsp_frontend (
     irq,                           // Maskable interrupts
     mclk,                          // Main system clock
     mdb_in,                        // Frontend Memory data bus input
-    nmi_evt,                       // Non-maskable interrupt event
+    nmi_pnd,                       // Non-maskable interrupt pending
+    nmi_wkup,                      // NMI Wakeup
     pc_sw,                         // Program counter software value
     pc_sw_wr,                      // Program counter software write
     puc_rst,                       // Main system reset
-    wdt_irq                        // Watchdog-timer interrupt
+    scan_enable,                   // Scan enable (active during scan shifting)
+    wdt_irq,                       // Watchdog-timer interrupt
+    wdt_wkup,                      // Watchdog Wakeup
+    wkup                           // System Wake-up (asynchronous)
 );
 
 // OUTPUTs
@@ -106,6 +117,8 @@ output        [2:0] inst_type;     // Decoded Instruction type
 output       [13:0] irq_acc;       // Interrupt request accepted (one-hot signal)
 output       [15:0] mab;           // Frontend Memory address bus
 output              mb_en;         // Frontend Memory bus enable
+output              mclk_enable;   // Main System Clock enable
+output              mclk_wkup;     // Main System Clock wake-up (asynchronous)
 output              nmi_acc;       // Non-Maskable interrupt request accepted
 output       [15:0] pc;            // Program counter
 output       [15:0] pc_nxt;        // Next PC value (for CALL & IRQ)
@@ -117,15 +130,19 @@ input               cpuoff;        // Turns off the CPU
 input               dbg_halt_cmd;  // Halt CPU command
 input         [3:0] dbg_reg_sel;   // Debug selected register for rd/wr access
 input               fe_pmem_wait;  // Frontend wait for Instruction fetch
-input 	            gie;           // General interrupt enable
-input 	     [13:0] irq;           // Maskable interrupts
+input               gie;           // General interrupt enable
+input        [13:0] irq;           // Maskable interrupts
 input               mclk;          // Main system clock
 input        [15:0] mdb_in;        // Frontend Memory data bus input
-input 	            nmi_evt;       // Non-maskable interrupt event
+input               nmi_pnd;       // Non-maskable interrupt pending
+input               nmi_wkup;      // NMI Wakeup
 input        [15:0] pc_sw;         // Program counter software value
 input               pc_sw_wr;      // Program counter software write
 input               puc_rst;       // Main system reset
+input               scan_enable;   // Scan enable (active during scan shifting)
 input               wdt_irq;       // Watchdog-timer interrupt
+input               wdt_wkup;      // Watchdog Wakeup
+input               wkup;          // System Wake-up (asynchronous)
 
 
 //=============================================================================
@@ -152,7 +169,7 @@ endfunction
    
 
 //=============================================================================
-// 2)  Parameter definitions
+// 2)  PARAMETER DEFINITIONS
 //=============================================================================
 
 //
@@ -201,7 +218,7 @@ wire [2:0] inst_type_nxt;
 wire       is_const;
 reg [15:0] sconst_nxt;
 reg  [3:0] e_state_nxt;
-	   
+           
 // CPU on/off through the debug interface or cpu_en port
 wire   cpu_halt_cmd = dbg_halt_cmd | ~cpu_en_s;
    
@@ -217,13 +234,14 @@ always @(i_state    or inst_sz  or inst_sz_nxt  or pc_sw_wr or exec_done or
                           (cpuoff | cpu_halt_cmd) & exec_done ? I_IDLE      :
                             cpu_halt_cmd & (e_state==E_IDLE)  ? I_IDLE      :
                                   pc_sw_wr                    ? I_DEC       :
-		             ~exec_done & ~(e_state==E_IDLE)  ? I_DEC       :        // Wait in decode state
+                             ~exec_done & ~(e_state==E_IDLE)  ? I_DEC       :        // Wait in decode state
                                   (inst_sz_nxt!=2'b00)        ? I_EXT1      : I_DEC; // until execution is completed
-      I_EXT1     : i_state_nxt =  irq_detect                  ? I_IRQ_FETCH :
-                                  pc_sw_wr                    ? I_DEC       : 
+      I_EXT1     : i_state_nxt =  pc_sw_wr                    ? I_DEC       : 
                                   (inst_sz!=2'b01)            ? I_EXT2      : I_DEC;
-      I_EXT2     : i_state_nxt =  irq_detect                  ? I_IRQ_FETCH : I_DEC;
+      I_EXT2     : i_state_nxt =  I_DEC;
+    // pragma coverage off
       default    : i_state_nxt =  I_IRQ_FETCH;
+    // pragma coverage on
     endcase
 
 // State machine
@@ -244,16 +262,12 @@ always @(posedge mclk or posedge puc_rst)
 
 
 //=============================================================================
-// 4)  INTERRUPT HANDLING
+// 4)  INTERRUPT HANDLING & SYSTEM WAKEUP
 //=============================================================================
 
-// Detect nmi interrupt
-reg         inst_nmi;
-always @(posedge mclk or posedge puc_rst)
-  if (puc_rst)                  inst_nmi <= 1'b0;
-  else if (nmi_evt)             inst_nmi <= 1'b1;
-  else if (i_state==I_IRQ_DONE) inst_nmi <= 1'b0;
-
+//
+// 4.1) INTERRUPT HANDLING
+//-----------------------------------------
 
 // Detect reset interrupt
 reg         inst_irq_rst;
@@ -262,13 +276,25 @@ always @(posedge mclk or posedge puc_rst)
   else if (exec_done)           inst_irq_rst <= 1'b0;
 
 //  Detect other interrupts
-assign  irq_detect = (inst_nmi | ((|irq | wdt_irq) & gie)) & ~cpu_halt_cmd & ~dbg_halt_st & (exec_done | (i_state==I_IDLE));
+assign  irq_detect = (nmi_pnd | ((|irq | wdt_irq) & gie)) & ~cpu_halt_cmd & ~dbg_halt_st & (exec_done | (i_state==I_IDLE));
+
+`ifdef CLOCK_GATING
+wire       mclk_irq_num;
+omsp_clock_gate clock_gate_irq_num (.gclk(mclk_irq_num),
+                                    .clk (mclk), .enable(irq_detect), .scan_enable(scan_enable));
+`else
+wire       mclk_irq_num = mclk;
+`endif
 
 // Select interrupt vector
 reg  [3:0] irq_num;
-always @(posedge mclk or posedge puc_rst)
+always @(posedge mclk_irq_num or posedge puc_rst)
   if (puc_rst)         irq_num <= 4'hf;
-  else if (irq_detect) irq_num <= inst_nmi           ?  4'he :
+`ifdef CLOCK_GATING
+  else                 irq_num <= nmi_pnd            ?  4'he :
+`else
+  else if (irq_detect) irq_num <= nmi_pnd            ?  4'he :
+`endif
                                   irq[13]            ?  4'hd :
                                   irq[12]            ?  4'hc :
                                   irq[11]            ?  4'hb :
@@ -291,6 +317,34 @@ wire [15:0] irq_acc_all = one_hot16(irq_num) & {16{(i_state==I_IRQ_FETCH)}};
 wire [13:0] irq_acc     = irq_acc_all[13:0];
 wire        nmi_acc     = irq_acc_all[14];
 
+//
+// 4.2) SYSTEM WAKEUP
+//-----------------------------------------
+`ifdef CPUOFF_EN
+
+// Generate the main system clock enable signal
+                                                    // Keep the clock running if:
+wire mclk_enable = inst_irq_rst ? cpu_en_s :        //      - the RESET interrupt is currently executing
+                                                    //        and if the CPU is enabled
+                                                    // otherwise if:
+                  ~((cpuoff | ~cpu_en_s) &          //      - the CPUOFF flag, cpu_en command, instruction
+                   (i_state==I_IDLE) &              //        and execution state machines are all two
+                   (e_state==E_IDLE));              //        not idle.
+
+   
+// Wakeup condition from maskable interrupts
+wire mirq_wkup;
+omsp_and_gate and_mirq_wkup (.y(mirq_wkup), .a(wkup | wdt_wkup), .b(gie));
+
+// Combined asynchronous wakeup detection from nmi & irq (masked if the cpu is disabled)
+omsp_and_gate and_mclk_wkup (.y(mclk_wkup), .a(nmi_wkup | mirq_wkup), .b(cpu_en_s));
+
+`else
+
+// In the CPUOFF feature is disabled, the wake-up and enable signals are always 1
+assign  mclk_wkup   = 1'b1;
+assign  mclk_enable = 1'b1;
+`endif
 
 //=============================================================================
 // 5)  FETCH INSTRUCTION
@@ -309,7 +363,19 @@ wire [15:0] pc_nxt  = pc_sw_wr               ? pc_sw    :
                       (i_state==I_IRQ_FETCH) ? irq_addr :
                       (i_state==I_IRQ_DONE)  ? mdb_in   :  pc_incr;
 
-always @(posedge mclk or posedge puc_rst)
+`ifdef CLOCK_GATING
+wire       pc_en  = fetch                  |
+                    pc_sw_wr               |
+                    (i_state==I_IRQ_FETCH) |
+                    (i_state==I_IRQ_DONE);
+wire       mclk_pc;
+omsp_clock_gate clock_gate_pc (.gclk(mclk_pc),
+                               .clk (mclk), .enable(pc_en), .scan_enable(scan_enable));
+`else
+wire       mclk_pc = mclk;
+`endif
+
+always @(posedge mclk_pc or posedge puc_rst)
   if (puc_rst)  pc <= 16'h0000;
   else          pc <= pc_nxt;
 
@@ -334,9 +400,6 @@ wire [15:0] ir  = mdb_in;
 // Detect if source extension word is required
 wire is_sext = (inst_as[`IDX] | inst_as[`SYMB] | inst_as[`ABS] | inst_as[`IMM]);
 
-// Detect if destination extension word is required
-wire is_dext = (inst_ad[`IDX] | inst_ad[`SYMB] | inst_ad[`ABS]);
-
 // For the Symbolic addressing mode, add -2 to the extension word in order
 // to make up for the PC address
 wire [15:0] ext_incr = ((i_state==I_EXT1)     &  inst_as[`SYMB]) |
@@ -348,11 +411,27 @@ wire [15:0] ext_nxt  = ir + ext_incr;
 
 // Store source extension word
 reg [15:0] inst_sext;
-always @(posedge mclk or posedge puc_rst)
+
+`ifdef CLOCK_GATING
+wire       inst_sext_en  = (decode & is_const)                 |
+                           (decode & inst_type_nxt[`INST_JMP]) |
+                           ((i_state==I_EXT1) & is_sext);
+wire       mclk_inst_sext;
+omsp_clock_gate clock_gate_inst_sext (.gclk(mclk_inst_sext),
+                                      .clk (mclk), .enable(inst_sext_en), .scan_enable(scan_enable));
+`else
+wire       mclk_inst_sext = mclk;
+`endif
+
+always @(posedge mclk_inst_sext or posedge puc_rst)
   if (puc_rst)                                 inst_sext <= 16'h0000;
   else if (decode & is_const)                  inst_sext <= sconst_nxt;
   else if (decode & inst_type_nxt[`INST_JMP])  inst_sext <= {{5{ir[9]}},ir[9:0],1'b0};
+`ifdef CLOCK_GATING
+  else                                         inst_sext <= ext_nxt;
+`else
   else if ((i_state==I_EXT1) & is_sext)        inst_sext <= ext_nxt;
+`endif
 
 // Source extension word is ready
 wire inst_sext_rdy = (i_state==I_EXT1) & is_sext;
@@ -360,10 +439,25 @@ wire inst_sext_rdy = (i_state==I_EXT1) & is_sext;
 
 // Store destination extension word
 reg [15:0] inst_dext;
-always @(posedge mclk or posedge puc_rst)
+
+`ifdef CLOCK_GATING
+wire       inst_dext_en  = ((i_state==I_EXT1) & ~is_sext) |
+                            (i_state==I_EXT2);
+wire       mclk_inst_dext;
+omsp_clock_gate clock_gate_inst_dext (.gclk(mclk_inst_dext),
+                                      .clk (mclk), .enable(inst_dext_en), .scan_enable(scan_enable));
+`else
+wire       mclk_inst_dext = mclk;
+`endif
+
+always @(posedge mclk_inst_dext or posedge puc_rst)
   if (puc_rst)                           inst_dext <= 16'h0000;
   else if ((i_state==I_EXT1) & ~is_sext) inst_dext <= ext_nxt;
+`ifdef CLOCK_GATING
+  else                                   inst_dext <= ext_nxt;
+`else
   else if  (i_state==I_EXT2)             inst_dext <= ext_nxt;
+`endif
 
 // Destination extension word is ready
 wire inst_dext_rdy = (((i_state==I_EXT1) & ~is_sext) | (i_state==I_EXT2));
@@ -372,6 +466,14 @@ wire inst_dext_rdy = (((i_state==I_EXT1) & ~is_sext) | (i_state==I_EXT2));
 //=============================================================================
 // 6)  DECODE INSTRUCTION
 //=============================================================================
+
+`ifdef CLOCK_GATING
+wire       mclk_decode;
+omsp_clock_gate clock_gate_decode (.gclk(mclk_decode),
+                                   .clk (mclk), .enable(decode), .scan_enable(scan_enable));
+`else
+wire       mclk_decode = mclk;
+`endif
 
 //
 // 6.1) OPCODE: INSTRUCTION TYPE
@@ -387,9 +489,13 @@ assign     inst_type_nxt = {(ir[15:14]!=2'b00),
                             (ir[15:13]==3'b001),
                             (ir[15:13]==3'b000)} & {3{~irq_detect}};
    
-always @(posedge mclk or posedge puc_rst)
+always @(posedge mclk_decode or posedge puc_rst)
   if (puc_rst)      inst_type <= 3'b000;
+`ifdef CLOCK_GATING
+  else              inst_type <= inst_type_nxt;
+`else
   else if (decode)  inst_type <= inst_type_nxt;
+`endif
 
 //
 // 6.2) OPCODE: SINGLE-OPERAND ARITHMETIC
@@ -408,9 +514,13 @@ always @(posedge mclk or posedge puc_rst)
 reg   [7:0] inst_so;
 wire  [7:0] inst_so_nxt = irq_detect ? 8'h80 : (one_hot8(ir[9:7]) & {8{inst_type_nxt[`INST_SO]}});
 
-always @(posedge mclk or posedge puc_rst)
+always @(posedge mclk_decode or posedge puc_rst)
   if (puc_rst)     inst_so <= 8'h00;
+`ifdef CLOCK_GATING
+  else             inst_so <= inst_so_nxt;
+`else
   else if (decode) inst_so <= inst_so_nxt;
+`endif
 
 //
 // 6.3) OPCODE: CONDITIONAL JUMP
@@ -427,9 +537,13 @@ always @(posedge mclk or posedge puc_rst)
 // 8'b10000000: JMP
 
 reg   [2:0] inst_jmp_bin;
-always @(posedge mclk or posedge puc_rst)
+always @(posedge mclk_decode or posedge puc_rst)
   if (puc_rst)     inst_jmp_bin <= 3'h0;
+`ifdef CLOCK_GATING
+  else             inst_jmp_bin <= ir[12:10];
+`else
   else if (decode) inst_jmp_bin <= ir[12:10];
+`endif
 
 wire [7:0] inst_jmp = one_hot8(inst_jmp_bin) & {8{inst_type[`INST_JMP]}};
 
@@ -456,9 +570,13 @@ wire [15:0] inst_to_1hot = one_hot16(ir[15:12]) & {16{inst_type_nxt[`INST_TO]}};
 wire [11:0] inst_to_nxt  = inst_to_1hot[15:4];
 
 reg         inst_mov;
-always @(posedge mclk or posedge puc_rst)
+always @(posedge mclk_decode or posedge puc_rst)
   if (puc_rst)     inst_mov <= 1'b0;
+`ifdef CLOCK_GATING
+  else             inst_mov <= inst_to_nxt[`MOV];
+`else
   else if (decode) inst_mov <= inst_to_nxt[`MOV];
+`endif
 
 
 //
@@ -467,9 +585,13 @@ always @(posedge mclk or posedge puc_rst)
 
 // Destination register
 reg [3:0] inst_dest_bin;
-always @(posedge mclk or posedge puc_rst)
+always @(posedge mclk_decode or posedge puc_rst)
   if (puc_rst)     inst_dest_bin <= 4'h0;
+`ifdef CLOCK_GATING
+  else             inst_dest_bin <= ir[3:0];
+`else
   else if (decode) inst_dest_bin <= ir[3:0];
+`endif
 
 wire  [15:0] inst_dest = dbg_halt_st          ? one_hot16(dbg_reg_sel) :
                          inst_type[`INST_JMP] ? 16'h0001               :
@@ -481,9 +603,13 @@ wire  [15:0] inst_dest = dbg_halt_st          ? one_hot16(dbg_reg_sel) :
 
 // Source register
 reg [3:0] inst_src_bin;
-always @(posedge mclk or posedge puc_rst)
+always @(posedge mclk_decode or posedge puc_rst)
   if (puc_rst)     inst_src_bin <= 4'h0;
+`ifdef CLOCK_GATING
+  else             inst_src_bin <= ir[11:8];
+`else
   else if (decode) inst_src_bin <= ir[11:8];
+`endif
 
 wire  [15:0] inst_src = inst_type[`INST_TO] ? one_hot16(inst_src_bin)  :
                         inst_so[`RETI]      ? 16'h0002                 :
@@ -520,39 +646,43 @@ always @(src_reg or ir or inst_type_nxt)
        inst_as_nxt =  13'b0000000000001;
      else if (src_reg==4'h3) // Addressing mode using R3
        case (ir[5:4])
-	 2'b11  : inst_as_nxt =  13'b1000000000000;
-	 2'b10  : inst_as_nxt =  13'b0100000000000;
-	 2'b01  : inst_as_nxt =  13'b0010000000000;
-	 default: inst_as_nxt =  13'b0001000000000;
+         2'b11  : inst_as_nxt =  13'b1000000000000;
+         2'b10  : inst_as_nxt =  13'b0100000000000;
+         2'b01  : inst_as_nxt =  13'b0010000000000;
+         default: inst_as_nxt =  13'b0001000000000;
        endcase
      else if (src_reg==4'h2) // Addressing mode using R2
        case (ir[5:4])
-	 2'b11  : inst_as_nxt =  13'b0000100000000;
-	 2'b10  : inst_as_nxt =  13'b0000010000000;
-	 2'b01  : inst_as_nxt =  13'b0000001000000;
-	 default: inst_as_nxt =  13'b0000000000001;
+         2'b11  : inst_as_nxt =  13'b0000100000000;
+         2'b10  : inst_as_nxt =  13'b0000010000000;
+         2'b01  : inst_as_nxt =  13'b0000001000000;
+         default: inst_as_nxt =  13'b0000000000001;
        endcase
      else if (src_reg==4'h0) // Addressing mode using R0
        case (ir[5:4])
-	 2'b11  : inst_as_nxt =  13'b0000000100000;
-	 2'b10  : inst_as_nxt =  13'b0000000000100;
-	 2'b01  : inst_as_nxt =  13'b0000000010000;
-	 default: inst_as_nxt =  13'b0000000000001;
+         2'b11  : inst_as_nxt =  13'b0000000100000;
+         2'b10  : inst_as_nxt =  13'b0000000000100;
+         2'b01  : inst_as_nxt =  13'b0000000010000;
+         default: inst_as_nxt =  13'b0000000000001;
        endcase
      else                    // General Addressing mode
        case (ir[5:4])
-	 2'b11  : inst_as_nxt =  13'b0000000001000;
-	 2'b10  : inst_as_nxt =  13'b0000000000100;
-	 2'b01  : inst_as_nxt =  13'b0000000000010;
-	 default: inst_as_nxt =  13'b0000000000001;
+         2'b11  : inst_as_nxt =  13'b0000000001000;
+         2'b10  : inst_as_nxt =  13'b0000000000100;
+         2'b01  : inst_as_nxt =  13'b0000000000010;
+         default: inst_as_nxt =  13'b0000000000001;
        endcase
   end
 assign    is_const = |inst_as_nxt[12:7];
 
 reg [7:0] inst_as;
-always @(posedge mclk or posedge puc_rst)
+always @(posedge mclk_decode or posedge puc_rst)
   if (puc_rst)     inst_as <= 8'h00;
+`ifdef CLOCK_GATING
+  else             inst_as <= {is_const, inst_as_nxt[6:0]};
+`else
   else if (decode) inst_as <= {is_const, inst_as_nxt[6:0]};
+`endif
 
 
 // 13'b0000010000000: Constant 4.
@@ -593,25 +723,29 @@ always @(dest_reg or ir or inst_type_nxt)
        inst_ad_nxt =  8'b00000000;
      else if (dest_reg==4'h2)   // Addressing mode using R2
        case (ir[7])
-	 1'b1   : inst_ad_nxt =  8'b01000000;
-	 default: inst_ad_nxt =  8'b00000001;
+         1'b1   : inst_ad_nxt =  8'b01000000;
+         default: inst_ad_nxt =  8'b00000001;
        endcase
      else if (dest_reg==4'h0)   // Addressing mode using R0
        case (ir[7])
-	 1'b1   : inst_ad_nxt =  8'b00010000;
-	 default: inst_ad_nxt =  8'b00000001;
+         1'b1   : inst_ad_nxt =  8'b00010000;
+         default: inst_ad_nxt =  8'b00000001;
        endcase
      else                       // General Addressing mode
        case (ir[7])
-	 1'b1   : inst_ad_nxt =  8'b00000010;
-	 default: inst_ad_nxt =  8'b00000001;
+         1'b1   : inst_ad_nxt =  8'b00000010;
+         default: inst_ad_nxt =  8'b00000001;
        endcase
   end
 
 reg [7:0] inst_ad;
-always @(posedge mclk or posedge puc_rst)
+always @(posedge mclk_decode or posedge puc_rst)
   if (puc_rst)     inst_ad <= 8'h00;
+`ifdef CLOCK_GATING
+  else             inst_ad <= inst_ad_nxt;
+`else
   else if (decode) inst_ad <= inst_ad_nxt;
+`endif
 
 
 //
@@ -627,9 +761,13 @@ always @(posedge mclk or posedge puc_rst)
 // Extended instruction size
 assign    inst_sz_nxt = {1'b0,  (inst_as_nxt[`IDX] | inst_as_nxt[`SYMB] | inst_as_nxt[`ABS] | inst_as_nxt[`IMM])} +
                         {1'b0, ((inst_ad_nxt[`IDX] | inst_ad_nxt[`SYMB] | inst_ad_nxt[`ABS]) & ~inst_type_nxt[`INST_SO])};
-always @(posedge mclk or posedge puc_rst)
+always @(posedge mclk_decode or posedge puc_rst)
   if (puc_rst)     inst_sz     <= 2'b00;
+`ifdef CLOCK_GATING
+  else             inst_sz     <= inst_sz_nxt;
+`else
   else if (decode) inst_sz     <= inst_sz_nxt;
+`endif
 
 
 //=============================================================================
@@ -718,7 +856,9 @@ always @(e_state       or dst_acalc     or dst_rd   or inst_sext_rdy or
       E_JUMP   : e_state_nxt =  e_first_state;
       E_DST_WR : e_state_nxt =  exec_jmp          ? E_JUMP   : e_first_state;
       E_SRC_WR : e_state_nxt =  e_first_state;
+    // pragma coverage off
       default  : e_state_nxt =  E_IRQ_0;
+    // pragma coverage on
     endcase
 
 // State machine
@@ -796,20 +936,26 @@ wire        alu_shift     = inst_so_nxt[`RRC]  | inst_so_nxt[`RRA];
 
 wire        exec_no_wr    = inst_to_nxt[`CMP] | inst_to_nxt[`BIT];
 
-always @(posedge mclk or posedge puc_rst)
+wire [11:0] inst_alu_nxt  = {exec_no_wr,
+                             alu_shift,
+                             alu_stat_f,
+                             alu_stat_7,
+                             alu_dadd,
+                             alu_xor,
+                             alu_or,
+                             alu_and,
+                             alu_add,
+                             alu_inc_c,
+                             alu_inc,
+                             alu_src_inv};
+
+always @(posedge mclk_decode or posedge puc_rst)
   if (puc_rst)     inst_alu <= 12'h000;
-  else if (decode) inst_alu <= {exec_no_wr,
-                                alu_shift,
-                                alu_stat_f,
-                                alu_stat_7,
-                                alu_dadd,
-                                alu_xor,
-                                alu_or,
-                                alu_and,
-                                alu_add,
-                                alu_inc_c,
-                                alu_inc,
-                                alu_src_inv};
+`ifdef CLOCK_GATING
+  else             inst_alu <= inst_alu_nxt;
+`else
+  else if (decode) inst_alu <= inst_alu_nxt;
+`endif
 
 
 endmodule // omsp_frontend

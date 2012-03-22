@@ -25,7 +25,8 @@
 // *File Name: registers.v
 // 
 // *Module Description:
-//                      openMSP430 testbench
+//                      Direct connections to internal registers & memory.
+//
 //
 // *Author(s):
 //              - Olivier Girard,    olgirard@gmail.com
@@ -127,7 +128,7 @@ wire       [15:0] r15   = dut.openMSP430_0.execution_unit_0.register_file_0.r15;
 //wire       [15:0] mem280 = {dut.ram_8x512_hi_0.inst.mem[64], dut.ram_8x512_lo_0.inst.mem[64]};
 
 
-// ROM cells
+// Program Memory cells
 //======================
 reg   [15:0] pmem [2047:0];
 
@@ -148,6 +149,16 @@ wire  [15:0] irq_vect_03 = pmem[(1<<(`PMEM_MSB+1))-13]; // IRQ  3
 wire  [15:0] irq_vect_02 = pmem[(1<<(`PMEM_MSB+1))-14]; // IRQ  2
 wire  [15:0] irq_vect_01 = pmem[(1<<(`PMEM_MSB+1))-15]; // IRQ  1
 wire  [15:0] irq_vect_00 = pmem[(1<<(`PMEM_MSB+1))-16]; // IRQ  0
+
+
+// Interrupt detection
+wire              nmi_detect  = dut.openMSP430_0.frontend_0.nmi_pnd;
+wire              irq_detect  = dut.openMSP430_0.frontend_0.irq_detect;
+
+// Debug interface
+wire              dbg_en      = dut.openMSP430_0.dbg_en;
+wire              dbg_clk     = dut.openMSP430_0.clock_module_0.dbg_clk;
+wire              dbg_rst     = dut.openMSP430_0.clock_module_0.dbg_rst;
 
 
 // CPU internals

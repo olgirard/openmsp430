@@ -15,7 +15,7 @@ initial
       repeat(50) @(posedge mclk);
 
       // Send uart synchronization frame
-      dbg_uart_tx(DBG_SYNC);
+      dbg_uart_sync;
 
       // Let the CPU run
       dbg_uart_wr(CPU_CTL,  16'h0002);

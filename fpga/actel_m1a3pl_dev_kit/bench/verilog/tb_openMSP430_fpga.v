@@ -59,9 +59,15 @@ reg         [9:0] switch;
 wire        [9:0] led;
 
 // UART
-reg               dbg_uart_rxd;
+wire              dbg_uart_rxd;
 wire              dbg_uart_txd;
+reg               dbg_uart_rxd_sel;
+reg               dbg_uart_rxd_dly;
+reg               dbg_uart_rxd_pre;
+reg               dbg_uart_rxd_meta;
 reg        [15:0] dbg_uart_buf;
+reg               dbg_uart_rx_busy;
+reg               dbg_uart_tx_busy;
 
 // Core debug signals
 wire   [8*32-1:0] i_state;
@@ -145,10 +151,15 @@ initial
 //------------------------------
 initial
   begin
-     error         = 0;
-     stimulus_done = 1;
-     switch        = 10'h000;
-     dbg_uart_rxd  = 1'b1;
+     error            = 0;
+     stimulus_done    = 1;
+     switch           = 10'h000;
+     dbg_uart_rxd_sel = 1'b0;
+     dbg_uart_rxd_dly = 1'b1;
+     dbg_uart_rxd_pre = 1'b1;
+     dbg_uart_rxd_meta= 1'b0;
+     dbg_uart_rx_busy = 1'b0;
+     dbg_uart_tx_busy = 1'b0;
   end
 
 //

@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------
-// Copyright (C) 2009 Authors
+// Copyright (C) 2009 , Olivier Girard
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -87,7 +87,7 @@ parameter [DEC_WD-1:0] CNTRL1      =  'h0,
 
    
 // Register one-hot decoder utilities
-parameter              DEC_SZ      =  2**DEC_WD;
+parameter              DEC_SZ      =  (1 << DEC_WD);
 parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder

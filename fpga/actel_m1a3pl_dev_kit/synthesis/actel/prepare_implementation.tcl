@@ -55,8 +55,7 @@ set fpgaConfig {  ProASIC3L     M1A3P1000L  FBGA484     "484 FBGA"        Std}
 set designTop "openMSP430_fpga"
 
 # RTL include files
-set rtlIncludeFiles "../../../rtl/verilog/openmsp430/timescale.v                     \
-                     ../../../rtl/verilog/openmsp430/openMSP430_defines.v            \
+set rtlIncludeFiles "../../../rtl/verilog/openmsp430/openMSP430_defines.v            \
                      ../../../rtl/verilog/openmsp430/openMSP430_undefines.v          \
                      ../../../rtl/verilog/openmsp430/periph/omsp_timerA_defines.v    \
                      ../../../rtl/verilog/openmsp430/periph/omsp_timerA_undefines.v"

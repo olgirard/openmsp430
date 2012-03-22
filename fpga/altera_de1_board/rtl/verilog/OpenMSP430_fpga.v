@@ -293,14 +293,19 @@ assign reset_n = reset_pin_n;
 openMSP430 openMSP430_0 (
 
 // OUTPUTs
-    .aclk_en      (aclk_en),      // ACLK enable
+    .aclk         (),             // ASIC ONLY: ACLK
+    .aclk_en      (aclk_en),      // FPGA ONLY: ACLK enable
     .dbg_freeze   (dbg_freeze),   // Freeze peripherals
     .dbg_uart_txd (dbg_uart_txd), // Debug interface: UART TXD
+    .dco_enable   (),             // ASIC ONLY: Fast oscillator enable
+    .dco_wkup     (),             // ASIC ONLY: Fast oscillator wake-up (asynchronous)
     .dmem_addr    (dmem_addr),    // Data Memory address
     .dmem_cen     (dmem_cen),     // Data Memory chip enable (low active)
     .dmem_din     (dmem_din),     // Data Memory data input
     .dmem_wen     (dmem_wen),     // Data Memory write enable (low active)
     .irq_acc      (irq_acc),      // Interrupt request accepted (one-hot signal)
+    .lfxt_enable  (),             // ASIC ONLY: Low frequency oscillator enable
+    .lfxt_wkup    (),             // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
     .mclk         (mclk),         // Main system clock
     .per_addr     (per_addr),     // Peripheral address
     .per_din      (per_din),      // Peripheral data input
@@ -311,12 +316,13 @@ openMSP430 openMSP430_0 (
     .pmem_din     (pmem_din),     // Program Memory data input (optional)
     .pmem_wen     (pmem_wen),     // Program Memory write enable (low active) (optional)
     .puc_rst      (puc_rst),      // Main system reset
-    .smclk_en     (smclk_en),     // SMCLK enable
+    .smclk        (),             // ASIC ONLY: SMCLK
+    .smclk_en     (smclk_en),     // FPGA ONLY: SMCLK enable
 
 // INPUTs
-    .cpu_en       (1'b1),         // Enable CPU code execution (asynchronous)
-    .dbg_en       (1'b1),         // Debug interface enable (asynchronous)
-    .dbg_uart_rxd (dbg_uart_rxd), // Debug interface: UART RXD
+    .cpu_en       (1'b1),         // Enable CPU code execution (asynchronous and non-glitchy)
+    .dbg_en       (1'b1),         // Debug interface enable (asynchronous and non-glitchy)
+    .dbg_uart_rxd (dbg_uart_rxd), // Debug interface: UART RXD (asynchronous)
     .dco_clk      (clk_sys),      // Fast oscillator (fast clock)
     .dmem_dout    (dmem_dout),    // Data Memory data output
     .irq          (irq_bus),      // Maskable interrupts
@@ -324,7 +330,10 @@ openMSP430 openMSP430_0 (
     .nmi          (nmi),          // Non-maskable interrupt (asynchronous)
     .per_dout     (per_dout),     // Peripheral data output
     .pmem_dout    (pmem_dout),    // Program Memory data output
-    .reset_n      (reset_n)       // Reset Pin (low active)
+    .reset_n      (reset_n),      // Reset Pin (low active, asynchronous and non-glitchy)
+    .scan_enable  (1'b0),         // ASIC ONLY: Scan enable (active during scan shifting)
+    .scan_mode    (1'b0),         // ASIC ONLY: Scan mode
+    .wkup         (1'b0)          // ASIC ONLY: System Wake-up (asynchronous and non-glitchy)
 );
 
 

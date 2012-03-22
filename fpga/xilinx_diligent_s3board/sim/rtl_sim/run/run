@@ -1,4 +1,5 @@
 #!/bin/csh -f
 
 #../bin/msp430sim leds
-../bin/msp430sim ta_uart
+#../bin/msp430sim ta_uart
+../bin/msp430sim hw_uart

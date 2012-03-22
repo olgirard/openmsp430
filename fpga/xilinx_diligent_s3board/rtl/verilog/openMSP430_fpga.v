@@ -327,6 +327,14 @@ wire        [15:0] per_dout_tA;
 // 7 segment driver
 wire        [15:0] per_dout_7seg;
 
+// Simple UART
+wire               irq_uart_rx;
+wire               irq_uart_tx;
+wire        [15:0] per_dout_uart;
+wire               hw_uart_txd;
+wire               hw_uart_rxd;
+
+      
 // Others
 wire               reset_pin;
 
@@ -478,14 +486,19 @@ STARTUP_SPARTAN3 xstartup (.CLK(clk_sys), .GSR(gsr_tb), .GTS(gts_tb));
 openMSP430 openMSP430_0 (
 
 // OUTPUTs
-    .aclk_en      (aclk_en),      // ACLK enable
+    .aclk         (),             // ASIC ONLY: ACLK
+    .aclk_en      (aclk_en),      // FPGA ONLY: ACLK enable
     .dbg_freeze   (dbg_freeze),   // Freeze peripherals
     .dbg_uart_txd (dbg_uart_txd), // Debug interface: UART TXD
+    .dco_enable   (),             // ASIC ONLY: Fast oscillator enable
+    .dco_wkup     (),             // ASIC ONLY: Fast oscillator wake-up (asynchronous)
     .dmem_addr    (dmem_addr),    // Data Memory address
     .dmem_cen     (dmem_cen),     // Data Memory chip enable (low active)
     .dmem_din     (dmem_din),     // Data Memory data input
     .dmem_wen     (dmem_wen),     // Data Memory write enable (low active)
     .irq_acc      (irq_acc),      // Interrupt request accepted (one-hot signal)
+    .lfxt_enable  (),             // ASIC ONLY: Low frequency oscillator enable
+    .lfxt_wkup    (),             // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
     .mclk         (mclk),         // Main system clock
     .per_addr     (per_addr),     // Peripheral address
     .per_din      (per_din),      // Peripheral data input
@@ -496,12 +509,13 @@ openMSP430 openMSP430_0 (
     .pmem_din     (pmem_din),     // Program Memory data input (optional)
     .pmem_wen     (pmem_wen),     // Program Memory write enable (low active) (optional)
     .puc_rst      (puc_rst),      // Main system reset
-    .smclk_en     (smclk_en),     // SMCLK enable
+    .smclk        (),             // ASIC ONLY: SMCLK
+    .smclk_en     (smclk_en),     // FPGA ONLY: SMCLK enable
 
 // INPUTs
-    .cpu_en       (1'b1),         // Enable CPU code execution (asynchronous)
-    .dbg_en       (1'b1),         // Debug interface enable (asynchronous)
-    .dbg_uart_rxd (dbg_uart_rxd), // Debug interface: UART RXD
+    .cpu_en       (1'b1),         // Enable CPU code execution (asynchronous and non-glitchy)
+    .dbg_en       (1'b1),         // Debug interface enable (asynchronous and non-glitchy)
+    .dbg_uart_rxd (dbg_uart_rxd), // Debug interface: UART RXD (asynchronous)
     .dco_clk      (clk_sys),      // Fast oscillator (fast clock)
     .dmem_dout    (dmem_dout),    // Data Memory data output
     .irq          (irq_bus),      // Maskable interrupts
@@ -509,7 +523,10 @@ openMSP430 openMSP430_0 (
     .nmi          (nmi),          // Non-maskable interrupt (asynchronous)
     .per_dout     (per_dout),     // Peripheral data output
     .pmem_dout    (pmem_dout),    // Program Memory data output
-    .reset_n      (reset_n)       // Reset Pin (low active)
+    .reset_n      (reset_n),      // Reset Pin (low active, asynchronous and non-glitchy)
+    .scan_enable  (1'b0),         // ASIC ONLY: Scan enable (active during scan shifting)
+    .scan_mode    (1'b0),         // ASIC ONLY: Scan mode
+    .wkup         (1'b0)          // ASIC ONLY: System Wake-up (asynchronous and non-glitchy)
 );
 
 
@@ -637,12 +654,37 @@ driver_7segment driver_7segment_0 (
 
 
 //
+// Simple full duplex UART (8N1 protocol)
+//----------------------------------------
+
+omsp_uart #(.BASE_ADDR(15'h0080)) uart_0 (
+
+// OUTPUTs
+    .irq_uart_rx  (irq_uart_rx),   // UART receive interrupt
+    .irq_uart_tx  (irq_uart_tx),   // UART transmit interrupt
+    .per_dout     (per_dout_uart), // Peripheral data output
+    .uart_txd     (hw_uart_txd),   // UART Data Transmit (TXD)
+
+// INPUTs
+    .mclk         (mclk),          // Main system clock
+    .per_addr     (per_addr),      // Peripheral address
+    .per_din      (per_din),       // Peripheral data input
+    .per_en       (per_en),        // Peripheral enable (high active)
+    .per_we       (per_we),        // Peripheral write enable (high active)
+    .puc_rst      (puc_rst),       // Main system reset
+    .smclk_en     (smclk_en),      // SMCLK enable (from CPU)
+    .uart_rxd     (hw_uart_rxd)    // UART Data Receive (RXD)
+);
+
+
+//
 // Combine peripheral data buses
 //-------------------------------
 
 assign per_dout = per_dout_dio  |
                   per_dout_tA   |
-                  per_dout_7seg;
+                  per_dout_7seg |
+                  per_dout_uart;
    
 //
 // Assign interrupts
@@ -655,8 +697,8 @@ assign irq_bus    = {1'b0,         // Vector 13  (0xFFFA)
                      1'b0,         // Vector 10  (0xFFF4) - Watchdog -
                      irq_ta0,      // Vector  9  (0xFFF2)
                      irq_ta1,      // Vector  8  (0xFFF0)
-                     1'b0,         // Vector  7  (0xFFEE)
-                     1'b0,         // Vector  6  (0xFFEC)
+                     irq_uart_rx,  // Vector  7  (0xFFEE)
+                     irq_uart_tx,  // Vector  6  (0xFFEC)
                      1'b0,         // Vector  5  (0xFFEA)
                      1'b0,         // Vector  4  (0xFFE8)
                      irq_port2,    // Vector  3  (0xFFE6)
@@ -873,12 +915,28 @@ assign p1_io_din      = 8'h00;
 assign p2_io_din[7:3] = 5'h00;
 assign p2_io_din[1:0] = 2'h0;
 
-// Mux the RS-232 port between IO port and the debug interface.
-// The mux is controlled with the SW0 switch
-wire   uart_txd_out = p3_din[0] ? dbg_uart_txd : p1_io_dout[1];
+// Mux the RS-232 port between:
+//   - GPIO port P1.1 (TX) / P2.2 (RX)
+//   - the debug interface.
+//   - the simple hardware UART
+//
+// The mux is controlled with the SW0/SW1 switches:
+//        00 = debug interface
+//        01 = GPIO
+//        10 = simple hardware uart
+//        11 = debug interface
+wire sdi_select  = ({p3_din[1], p3_din[0]}==2'b00) |
+                   ({p3_din[1], p3_din[0]}==2'b11);
+wire gpio_select = ({p3_din[1], p3_din[0]}==2'b01);
+wire uart_select = ({p3_din[1], p3_din[0]}==2'b10);
+
+wire   uart_txd_out = gpio_select ? p1_io_dout[1]  :
+                      uart_select ? hw_uart_txd    : dbg_uart_txd;
+
 wire   uart_rxd_in;
-assign p2_io_din[2] = p3_din[0] ? 1'b1         : uart_rxd_in;
-assign dbg_uart_rxd = p3_din[0] ? uart_rxd_in  : 1'b1;
+assign p2_io_din[2] = gpio_select ? uart_rxd_in : 1'b1;
+assign hw_uart_rxd  = uart_select ? uart_rxd_in : 1'b1;
+assign dbg_uart_rxd = sdi_select  ? uart_rxd_in : 1'b1;
 
 IBUF  UART_RXD_PIN   (.O(uart_rxd_in),                 .I(UART_RXD));
 OBUF  UART_TXD_PIN   (.I(uart_txd_out),                .O(UART_TXD));

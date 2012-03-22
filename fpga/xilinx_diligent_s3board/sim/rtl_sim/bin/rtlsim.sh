@@ -43,7 +43,7 @@ if [ $# -ne $EXPECTED_ARGS ]; then
   echo "ERROR    : wrong number of arguments"
   echo "USAGE    : rtlsim.sh <verilog stimulus file> <memory file> <submit file>"
   echo "Example  : rtlsim.sh ./stimulus.v            pmem.mem      ../src/submit.f"
-  echo "MYVLOG env keeps simulator name iverilog/cver/verilog/ncverilog/vsim/vcs"
+  echo "OMSP_SIMULATOR env keeps simulator name iverilog/cver/verilog/ncverilog/vsim/vcs"
   exit 1
 fi
 
@@ -70,7 +70,7 @@ fi
 #                         Start verilog simulation                            #
 ###############################################################################
 
-if [ "${MYVLOG:-iverilog}" = iverilog ]; then
+if [ "${OMSP_SIMULATOR:-iverilog}" = iverilog ]; then
 
     rm -rf simv
     
@@ -92,24 +92,31 @@ else
        vargs=""
     fi
 
-   case $MYVLOG in 
+   case $OMSP_SIMULATOR in 
     cver* ) 
-       vargs="$vargs +define+VXL" ;;
+       vargs="$vargs +define+VXL +define+CVER" ;;
     verilog* )
        vargs="$vargs +define+VXL" ;;
     ncverilog* )
        rm -rf INCA_libs
-       vargs="$vargs +access+r +define+TRN_FILE" ;;
+       vargs="$vargs +access+r +nclicq +ncinput+../bin/cov_ncverilog.tcl -covdut openMSP430 -covfile ../bin/cov_ncverilog.ccf -coverage all +define+TRN_FILE" ;;
     vcs* )
        rm -rf csrc simv*
        vargs="$vargs -R -debug_pp +vcs+lic+wait +v2k +define+VPD_FILE" ;;
-    vsim )
+    vsim* )
        # Modelsim
        if [ -d work ]; then  vdel -all; fi
        vlib work
-       exec vlog +acc=prn -f $3 $vargs -R -c -do "run -all"
+       exec vlog +acc=prn -f $3 $vargs -R -c -do "run -all" ;;
+    isim )
+       # Xilinx simulator
+       rm -rf fuse* isim*
+       fuse tb_openMSP430 -prj $3 -o isim.exe -i ../../../bench/verilog/ -i ../../../rtl/verilog/ -i ../../../rtl/verilog/periph/
+       echo "run all" > isim.tcl
+       ./isim.exe -tclbatch isim.tcl
+       exit
    esac
    
-   echo "Running: $MYVLOG -f $3 $vargs"
-   exec $MYVLOG -f $3 $vargs
+   echo "Running: $OMSP_SIMULATOR -f $3 $vargs"
+   exec $OMSP_SIMULATOR -f $3 $vargs
 fi

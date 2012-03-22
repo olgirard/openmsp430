@@ -43,7 +43,7 @@ if [ $# -ne $EXPECTED_ARGS ]; then
   echo "USAGE    : msp430sim <test name>"
   echo "Example  : msp430sim leds"
   echo ""
-  echo "In order to switch the verilog simulator, the MYVLOG environment"
+  echo "In order to switch the verilog simulator, the OMSP_SIMULATOR environment"
   echo "variable can be set to the following values:"
   echo ""
   echo "                  - iverilog  : Icarus Verilog  (default)"
@@ -52,6 +52,7 @@ if [ $# -ne $EXPECTED_ARGS ]; then
   echo "                  - ncverilog : NC-Verilog"
   echo "                  - vcs       : VCS"
   echo "                  - vsim      : Modelsim"
+  echo "                  - isim      : Xilinx simulator"
   echo ""
   exit 1
 fi

@@ -1,25 +1,29 @@
-
 //----------------------------------------------------------------------------
-// Copyright (C) 2001 Authors
+// Copyright (C) 2009 , Olivier Girard
 //
-// This source file may be used and distributed without restriction provided
-// that this copyright statement is not removed from the file and that any
-// derivative work contains the original copyright notice and the associated
-// disclaimer.
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the authors nor the names of its contributors
+//       may be used to endorse or promote products derived from this software
+//       without specific prior written permission.
 //
-// This source file is free software; you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published
-// by the Free Software Foundation; either version 2.1 of the License, or
-// (at your option) any later version.
-//
-// This source is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-// FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-// License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with this source; if not, write to the Free Software Foundation,
-// Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+// OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
 //
@@ -52,7 +56,8 @@ module  omsp_multiplier (
     per_din,                        // Peripheral data input
     per_en,                         // Peripheral enable (high active)
     per_we,                         // Peripheral write enable (high active)
-    puc_rst                         // Main system reset
+    puc_rst,                        // Main system reset
+    scan_enable                     // Scan enable (active during scan shifting)
 );
 
 // OUTPUTs
@@ -67,6 +72,7 @@ input        [15:0] per_din;        // Peripheral data input
 input               per_en;         // Peripheral enable (high active)
 input         [1:0] per_we;         // Peripheral write enable (high active)
 input               puc_rst;        // Main system reset
+input               scan_enable;    // Scan enable (active during scan shifting)
 
 
 //=============================================================================
@@ -90,7 +96,7 @@ parameter [DEC_WD-1:0] OP1_MPY     = 'h0,
                        SUMEXT      = 'hE;
 
 // Register one-hot decoder utilities
-parameter              DEC_SZ      =  2**DEC_WD;
+parameter              DEC_SZ      =  (1 << DEC_WD);
 parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder
@@ -152,10 +158,22 @@ wire        op1_wr = reg_wr[OP1_MPY]  |
                      reg_wr[OP1_MAC]  |
                      reg_wr[OP1_MACS];
 
-always @ (posedge mclk or posedge puc_rst)
+`ifdef CLOCK_GATING
+wire        mclk_op1;
+omsp_clock_gate clock_gate_op1 (.gclk(mclk_op1),
+                                .clk (mclk), .enable(op1_wr), .scan_enable(scan_enable));
+`else
+wire        mclk_op1 = mclk;
+`endif
+
+always @ (posedge mclk_op1 or posedge puc_rst)
   if (puc_rst)      op1 <=  16'h0000;
+`ifdef CLOCK_GATING
+  else              op1 <=  per_din;
+`else
   else if (op1_wr)  op1 <=  per_din;
-   
+`endif
+
 wire [15:0] op1_rd  = op1;
 
    
@@ -165,9 +183,21 @@ reg  [15:0] op2;
 
 wire        op2_wr = reg_wr[OP2];
 
-always @ (posedge mclk or posedge puc_rst)
+`ifdef CLOCK_GATING
+wire        mclk_op2;
+omsp_clock_gate clock_gate_op2 (.gclk(mclk_op2),
+                                .clk (mclk), .enable(op2_wr), .scan_enable(scan_enable));
+`else
+wire        mclk_op2 = mclk;
+`endif
+
+always @ (posedge mclk_op2 or posedge puc_rst)
   if (puc_rst)      op2 <=  16'h0000;
+`ifdef CLOCK_GATING
+  else              op2 <=  per_din;
+`else
   else if (op2_wr)  op2 <=  per_din;
+`endif
 
 wire [15:0] op2_rd  = op2;
 
@@ -179,11 +209,24 @@ reg  [15:0] reslo;
 wire [15:0] reslo_nxt;
 wire        reslo_wr = reg_wr[RESLO];
 
-always @ (posedge mclk or posedge puc_rst)
+`ifdef CLOCK_GATING
+wire        reslo_en = reslo_wr | result_clr | result_wr;
+wire        mclk_reslo;
+omsp_clock_gate clock_gate_reslo (.gclk(mclk_reslo),
+                                  .clk (mclk), .enable(reslo_en), .scan_enable(scan_enable));
+`else
+wire        mclk_reslo = mclk;
+`endif
+
+always @ (posedge mclk_reslo or posedge puc_rst)
   if (puc_rst)         reslo <=  16'h0000;
   else if (reslo_wr)   reslo <=  per_din;
   else if (result_clr) reslo <=  16'h0000;
+`ifdef CLOCK_GATING
+  else                 reslo <=  reslo_nxt;
+`else
   else if (result_wr)  reslo <=  reslo_nxt;
+`endif
 
 wire [15:0] reslo_rd = early_read ? reslo_nxt : reslo;
 
@@ -195,11 +238,24 @@ reg  [15:0] reshi;
 wire [15:0] reshi_nxt;
 wire        reshi_wr = reg_wr[RESHI];
 
-always @ (posedge mclk or posedge puc_rst)
+`ifdef CLOCK_GATING
+wire        reshi_en = reshi_wr | result_clr | result_wr;
+wire        mclk_reshi;
+omsp_clock_gate clock_gate_reshi (.gclk(mclk_reshi),
+                                  .clk (mclk), .enable(reshi_en), .scan_enable(scan_enable));
+`else
+wire        mclk_reshi = mclk;
+`endif
+
+always @ (posedge mclk_reshi or posedge puc_rst)
   if (puc_rst)         reshi <=  16'h0000;
   else if (reshi_wr)   reshi <=  per_din;
   else if (result_clr) reshi <=  16'h0000;
+`ifdef CLOCK_GATING
+  else                 reshi <=  reshi_nxt;
+`else
   else if (result_wr)  reshi <=  reshi_nxt;
+`endif
 
 wire [15:0] reshi_rd = early_read ? reshi_nxt  : reshi;
 
@@ -250,16 +306,24 @@ wire [15:0] per_dout   = op1_mux    |
 
 // Detect signed mode
 reg sign_sel;
-always @ (posedge mclk or posedge puc_rst)
+always @ (posedge mclk_op1 or posedge puc_rst)
   if (puc_rst)     sign_sel <=  1'b0;
+`ifdef CLOCK_GATING
+  else             sign_sel <=  reg_wr[OP1_MPYS] | reg_wr[OP1_MACS];
+`else
   else if (op1_wr) sign_sel <=  reg_wr[OP1_MPYS] | reg_wr[OP1_MACS];
+`endif
 
 
 // Detect accumulate mode
 reg acc_sel;
-always @ (posedge mclk or posedge puc_rst)
+always @ (posedge mclk_op1 or posedge puc_rst)
   if (puc_rst)     acc_sel  <=  1'b0;
+`ifdef CLOCK_GATING
+  else             acc_sel  <=  reg_wr[OP1_MAC]  | reg_wr[OP1_MACS];
+`else
   else if (op1_wr) acc_sel  <=  reg_wr[OP1_MAC]  | reg_wr[OP1_MACS];
+`endif
 
 
 // Detect whenever the RESHI and RESLO registers should be cleared

@@ -89,11 +89,14 @@ if [catch {open $ihex r} f_ihex] {
 }
 
 # MEMH Output
-if [catch {open $out w } f_out]  {
-    puts "ERROR Cannot create output file $out"
-    exit 1
+if { "$out"=="-"} {
+   set f_out stdout
+} else {
+   if [catch {open $out w } f_out]  {
+       puts "ERROR Cannot create output file $out"
+       exit 1
+   }
 }
-
 
 #-----------------------------------------------------------------------------#
 #                                 CONVERSION                                  #
@@ -148,6 +151,9 @@ for {set i 0} {$i <= $num_word} {incr i} {
 }
 
 puts  $f_out "\n"
-close $f_out
+
+if { "$out"!="-"} {
+  close $f_out
+}
 
 exit 0

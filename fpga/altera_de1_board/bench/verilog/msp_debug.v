@@ -149,9 +149,9 @@ reg [8*32-1:0] e_state;
 
 always @(e_state_bin)
     case(e_state_bin)
-      4'h0    : e_state =  "IRQ_0";
+      4'h2    : e_state =  "IRQ_0";
       4'h1    : e_state =  "IRQ_1";
-      4'h2    : e_state =  "IRQ_2";
+      4'h0    : e_state =  "IRQ_2";
       4'h3    : e_state =  "IRQ_3";
       4'h4    : e_state =  "IRQ_4";
       4'h5    : e_state =  "SRC_AD";

@@ -58,6 +58,7 @@ module  omsp_execution_unit (
     oscoff,                        // Turns off LFXT1 clock input
     pc_sw,                         // Program counter software value
     pc_sw_wr,                      // Program counter software write
+    scg0,                          // System clock generator 1. Turns off the DCO
     scg1,                          // System clock generator 1. Turns off the SMCLK
 
 // INPUTs
@@ -83,7 +84,8 @@ module  omsp_execution_unit (
     mdb_in,                        // Memory data bus input
     pc,                            // Program counter
     pc_nxt,                        // Next PC value (for CALL & IRQ)
-    puc_rst                        // Main system reset
+    puc_rst,                       // Main system reset
+    scan_enable                    // Scan enable (active during scan shifting)
 );
 
 // OUTPUTs
@@ -98,6 +100,7 @@ output       [15:0] mdb_out;       // Memory data bus output
 output 	            oscoff;        // Turns off LFXT1 clock input
 output       [15:0] pc_sw;         // Program counter software value
 output              pc_sw_wr;      // Program counter software write
+output              scg0;          // System clock generator 1. Turns off the DCO
 output              scg1;          // System clock generator 1. Turns off the SMCLK
 
 // INPUTs
@@ -125,6 +128,7 @@ input        [15:0] mdb_in;        // Memory data bus input
 input        [15:0] pc;            // Program counter
 input        [15:0] pc_nxt;        // Next PC value (for CALL & IRQ)
 input               puc_rst;       // Main system reset
+input               scan_enable;   // Scan enable (active during scan shifting)
 
 
 //=============================================================================
@@ -182,6 +186,7 @@ omsp_register_file register_file_0 (
     .pc_sw_wr     (pc_sw_wr),     // Program counter software write
     .reg_dest     (reg_dest),     // Selected register destination content
     .reg_src      (reg_src),      // Selected register source content
+    .scg0         (scg0),         // System clock generator 1. Turns off the DCO
     .scg1         (scg1),         // System clock generator 1. Turns off the SMCLK
     .status       (status),       // R2 Status {V,N,Z,C}
 
@@ -201,7 +206,8 @@ omsp_register_file register_file_0 (
     .reg_sp_wr    (reg_sp_wr),    // Stack Pointer write
     .reg_sr_clr   (reg_sr_clr),   // Status register clear for interrupts
     .reg_sr_wr    (reg_sr_wr),    // Status Register update for RETI instruction
-    .reg_incr     (reg_incr)      // Increment source register
+    .reg_incr     (reg_incr),     // Increment source register
+    .scan_enable  (scan_enable)   // Scan enable (active during scan shifting)
 );
 
 
@@ -340,11 +346,27 @@ assign      mab       = alu_out_add[15:0];
 
 // Memory data bus output
 reg  [15:0] mdb_out_nxt;
-always @(posedge mclk or posedge puc_rst)
+
+`ifdef CLOCK_GATING
+wire        mdb_out_nxt_en  = (e_state==`E_DST_RD) |
+                              (((e_state==`E_EXEC) & ~inst_so[`CALL]) |
+                                (e_state==`E_IRQ_0) | (e_state==`E_IRQ_2));
+wire        mclk_mdb_out_nxt;
+omsp_clock_gate clock_gate_mdb_out_nxt (.gclk(mclk_mdb_out_nxt),
+                                        .clk (mclk), .enable(mdb_out_nxt_en), .scan_enable(scan_enable));
+`else
+wire        mclk_mdb_out_nxt = mclk;
+`endif
+
+always @(posedge mclk_mdb_out_nxt or posedge puc_rst)
   if (puc_rst)                                        mdb_out_nxt <= 16'h0000;
   else if (e_state==`E_DST_RD)                        mdb_out_nxt <= pc_nxt;
+`ifdef CLOCK_GATING
+  else                                                mdb_out_nxt <= alu_out;
+`else
   else if ((e_state==`E_EXEC & ~inst_so[`CALL]) |
            (e_state==`E_IRQ_0) | (e_state==`E_IRQ_2)) mdb_out_nxt <= alu_out;
+`endif
 
 assign      mdb_out = inst_bw ? {2{mdb_out_nxt[7:0]}} : mdb_out_nxt;
 
@@ -370,9 +392,22 @@ always @(posedge mclk or posedge puc_rst)
   else if (mdb_in_buf_en)    mdb_in_buf_valid <= 1'b1;
 
 reg  [15:0] mdb_in_buf;
-always @(posedge mclk or posedge puc_rst)
+
+`ifdef CLOCK_GATING
+wire        mclk_mdb_in_buf;
+omsp_clock_gate clock_gate_mdb_in_buf (.gclk(mclk_mdb_in_buf),
+                                       .clk (mclk), .enable(mdb_in_buf_en), .scan_enable(scan_enable));
+`else
+wire        mclk_mdb_in_buf = mclk;
+`endif
+
+always @(posedge mclk_mdb_in_buf or posedge puc_rst)
   if (puc_rst)            mdb_in_buf <= 16'h0000;
+`ifdef CLOCK_GATING
+  else                    mdb_in_buf <= mdb_in_bw;
+`else
   else if (mdb_in_buf_en) mdb_in_buf <= mdb_in_bw;
+`endif
 
 assign mdb_in_val = mdb_in_buf_valid ? mdb_in_buf : mdb_in_bw;
 

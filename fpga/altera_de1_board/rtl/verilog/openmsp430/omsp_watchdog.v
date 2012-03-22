@@ -1,24 +1,29 @@
 //----------------------------------------------------------------------------
-// Copyright (C) 2001 Authors
+// Copyright (C) 2009 , Olivier Girard
 //
-// This source file may be used and distributed without restriction provided
-// that this copyright statement is not removed from the file and that any
-// derivative work contains the original copyright notice and the associated
-// disclaimer.
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the authors nor the names of its contributors
+//       may be used to endorse or promote products derived from this software
+//       without specific prior written permission.
 //
-// This source file is free software; you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published
-// by the Free Software Foundation; either version 2.1 of the License, or
-// (at your option) any later version.
-//
-// This source is distributed in the hope that it will be useful, but WITHOUT
-// ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-// FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-// License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with this source; if not, write to the Free Software Foundation,
-// Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+// OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
 //
@@ -43,49 +48,63 @@
 module  omsp_watchdog (
 
 // OUTPUTs
-    nmi_evt,                        // NMI Event
     per_dout,                       // Peripheral data output
-    wdtifg_set,                     // Set Watchdog-timer interrupt flag
-    wdtpw_error,                    // Watchdog-timer password error
-    wdttmsel,                       // Watchdog-timer mode select
+    wdt_irq,                        // Watchdog-timer interrupt
+    wdt_reset,                      // Watchdog-timer reset
+    wdt_wkup,                       // Watchdog Wakeup
+    wdtifg,                         // Watchdog-timer interrupt flag
+    wdtnmies,                       // Watchdog-timer NMI edge selection
 
 // INPUTs
+    aclk,                           // ACLK
     aclk_en,                        // ACLK enable
     dbg_freeze,                     // Freeze Watchdog counter
     mclk,                           // Main system clock
-    nmi,                            // Non-maskable interrupt (asynchronous)
-    nmie,                           // Non-maskable interrupt enable
     per_addr,                       // Peripheral address
     per_din,                        // Peripheral data input
     per_en,                         // Peripheral enable (high active)
     per_we,                         // Peripheral write enable (high active)
+    por,                            // Power-on reset
     puc_rst,                        // Main system reset
+    scan_enable,                    // Scan enable (active during scan shifting)
+    scan_mode,                      // Scan mode
+    smclk,                          // SMCLK
     smclk_en,                       // SMCLK enable
-    wdtie                           // Watchdog timer interrupt enable
+    wdtie,                          // Watchdog timer interrupt enable
+    wdtifg_irq_clr,                 // Watchdog-timer interrupt flag irq accepted clear
+    wdtifg_sw_clr,                  // Watchdog-timer interrupt flag software clear
+    wdtifg_sw_set                   // Watchdog-timer interrupt flag software set
 );
 
 // OUTPUTs
 //=========
-output              nmi_evt;        // NMI Event
 output       [15:0] per_dout;       // Peripheral data output
-output              wdtifg_set;     // Set Watchdog-timer interrupt flag
-output              wdtpw_error;    // Watchdog-timer password error
-output              wdttmsel;       // Watchdog-timer mode select
+output              wdt_irq;        // Watchdog-timer interrupt
+output              wdt_reset;      // Watchdog-timer reset
+output              wdt_wkup;       // Watchdog Wakeup
+output              wdtifg;         // Watchdog-timer interrupt flag
+output              wdtnmies;       // Watchdog-timer NMI edge selection
 
 // INPUTs
 //=========
+input               aclk;           // ACLK
 input               aclk_en;        // ACLK enable
 input               dbg_freeze;     // Freeze Watchdog counter
 input               mclk;           // Main system clock
-input               nmi;            // Non-maskable interrupt (asynchronous)
-input               nmie;           // Non-maskable interrupt enable
 input        [13:0] per_addr;       // Peripheral address
 input        [15:0] per_din;        // Peripheral data input
 input               per_en;         // Peripheral enable (high active)
 input         [1:0] per_we;         // Peripheral write enable (high active)
+input               por;            // Power-on reset
 input               puc_rst;        // Main system reset
+input               scan_enable;    // Scan enable (active during scan shifting)
+input               scan_mode;      // Scan mode
+input               smclk;          // SMCLK
 input               smclk_en;       // SMCLK enable
 input               wdtie;          // Watchdog timer interrupt enable
+input               wdtifg_irq_clr; // Clear Watchdog-timer interrupt flag
+input               wdtifg_sw_clr;  // Watchdog-timer interrupt flag software clear
+input               wdtifg_sw_set;  // Watchdog-timer interrupt flag software set
 
 
 //=============================================================================
@@ -102,7 +121,7 @@ parameter              DEC_WD      =  2;
 parameter [DEC_WD-1:0] WDTCTL      = 'h0;
 
 // Register one-hot decoder utilities
-parameter              DEC_SZ      =  2**DEC_WD;
+parameter              DEC_SZ      =  (1 << DEC_WD);
 parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder
@@ -137,64 +156,326 @@ wire [DEC_SZ-1:0] reg_rd    = reg_dec & {DEC_SZ{reg_read}};
 
 // WDTCTL Register
 //-----------------
-// WDTNMI & WDTSSEL are not implemented and therefore masked
+// WDTNMI is not implemented and therefore masked
    
 reg  [7:0] wdtctl;
 
 wire       wdtctl_wr = reg_wr[WDTCTL];
 
-always @ (posedge mclk or posedge puc_rst)
+`ifdef CLOCK_GATING
+wire       mclk_wdtctl;
+omsp_clock_gate clock_gate_wdtctl (.gclk(mclk_wdtctl),
+                                   .clk (mclk), .enable(wdtctl_wr), .scan_enable(scan_enable));
+`else
+wire       mclk_wdtctl = mclk;
+`endif
+
+`ifdef NMI
+parameter [7:0] WDTNMIES_MASK = 8'h40;
+`else
+parameter [7:0] WDTNMIES_MASK = 8'h00;
+`endif
+
+`ifdef ASIC
+  `ifdef WATCHDOG_MUX
+parameter [7:0] WDTSSEL_MASK  = 8'h04;
+  `else
+parameter [7:0] WDTSSEL_MASK  = 8'h00;
+  `endif
+`else
+parameter [7:0] WDTSSEL_MASK  = 8'h04;
+`endif
+
+parameter [7:0] WDTCTL_MASK   = (8'b1001_0011 | WDTSSEL_MASK | WDTNMIES_MASK);
+   
+always @ (posedge mclk_wdtctl or posedge puc_rst)
   if (puc_rst)        wdtctl <=  8'h00;
-  else if (wdtctl_wr) wdtctl <=  per_din[7:0] & 8'hd7;
+`ifdef CLOCK_GATING
+  else                wdtctl <=  per_din[7:0] & WDTCTL_MASK;
+`else
+  else if (wdtctl_wr) wdtctl <=  per_din[7:0] & WDTCTL_MASK;
+`endif
 
 wire       wdtpw_error = wdtctl_wr & (per_din[15:8]!=8'h5a);
 wire       wdttmsel    = wdtctl[4];
+wire       wdtnmies    = wdtctl[6];
 
 
 //============================================================================
-// 3) REGISTERS
+// 4) DATA OUTPUT GENERATION
 //============================================================================
+
+`ifdef NMI
+parameter [7:0] WDTNMI_RD_MASK  = 8'h20;
+`else
+parameter [7:0] WDTNMI_RD_MASK  = 8'h00;
+`endif
+`ifdef WATCHDOG_MUX
+parameter [7:0] WDTSSEL_RD_MASK = 8'h00;
+`else
+  `ifdef WATCHDOG_NOMUX_ACLK
+parameter [7:0] WDTSSEL_RD_MASK = 8'h04;
+  `else
+parameter [7:0] WDTSSEL_RD_MASK = 8'h00;
+  `endif
+`endif
+parameter [7:0] WDTCTL_RD_MASK  = WDTNMI_RD_MASK | WDTSSEL_RD_MASK;
 
 // Data output mux
-wire [15:0] wdtctl_rd  = {8'h69, wdtctl}  & {16{reg_rd[WDTCTL]}};
-
+wire [15:0] wdtctl_rd  = {8'h69, wdtctl | WDTCTL_RD_MASK} & {16{reg_rd[WDTCTL]}};
 wire [15:0] per_dout   =  wdtctl_rd;
 
 
 //=============================================================================
-// 4)  NMI GENERATION
+// 5)  WATCHDOG TIMER (ASIC IMPLEMENTATION)
 //=============================================================================
+`ifdef ASIC
 
-// Synchronization
-wire   nmi_s;
-`ifdef SYNC_NMI
-omsp_sync_cell sync_cell_nmi (
-    .data_out (nmi_s),
-    .clk      (mclk),
-    .data_in  (nmi),
-    .rst      (puc_rst)
+// Watchdog clock source selection
+//---------------------------------
+wire wdt_clk;
+
+`ifdef WATCHDOG_MUX
+omsp_clock_mux clock_mux_watchdog (
+   .clk_out   (wdt_clk),
+   .clk_in0   (smclk),
+   .clk_in1   (aclk),
+   .reset     (puc_rst),
+   .scan_mode (scan_mode),
+   .select    (wdtctl[2])
 );
 `else
-assign nmi_s = nmi;
+  `ifdef WATCHDOG_NOMUX_ACLK
+     assign wdt_clk =  aclk;
+  `else
+     assign wdt_clk =  smclk;
+  `endif
 `endif
+
+// Reset synchronizer for the watchdog local clock domain
+//--------------------------------------------------------
    
-// Delay
-reg  nmi_dly;
+wire wdt_rst_noscan;
+wire wdt_rst;
+
+// Reset Synchronizer
+omsp_sync_reset sync_reset_por (
+    .rst_s        (wdt_rst_noscan),
+    .clk          (wdt_clk),
+    .rst_a        (puc_rst)
+);
+
+// Scan Reset Mux
+omsp_scan_mux scan_mux_wdt_rst (
+    .scan_mode    (scan_mode),
+    .data_in_scan (puc_rst),
+    .data_in_func (wdt_rst_noscan),
+    .data_out     (wdt_rst)
+);
+   
+
+// Watchog counter clear (synchronization)
+//-----------------------------------------
+
+// Toggle bit whenever the watchog needs to be cleared
+reg        wdtcnt_clr_toggle;
+wire       wdtcnt_clr_detect = (wdtctl_wr & per_din[3]);
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst) nmi_dly <= 1'b0;
-  else         nmi_dly <= nmi_s;
+  if (puc_rst)                wdtcnt_clr_toggle <= 1'b0;
+  else if (wdtcnt_clr_detect) wdtcnt_clr_toggle <= ~wdtcnt_clr_toggle;
+
+// Synchronization
+wire wdtcnt_clr_sync;
+omsp_sync_cell sync_cell_wdtcnt_clr (
+    .data_out  (wdtcnt_clr_sync),
+    .data_in   (wdtcnt_clr_toggle),
+    .clk       (wdt_clk),
+    .rst       (wdt_rst)
+);
 
 // Edge detection
-wire        nmi_re    = ~nmi_dly &  nmi_s & nmie;
-wire        nmi_fe    =  nmi_dly & ~nmi_s & nmie;
+reg wdtcnt_clr_sync_dly;
+always @ (posedge wdt_clk or posedge wdt_rst)
+  if (wdt_rst)  wdtcnt_clr_sync_dly <= 1'b0;
+  else          wdtcnt_clr_sync_dly <= wdtcnt_clr_sync;
 
-// NMI event
-wire        nmi_evt   = wdtctl[6] ? nmi_fe : nmi_re;
+wire wdtqn_edge;
+wire wdtcnt_clr = (wdtcnt_clr_sync ^ wdtcnt_clr_sync_dly) | wdtqn_edge;
+
+
+// Watchog counter increment (synchronization)
+//----------------------------------------------
+wire wdtcnt_incr;
+
+omsp_sync_cell sync_cell_wdtcnt_incr (
+    .data_out  (wdtcnt_incr),
+    .data_in   (~wdtctl[7] & ~dbg_freeze),
+    .clk       (wdt_clk),
+    .rst       (wdt_rst)
+);
+
+
+// Watchdog 16 bit counter
+//--------------------------
+reg  [15:0] wdtcnt;
+
+wire [15:0] wdtcnt_nxt  = wdtcnt+16'h0001;
+
+`ifdef CLOCK_GATING
+wire       wdtcnt_en   = wdtcnt_clr | wdtcnt_incr;
+wire       wdt_clk_cnt;
+omsp_clock_gate clock_gate_wdtcnt (.gclk(wdt_clk_cnt),
+                                   .clk (wdt_clk), .enable(wdtcnt_en), .scan_enable(scan_enable));
+`else
+wire       wdt_clk_cnt = wdt_clk;
+`endif
+
+always @ (posedge wdt_clk_cnt or posedge wdt_rst)
+  if (wdt_rst)           wdtcnt <= 16'h0000;
+  else if (wdtcnt_clr)   wdtcnt <= 16'h0000;
+`ifdef CLOCK_GATING
+  else                   wdtcnt <= wdtcnt_nxt;
+`else
+  else if (wdtcnt_incr)  wdtcnt <= wdtcnt_nxt;
+`endif
+
+
+// Local synchronizer for the wdtctl.WDTISx
+// configuration (note that we can live with
+// a full bus synchronizer as it won't hurt
+// if we get a wrong WDTISx value for a
+// single clock cycle)
+//--------------------------------------------
+reg [1:0] wdtisx_s;
+reg [1:0] wdtisx_ss;
+always @ (posedge wdt_clk_cnt or posedge wdt_rst)
+  if (wdt_rst)
+    begin
+       wdtisx_s  <=  2'h0;
+       wdtisx_ss <=  2'h0;
+    end
+  else
+    begin
+       wdtisx_s  <=  wdtctl[1:0];
+       wdtisx_ss <=  wdtisx_s;
+    end
+
+
+// Interval selection mux
+//--------------------------
+reg        wdtqn;
+
+always @(wdtisx_ss or wdtcnt_nxt)
+    case(wdtisx_ss)
+      2'b00  : wdtqn =  wdtcnt_nxt[15];
+      2'b01  : wdtqn =  wdtcnt_nxt[13];
+      2'b10  : wdtqn =  wdtcnt_nxt[9];
+      default: wdtqn =  wdtcnt_nxt[6];
+    endcase
+
+
+// Watchdog event detection
+//-----------------------------
+
+// Interval end detection
+assign     wdtqn_edge =  (wdtqn & wdtcnt_incr);
+
+// Toggle bit for the transmition to the MCLK domain
+reg        wdt_evt_toggle;
+always @ (posedge wdt_clk_cnt or posedge wdt_rst)
+  if (wdt_rst)         wdt_evt_toggle <= 1'b0;
+  else if (wdtqn_edge) wdt_evt_toggle <= ~wdt_evt_toggle;
+
+// Synchronize in the MCLK domain
+wire       wdt_evt_toggle_sync;
+omsp_sync_cell sync_cell_wdt_evt (
+    .data_out  (wdt_evt_toggle_sync),
+    .data_in   (wdt_evt_toggle),
+    .clk       (mclk),
+    .rst       (puc_rst)
+);
+
+// Delay for edge detection of the toggle bit
+reg        wdt_evt_toggle_sync_dly;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst) wdt_evt_toggle_sync_dly <= 1'b0;
+  else         wdt_evt_toggle_sync_dly <= wdt_evt_toggle_sync;
+
+wire       wdtifg_evt =  (wdt_evt_toggle_sync_dly ^ wdt_evt_toggle_sync) | wdtpw_error;
+
+
+// Watchdog wakeup generation
+//-------------------------------------------------------------
+
+// Clear wakeup when the watchdog flag is cleared (glitch free)
+reg  wdtifg_clr_reg;
+wire wdtifg_clr;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst) wdtifg_clr_reg <= 1'b1;
+  else         wdtifg_clr_reg <= wdtifg_clr;
+
+// Set wakeup when the watchdog event is detected (glitch free)
+reg  wdtqn_edge_reg;
+always @ (posedge wdt_clk_cnt or posedge wdt_rst)
+  if (wdt_rst) wdtqn_edge_reg <= 1'b0;
+  else         wdtqn_edge_reg <= wdtqn_edge;
+
+// Watchdog wakeup cell
+wire wdt_wkup_pre;
+omsp_wakeup_cell wakeup_cell_wdog (
+				   .wkup_out   (wdt_wkup_pre),    // Wakup signal (asynchronous)
+				   .scan_clk   (mclk),            // Scan clock
+				   .scan_mode  (scan_mode),       // Scan mode
+				   .scan_rst   (puc_rst),         // Scan reset
+				   .wkup_clear (wdtifg_clr_reg),  // Glitch free wakeup event clear
+				   .wkup_event (wdtqn_edge_reg)   // Glitch free asynchronous wakeup event
+);
+
+// When not in HOLD, the watchdog can generate a wakeup when:
+//     - in interval mode (if interrupts are enabled)
+//     - in reset mode (always)
+reg  wdt_wkup_en;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst) wdt_wkup_en <= 1'b0;
+  else         wdt_wkup_en <= ~wdtctl[7] & (~wdttmsel | (wdttmsel & wdtie));
+
+// Make wakeup when not enabled
+wire wdt_wkup;
+omsp_and_gate and_wdt_wkup (.y(wdt_wkup), .a(wdt_wkup_pre), .b(wdt_wkup_en));
+
+
+// Watchdog interrupt flag
+//------------------------------
+reg        wdtifg;
+
+wire       wdtifg_set =  wdtifg_evt                  |  wdtifg_sw_set;
+assign     wdtifg_clr =  (wdtifg_irq_clr & wdttmsel) |  wdtifg_sw_clr;
+
+always @ (posedge mclk or posedge por)
+  if (por)             wdtifg <=  1'b0;
+  else if (wdtifg_set) wdtifg <=  1'b1;
+  else if (wdtifg_clr) wdtifg <=  1'b0;
+
+
+// Watchdog interrupt generation
+//---------------------------------
+wire    wdt_irq       = wdttmsel & wdtifg & wdtie;
+
+
+// Watchdog reset generation
+//-----------------------------
+reg     wdt_reset;
+
+always @ (posedge mclk or posedge por)
+  if (por) wdt_reset <= 1'b0;
+  else     wdt_reset <= wdtpw_error | (wdtifg_set & ~wdttmsel);
+
 
 
 //=============================================================================
-// 5)  WATCHDOG TIMER
+// 6)  WATCHDOG TIMER (FPGA IMPLEMENTATION)
 //=============================================================================
+`else
 
 // Watchdog clock source selection
 //---------------------------------
@@ -205,36 +486,66 @@ wire  clk_src_en = wdtctl[2] ? aclk_en : smclk_en;
 //--------------------------
 reg [15:0] wdtcnt;
 
-wire       wdtcnt_clr = (wdtctl_wr & per_din[3]) | wdtifg_set;
+wire        wdtifg_evt;
+wire        wdtcnt_clr  = (wdtctl_wr & per_din[3]) | wdtifg_evt;
+wire        wdtcnt_incr = ~wdtctl[7] & clk_src_en & ~dbg_freeze;
+
+wire [15:0] wdtcnt_nxt  = wdtcnt+16'h0001;
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                                    wdtcnt <= 16'h0000;
-  else if (wdtcnt_clr)                            wdtcnt <= 16'h0000;
-  else if (~wdtctl[7] & clk_src_en & ~dbg_freeze) wdtcnt <= wdtcnt+16'h0001;
+  if (puc_rst)           wdtcnt <= 16'h0000;
+  else if (wdtcnt_clr)   wdtcnt <= 16'h0000;
+  else if (wdtcnt_incr)  wdtcnt <= wdtcnt_nxt;
 
    
 // Interval selection mux
 //--------------------------
 reg        wdtqn;
 
-always @(wdtctl or wdtcnt)
+always @(wdtctl or wdtcnt_nxt)
     case(wdtctl[1:0])
-      2'b00  : wdtqn =  wdtcnt[15];
-      2'b01  : wdtqn =  wdtcnt[13];
-      2'b10  : wdtqn =  wdtcnt[9];
-      default: wdtqn =  wdtcnt[6];
+      2'b00  : wdtqn =  wdtcnt_nxt[15];
+      2'b01  : wdtqn =  wdtcnt_nxt[13];
+      2'b10  : wdtqn =  wdtcnt_nxt[9];
+      default: wdtqn =  wdtcnt_nxt[6];
     endcase
 
 
 // Watchdog event detection
 //-----------------------------
-reg        wdtqn_dly;
 
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst) wdtqn_dly <= 1'b0;
-  else         wdtqn_dly <= wdtqn;
+assign     wdtifg_evt =  (wdtqn & wdtcnt_incr) | wdtpw_error;
 
-wire       wdtifg_set =  (~wdtqn_dly & wdtqn) | wdtpw_error;
+
+// Watchdog interrupt flag
+//------------------------------
+reg        wdtifg;
+
+wire       wdtifg_set =  wdtifg_evt                  |  wdtifg_sw_set;
+wire       wdtifg_clr =  (wdtifg_irq_clr & wdttmsel) |  wdtifg_sw_clr;
+
+always @ (posedge mclk or posedge por)
+  if (por)             wdtifg <=  1'b0;
+  else if (wdtifg_set) wdtifg <=  1'b1;
+  else if (wdtifg_clr) wdtifg <=  1'b0;
+
+
+// Watchdog interrupt generation
+//---------------------------------
+wire    wdt_irq       = wdttmsel & wdtifg & wdtie;
+wire    wdt_wkup      =  1'b0;
+
+
+// Watchdog reset generation
+//-----------------------------
+reg     wdt_reset;
+
+always @ (posedge mclk or posedge por)
+  if (por) wdt_reset <= 1'b0;
+  else     wdt_reset <= wdtpw_error | (wdtifg_set & ~wdttmsel);
+
+
+`endif
 
 
 endmodule // omsp_watchdog

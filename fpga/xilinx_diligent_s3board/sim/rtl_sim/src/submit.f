@@ -61,6 +61,7 @@
 ../../../rtl/verilog/openMSP430_fpga.v
 ../../../rtl/verilog/io_mux.v
 ../../../rtl/verilog/driver_7segment.v
+../../../rtl/verilog/omsp_uart.v
 ../../../rtl/verilog/coregen/ram_8x512_hi.v
 ../../../rtl/verilog/coregen/ram_8x512_lo.v
 ../../../rtl/verilog/coregen/rom_8x2k_hi.v
@@ -78,16 +79,21 @@
 ../../../rtl/verilog/openmsp430/omsp_execution_unit.v
 ../../../rtl/verilog/openmsp430/omsp_register_file.v
 ../../../rtl/verilog/openmsp430/omsp_alu.v
+../../../rtl/verilog/openmsp430/omsp_sfr.v
 ../../../rtl/verilog/openmsp430/omsp_mem_backbone.v
 ../../../rtl/verilog/openmsp430/omsp_clock_module.v
-../../../rtl/verilog/openmsp430/omsp_sfr.v
 ../../../rtl/verilog/openmsp430/omsp_dbg.v
 ../../../rtl/verilog/openmsp430/omsp_dbg_hwbrk.v
 ../../../rtl/verilog/openmsp430/omsp_dbg_uart.v
 ../../../rtl/verilog/openmsp430/omsp_watchdog.v
 ../../../rtl/verilog/openmsp430/omsp_multiplier.v
+../../../rtl/verilog/openmsp430/omsp_sync_reset.v
 ../../../rtl/verilog/openmsp430/omsp_sync_cell.v
+../../../rtl/verilog/openmsp430/omsp_scan_mux.v
+../../../rtl/verilog/openmsp430/omsp_and_gate.v
+../../../rtl/verilog/openmsp430/omsp_wakeup_cell.v
+../../../rtl/verilog/openmsp430/omsp_clock_gate.v
+../../../rtl/verilog/openmsp430/omsp_clock_mux.v
 ../../../rtl/verilog/openmsp430/periph/omsp_gpio.v
 ../../../rtl/verilog/openmsp430/periph/omsp_timerA.v
-
 
