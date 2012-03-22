@@ -148,5 +148,37 @@ wire       [15:0] irq_vect_01 = pmem_0.mem[(1<<(`PMEM_MSB+1))-15]; // IRQ  1
 wire       [15:0] irq_vect_00 = pmem_0.mem[(1<<(`PMEM_MSB+1))-16]; // IRQ  0
 
 // Interrupt detection
-wire              nmi_detect  = dut.frontend_0.inst_nmi;
+wire              nmi_detect  = dut.frontend_0.nmi_pnd;
 wire              irq_detect  = dut.frontend_0.irq_detect;
+
+// Debug interface
+wire              dbg_clk     = dut.clock_module_0.dbg_clk;
+wire              dbg_rst     = dut.clock_module_0.dbg_rst;
+
+
+// CPU ID
+//======================
+
+ wire  [2:0] dbg_cpu_version  =  `CPU_VERSION;
+`ifdef ASIC
+ wire        dbg_cpu_asic     =  1'b1;
+`else
+ wire        dbg_cpu_asic     =  1'b0;
+`endif
+ wire  [4:0] dbg_user_version =  `USER_VERSION;
+ wire  [6:0] dbg_per_space    = (`PER_SIZE  >> 9);
+`ifdef MULTIPLIER
+ wire        dbg_mpy_info     =  1'b1;
+`else
+ wire        dbg_mpy_info     =  1'b0;
+`endif
+ wire  [8:0] dbg_dmem_size    = (`DMEM_SIZE >> 7);
+ wire  [5:0] dbg_pmem_size    = (`PMEM_SIZE >> 10);
+
+ wire [31:0] dbg_cpu_id       = {dbg_pmem_size,
+                                 dbg_dmem_size,
+                                 dbg_mpy_info,
+                                 dbg_per_space,
+                                 dbg_user_version,
+                                 dbg_cpu_asic,
+                                 dbg_cpu_version};

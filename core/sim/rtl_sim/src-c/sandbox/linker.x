@@ -1,12 +1,13 @@
 /* Default linker script, for normal executables */
 OUTPUT_FORMAT("elf32-msp430","elf32-msp430","elf32-msp430")
-OUTPUT_ARCH(msp:110)
+OUTPUT_ARCH("msp430")
 MEMORY
 {
   text   (rx)   	: ORIGIN = 0xF800,      LENGTH = 0x800
   data   (rwx)  	: ORIGIN = 0x0200, 	LENGTH = 0x080
   vectors (rw)   	: ORIGIN = 0xffe0,      LENGTH = 0x20
 }
+/* INCLUDE periph.x */
 SECTIONS
 {
   /* Read-only sections, merged into text segment.  */

@@ -64,7 +64,7 @@ initial
       //--------------------------------------------------------
       @(r15==16'h1000);
 
-      if (r2 !==16'h0022) tb_error("R2  initialization");
+      if (r2 !==16'h0002) tb_error("R2  initialization");
       if (r3 !==16'h3333) tb_error("R3  initialization");
       if (r4 !==16'h4444) tb_error("R4  initialization");
       if (r5 !==16'h5555) tb_error("R5  initialization");

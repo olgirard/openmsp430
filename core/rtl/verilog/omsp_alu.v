@@ -93,13 +93,13 @@ function [4:0] bcd_add;
 
    input [3:0] X;
    input [3:0] Y;
-   input       C;
+   input       C_;
 
-   reg   [4:0] Z;
+   reg   [4:0] Z_;
    begin
-      Z = {1'b0,X}+{1'b0,Y}+{4'b0,C};
-      if (Z<5'd10) bcd_add = Z;
-      else         bcd_add = Z+5'd6;
+      Z_ = {1'b0,X}+{1'b0,Y}+{4'b0,C_};
+      if (Z_<5'd10) bcd_add = Z_;
+      else          bcd_add = Z_+5'd6;
    end
 
 endfunction

@@ -82,11 +82,12 @@
 `include "../../../rtl/verilog/omsp_execution_unit.v"
 `include "../../../rtl/verilog/omsp_register_file.v"
 `include "../../../rtl/verilog/omsp_alu.v"
-`include "../../../rtl/verilog/omsp_mem_backbone.v"
-`include "../../../rtl/verilog/omsp_clock_module.v"
 `include "../../../rtl/verilog/omsp_sfr.v"
+`include "../../../rtl/verilog/omsp_clock_module.v"
+`include "../../../rtl/verilog/omsp_mem_backbone.v"
 `include "../../../rtl/verilog/omsp_watchdog.v"
 `include "../../../rtl/verilog/omsp_sync_cell.v"
+`include "../../../rtl/verilog/omsp_sync_reset.v"
 
 `include "../src/openMSP430_defines.v"
 `ifdef DBG_EN

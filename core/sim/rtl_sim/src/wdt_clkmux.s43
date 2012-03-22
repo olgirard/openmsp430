@@ -65,10 +65,11 @@ main:
 	mov   #0x5a1b, &WDTCTL	  ;# Enable interval mode /64 & clear counter
 	mov   #0x0001, r15
 
-	mov   #0x0170, r14
+	mov   #0x0470, r14
         call  #WAIT_FUNC
 	
 	mov   #0x1000, r15
+ 	mov.b   #0x00, &BCSCTL2	  ;# SMCLK = MCLK
 
 	
         /* -------   WATCHDOG TEST INTERVAL MODE /64 - ACLK        ------ */

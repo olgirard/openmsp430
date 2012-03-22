@@ -52,6 +52,14 @@ initial
       stimulus_done = 0;
       test_step     = 0;
       
+`ifdef ASIC
+      $display(" ===============================================");
+      $display("|               SIMULATION SKIPPED              |");
+      $display("|   (this test is not supported in ASIC mode)   |");
+      $display(" ===============================================");
+      $finish;
+`else
+
       // TIMER A TEST:  RD/WR ACCESS
       //--------------------------------------------------------
 
@@ -215,6 +223,7 @@ initial
       if (mem204 !== 16'h0028) tb_error("====== TIMER_A UP-DOWN MODE: TACCR0 LATENCY ERROR =====");
       test_step = 15;
 
+`endif
 
       stimulus_done = 1;
    end

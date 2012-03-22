@@ -53,6 +53,7 @@ initial
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
+`ifdef WATCHDOG
 
       // WATCHDOG TEST INTERVAL MODE /64 - SMCLK == MCLK/2
       //--------------------------------------------------------
@@ -63,10 +64,34 @@ initial
       mclk_counter = 0;
       r5_counter   = 0;
       repeat(1024) @(negedge mclk);
-      if (mclk_counter !== 1024) tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK =====");
-      if (r5_counter   !== 8)    tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK =====");
+      if (mclk_counter !== 1024)        tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK - TEST 1 =====");
+   `ifdef ASIC
+     `ifdef WATCHDOG_MUX
+        `ifdef SMCLK_DIVIDER
+            if (r5_counter   !== 7)     tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK - TEST 2 =====");
+        `else
+            if (r5_counter   !== 14)    tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK - TEST 3 =====");
+        `endif
+     `else
+        `ifdef WATCHDOG_NOMUX_ACLK
+           `ifdef LFXT_DOMAIN
+               if (r5_counter   !== 0)  tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK - TEST 4 =====");
+           `else
+               if (r5_counter   !== 14) tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK - TEST 5 =====");
+           `endif
+        `else
+           `ifdef SMCLK_DIVIDER
+               if (r5_counter   !== 7)  tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK - TEST 6 =====");
+           `else
+               if (r5_counter   !== 14) tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK - TEST 7 =====");
+           `endif
+        `endif
+     `endif
+   `else
+      if (r5_counter   !== 8)           tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK - TEST 8 =====");
+   `endif
 
-      
+   
       // WATCHDOG TEST INTERVAL MODE /64 - ACLK == LFXTCLK/1
       //--------------------------------------------------------
 
@@ -76,10 +101,32 @@ initial
       mclk_counter = 0;
       r5_counter   = 0;
       repeat(7815) @(negedge mclk);
-      if (mclk_counter !== 7815) tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK =====");
-      if (r5_counter   !== 4)    tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK =====");
+      if (mclk_counter !== 7815)         tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK - TEST 1 =====");
+   `ifdef ASIC
+     `ifdef WATCHDOG_MUX
+            if (r5_counter      !== 4)   tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK - TEST 2 =====");
+     `else
+        `ifdef WATCHDOG_NOMUX_ACLK
+           `ifdef LFXT_DOMAIN
+               if (r5_counter   !== 4)   tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK - TEST 3 =====");
+           `else
+               if (r5_counter   !== 122) tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK - TEST 4 =====");
+           `endif
+        `else
+             if (r5_counter     !== 122) tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK - TEST 5 =====");
+        `endif
+     `endif
+   `else
+      if (r5_counter   !== 4)            tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK - TEST 6 =====");
+   `endif
 
-      
+`else
+      $display(" ===============================================");
+      $display("|               SIMULATION SKIPPED              |");
+      $display("|         (the Watchdog is not included)        |");
+      $display(" ===============================================");
+      $finish;
+`endif
 
       stimulus_done = 1;
    end

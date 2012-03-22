@@ -135,7 +135,7 @@ parameter [DEC_WD-1:0] TACTL      = 'h60,
                        TAIV       = 'h2E;
 
 // Register one-hot decoder utilities
-parameter              DEC_SZ     =  2**DEC_WD;
+parameter              DEC_SZ     =  (1 << DEC_WD);
 parameter [DEC_SZ-1:0] BASE_REG   =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder
@@ -364,17 +364,17 @@ wire taclk_s;
 wire inclk_s;
 
 omsp_sync_cell sync_cell_taclk (
-    .data_out (taclk_s),
-    .clk      (mclk),
-    .data_in  (taclk),
-    .rst      (puc_rst)
+    .data_out  (taclk_s),
+    .data_in   (taclk),
+    .clk       (mclk),
+    .rst       (puc_rst)
 );
 
 omsp_sync_cell sync_cell_inclk (
-    .data_out (inclk_s),
-    .clk      (mclk),
-    .data_in  (inclk),
-    .rst      (puc_rst)
+    .data_out  (inclk_s),
+    .data_in   (inclk),
+    .clk       (mclk),
+    .rst       (puc_rst)
 );
 
 
@@ -479,20 +479,20 @@ wire cci2_s;
 
 omsp_sync_cell sync_cell_cci0 (
     .data_out (cci0_s),
-    .clk      (mclk),
     .data_in  (cci0),
+    .clk      (mclk),
     .rst      (puc_rst)
 );
 omsp_sync_cell sync_cell_cci1 (
     .data_out (cci1_s),
-    .clk      (mclk),
     .data_in  (cci1),
+    .clk      (mclk),
     .rst      (puc_rst)
 );
 omsp_sync_cell sync_cell_cci2 (
     .data_out (cci2_s),
-    .clk      (mclk),
     .data_in  (cci2),
+    .clk      (mclk),
     .rst      (puc_rst)
 );
 

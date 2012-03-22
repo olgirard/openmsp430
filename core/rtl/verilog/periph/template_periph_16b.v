@@ -86,7 +86,7 @@ parameter [DEC_WD-1:0] CNTRL1      = 'h0,
                        CNTRL4      = 'h6;
 
 // Register one-hot decoder utilities
-parameter              DEC_SZ      =  2**DEC_WD;
+parameter              DEC_SZ      =  (1 << DEC_WD);
 parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder

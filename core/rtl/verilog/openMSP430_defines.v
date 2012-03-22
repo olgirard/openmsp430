@@ -108,6 +108,56 @@
 //============================================================================
 
 //-------------------------------------------------------
+// Custom user version number
+//-------------------------------------------------------
+// This 5 bit field can be freely used in order to allow
+// custom identification of the system through the debug
+// interface.
+// (see CPU_ID.USER_VERSION field in the documentation)
+//-------------------------------------------------------
+`define USER_VERSION 5'b00000
+
+
+//-------------------------------------------------------
+// Include/Exclude Watchdog timer
+//-------------------------------------------------------
+// When excluded, the following functionality will be
+// lost:
+//        - Watchog (both interval and watchdog modes)
+//        - NMI interrupt edge selection
+//        - Possibility to generate a software PUC reset
+//-------------------------------------------------------
+`define WATCHDOG
+
+
+///-------------------------------------------------------
+// Include/Exclude Non-Maskable-Interrupt support
+//-------------------------------------------------------
+`define NMI
+
+
+//-------------------------------------------------------
+// Input synchronizers
+//-------------------------------------------------------
+// In some cases, the asynchronous input ports might
+// already be synchronized externally.
+// If an extensive CDC design review showed that this
+// is really the case,  the individual synchronizers
+// can be disabled with the following defines.
+//
+// Notes:
+//        - all three signals are all sampled in the MCLK domain
+//
+//        - the dbg_en signal reset the debug interface
+//         when 0. Therefore make sure it is glitch free.
+//
+//-------------------------------------------------------
+`define SYNC_NMI
+//`define SYNC_CPU_EN
+//`define SYNC_DBG_EN
+
+
+//-------------------------------------------------------
 // Peripheral Memory Space:
 //-------------------------------------------------------
 // The original MSP430 architecture map the peripherals
@@ -132,22 +182,11 @@
 // (CPU break on PUC reset)
 //-------------------------------------------------------
 // When defined, the CPU will automatically break after
-// a PUC occurrence by default. This is typically usefull
+// a PUC occurrence by default. This is typically useful
 // when the program memory can only be initialized through
 // the serial debug interface.
 //-------------------------------------------------------
-//`define DBG_RST_BRK_EN
-
-
-//-------------------------------------------------------
-// Custom user version number
-//-------------------------------------------------------
-// This 5 bit field can be freely used in order to allow
-// custom identification of the system through the debug
-// interface.
-// (see CPU_ID.USER_VERSION field in the documentation)
-//-------------------------------------------------------
-`define USER_VERSION 5'b00000
+`define DBG_RST_BRK_EN
 
 
 //============================================================================
@@ -163,8 +202,9 @@
 //============================================================================
 
 //-------------------------------------------------------
-// Number of hardware breakpoint units (each unit contains
-// two hardware address breakpoints):
+// Number of hardware breakpoint/watchpoint units
+// (each unit contains two hardware addresses available
+// for breakpoints or watchpoints):
 //   - DBG_HWBRK_0 -> Include hardware breakpoints unit 0
 //   - DBG_HWBRK_1 -> Include hardware breakpoints unit 1
 //   - DBG_HWBRK_2 -> Include hardware breakpoints unit 2
@@ -173,7 +213,7 @@
 // Please keep in mind that hardware breakpoints only
 // make sense whenever the program memory is not an SRAM
 // (i.e. Flash/OTP/ROM/...) or when you are interested
-// in data breakpoints (btw. not supported by GDB).
+// in data breakpoints.
 //-------------------------------------------------------
 //`define  DBG_HWBRK_0
 //`define  DBG_HWBRK_1
@@ -193,27 +233,161 @@
 
 
 //-------------------------------------------------------
-// Input synchronizers
+// ASIC version
 //-------------------------------------------------------
-// In some cases, the asynchronous input ports might
-// already be synchronized externally.
-// If an extensive CDC design review showed that this
-// is really the case,  the individual synchronizers
-// can be disabled with the following defines.
+// When uncommented, this define will enable the
+// ASIC system configuration section (see below) and
+// will activate scan support for production test.
 //
-// Notes:
-//        - the dbg_en signal will reset the debug interface
-//         when 0. Therefore make sure it is glitch free.
-//
-//        - the dbg_uart_rxd synchronizer must be set to 1
-//          when its reset is active.
+// WARNING: if you target an FPGA, leave this define
+//          commented.
 //-------------------------------------------------------
-`define SYNC_CPU_EN
-`define SYNC_DBG_EN
-`define SYNC_DBG_UART_RXD
-`define SYNC_NMI
+//`define ASIC
 
 
+//============================================================================
+//============================================================================
+// ASIC SYSTEM CONFIGURATION ( !!!! EXPERTS/PROFESSIONALS ONLY !!!! )
+//============================================================================
+//============================================================================
+`ifdef ASIC
+
+//===============================================================
+// FINE GRAINED CLOCK GATING
+//===============================================================
+
+//-------------------------------------------------------
+// When uncommented, this define will enable the fine
+// grained clock gating of all registers in the core.
+//-------------------------------------------------------
+`define CLOCK_GATING
+
+
+//===============================================================
+// LFXT CLOCK DOMAIN
+//===============================================================
+
+//-------------------------------------------------------
+// When uncommented, this define will enable the lfxt_clk
+// clock domain.
+// When commented out, the whole chip is clocked with dco_clk.
+//-------------------------------------------------------
+`define LFXT_DOMAIN
+
+
+//===============================================================
+// CLOCK MUXES
+//===============================================================
+
+//-------------------------------------------------------
+// MCLK: Clock Mux
+//-------------------------------------------------------
+// When uncommented, this define will enable the
+// MCLK clock MUX allowing the selection between
+// DCO_CLK and LFXT_CLK with the BCSCTL2.SELMx register.
+// When commented, DCO_CLK is selected.
+//-------------------------------------------------------
+`define MCLK_MUX
+
+//-------------------------------------------------------
+// SMCLK: Clock Mux
+//-------------------------------------------------------
+// When uncommented, this define will enable the
+// SMCLK clock MUX allowing the selection between
+// DCO_CLK and LFXT_CLK with the BCSCTL2.SELS register.
+// When commented, DCO_CLK is selected.
+//-------------------------------------------------------
+`define SMCLK_MUX
+
+//-------------------------------------------------------
+// WATCHDOG: Clock Mux
+//-------------------------------------------------------
+// When uncommented, this define will enable the
+// Watchdog clock MUX allowing the selection between
+// ACLK and SMCLK with the WDTCTL.WDTSSEL register.
+// When commented out, ACLK is selected if the
+// WATCHDOG_NOMUX_ACLK define is uncommented, SMCLK is
+// selected otherwise.
+//-------------------------------------------------------
+`define WATCHDOG_MUX
+//`define WATCHDOG_NOMUX_ACLK
+
+
+//===============================================================
+// CLOCK DIVIDERS
+//===============================================================
+
+//-------------------------------------------------------
+// MCLK: Clock divider
+//-------------------------------------------------------
+// When uncommented, this define will enable the
+// MCLK clock divider (/1/2/4/8)
+//-------------------------------------------------------
+`define MCLK_DIVIDER
+
+//-------------------------------------------------------
+// SMCLK: Clock divider (/1/2/4/8)
+//-------------------------------------------------------
+// When uncommented, this define will enable the
+// SMCLK clock divider
+//-------------------------------------------------------
+`define SMCLK_DIVIDER
+
+//-------------------------------------------------------
+// ACLK: Clock divider (/1/2/4/8)
+//-------------------------------------------------------
+// When uncommented, this define will enable the
+// ACLK clock divider
+//-------------------------------------------------------
+`define ACLK_DIVIDER
+
+
+//===============================================================
+// LOW POWER MODES
+//===============================================================
+
+//-------------------------------------------------------
+// LOW POWER MODE: CPUOFF
+//-------------------------------------------------------
+// When uncommented, this define will include the
+// clock gate allowing to switch off MCLK in
+// all low power modes: LPM0, LPM1, LPM2, LPM3, LPM4
+//-------------------------------------------------------
+`define CPUOFF_EN
+
+//-------------------------------------------------------
+// LOW POWER MODE: SCG0
+//-------------------------------------------------------
+// When uncommented, this define will enable the
+// DCO_ENABLE/WKUP port control (always 1 when commented).
+// This allows to switch off the DCO oscillator in the
+// following low power modes: LPM1, LPM3, LPM4
+//-------------------------------------------------------
+`define SCG0_EN
+
+//-------------------------------------------------------
+// LOW POWER MODE: SCG1
+//-------------------------------------------------------
+// When uncommented, this define will include the
+// clock gate allowing to switch off SMCLK in
+// the following low power modes: LPM2, LPM3, LPM4
+//-------------------------------------------------------
+`define SCG1_EN
+
+//-------------------------------------------------------
+// LOW POWER MODE: OSCOFF
+//-------------------------------------------------------
+// When uncommented, this define will include the
+// LFXT_CLK clock gate and enable the LFXT_ENABLE/WKUP
+// port control (always 1 when commented).
+// This allows to switch off the low frequency oscillator
+// in the following low power modes: LPM4
+//-------------------------------------------------------
+`define OSCOFF_EN
+
+
+
+`endif
 
 //==========================================================================//
 //==========================================================================//
@@ -441,9 +615,10 @@
 `define I_IDLE      3'h5
 
 // Execution state machine
-`define E_IRQ_0     4'h0
+// (swapped E_IRQ_0 and E_IRQ_2 values to suppress glitch generation warning from lint tool)
+`define E_IRQ_0     4'h2
 `define E_IRQ_1     4'h1
-`define E_IRQ_2     4'h2
+`define E_IRQ_2     4'h0
 `define E_IRQ_3     4'h3
 `define E_IRQ_4     4'h4
 `define E_SRC_AD    4'h5
@@ -503,16 +678,35 @@
 `define DIVAx       5:4
 
 // Basic clock module: BCSCTL2 Control Register
+`define SELMx       7
+`define DIVMx       5:4
 `define SELS        3
 `define DIVSx       2:1
 
+// MCLK Clock gate
+`ifdef CPUOFF_EN
+  `define MCLK_CGATE
+`else
+`ifdef MCLK_DIVIDER
+  `define MCLK_CGATE
+`endif
+`endif
+
+// SMCLK Clock gate
+`ifdef SCG1_EN
+  `define SMCLK_CGATE
+`else
+`ifdef SMCLK_DIVIDER
+  `define SMCLK_CGATE
+`endif
+`endif
 
 //
 // DEBUG INTERFACE EXTRA CONFIGURATION
 //======================================
 
 // Debug interface: CPU version
-`define CPU_VERSION   3'h1
+`define CPU_VERSION   3'h2
 
 // Debug interface: Software breakpoint opcode
 `define DBG_SWBRK_OP 16'h4343
@@ -548,6 +742,9 @@
 `define DBG_UART
 //`define DBG_JTAG
 
+// Debug interface input synchronizer
+`define SYNC_DBG_UART_RXD
+
 // Enable/Disable the hardware breakpoint RANGE mode
 `ifdef DBG_HWBRK_RANGE
  `define HWBRK_RANGE 1'b1
@@ -582,3 +779,25 @@ CONFIGURATION ERROR: JTAG OR UART DEBUG INTERFACE SHOULD BE ENABLED
 // default 16x8 multplier (2 cycles)
 //`define MPY_16x16
   
+//======================================
+// CONFIGURATION CHECKS
+//======================================
+`ifdef LFXT_DOMAIN
+`else
+ `ifdef MCLK_MUX
+CONFIGURATION ERROR: THE MCLK_MUX CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
+ `endif
+ `ifdef SMCLK_MUX
+CONFIGURATION ERROR: THE SMCLK_MUX CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
+ `endif   
+ `ifdef WATCHDOG_MUX
+CONFIGURATION ERROR: THE WATCHDOG_MUX CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
+ `else
+   `ifdef WATCHDOG_NOMUX_ACLK
+CONFIGURATION ERROR: THE WATCHDOG_NOMUX_ACLK CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
+   `endif
+ `endif
+ `ifdef OSCOFF_EN
+CONFIGURATION ERROR: THE OSCOFF LOW POWER MODE CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
+ `endif   
+`endif

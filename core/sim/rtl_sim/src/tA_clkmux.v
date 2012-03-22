@@ -73,6 +73,14 @@ initial
       stimulus_done = 0;
 
 
+`ifdef ASIC
+      $display(" ===============================================");
+      $display("|               SIMULATION SKIPPED              |");
+      $display("|   (this test is not supported in ASIC mode)   |");
+      $display(" ===============================================");
+      $finish;
+`else
+
       // TIMER A TEST:  INPUT MUX - TACLK
       //--------------------------------------------------------
 //      @(r15 === 16'h0000);
@@ -116,7 +124,8 @@ initial
       repeat(300) @(posedge mclk);
       if (tar !== 16'h001E) tb_error("====== TIMER A TEST:  INPUT MUX - INCLK =====");
 
-    
+`endif    
+
       stimulus_done = 1;
    end
 

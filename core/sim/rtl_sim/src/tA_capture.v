@@ -49,6 +49,14 @@ initial
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
+`ifdef ASIC
+      $display(" ===============================================");
+      $display("|               SIMULATION SKIPPED              |");
+      $display("|   (this test is not supported in ASIC mode)   |");
+      $display(" ===============================================");
+      $finish;
+`else
+
       // TIMER A TEST:  INPUT MUX (CCI)
       //--------------------------------------------------------
 
@@ -492,7 +500,8 @@ initial
       if (mem204 !== 16'hC000) tb_error("====== TIMER_A CAPTURE OVERFLOW: COMPARATOR 2 =====");
 
 
-     
+`endif     
+
       stimulus_done = 1;
    end
 

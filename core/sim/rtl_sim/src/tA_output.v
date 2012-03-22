@@ -49,6 +49,14 @@ initial
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
+`ifdef ASIC
+      $display(" ===============================================");
+      $display("|               SIMULATION SKIPPED              |");
+      $display("|   (this test is not supported in ASIC mode)   |");
+      $display(" ===============================================");
+      $finish;
+`else
+
       // TIMER A TEST:  COMPARATOR 0
       //--------------------------------------------------------
 
@@ -370,6 +378,7 @@ initial
       @(tar === 16'h0020);
       if (ta_out2 !== 1'b1) tb_error("====== TIMER_A COMPARE 2: Reset/Set (mode 7) =====");
 
+`endif
 
       stimulus_done = 1;
    end

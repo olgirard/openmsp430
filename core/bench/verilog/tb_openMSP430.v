@@ -101,6 +101,13 @@ reg          [7:0] p6_din;
 wire        [15:0] per_dout_temp_8b;
 wire        [15:0] per_dout_temp_16b;
 
+// Simple full duplex UART
+wire        [15:0] per_dout_uart;
+wire               irq_uart_rx;
+wire               irq_uart_tx;
+wire               uart_txd;
+reg                uart_rxd;
+
 // Timer A
 wire               irq_ta0;
 wire               irq_ta1;
@@ -122,9 +129,17 @@ wire               ta_out2_en;
    
 // Clock / Reset & Interrupts
 reg                dco_clk;
+wire               dco_enable;
+wire               dco_wkup;
+reg                dco_local_enable;
 reg                lfxt_clk;
+wire               lfxt_enable;
+wire               lfxt_wkup;
+reg                lfxt_local_enable;
 wire               mclk;
+wire               aclk;
 wire               aclk_en;
+wire               smclk;
 wire               smclk_en;
 reg                reset_n;
 wire               puc_rst;
@@ -133,13 +148,25 @@ reg         [13:0] irq;
 wire        [13:0] irq_acc;
 wire        [13:0] irq_in;
 reg                cpu_en;
+reg         [13:0] wkup;
+wire        [13:0] wkup_in;
    
+// Scan (ASIC version only)
+reg                scan_enable;
+reg                scan_mode;
+
 // Debug interface
 reg                dbg_en;
 wire               dbg_freeze;
 wire               dbg_uart_txd;
-reg                dbg_uart_rxd;
+wire               dbg_uart_rxd;
+reg                dbg_uart_rxd_sel;
+reg                dbg_uart_rxd_dly;
+reg                dbg_uart_rxd_pre;
+reg                dbg_uart_rxd_meta;
 reg         [15:0] dbg_uart_buf;
+reg                dbg_uart_rx_busy;
+reg                dbg_uart_tx_busy;
 
 // Core testbench debuging signals
 wire    [8*32-1:0] i_state;
@@ -165,6 +192,9 @@ reg                stimulus_done;
 // Debug interface tasks
 `include "dbg_uart_tasks.v"
 
+// Simple uart tasks
+//`include "uart_tasks.v"
+
 // Verilog stimulus
 `include "stimulus.v"
 
@@ -182,13 +212,28 @@ initial
 //------------------------------
 initial
   begin
-     dco_clk = 1'b0;
-     forever #25 dco_clk <= ~dco_clk;   // 20 MHz
+     dco_clk          = 1'b0;
+     dco_local_enable = 1'b0;
+     forever
+       begin
+	  #25;   // 20 MHz
+	  dco_local_enable = (dco_enable===1) ? dco_enable : (dco_wkup===1);
+	  if (dco_local_enable)
+	    dco_clk = ~dco_clk;
+       end
   end
+
 initial
   begin
-     lfxt_clk = 1'b0;
-     forever #763 lfxt_clk <= ~lfxt_clk; // 655 kHz
+     lfxt_clk          = 1'b0;
+     lfxt_local_enable = 1'b0;
+     forever
+       begin
+	  #763;  // 655 kHz
+	  lfxt_local_enable = (lfxt_enable===1) ? lfxt_enable : (lfxt_wkup===1);
+	  if (lfxt_local_enable)
+	    lfxt_clk = ~lfxt_clk;
+       end
   end
 
 initial
@@ -202,28 +247,37 @@ initial
 
 initial
   begin
-     error         = 0;
-     stimulus_done = 1;
-     irq           = 14'b0000;
-     nmi           = 1'b0;
-     cpu_en        = 1'b1;
-     dbg_en        = 1'b0;
-     dbg_uart_rxd  = 1'b1;
-     dbg_uart_buf  = 16'h0000;
-     p1_din        = 8'h00;
-     p2_din        = 8'h00;
-     p3_din        = 8'h00;
-     p4_din        = 8'h00;
-     p5_din        = 8'h00;
-     p6_din        = 8'h00;
-     inclk         = 1'b0;
-     taclk         = 1'b0;
-     ta_cci0a      = 1'b0;
-     ta_cci0b      = 1'b0;
-     ta_cci1a      = 1'b0;
-     ta_cci1b      = 1'b0;
-     ta_cci2a      = 1'b0;
-     ta_cci2b      = 1'b0;
+     error            = 0;
+     stimulus_done    = 1;
+     irq              = 14'h0000;
+     nmi              = 1'b0;
+     wkup             = 14'h0000;
+     cpu_en           = 1'b1;
+     dbg_en           = 1'b0;
+     dbg_uart_rxd_sel = 1'b0;
+     dbg_uart_rxd_dly = 1'b1;
+     dbg_uart_rxd_pre = 1'b1;
+     dbg_uart_rxd_meta= 1'b0;
+     dbg_uart_buf     = 16'h0000;
+     dbg_uart_rx_busy = 1'b0;
+     dbg_uart_tx_busy = 1'b0;
+     p1_din           = 8'h00;
+     p2_din           = 8'h00;
+     p3_din           = 8'h00;
+     p4_din           = 8'h00;
+     p5_din           = 8'h00;
+     p6_din           = 8'h00;
+     inclk            = 1'b0;
+     taclk            = 1'b0;
+     ta_cci0a         = 1'b0;
+     ta_cci0b         = 1'b0;
+     ta_cci1a         = 1'b0;
+     ta_cci1b         = 1'b0;
+     ta_cci2a         = 1'b0;
+     ta_cci2b         = 1'b0;
+     uart_rxd         = 1'b1;
+     scan_enable      = 1'b0;
+     scan_mode        = 1'b0;
   end
 
    
@@ -270,14 +324,19 @@ ram #(`DMEM_MSB, `DMEM_SIZE) dmem_0 (
 openMSP430 dut (
 
 // OUTPUTs
-    .aclk_en      (aclk_en),           // ACLK enable
+    .aclk         (aclk),              // ASIC ONLY: ACLK
+    .aclk_en      (aclk_en),           // FPGA ONLY: ACLK enable
     .dbg_freeze   (dbg_freeze),        // Freeze peripherals
     .dbg_uart_txd (dbg_uart_txd),      // Debug interface: UART TXD
+    .dco_enable   (dco_enable),        // ASIC ONLY: Fast oscillator enable
+    .dco_wkup     (dco_wkup),          // ASIC ONLY: Fast oscillator wake-up (asynchronous)
     .dmem_addr    (dmem_addr),         // Data Memory address
     .dmem_cen     (dmem_cen),          // Data Memory chip enable (low active)
     .dmem_din     (dmem_din),          // Data Memory data input
     .dmem_wen     (dmem_wen),          // Data Memory write enable (low active)
     .irq_acc      (irq_acc),           // Interrupt request accepted (one-hot signal)
+    .lfxt_enable  (lfxt_enable),       // ASIC ONLY: Low frequency oscillator enable
+    .lfxt_wkup    (lfxt_wkup),         // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
     .mclk         (mclk),              // Main system clock
     .per_addr     (per_addr),          // Peripheral address
     .per_din      (per_din),           // Peripheral data input
@@ -288,12 +347,13 @@ openMSP430 dut (
     .pmem_din     (pmem_din),          // Program Memory data input (optional)
     .pmem_wen     (pmem_wen),          // Program Memory write enable (low active) (optional)
     .puc_rst      (puc_rst),           // Main system reset
-    .smclk_en     (smclk_en),          // SMCLK enable
+    .smclk        (smclk),             // ASIC ONLY: SMCLK
+    .smclk_en     (smclk_en),          // FPGA ONLY: SMCLK enable
 
 // INPUTs
-    .cpu_en       (cpu_en),            // Enable CPU code execution
-    .dbg_en       (dbg_en),            // Debug interface enable
-    .dbg_uart_rxd (dbg_uart_rxd),      // Debug interface: UART RXD
+    .cpu_en       (cpu_en),            // Enable CPU code execution (asynchronous)
+    .dbg_en       (dbg_en),            // Debug interface enable (asynchronous)
+    .dbg_uart_rxd (dbg_uart_rxd),      // Debug interface: UART RXD (asynchronous)
     .dco_clk      (dco_clk),           // Fast oscillator (fast clock)
     .dmem_dout    (dmem_dout),         // Data Memory data output
     .irq          (irq_in),            // Maskable interrupts
@@ -301,7 +361,10 @@ openMSP430 dut (
     .nmi          (nmi),               // Non-maskable interrupt (asynchronous)
     .per_dout     (per_dout),          // Peripheral data output
     .pmem_dout    (pmem_dout),         // Program Memory data output
-    .reset_n      (reset_n)            // Reset Pin (low active)
+    .reset_n      (reset_n),           // Reset Pin (low active, asynchronous)
+    .scan_enable  (scan_enable),       // ASIC ONLY: Scan enable (active during scan shifting)
+    .scan_mode    (scan_mode),         // ASIC ONLY: Scan mode
+    .wkup         (|wkup_in)           // ASIC ONLY: System Wake-up (asynchronous)
 );
 
 //
@@ -401,6 +464,35 @@ omsp_timerA timerA_0 (
 );
    
 //
+// Simple full duplex UART (8N1 protocol)
+//----------------------------------------
+`ifdef READY_FOR_PRIMETIME
+omsp_uart #(.BASE_ADDR(15'h0080)) uart_0 (
+
+// OUTPUTs
+    .irq_uart_rx  (irq_uart_rx),   // UART receive interrupt
+    .irq_uart_tx  (irq_uart_tx),   // UART transmit interrupt
+    .per_dout     (per_dout_uart), // Peripheral data output
+    .uart_txd     (uart_txd),      // UART Data Transmit (TXD)
+
+// INPUTs
+    .mclk         (mclk),          // Main system clock
+    .per_addr     (per_addr),      // Peripheral address
+    .per_din      (per_din),       // Peripheral data input
+    .per_en       (per_en),        // Peripheral enable (high active)
+    .per_we       (per_we),        // Peripheral write enable (high active)
+    .puc_rst      (puc_rst),       // Main system reset
+    .smclk_en     (smclk_en),      // SMCLK enable (from CPU)
+    .uart_rxd     (uart_rxd)       // UART Data Receive (RXD)
+);
+`else
+    assign irq_uart_rx   =  1'b0;
+    assign irq_uart_tx   =  1'b0;
+    assign per_dout_uart = 16'h0000;
+    assign uart_txd      =  1'b0;
+`endif
+
+//
 // Peripheral templates
 //----------------------------------
 
@@ -442,28 +534,44 @@ template_periph_16b #(.BASE_ADDR(15'd`PER_SIZE-15'h0070)) template_periph_16b_0 
 
 assign per_dout = per_dout_dio       |
                   per_dout_timerA    |
+                  per_dout_uart      |
                   per_dout_temp_8b   |
                   per_dout_temp_16b;
 
 
 //
-// Map peripheral interrupts
+// Map peripheral interrupts & wakeups
 //----------------------------------------
 
-assign irq_in = irq | {1'b0,           // Vector 13  (0xFFFA)
-                       1'b0,           // Vector 12  (0xFFF8)
-                       1'b0,           // Vector 11  (0xFFF6)
-                       1'b0,           // Vector 10  (0xFFF4) - Watchdog -
-                       irq_ta0,        // Vector  9  (0xFFF2)
-                       irq_ta1,        // Vector  8  (0xFFF0)
-                       1'b0,           // Vector  7  (0xFFEE)
-                       1'b0,           // Vector  6  (0xFFEC)
-                       1'b0,           // Vector  5  (0xFFEA)
-                       1'b0,           // Vector  4  (0xFFE8)
-                       irq_port2,      // Vector  3  (0xFFE6)
-                       irq_port1,      // Vector  2  (0xFFE4)
-                       1'b0,           // Vector  1  (0xFFE2)
-                       1'b0};          // Vector  0  (0xFFE0)
+assign irq_in  = irq  | {1'b0,           // Vector 13  (0xFFFA)
+                         1'b0,           // Vector 12  (0xFFF8)
+                         1'b0,           // Vector 11  (0xFFF6)
+                         1'b0,           // Vector 10  (0xFFF4) - Watchdog -
+                         irq_ta0,        // Vector  9  (0xFFF2)
+                         irq_ta1,        // Vector  8  (0xFFF0)
+                         irq_uart_rx,    // Vector  7  (0xFFEE)
+                         irq_uart_tx,    // Vector  6  (0xFFEC)
+                         1'b0,           // Vector  5  (0xFFEA)
+                         1'b0,           // Vector  4  (0xFFE8)
+                         irq_port2,      // Vector  3  (0xFFE6)
+                         irq_port1,      // Vector  2  (0xFFE4)
+                         1'b0,           // Vector  1  (0xFFE2)
+                         1'b0};          // Vector  0  (0xFFE0)
+
+assign wkup_in = wkup | {1'b0,           // Vector 13  (0xFFFA)
+                         1'b0,           // Vector 12  (0xFFF8)
+                         1'b0,           // Vector 11  (0xFFF6)
+                         1'b0,           // Vector 10  (0xFFF4) - Watchdog -
+                         1'b0,           // Vector  9  (0xFFF2)
+                         1'b0,           // Vector  8  (0xFFF0)
+                         1'b0,           // Vector  7  (0xFFEE)
+                         1'b0,           // Vector  6  (0xFFEC)
+                         1'b0,           // Vector  5  (0xFFEA)
+                         1'b0,           // Vector  4  (0xFFE8)
+                         1'b0,           // Vector  3  (0xFFE6)
+                         1'b0,           // Vector  2  (0xFFE4)
+                         1'b0,           // Vector  1  (0xFFE2)
+                         1'b0};          // Vector  0  (0xFFE0)
 
 
 //
@@ -516,10 +624,14 @@ initial // Timeout
   begin
    `ifdef NO_TIMEOUT
    `else
+     `ifdef VERY_LONG_TIMEOUT
+       #500000000;
+     `else     
      `ifdef LONG_TIMEOUT
        #5000000;
      `else     
        #500000;
+     `endif
      `endif
        $display(" ===============================================");
        $display("|               SIMULATION FAILED               |");

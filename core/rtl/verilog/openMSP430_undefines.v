@@ -178,6 +178,15 @@
 `undef USER_VERSION
 `endif
 
+// Include/Exclude Watchdog timer
+`ifdef WATCHDOG
+`undef WATCHDOG
+`endif
+
+// Include/Exclude Non-Maskable-Interrupt support
+`ifdef NMI
+`undef NMI
+`endif
 
 //----------------------------------------------------------------------------
 // EXPERT SYSTEM CONFIGURATION ( !!!! EXPERTS ONLY !!!! )
@@ -214,6 +223,76 @@
 `endif
 `ifdef SYNC_NMI
 `undef SYNC_NMI
+`endif
+
+// ASIC version
+`ifdef ASIC
+`undef ASIC
+`endif
+
+
+//----------------------------------------------------------------------------
+// ASIC SYSTEM CONFIGURATION ( !!!! EXPERTS ONLY !!!! )
+//----------------------------------------------------------------------------
+
+// Fine grained clock gating
+`ifdef CLOCK_GATING
+`undef CLOCK_GATING
+`endif
+
+// LFXT clock domain
+`ifdef LFXT_DOMAIN
+`undef LFXT_DOMAIN
+`endif
+
+// MCLK: Clock Mux
+`ifdef MCLK_MUX
+`undef MCLK_MUX
+`endif
+
+// SMCLK: Clock Mux
+`ifdef SMCLK_MUX
+`undef SMCLK_MUX
+`endif
+
+// WATCHDOG: Clock Mux
+`ifdef WATCHDOG_MUX
+`undef WATCHDOG_MUX
+`endif
+
+// MCLK: Clock divider
+`ifdef MCLK_DIVIDER
+`undef MCLK_DIVIDER
+`endif
+
+// SMCLK: Clock divider (/1/2/4/8)
+`ifdef SMCLK_DIVIDER
+`undef SMCLK_DIVIDER
+`endif
+
+// ACLK: Clock divider (/1/2/4/8)
+`ifdef ACLK_DIVIDER
+`undef ACLK_DIVIDER
+`endif
+
+// LOW POWER MODE: CPUOFF
+`ifdef CPUOFF_EN
+`undef CPUOFF_EN
+`endif
+
+// LOW POWER MODE: OSCOFF
+`ifdef OSCOFF_EN
+`undef OSCOFF_EN
+`endif
+
+// LOW POWER MODE: SCG0
+`ifdef SCG0_EN
+`undef SCG0_EN
+`endif
+
+// LOW POWER MODE: SCG1
+`ifdef SCG1_EN
+`undef SCG1_EN
 `endif
 
 
@@ -573,6 +652,12 @@
 `endif
 
 // Basic clock module: BCSCTL2 Control Register
+`ifdef SELMx
+`undef SELMx
+`endif
+`ifdef DIVMx
+`undef DIVMx
+`endif
 `ifdef SELS
 `undef SELS
 `endif
@@ -580,6 +665,15 @@
 `undef DIVSx
 `endif
 
+// MCLK Clock gate
+`ifdef MCLK_CGATE
+`undef MCLK_CGATE
+`endif
+
+// SMCLK Clock gate
+`ifdef SMCLK_CGATE
+`undef SMCLK_CGATE
+`endif
 
 //
 // DEBUG INTERFACE EXTRA CONFIGURATION

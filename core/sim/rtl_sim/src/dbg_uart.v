@@ -337,15 +337,15 @@ initial
       dbg_uart_wr(MEM_CNT,  16'h0004);             // 5 consecutive access
       
       dbg_uart_wr(MEM_CTL,  16'h0001); // Start burst to 16 bit registers read
-      dbg_uart_rx16();                 // read 1st data
+      dbg_uart_rx16;                   // read 1st data
       if (dbg_uart_buf !== 16'h1234)      tb_error("====== 16B WRITE BURSTS (MEMORY) RD ERROR: 1st DATA =====");
-      dbg_uart_rx16();                 // read 2nd data
+      dbg_uart_rx16;                   // read 2nd data
       if (dbg_uart_buf !== 16'h5678)      tb_error("====== 16B WRITE BURSTS (MEMORY) RD ERROR: 2nd DATA =====");
-      dbg_uart_rx16();                 // read 3rd data
+      dbg_uart_rx16;                   // read 3rd data
       if (dbg_uart_buf !== 16'h9abc)      tb_error("====== 16B WRITE BURSTS (MEMORY) RD ERROR: 3rd DATA =====");
-      dbg_uart_rx16();                 // read 4th data
+      dbg_uart_rx16;                   // read 4th data
       if (dbg_uart_buf !== 16'hdef0)      tb_error("====== 16B WRITE BURSTS (MEMORY) RD ERROR: 4th DATA =====");
-      dbg_uart_rx16();                 // read 5th data
+      dbg_uart_rx16;                   // read 5th data
       if (dbg_uart_buf !== 16'h0fed)      tb_error("====== 16B WRITE BURSTS (MEMORY) RD ERROR: 5th DATA =====");
 
 
@@ -376,15 +376,15 @@ initial
       dbg_uart_wr(MEM_CNT,  16'h0004); // 5 consecutive access
       
       dbg_uart_wr(MEM_CTL,  16'h0005); // Start burst to 16 bit cpu registers read
-      dbg_uart_rx16();                 // read 1st data
+      dbg_uart_rx16;                   // read 1st data
       if (dbg_uart_buf !== 16'hcba9)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) RD ERROR: 1st DATA =====");
-      dbg_uart_rx16();                 // read 2nd data
+      dbg_uart_rx16;                   // read 2nd data
       if (dbg_uart_buf !== 16'h8765)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) RD ERROR: 2nd DATA =====");
-      dbg_uart_rx16();                 // read 3rd data
+      dbg_uart_rx16;                   // read 3rd data
       if (dbg_uart_buf !== 16'h4321)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) RD ERROR: 3rd DATA =====");
-      dbg_uart_rx16();                 // read 4th data
+      dbg_uart_rx16;                   // read 4th data
       if (dbg_uart_buf !== 16'h0123)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) RD ERROR: 4th DATA =====");
-      dbg_uart_rx16();                 // read 5th data
+      dbg_uart_rx16;                   // read 5th data
       if (dbg_uart_buf !== 16'h4567)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) RD ERROR: 5th DATA =====");
 
 
@@ -415,15 +415,15 @@ initial
       dbg_uart_wr(MEM_CNT,  16'h0004); // 5 consecutive access
       
       dbg_uart_wr(MEM_CTL,  16'h0009); // Start burst to 8 bit registers read
-      dbg_uart_rx8();                 // read 1st data
+      dbg_uart_rx8;                   // read 1st data
       if (dbg_uart_buf !== 16'h0091)      tb_error("====== 8B WRITE BURSTS (MEMORY) RD ERROR: 1st DATA =====");
-      dbg_uart_rx8();                 // read 2nd data
+      dbg_uart_rx8;                   // read 2nd data
       if (dbg_uart_buf !== 16'h0082)      tb_error("====== 8B WRITE BURSTS (MEMORY) RD ERROR: 2nd DATA =====");
-      dbg_uart_rx8();                 // read 3rd data
+      dbg_uart_rx8;                   // read 3rd data
       if (dbg_uart_buf !== 16'h0073)      tb_error("====== 8B WRITE BURSTS (MEMORY) RD ERROR: 3rd DATA =====");
-      dbg_uart_rx8();                 // read 4th data
+      dbg_uart_rx8;                   // read 4th data
       if (dbg_uart_buf !== 16'h0064)      tb_error("====== 8B WRITE BURSTS (MEMORY) RD ERROR: 4th DATA =====");
-      dbg_uart_rx8();                 // read 5th data
+      dbg_uart_rx8;                   // read 5th data
       if (dbg_uart_buf !== 16'h0055)      tb_error("====== 8B WRITE BURSTS (MEMORY) RD ERROR: 5th DATA =====");
 
 

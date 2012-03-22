@@ -66,7 +66,7 @@ main:
 	# Pre-initialize stack
 	mov             #DMEM_252, r1
 	push #RETI_ROUTINE
-	push            #0x0145
+	push            #0x010f
 	mov     #0x0000, &0x0200
 
 	# Run RETI test
@@ -304,13 +304,18 @@ wait_irq13:
 
         # Test IRQ NMI:	 rising edge
 	#----------------------------
+
 .set   WDTCTL, 0x0120
 .set   IE1,    0x0000
 .set   IFG1,   0x0002
 
+
 	mov     #0x5a00, &WDTCTL  ; NMI Edge selection: rising
 	bic.b   #0x0010, &IFG1    ; Clear NMI flag
 	bis.b   #0x0010, &IE1     ; Enable NMI
+
+	bit     #0x0010, &IE1     ; skip this test if the NMI is not included
+	jz      skip_nmi
 
 	mov     #0x0000, r6
 	mov     #0xaaaa, r7
@@ -323,8 +328,11 @@ wait_nmi:
 	jne    wait_nmi
 
 	mov.b      &IE1,  r9
-	mov.b      &IFG1, r10
+	mov.b     &IFG1, r10
+	bic.b     #0x10, &IFG1    ; Clear NMI flag
+	bis.b     #0x10, &IE1     ; Enable NMI
 
+skip_nmi:
 	mov     #0xf201, r15
 
 

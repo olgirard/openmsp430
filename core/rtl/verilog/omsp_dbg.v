@@ -60,6 +60,7 @@ module  omsp_dbg (
 			     
 // INPUTs
     cpu_en_s,                       // Enable CPU code execution (synchronous)
+    cpu_id,                         // CPU ID
     dbg_clk,                        // Debug unit clock
     dbg_en_s,                       // Debug interface enable (synchronous)
     dbg_halt_st,                    // Halt/Run status from CPU
@@ -77,7 +78,7 @@ module  omsp_dbg (
     fe_mb_en,                       // Frontend Memory bus enable
     fe_mdb_in,                      // Frontend Memory data bus input
     pc,                             // Program counter
-    puc_rst                         // Main system reset
+    puc_pnd_set                     // PUC pending set for the serial debug interface
 );
 
 // OUTPUTs
@@ -95,6 +96,7 @@ output              dbg_uart_txd;   // Debug interface: UART TXD
 // INPUTs
 //=========
 input               cpu_en_s;       // Enable CPU code execution (synchronous)
+input        [31:0] cpu_id;         // CPU ID
 input               dbg_clk;        // Debug unit clock
 input               dbg_en_s;       // Debug interface enable (synchronous)
 input               dbg_halt_st;    // Halt/Run status from CPU
@@ -112,7 +114,7 @@ input               exec_done;      // Execution completed
 input               fe_mb_en;       // Frontend Memory bus enable
 input        [15:0] fe_mdb_in;      // Frontend Memory data bus input
 input        [15:0] pc;             // Program counter
-input               puc_rst;        // Main system reset
+input               puc_pnd_set;    // PUC pending set for the serial debug interface
 
 
 //=============================================================================
@@ -145,6 +147,9 @@ wire        brk3_halt;
 wire        brk3_pnd;
 wire [15:0] brk3_dout;
     
+// Number of registers
+parameter           NR_REG       = 24;
+
 // Register addresses
 parameter           CPU_ID_LO    = 6'h00;
 parameter           CPU_ID_HI    = 6'h01;
@@ -180,45 +185,39 @@ parameter           BRK3_ADDR1   = 6'h17;
 `endif
 
 // Register one-hot decoder
-parameter           CPU_ID_LO_D  = (64'h1 << CPU_ID_LO);
-parameter           CPU_ID_HI_D  = (64'h1 << CPU_ID_HI);
-parameter           CPU_CTL_D    = (64'h1 << CPU_CTL);
-parameter           CPU_STAT_D   = (64'h1 << CPU_STAT);
-parameter           MEM_CTL_D    = (64'h1 << MEM_CTL);
-parameter           MEM_ADDR_D   = (64'h1 << MEM_ADDR);
-parameter           MEM_DATA_D   = (64'h1 << MEM_DATA);
-parameter           MEM_CNT_D    = (64'h1 << MEM_CNT);
+parameter           BASE_D       = {{NR_REG-1{1'b0}}, 1'b1};
+parameter           CPU_ID_LO_D  = (BASE_D << CPU_ID_LO);
+parameter           CPU_ID_HI_D  = (BASE_D << CPU_ID_HI);
+parameter           CPU_CTL_D    = (BASE_D << CPU_CTL);
+parameter           CPU_STAT_D   = (BASE_D << CPU_STAT);
+parameter           MEM_CTL_D    = (BASE_D << MEM_CTL);
+parameter           MEM_ADDR_D   = (BASE_D << MEM_ADDR);
+parameter           MEM_DATA_D   = (BASE_D << MEM_DATA);
+parameter           MEM_CNT_D    = (BASE_D << MEM_CNT);
 `ifdef DBG_HWBRK_0
-parameter           BRK0_CTL_D   = (64'h1 << BRK0_CTL);
-parameter           BRK0_STAT_D  = (64'h1 << BRK0_STAT);
-parameter           BRK0_ADDR0_D = (64'h1 << BRK0_ADDR0);
-parameter           BRK0_ADDR1_D = (64'h1 << BRK0_ADDR1);
+parameter           BRK0_CTL_D   = (BASE_D << BRK0_CTL);
+parameter           BRK0_STAT_D  = (BASE_D << BRK0_STAT);
+parameter           BRK0_ADDR0_D = (BASE_D << BRK0_ADDR0);
+parameter           BRK0_ADDR1_D = (BASE_D << BRK0_ADDR1);
 `endif
 `ifdef DBG_HWBRK_1
-parameter           BRK1_CTL_D   = (64'h1 << BRK1_CTL);
-parameter           BRK1_STAT_D  = (64'h1 << BRK1_STAT);
-parameter           BRK1_ADDR0_D = (64'h1 << BRK1_ADDR0);
-parameter           BRK1_ADDR1_D = (64'h1 << BRK1_ADDR1);
+parameter           BRK1_CTL_D   = (BASE_D << BRK1_CTL);
+parameter           BRK1_STAT_D  = (BASE_D << BRK1_STAT);
+parameter           BRK1_ADDR0_D = (BASE_D << BRK1_ADDR0);
+parameter           BRK1_ADDR1_D = (BASE_D << BRK1_ADDR1);
 `endif
 `ifdef DBG_HWBRK_2
-parameter           BRK2_CTL_D   = (64'h1 << BRK2_CTL);
-parameter           BRK2_STAT_D  = (64'h1 << BRK2_STAT);
-parameter           BRK2_ADDR0_D = (64'h1 << BRK2_ADDR0);
-parameter           BRK2_ADDR1_D = (64'h1 << BRK2_ADDR1);
+parameter           BRK2_CTL_D   = (BASE_D << BRK2_CTL);
+parameter           BRK2_STAT_D  = (BASE_D << BRK2_STAT);
+parameter           BRK2_ADDR0_D = (BASE_D << BRK2_ADDR0);
+parameter           BRK2_ADDR1_D = (BASE_D << BRK2_ADDR1);
 `endif
 `ifdef DBG_HWBRK_3
-parameter           BRK3_CTL_D   = (64'h1 << BRK3_CTL);
-parameter           BRK3_STAT_D  = (64'h1 << BRK3_STAT);
-parameter           BRK3_ADDR0_D = (64'h1 << BRK3_ADDR0);
-parameter           BRK3_ADDR1_D = (64'h1 << BRK3_ADDR1);
+parameter           BRK3_CTL_D   = (BASE_D << BRK3_CTL);
+parameter           BRK3_STAT_D  = (BASE_D << BRK3_STAT);
+parameter           BRK3_ADDR0_D = (BASE_D << BRK3_ADDR0);
+parameter           BRK3_ADDR1_D = (BASE_D << BRK3_ADDR1);
 `endif
-
-// PUC is localy used as a data.
-reg  [1:0] puc_sync;
-always @ (posedge dbg_clk or posedge dbg_rst)
-  if (dbg_rst) puc_sync <=  2'b11;
-  else         puc_sync <=  {puc_sync[0] , puc_rst};
-wire           puc_s     =  puc_sync[1];
 
 
 //============================================================================
@@ -229,7 +228,7 @@ wire           puc_s     =  puc_sync[1];
 wire  [5:0] dbg_addr_in = mem_burst ? MEM_DATA : dbg_addr;
 
 // Register address decode
-reg  [63:0]  reg_dec; 
+reg  [NR_REG-1:0]  reg_dec; 
 always @(dbg_addr_in)
   case (dbg_addr_in)
     CPU_ID_LO :  reg_dec  =  CPU_ID_LO_D;
@@ -264,16 +263,18 @@ always @(dbg_addr_in)
     BRK3_ADDR0:  reg_dec  =  BRK3_ADDR0_D;
     BRK3_ADDR1:  reg_dec  =  BRK3_ADDR1_D;
 `endif
-    default:     reg_dec  =  {64{1'b0}};
+  // pragma coverage off
+    default:     reg_dec  =  {NR_REG{1'b0}};
+  // pragma coverage on
   endcase
 
 // Read/Write probes
-wire         reg_write =  dbg_wr;
-wire         reg_read  =  1'b1;
+wire               reg_write =  dbg_wr;
+wire               reg_read  =  1'b1;
 
 // Read/Write vectors
-wire  [63:0] reg_wr    = reg_dec & {64{reg_write}};
-wire  [63:0] reg_rd    = reg_dec & {64{reg_read}};
+wire  [NR_REG-1:0] reg_wr    = reg_dec & {NR_REG{reg_write}};
+wire  [NR_REG-1:0] reg_rd    = reg_dec & {NR_REG{reg_read}};
 
 
 //=============================================================================
@@ -292,29 +293,7 @@ wire  [63:0] reg_rd    = reg_dec & {64{reg_read}};
 //             |         PMEM_SIZE          |            DMEM_SIZE          |  MPY |
 //              -------------------------------------------------------------------
 
-wire  [2:0] cpu_version  =  `CPU_VERSION;
-`ifdef ASIC
-wire        cpu_asic     =  1'b1;
-`else
-wire        cpu_asic     =  1'b0;
-`endif
-wire  [4:0] user_version =  `USER_VERSION;
-wire  [6:0] per_space    = (`PER_SIZE  >> 9);  // cpu_id_per  *  512 = peripheral space size
-`ifdef MULTIPLIER
-wire        mpy_info     =  1'b1;
-`else
-wire        mpy_info     =  1'b0;
-`endif
-wire  [8:0] dmem_size    = (`DMEM_SIZE >> 7);  // cpu_id_dmem *  128 = data memory size
-wire  [5:0] pmem_size    = (`PMEM_SIZE >> 10); // cpu_id_pmem * 1024 = program memory size
-
-wire [31:0] cpu_id       = {pmem_size,
-			    dmem_size,
-			    mpy_info,
-			    per_space,
-			    user_version,
-			    cpu_asic,
-                            cpu_version};
+// This register is assigned in the SFR module
 
 
 // CPU_CTL Register
@@ -328,9 +307,9 @@ wire        cpu_ctl_wr = reg_wr[CPU_CTL];
    
 always @ (posedge dbg_clk or posedge dbg_rst)
 `ifdef DBG_RST_BRK_EN
-  if (dbg_rst)         cpu_ctl <=  4'h4;
+  if (dbg_rst)         cpu_ctl <=  4'h6;
 `else
-  if (dbg_rst)         cpu_ctl <=  4'h0;
+  if (dbg_rst)         cpu_ctl <=  4'h2;
 `endif
   else if (cpu_ctl_wr) cpu_ctl <=  dbg_din[6:3];
 
@@ -349,7 +328,7 @@ wire        istep    = cpu_ctl_wr & dbg_din[`ISTEP] &  dbg_halt_st;
 reg   [3:2] cpu_stat;
 
 wire        cpu_stat_wr  = reg_wr[CPU_STAT];
-wire  [3:2] cpu_stat_set = {dbg_swbrk, puc_s};
+wire  [3:2] cpu_stat_set = {dbg_swbrk, puc_pnd_set};
 wire  [3:2] cpu_stat_clr = ~dbg_din[3:2];
 
 always @ (posedge dbg_clk or posedge dbg_rst)
@@ -667,7 +646,7 @@ wire dbg_cpu_reset  = cpu_ctl[`CPU_RST];
    
 // Break after reset
 //--------------------------
-wire halt_rst = cpu_ctl[`RST_BRK_EN] & dbg_en_s & puc_s;
+wire halt_rst = cpu_ctl[`RST_BRK_EN] & dbg_en_s & puc_pnd_set;
 
    
 // Freeze peripherals
@@ -757,7 +736,9 @@ always @(mem_state or mem_seq_start or dbg_halt_st)
     M_SET_BRK    : mem_state_nxt =  dbg_halt_st   ? M_ACCESS_BRK : M_SET_BRK;
     M_ACCESS_BRK : mem_state_nxt =  M_IDLE;
     M_ACCESS     : mem_state_nxt =  M_IDLE;
+  // pragma coverage off
     default      : mem_state_nxt =  M_IDLE;
+  // pragma coverage on
   endcase
 
 // State machine

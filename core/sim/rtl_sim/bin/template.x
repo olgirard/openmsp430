@@ -1,6 +1,6 @@
 /* Default linker script, for normal executables */
 OUTPUT_FORMAT("elf32-msp430","elf32-msp430","elf32-msp430")
-OUTPUT_ARCH(msp430)
+OUTPUT_ARCH("msp430")
 MEMORY
 {
   text   (rx)   	: ORIGIN = PMEM_BASE,   LENGTH = PMEM_SIZE

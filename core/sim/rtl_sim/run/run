@@ -15,4 +15,6 @@ export OMSP_NODUMP
 OMSP_SIMULATOR=iverilog
 export OMSP_SIMULATOR
 
-../bin/msp430sim two-op_mov
+rm -rf cov_work
+
+../bin/msp430sim sing-op_reti

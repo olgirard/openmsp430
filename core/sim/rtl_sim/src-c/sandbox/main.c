@@ -35,6 +35,7 @@
 
 #include <msp430x11x1.h>
 #include <signal.h>                    // Needed for using interrupts with msp430-gcc
+//#include <legacymsp430.h>
 
 
 volatile char shift_direction = 0x01;  // Global variable

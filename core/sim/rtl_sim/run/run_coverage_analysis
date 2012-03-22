@@ -6,10 +6,10 @@
 #       WAS RUN USING "ncverilog" SIMULATOR
 
 # Remove old merged report
-rm -rf cov_work/design/merged_coverage
+rm -rf cov_work/scope/merged_coverage
 
 # Merge all available coverage reports
-iccr ../bin/cov_iccr_merge.cf
+imc -batch ../bin/cov_iccr_merge.cf
 
 # Launch GUI
-iccr -test cov_work/design/merged_coverage -GUI
+imc -gui -load cov_work/scope/merged_coverage

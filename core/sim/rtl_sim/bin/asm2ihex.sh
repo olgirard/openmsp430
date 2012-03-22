@@ -10,7 +10,7 @@
 # This source file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published
 # by the Free Software Foundation; either version 2.1 of the License, or
-# (at your option) any later version.
+# (at your option) any later version.1
 #
 # This source is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -40,8 +40,8 @@
 EXPECTED_ARGS=6
 if [ $# -ne $EXPECTED_ARGS ]; then
   echo "ERROR    : wrong number of arguments"
-  echo "USAGE    : asm2ihex.sh <test name> <test assembler file> <definition file>   <prog mem size> <data mem size> <peripheral addr space size>"
-  echo "Example  : asm2ihex.sh c-jump_jge  ../src/c-jump_jge.s43 ../bin/template.def 2048            128             512"
+  echo "USAGE    : asm2ihex.sh <test name> <test assembler file> <linker script>   <prog mem size> <data mem size> <peripheral addr space size>"
+  echo "Example  : asm2ihex.sh c-jump_jge  ../src/c-jump_jge.s43 ../bin/template.x 2048            128             512"
   exit 1
 fi
 
@@ -70,12 +70,12 @@ PMEM_SIZE=$4
 PMEM_BASE=$((0x10000-$PMEM_SIZE))
 STACK_INIT=$((PER_SIZE+0x0080))
 
-cp  $3  ./pmem.def
-sed -i "s/PMEM_BASE/$PMEM_BASE/g"    pmem.def
-sed -i "s/PMEM_SIZE/$PMEM_SIZE/g"    pmem.def
-sed -i "s/DMEM_SIZE/$DMEM_SIZE/g"    pmem.def
-sed -i "s/PER_SIZE/$PER_SIZE/g"      pmem.def
-sed -i "s/STACK_INIT/$STACK_INIT/g"  pmem.def
+cp  $3  ./pmem.x
+sed -i "s/PMEM_BASE/$PMEM_BASE/g"    pmem.x
+sed -i "s/PMEM_SIZE/$PMEM_SIZE/g"    pmem.x
+sed -i "s/DMEM_SIZE/$DMEM_SIZE/g"    pmem.x
+sed -i "s/PER_SIZE/$PER_SIZE/g"      pmem.x
+sed -i "s/STACK_INIT/$STACK_INIT/g"  pmem.x
 
 
 ###############################################################################
@@ -83,5 +83,5 @@ sed -i "s/STACK_INIT/$STACK_INIT/g"  pmem.def
 ###############################################################################
 msp430-as      -alsm         $2     -o $1.o     > $1.l43
 msp430-objdump -xdsStr       $1.o              >> $1.l43
-msp430-ld      -T ./pmem.def $1.o   -o $1.elf
+msp430-ld      -T ./pmem.x   $1.o   -o $1.elf
 msp430-objcopy -O ihex       $1.elf    $1.ihex

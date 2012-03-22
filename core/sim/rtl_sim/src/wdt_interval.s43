@@ -50,15 +50,17 @@ main:
 
         /* --------------   WATCHDOG TEST:  RD/WR ACCESS    --------------- */
 
-	mov  &WDTCTL, r4
-	mov  #0x5aff, &WDTCTL
-	mov  &WDTCTL, r5
-	mov  #0x5a55, &WDTCTL
-	mov  &WDTCTL, r6
-	mov  #0x5aaa, &WDTCTL
-	mov  &WDTCTL, r7
-	mov  #0x5a00, &WDTCTL
-	mov  &WDTCTL, r8
+	mov   &WDTCTL, r4
+	mov   #0x5aff, &WDTCTL
+	mov   &WDTCTL, r5
+	mov   #0x5a55, &WDTCTL
+	mov   &WDTCTL, r6
+	mov   #0x5aaa, &WDTCTL
+	mov   &WDTCTL, r7
+	mov   #0x5a00, &WDTCTL
+	mov   &WDTCTL, r8
+	mov   &IFG1,   r9
+	mov.b #0x00,   &IFG1
 
 	mov  #0x1000, r15
 
@@ -84,10 +86,16 @@ wait_loop_64:
 
 	bic.b #0x01,   &IE1	  ;# Disable watchdog interrupt
 
-	mov   #0x5a1b, &WDTCTL	  ;# Enable interval mode /64 & clear counter
+	mov   #0x0205, r4
+	mov   &WDTCTL, r5	  ;# Check if ACLK is selected
+	bit   #0x0004, r5
+	jnz   aclk_sel_64
+	mov   #0x0012, r4
+   aclk_sel_64:
 
-	mov   #0x0010, r4
+	mov   #0x5a1b, &WDTCTL	  ;# Enable interval mode /64 & clear counter
 	mov   #0x0002, r5
+
 wait_loop_64_no_irq:
 	dec   r4
 	cmp   #0x0000, r4
@@ -101,7 +109,6 @@ wait_loop_64_no_irq:
 	mov   #0x2001, r15
 
 
-	
 	mov   #0x5a9b, &WDTCTL	  ;# Enable interval mode /64 & clear counter & enable hold
 
 	mov   #0x0020, r4

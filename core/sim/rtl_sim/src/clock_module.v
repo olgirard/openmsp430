@@ -59,6 +59,13 @@ initial
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
+`ifdef ASIC
+      $display(" ===============================================");
+      $display("|               SIMULATION SKIPPED              |");
+      $display("|   (this test is not supported in ASIC mode)   |");
+      $display(" ===============================================");
+      $finish;
+`else
 
       // ACLK GENERATION
       //--------------------------------------------------------
@@ -198,6 +205,7 @@ initial
       reg_val       = r14;           // Read R14 register & initialize aclk/smclk counters
       aclk_counter  = 0;
       smclk_counter = 0;
+      repeat(3)   @(posedge mclk);
       if (dbg_freeze    !== 1'b1) tb_error("====== DBG_FREEZE signal is not active (test 2) =====");
 
       repeat(500) @(posedge mclk);   // Make sure that the CPU is stopped
@@ -233,6 +241,7 @@ initial
       if (r12 !== 16'h0000) tb_error("====== BCSCTL1 rd/wr access error (test 5) =====");
       if (r13 !== 16'h0000) tb_error("====== BCSCTL2 rd/wr access error (test 5) =====");
    
+`endif
 
       stimulus_done = 1;
    end

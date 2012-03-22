@@ -48,6 +48,14 @@ initial
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
+`ifdef ASIC
+      $display(" ===============================================");
+      $display("|               SIMULATION SKIPPED              |");
+      $display("|   (this test is not supported in ASIC mode)   |");
+      $display(" ===============================================");
+      $finish;
+`else
+
       // TIMER A TEST:  UP MODE
       //--------------------------------------------------------
 
@@ -244,6 +252,8 @@ initial
       if (mem224 !== 16'h3489) tb_error("====== TIMER_A COMPARE 2: CCI INPUT LATCHING (SCCI) =====");
       if (mem226 !== 16'h2480) tb_error("====== TIMER_A COMPARE 2: CCI INPUT LATCHING (SCCI) =====");
       if (mem228 !== 16'h2081) tb_error("====== TIMER_A COMPARE 2: CCI INPUT LATCHING (SCCI) =====");
+
+`endif
 
       stimulus_done = 1;
    end

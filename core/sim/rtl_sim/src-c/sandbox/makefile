@@ -22,7 +22,7 @@ download: download-uart
 
 #additional rules for files
 ${NAME}.elf: ${OBJECTS}
-	${CC} -T linker.def -o $@ ${OBJECTS}
+	${CC} -T linker.x -o $@ ${OBJECTS}
 
 ${NAME}.a43: ${NAME}.elf
 	msp430-objcopy -O ihex $^ $@

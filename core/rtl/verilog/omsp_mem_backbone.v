@@ -81,7 +81,8 @@ module  omsp_mem_backbone (
     mclk,                           // Main system clock
     per_dout,                       // Peripheral data output
     pmem_dout,                      // Program Memory data output
-    puc_rst                         // Main system reset
+    puc_rst,                        // Main system reset
+    scan_enable                     // Scan enable (active during scan shifting)
 );
 
 // OUTPUTs
@@ -121,6 +122,7 @@ input                mclk;          // Main system clock
 input         [15:0] per_dout;      // Peripheral data output
 input         [15:0] pmem_dout;     // Program Memory data output
 input                puc_rst;       // Main system reset
+input                scan_enable;   // Scan enable (active during scan shifting)
 
 
 //=============================================================================
@@ -205,11 +207,23 @@ always @(posedge mclk or posedge puc_rst)
 
 wire fe_pmem_save    = ( fe_pmem_cen & ~fe_pmem_cen_dly) & ~dbg_halt_st;
 wire fe_pmem_restore = (~fe_pmem_cen &  fe_pmem_cen_dly) |  dbg_halt_st;
+
+`ifdef CLOCK_GATING
+wire mclk_bckup;
+omsp_clock_gate clock_gate_bckup (.gclk(mclk_bckup),
+                                  .clk (mclk), .enable(fe_pmem_save), .scan_enable(scan_enable));
+`else
+wire mclk_bckup = mclk;
+`endif
    
 reg  [15:0] pmem_dout_bckup;
-always @(posedge mclk or posedge puc_rst)
+always @(posedge mclk_bckup or posedge puc_rst)
   if (puc_rst)           pmem_dout_bckup     <=  16'h0000;
+`ifdef CLOCK_GATING
+  else                   pmem_dout_bckup     <=  pmem_dout;
+`else
   else if (fe_pmem_save) pmem_dout_bckup     <=  pmem_dout;
+`endif
 
 // Mux between the ROM data and the backup
 reg         pmem_dout_bckup_sel;

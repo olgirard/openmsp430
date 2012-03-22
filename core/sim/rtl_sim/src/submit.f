@@ -44,26 +44,20 @@
 
 
 //=============================================================================
-// Module specific modules
+// CPU
 //=============================================================================
+
 +incdir+../../../rtl/verilog/
+-f ../src/core.f
+
+
+//=============================================================================
+// Peripherals
+//=============================================================================
+
 +incdir+../../../rtl/verilog/periph/
-../../../rtl/verilog/openMSP430_defines.v
-../../../rtl/verilog/openMSP430.v
-../../../rtl/verilog/omsp_frontend.v
-../../../rtl/verilog/omsp_execution_unit.v
-../../../rtl/verilog/omsp_register_file.v
-../../../rtl/verilog/omsp_alu.v
-../../../rtl/verilog/omsp_mem_backbone.v
-../../../rtl/verilog/omsp_clock_module.v
-../../../rtl/verilog/omsp_sfr.v
-../../../rtl/verilog/omsp_dbg.v
-../../../rtl/verilog/omsp_dbg_hwbrk.v
-../../../rtl/verilog/omsp_dbg_uart.v
-../../../rtl/verilog/omsp_watchdog.v
-../../../rtl/verilog/omsp_multiplier.v
-../../../rtl/verilog/omsp_sync_cell.v
 ../../../rtl/verilog/periph/omsp_gpio.v
 ../../../rtl/verilog/periph/omsp_timerA.v
+//../../../rtl/verilog/periph/omsp_uart.v
 ../../../rtl/verilog/periph/template_periph_8b.v
 ../../../rtl/verilog/periph/template_periph_16b.v

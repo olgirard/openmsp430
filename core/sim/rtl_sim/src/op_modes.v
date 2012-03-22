@@ -57,6 +57,13 @@ initial
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
+`ifdef ASIC
+      $display(" ===============================================");
+      $display("|               SIMULATION SKIPPED              |");
+      $display("|   (this test is not supported in ASIC mode)   |");
+      $display(" ===============================================");
+      $finish;
+`else
 
       // SCG1   (<=> R2[7]): turn off SMCLK
       //--------------------------------------------------------
@@ -184,7 +191,8 @@ initial
       repeat (80) @(negedge mclk);
       if (inst_cnt  <= 16'h0030) tb_error("====== CPUOFF TEST 6: CPU IS NOT RUNNING =====");
 
-    
+`endif    
+
       stimulus_done = 1;
    end
 

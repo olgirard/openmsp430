@@ -5,7 +5,8 @@
 ##############################################################################
 
 set DESIGN_NAME      "openMSP430"
-set RTL_SOURCE_FILES {../../rtl/verilog/openMSP430.v
+set RTL_SOURCE_FILES {../../rtl/verilog/openMSP430_defines.v
+                      ../../rtl/verilog/openMSP430.v
                       ../../rtl/verilog/omsp_frontend.v
                       ../../rtl/verilog/omsp_execution_unit.v
                       ../../rtl/verilog/omsp_register_file.v
@@ -18,7 +19,13 @@ set RTL_SOURCE_FILES {../../rtl/verilog/openMSP430.v
                       ../../rtl/verilog/omsp_dbg_uart.v
                       ../../rtl/verilog/omsp_dbg_hwbrk.v
                       ../../rtl/verilog/omsp_multiplier.v
+                      ../../rtl/verilog/omsp_sync_reset.v
                       ../../rtl/verilog/omsp_sync_cell.v
+                      ../../rtl/verilog/omsp_scan_mux.v
+                      ../../rtl/verilog/omsp_and_gate.v
+                      ../../rtl/verilog/omsp_wakeup_cell.v
+                      ../../rtl/verilog/omsp_clock_gate.v
+                      ../../rtl/verilog/omsp_clock_mux.v
 }
 
 set_svf ./results/$DESIGN_NAME.svf

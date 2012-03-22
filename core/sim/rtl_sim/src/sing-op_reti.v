@@ -66,7 +66,7 @@ initial
       //--------------------------
       @(r15==16'h2000);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== RETI: SP value      =====");
-      if (r2    !==16'h0145)             tb_error("====== RETI: SR value      =====");
+      if (r2    !==16'h010f)             tb_error("====== RETI: SR value      =====");
       if (r5    !==16'h1234)             tb_error("====== RETI: R5 value      =====");
 
 
@@ -296,6 +296,7 @@ initial
 
       // Test interruption NMI:	 rising edge
       //--------------------------------------
+  `ifdef NMI
       @(r15==16'hf200);
       repeat(2) @(negedge mclk);
       nmi       = 1'b1;
@@ -315,7 +316,7 @@ initial
 
       if (r9    !==16'h0000)             tb_error("====== NMI: NMIE   value  =====");
       if (r10   !==16'h0010)             tb_error("====== NMI: NMIIFG value  =====");
-
+   `endif
 
       stimulus_done = 1;
    end

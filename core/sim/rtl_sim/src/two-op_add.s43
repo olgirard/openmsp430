@@ -91,7 +91,7 @@
 
 main:
         /* ---------------------- INITIALIZE REGISTERS --------------------- */
-        mov     #0x2222, r2
+        mov     #0x2202, r2
         mov     #0x3333, r3
         mov     #0x4444, r4
         mov     #0x5555, r5

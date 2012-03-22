@@ -46,6 +46,13 @@ initial
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
 `ifdef DBG_EN
+  `ifdef ASIC
+      $display(" ===============================================");
+      $display("|               SIMULATION SKIPPED              |");
+      $display("|   (this test is not supported in ASIC mode)   |");
+      $display(" ===============================================");
+      $finish;
+  `else
       test_nr = 0;
       #1 dbg_en = 0;
       repeat(30) @(posedge mclk);
@@ -96,9 +103,9 @@ initial
       // Check CPU_CTL reset value
       dbg_uart_rd(CPU_CTL);
 `ifdef DBG_RST_BRK_EN
-      if (dbg_uart_buf !== 16'h0020) tb_error("====== CPU_CTL wrong reset value -  test 4 =====");
+      if (dbg_uart_buf !== 16'h0030) tb_error("====== CPU_CTL wrong reset value -  test 4 =====");
 `else
-      if (dbg_uart_buf !== 16'h0000) tb_error("====== CPU_CTL wrong reset value -  test 4 =====");     
+      if (dbg_uart_buf !== 16'h0010) tb_error("====== CPU_CTL wrong reset value -  test 4 =====");     
 `endif
 
 
@@ -136,9 +143,9 @@ initial
       // Check CPU_CTL reset value
       dbg_uart_rd(CPU_CTL);
 `ifdef DBG_RST_BRK_EN
-      if (dbg_uart_buf !== 16'h0020) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");
+      if (dbg_uart_buf !== 16'h0030) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");
 `else
-      if (dbg_uart_buf !== 16'h0000) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");     
+      if (dbg_uart_buf !== 16'h0010) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");     
 `endif
       dbg_uart_rd(MEM_DATA);
       if (dbg_uart_buf !== 16'h0000) tb_error("====== MEM_DATA read access failed - test 9 =====");
@@ -178,9 +185,9 @@ initial
       // Check CPU_CTL reset value
       dbg_uart_rd(CPU_CTL);
 `ifdef DBG_RST_BRK_EN
-      if (dbg_uart_buf !== 16'h0020) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");
+      if (dbg_uart_buf !== 16'h0030) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");
 `else
-      if (dbg_uart_buf !== 16'h0000) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");     
+      if (dbg_uart_buf !== 16'h0010) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");     
 `endif
       dbg_uart_rd(MEM_DATA);
       if (dbg_uart_buf !== 16'h0000) tb_error("====== MEM_DATA read access failed - test 9 =====");
@@ -197,6 +204,8 @@ initial
       irq[1] = 1'b0;
       
       stimulus_done = 1;
+
+  `endif
 `else
 
        $display(" ===============================================");
