@@ -1,3 +1,12 @@
+2012-03-22 [r134]  
+
+	* Add full ASIC support (low-power modes, DFT, ...). Improved
+	  serial debug interface reliability.
+
+2012-03-09 [r132]  
+
+	* Update FPGA examples with the POP.B bug fix
+
 2012-03-01 [r130]  
 
 	* Fixed POP.B bug (see Bugtracker

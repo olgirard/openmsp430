@@ -1,3 +1,7 @@
+2012-03-22 [r133]  
+
+	* Add support for new CPU version.
+
 2011-11-10 [r126]  
 
 	* Remove freewrap642 directory. Tools users now have to install
