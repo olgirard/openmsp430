@@ -18,7 +18,7 @@
 <a name="1. Introduction"></a>
 <h1>1. Introduction</h1>
 
-To simplify the integration of this IP, the directory structure is based on the <a href="http://www.opencores.org/downloads/opencores_coding_guidelines.pdf">OpenCores</a> recommendations.
+To simplify the integration of this IP, the directory structure is based on the <a href="http://cdn.opencores.org/downloads/opencores_coding_guidelines.pdf">OpenCores</a> recommendations.
 <br>
 <a name="2. Directory structure: openMSP430 core"></a>
 <div style="text-align: right;"><a href="#TOC">Top</a></div>
@@ -26,7 +26,7 @@ To simplify the integration of this IP, the directory structure is based on the 
 
 <table border="1">
 	<tbody><tr><td colspan="5"><b>core</b></td>                                                                           <td><i><b>openMSP430 Core top level directory</b></i></td></tr>
-	<tr><td rowspan="87" valign="bottom"><font color="white">abcd</font></td> <td colspan="4"><b>bench</b></td>    <td><i><b>Top level testbench directory</b></i></td></tr>
+	<tr><td rowspan="107" valign="bottom"><font color="white">abcd</font></td> <td colspan="4"><b>bench</b></td>    <td><i><b>Top level testbench directory</b></i></td></tr>
 	<tr><td rowspan="7" valign="bottom"><font color="white">abcd</font></td> <td colspan="3"><b>verilog</b></td>  <td><i></i><br>
 </td></tr>
 	<tr><td rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">tb_openMSP430.v</td> <td><i>Testbench top level module</i></td></tr>
@@ -41,9 +41,9 @@ To simplify the integration of this IP, the directory structure is based on the 
 	<tr><td colspan="4"><b>doc</b></td>                                                                            <td><i><b>Diverse documentation</b></i></td></tr>
 	<tr><td><font color="white">abcd</font></td> <td colspan="3">slau049f.pdf</td>                                 <td><i>MSP430x1xx Family User's Guide</i></td></tr>
 	<tr><td colspan="4"><b>rtl</b></td>                                                                            <td><i><b>RTL sources</b></i></td></tr>
-	<tr><td rowspan="24" valign="bottom"><font color="white">abcd</font></td><td colspan="3"><b>verilog</b></td>   <td><i></i><br>
+	<tr><td rowspan="30" valign="bottom"><font color="white">abcd</font></td><td colspan="3"><b>verilog</b></td>   <td><i></i><br>
 </td></tr>
-	<tr><td rowspan="23" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">openMSP430_defines.v</td>  <td><i>openMSP430 core configuration file (Program and Data memory size definition, Debug Interface configuration, ...)</i></td></tr>
+	<tr><td rowspan="29" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">openMSP430_defines.v</td>  <td><i>openMSP430 core configuration file (Program and Data memory size definition, Debug Interface configuration, ...)</i></td></tr>
 	<tr><td colspan="2">openMSP430_undefines.v</td>                                                                <td><i>openMSP430 Verilog `undef file</i></td></tr>
 	<tr><td colspan="2">openMSP430.v</td>                                                                          <td><i>openMSP430 top level</i></td></tr>
 	<tr><td colspan="2">omsp_frontend.v</td>                                                                       <td><i>Instruction fetch and decode</i></td></tr>
@@ -58,8 +58,39 @@ To simplify the integration of this IP, the directory structure is based on the 
 	<tr><td colspan="2">omsp_dbg.v</td>                                                                            <td><i>Serial Debug Interface main block</i></td></tr>
 	<tr><td colspan="2">omsp_dbg_hwbrk.v</td>                                                                      <td><i>Serial Debug Interface hardware breakpoint unit</i></td></tr>
 	<tr><td colspan="2">omsp_dbg_uart.v</td>                                                                       <td><i>Serial Debug Interface UART communication block</i></td></tr>
-	<tr><td colspan="2">omsp_sync_cell.v<br>
-</td>                                                                           <td><i>Simple synchronization module (double flip-flop).</i></td></tr>
+	<tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">omsp_sync_cell.v</td>
+      <td style="vertical-align: top;"><i>Simple synchronization module (double flip-flop).</i></td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">omsp_sync_reset.v</td>
+      <td style="vertical-align: top;"><i>Generic Reset synchronizer (double flip-flop).</i></td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">omsp_clock_gate.v</td>
+      <td style="vertical-align: top;"><i>Generic Clock gate (NAND2 or LATCH-AND based).</i></td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">omsp_clock_mux.v</td>
+      <td style="vertical-align: top;"><i>Standard Clock Mux (used in the clock module &amp; watchdog timer).<br>
+      </i></td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">omsp_and_gate.v</td>
+      <td style="vertical-align: top;"><i>AND gate module used on sensitive glitch free data paths.<br>
+      </i></td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">omsp_wakeup_cell.v</td>
+      <td style="vertical-align: top;"><i>Generic Wake-up module.<br>
+      </i></td>
+    </tr>
+    <tr>
+      <td colspan="2" rowspan="1" style="vertical-align: top;">omsp_scan_mux.v</td>
+      <td style="vertical-align: top;"><i>Scan MUX.<br>
+      </i></td>
+    </tr>
+
 	<tr><td colspan="2"><b>periph</b></td>                                                                         <td><i><b>Peripherals directory</b></i></td></tr>
 	<tr><td rowspan="6"><font color="white">abcd</font></td> <td>omsp_gpio.v</td>                                  <td><i>Digital I/O (Port 1 to 6)</i></td></tr>
 	<tr>
@@ -76,8 +107,8 @@ To simplify the integration of this IP, the directory structure is based on the 
 	<tr><td colspan="1">template_periph_16b.v</td>                                                                 <td><i>Verilog template for 16 bit peripherals</i></td></tr>
 	<tr><td colspan="1">template_periph_8b.v</td>                                                                  <td><i>Verilog template for 8 bit peripherals</i></td></tr>
 	<tr><td colspan="4"><b>sim</b></td>                                                                            <td><i><b>Top level simulations directory</b></i></td></tr>
-	<tr><td rowspan="40" valign="bottom"><font color="white">abcd</font></td> <td colspan="3"><b>rtl_sim</b></td>  <td><i><b>RTL simulations</b></i></td></tr>
-	<tr><td rowspan="39" valign="bottom"><font color="white">abcd</font></td> <td colspan="2"><b>bin</b></td>      <td><i><b>RTL simulation scripts</b></i></td></tr>
+	<tr><td rowspan="54" valign="bottom"><font color="white">abcd</font></td> <td colspan="3"><b>rtl_sim</b></td>  <td><i><b>RTL simulations</b></i></td></tr>
+	<tr><td rowspan="53" valign="bottom"><font color="white">abcd</font></td> <td colspan="2"><b>bin</b></td>      <td><i><b>RTL simulation scripts</b></i></td></tr>
 	<tr><td rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">msp430sim</td>       <td><i>Main simulation script for assembler vector sources (located in the <span style="font-weight: bold;">src</span> directory)<br>
 </i></td></tr>
 	<tr>
@@ -88,9 +119,17 @@ To simplify the integration of this IP, the directory structure is based on the 
 <tr><td colspan="1">asm2ihex.sh</td>                                                                           <td><i>Assembly file compilation (Intel HEX file generation)</i></td></tr>
 	<tr><td colspan="1">ihex2mem.tcl</td>                                                                          <td><i>Verilog program memory file generation</i></td></tr>
 	<tr><td colspan="1">rtlsim.sh</td>                                                                             <td><i>Verilog Icarus simulation script</i></td></tr>
-	<tr><td colspan="1">template.def</td>                                                                          <td><i>ASM linker definition file template</i></td></tr>
-	<tr><td colspan="2"><b>run</b></td>                                                                            <td><i><b>For running RTL simulations</b></i></td></tr>
-	<tr><td rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">run</td>             <td><i>Run single simulation of a given assembler vector</i></td></tr>
+	<tr><td colspan="1">template.x</td>                                                                          <td><i>ASM linker definition file template</i></td></tr>
+	<tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">cov_*<br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic;">Code coverage scripts for NC-Verilog and ICM</span><br>
+      </td>
+    </tr>
+<tr><td colspan="2"><b>run</b></td>                                                                            <td><i><b>For running RTL simulations</b></i></td></tr>
+	<tr><td rowspan="7" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">run</td>             <td><i>Run single simulation of a given assembler vector</i></td></tr>
 	<tr>
       <td style="vertical-align: top;">run_c<br>
       </td>
@@ -104,13 +143,31 @@ To simplify the integration of this IP, the directory structure is based on the 
       </td>
     </tr>
 <tr><td colspan="1">run_disassemble</td>                                                                       <td><i>Disassemble the program memory content of the latest simulation</i></td></tr>
-	<tr><td colspan="1">load_waveform.sav</td>                                                                     <td><i>SAV file for gtkWave</i></td></tr>
+	<tr>
+      <td style="vertical-align: top;">run_coverage_analysis<br>
+      </td>
+      <td style="vertical-align: top; font-style: italic;">Performs the coverage report merging of the regression run and starts ICM for the analysis.<br>
+      </td>
+    </tr>
+<tr><td colspan="1">load_waveform.sav</td>                                                                     <td><i>SAV file for gtkWave</i></td></tr>
 	<tr><td colspan="2"><b>src</b></td>                                                                            <td><i><b>RTL simulation vectors sources</b></i></td></tr>
-	<tr><td rowspan="24" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">ldscript_example.x<br>
+	<tr><td rowspan="36" valign="bottom"><font color="white">abcd</font></td> <td colspan="1">ldscript_example.x<br>
 </td>        <td><i>MSPGCC toolchain linker script example</i></td></tr>
 	<tr>
+      <td style="vertical-align: top;">submit.prj<br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic;">ISIM simulator verilog command file</span><br>
+      </td>
+    </tr>
+<tr>
       <td style="vertical-align: top;">submit.f</td>
       <td style="vertical-align: top;"><i>Verilog simulator command file</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">core.f<br>
+      </td>
+      <td style="vertical-align: top;"><span style="font-style: italic;">Command file listing the CPU files only.</span><br>
+      </td>
     </tr>
 <tr><td colspan="1">sing-op_*.s43</td>                                                                         <td><i>Single-operand assembler vector files</i></td></tr>
 	<tr><td colspan="1">sing-op_*.v</td>                                                                           <td><i>Single-operand verilog stimulus vector files</i></td></tr>
@@ -118,13 +175,45 @@ To simplify the integration of this IP, the directory structure is based on the 
 	<tr><td colspan="1">two-op_*.v</td>                                                                            <td><i>Two-operand verilog stimulus vector files</i></td></tr>
 	<tr><td colspan="1">c-jump_*.s43</td>                                                                          <td><i>Jump assembler vector files</i></td></tr>
 	<tr><td colspan="1">c-jump_*.v</td>                                                                            <td><i>Jump verilog stimulus vector files</i></td></tr>
-	<tr><td colspan="1">op_modes.s43</td>                                                                          <td><i>CPU operating modes assembler vector files (CPUOFF, OSCOFF, SCG1)</i></td></tr>
-	<tr><td colspan="1">op_modes.v</td>                                                                            <td><i>CPU operating modes verilog stimulus vector files (CPUOFF, OSCOFF, SCG1)</i></td></tr>
-	<tr><td colspan="1">clock_module.s43</td>                                                                      <td><i>Basic Clock Module assembler vector files</i></td></tr>
-	<tr><td colspan="1">clock_module.v</td>                                                                        <td><i>Basic Clock Module verilog stimulus vector files</i></td></tr>
-	<tr><td colspan="1">dbg_*.s43</td>                                                                             <td><i>Serial Debug Interface assembler vector files</i></td></tr>
+	<tr>
+      <td style="vertical-align: top;">nmi.s43</td>
+      <td style="vertical-align: top;"><i>NMI assembler vector files</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">nmi.v</td>
+      <td style="vertical-align: top;"><i>NMI verilog stimulus vector files</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">cpu_startup_asic.s43</td>
+      <td style="vertical-align: top;"><i>CPU startup assembler vector files</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">cpu_startup_asic.v</td>
+      <td style="vertical-align: top;"><i>CPU startup stimulus vector files</i></td>
+    </tr>
+<tr><td colspan="1">op_modes*.s43</td>                                                                          <td><i>CPU operating modes assembler vector files (CPUOFF, OSCOFF, SCG1)</i></td></tr>
+	<tr><td colspan="1">op_modes*.v</td>                                                                            <td><i>CPU operating modes verilog stimulus vector files (CPUOFF, OSCOFF, SCG1)</i></td></tr>
+	<tr><td colspan="1">clock_module*.s43</td>                                                                      <td><i>Basic Clock Module assembler vector files</i></td></tr>
+	<tr><td colspan="1">clock_module*.v</td>                                                                        <td><i>Basic Clock Module verilog stimulus vector files</i></td></tr>
+	<tr>
+      <td style="vertical-align: top;">lp_modes_*.s43</td>
+      <td style="vertical-align: top;"><i>Low Power modes assembler vector files</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">lp_modes_*.v</td>
+      <td style="vertical-align: top;"><i>Low Power modes verilog stimulus vector files</i></td>
+    </tr>
+<tr><td colspan="1">dbg_*.s43</td>                                                                             <td><i>Serial Debug Interface assembler vector files</i></td></tr>
 	<tr><td colspan="1">dbg_*.v</td>                                                                               <td><i>Serial Debug Interface verilog stimulus vector files</i></td></tr>
-	<tr><td colspan="1">gpio_*.s43</td>                                                                            <td><i>Digital I/O assembler vector files</i></td></tr>
+	<tr>
+      <td style="vertical-align: top;">sfr.s43</td>
+      <td style="vertical-align: top;"><i>SFR assembler vector files</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">sfr.v</td>
+      <td style="vertical-align: top;"><i>SFR verilog stimulus vector files</i></td>
+    </tr>
+<tr><td colspan="1">gpio_*.s43</td>                                                                            <td><i>Digital I/O assembler vector files</i></td></tr>
 	<tr><td colspan="1">gpio_*.v</td>                                                                              <td><i>Digital I/O verilog stimulus vector files</i></td></tr>
 	<tr><td colspan="1">template_periph_*.s43</td>                                                                 <td><i>Peripheral templates assembler vector files</i></td></tr>
 	<tr><td colspan="1">template_periph_*.v</td>                                                                   <td><i>Peripheral templates verilog stimulus vector files</i></td></tr>
@@ -133,7 +222,15 @@ To simplify the integration of this IP, the directory structure is based on the 
 	<tr><td colspan="1">tA_*.s43</td>                                                                              <td><i>Timer A assembler vector files</i></td></tr>
 	<tr><td colspan="1">tA_*.v</td>                                                                                <td><i>Timer A verilog stimulus vector files</i></td></tr>
 	<tr><td colspan="1">mpy_*.s43</td>                                                                             <td><i>16x16 Multiplier assembler vector files</i></td></tr>
-	<tr><td colspan="1">mpy_*.v</td>                                                                               <td><i>16x16 Multiplier verilog stimulus vector files</i></td></tr>
+	<tr>
+      <td style="vertical-align: top;">mpy_*.v</td>
+      <td style="vertical-align: top;"><i>16x16 Multiplier verilog stimulus vector files</i></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">scan.s43</td>
+      <td style="vertical-align: top;"><i>Scan test assembler vector files</i></td>
+    </tr>
+<tr><td colspan="1">scan.v</td>                                                                               <td><i>Scan test verilog stimulus vector files</i></td></tr>
 	<tr><td colspan="4"><b>synthesis</b></td>                                                                     <td><i><b>Top level synthesis directory</b></i></td></tr>
 	<tr><td rowspan="10" valign="bottom"><font color="white">abcd</font></td><td colspan="3"><b>synopsys</b></td><td><i>Synopsys (Design Compiler) directory</i></td></tr>
 	<tr><td rowspan="6" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">run_syn</td>        <td><i>Run synthesis</i></td></tr>
@@ -474,7 +571,7 @@ changed to satisfy quartus6.1 *.mif eating engine.</i></td></tr>
 <table border="1">
 	<tbody><tr><td colspan="4"><b>tools</b></td>                                                                                   <td><i><b>openMSP430 Software Development Tools top level directory</b></i></td></tr>
 	<tr>
-      <td colspan="1" rowspan="24" style="vertical-align: top;"><font color="white">abcd</font></td>
+      <td colspan="1" rowspan="19" style="vertical-align: top;"><font color="white">abcd</font></td>
       <td colspan="3" rowspan="1" style="vertical-align: top;">omsp_alias.xml<br>
       </td>
       <td style="vertical-align: top;"><span style="font-style: italic;">This
@@ -516,14 +613,11 @@ implementation, and add customized extra information (Alias, URL, ...).</span><b
 	<tr><td rowspan="1" colspan="1">Howto-GDB_Remote_Serial_Protocol.pdf<i><br>
       </i></td>                                                           <td style="vertical-align: top;"><i>Document from Jeremy Bennett (Embecosm): Howto: GDB Remote Serial Protocol - Writing a RSP Server</i></td>
 </tr>
-	<tr><td colspan="3"><b>freewrap642</b></td>                                                                             <td><i><b>The freeWrap program turns TCL/TK scripts into single-file binary executable programs for Windows.</b></i></td></tr>
-	<tr><td rowspan="4" valign="bottom"><font color="white">abcd</font></td> <td colspan="2">freewrap.exe</td>             <td><i>freeWrap executable to run on TCL/TK scripts (i.e. with GUI)</i></td></tr>
-	<tr><td colspan="2">freewrapTCLSH.exe</td>                                                                              <td><i>freeWrap executable to run on pure TCL scripts (i.e. command line)</i></td></tr>
-	<tr><td colspan="2">tclpip85s.dll</td>                                                                                  <td><i>freeWrap mandatory DLL</i></td></tr>
-	<tr><td rowspan="1" colspan="2" style="vertical-align: top;">generate_exec.bat<i><br>
-      </i></td>
-                                                                              <td style="vertical-align: top;"><i>Simple Batch file for auto generation of the tools' windows executables</i></td>
-</tr>
+	
+	
+	
+	
+	
 </tbody></table> 
 <br>
 <div style="text-align: right;"><a href="#TOC">Top</a></div>
