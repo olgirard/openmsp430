@@ -541,7 +541,7 @@ proc VerifyCPU_ID {} {
 
     if {[string eq "0x00000000" $cpu_id_full] |
     ([string length $cpu_id_full]!=10)    |
-        ($omsp_info(cpu_ver) >2)              } {
+        ($omsp_info(cpu_ver) >3)              } {
     puts "\n"
     puts "ERROR: cpu_id not valid: $cpu_id_full"
     puts ""

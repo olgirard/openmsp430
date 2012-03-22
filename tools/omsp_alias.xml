@@ -5,16 +5,16 @@
 
      <!--  ===============================================================  -->
      <!-- ||                                                             || -->
-     <!-- ||            oMSP-Xilinx-Example (CPU version 2)              || -->
+     <!-- ||            oMSP-Xilinx-Example (CPU version 3)              || -->
      <!-- ||                                                             || -->
      <!--  ===============================================================  -->
-     <omsp:alias val="oMSP-Xilinx-Example-CPUv2">
+     <omsp:alias val="oMSP-Xilinx-Example-CPUv3">
 
           <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
           <!-- | openMSP430 core configuration to be matched | -->
           <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
           <omsp:configuration>
-                <omsp:cpu_ver>2</omsp:cpu_ver>
+                <omsp:cpu_ver>3</omsp:cpu_ver>
                 <omsp:user_ver>1</omsp:user_ver>
                 <omsp:asic>0</omsp:asic>
                 <omsp:mpy>1</omsp:mpy>

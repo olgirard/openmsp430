@@ -77,6 +77,7 @@ proc dbg_uart_connect {Device Baudrate} {
 
     # Send synchronisation frame
     dbg_uart_tx {0x80}
+    after 100
 
     # Send dummy frame in case the debug interface is already synchronized
     dbg_uart_tx {0xC0}
