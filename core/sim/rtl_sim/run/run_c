@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/bash
 
 # Enable/Disable waveform dumping
 OMSP_NODUMP=0
@@ -11,7 +11,7 @@ export OMSP_NODUMP
 #                   - ncverilog : NC-Verilog
 #                   - vcs       : VCS
 #                   - vsim      : Modelsim
-OMSP_SIMULATOR=ncverilog
+OMSP_SIMULATOR=iverilog
 export OMSP_SIMULATOR
 
 

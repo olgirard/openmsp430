@@ -133,8 +133,14 @@ make
 cd ../../run/
 
 # Create links
-ln -s $elffile pmem.elf
-ln -s $verfile stimulus.v
+if [ `uname -o` = "Cygwin" ]
+then
+    cp $elffile pmem.elf
+    cp $verfile stimulus.v
+else
+    ln -s $elffile pmem.elf
+    ln -s $verfile stimulus.v
+fi
 
 # Create IHEX file from ELF
 echo "Convert ELF file to IHEX format..."

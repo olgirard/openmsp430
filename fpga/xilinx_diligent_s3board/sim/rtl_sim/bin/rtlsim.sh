@@ -82,7 +82,13 @@ if [ "${OMSP_SIMULATOR:-iverilog}" = iverilog ]; then
         iverilog -o simv -c $3
     fi
     
-    ./simv
+    if [ `uname -o` = "Cygwin" ]
+      then
+	    vvp.exe ./simv
+      else
+        ./simv
+    fi
+
 else
 
     NODUMP=${OMSP_NODUMP-0}

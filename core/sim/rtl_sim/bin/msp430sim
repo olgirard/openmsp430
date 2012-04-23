@@ -108,8 +108,14 @@ echo "| Start simulation:             $1"
 echo " ======================================================="
 
 # Create links
-ln -s $asmfile pmem.s43
-ln -s $verfile stimulus.v
+if [ `uname -o` = "Cygwin" ]
+then
+    cp $asmfile pmem.s43
+    cp $verfile stimulus.v
+else
+    ln -s $asmfile pmem.s43
+    ln -s $verfile stimulus.v
+fi
 
 # Make local copy of the openMSP403 configuration file and remove comments
 cp  $incfile  ./pmem.inc

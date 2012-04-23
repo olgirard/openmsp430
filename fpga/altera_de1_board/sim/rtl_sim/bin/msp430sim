@@ -108,9 +108,16 @@ make
 cd ../../sim/rtl_sim/run/
 
 # Create links
-ln -s $elffile pmem.elf
-ln -s $miffile pmem.mif
-ln -s $verfile stimulus.v
+if [ `uname -o` = "Cygwin" ]
+then
+    cp $elffile pmem.elf
+    cp $miffile pmem.mif
+    cp $verfile stimulus.v
+else
+    ln -s $elffile pmem.elf
+    ln -s $miffile pmem.mif
+    ln -s $verfile stimulus.v
+fi
 
 # Make local copy of the openMSP403 configuration file and remove comments
 cp  $incfile  ./pmem.inc
