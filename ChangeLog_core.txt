@@ -1,3 +1,12 @@
+2012-04-23 [r139]  
+
+	* Add some SVN ignore patterns
+
+2012-04-23 [r138]  
+
+	* Update simulation scripts to support Cygwin out of the box for
+	  Windows users.
+
 2012-03-22 [r134]  
 
 	* Add full ASIC support (low-power modes, DFT, ...). Improved
