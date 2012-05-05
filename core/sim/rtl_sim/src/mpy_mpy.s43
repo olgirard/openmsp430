@@ -35,20 +35,10 @@
 /* $LastChangedDate: 2009-08-04 23:44:12 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
+.include "pmem_defs.asm"
+
 .global main
 
-.set   WDTCTL, 0x0120
-
-.set   MPY,    0x0130
-.set   MPYS,   0x0132
-.set   MAC,    0x0134
-.set   MACS,   0x0136
-.set   OP2,    0x0138
-.set   RESLO,  0x013A
-.set   RESHI,  0x013C
-.set   SUMEXT, 0x013E
-	
-	
 main:
 	
         /* --------------   UNSIGNED MULTIPLICATION   --------------- */

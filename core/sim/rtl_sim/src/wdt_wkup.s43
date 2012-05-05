@@ -50,15 +50,9 @@
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
+.include "pmem_defs.asm"
+
 .global main
-
-.set   DMEM_BASE, (__data_start     )
-.set   DMEM_200,  (__data_start+0x00)
-.set   DMEM_250,  (__data_start+0x50)
-
-.set   IE1,    0x0000
-.set   IFG1,   0x0002
-.set   WDTCTL, 0x0120
 
 .macro LPM0
  bis    #0x0010, r2

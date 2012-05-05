@@ -7,7 +7,7 @@ MEMORY
   data   (rwx)  	: ORIGIN = 0x0200, 	LENGTH = 0x080
   vectors (rw)   	: ORIGIN = 0xffe0,      LENGTH = 0x20
 }
-/* INCLUDE periph.x */
+__WDTCTL = 0x0120;
 SECTIONS
 {
   /* Read-only sections, merged into text segment.  */

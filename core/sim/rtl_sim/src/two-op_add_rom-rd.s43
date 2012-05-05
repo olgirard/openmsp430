@@ -35,25 +35,7 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
-.set    DMEM_BASE, (__data_start     )
-.set    DMEM_200,  (__data_start+0x00)
-.set    DMEM_202,  (__data_start+0x02)
-.set    DMEM_204,  (__data_start+0x04)
-.set    DMEM_206,  (__data_start+0x06)
-.set    DMEM_208,  (__data_start+0x08)
-.set    DMEM_20A,  (__data_start+0x0A)
-.set    DMEM_20C,  (__data_start+0x0C)
-.set    DMEM_20E,  (__data_start+0x0E)
-.set    DMEM_210,  (__data_start+0x10)
-.set    DMEM_212,  (__data_start+0x12)
-.set    DMEM_214,  (__data_start+0x14)
-.set    DMEM_216,  (__data_start+0x16)
-.set    DMEM_218,  (__data_start+0x18)
-.set    DMEM_21A,  (__data_start+0x1A)
-.set    DMEM_21C,  (__data_start+0x1C)
-.set    DMEM_21E,  (__data_start+0x1E)
-.set    DMEM_220,  (__data_start+0x20)
-
+.include "pmem_defs.asm"
 	
 .global main
 
@@ -82,7 +64,7 @@ test_aRn_PC:
 
         mov            #0x8e1c, &DMEM_212
 	mov   #data_aRn_0x5f12, r7
-	add                @r7, aRn_EDE    ;# Write 0x5f12+0x8e1c=0xed2e to memory @0x0212
+	add                @r7, aRn_EDE+PMEM_LENGTH    ;# Write 0x5f12+0x8e1c=0xed2e to memory @0x0212
 
         mov            #0x1541, &DMEM_214
 	mov   #data_aRn_0x3112, r8
@@ -126,8 +108,8 @@ test_aRni_PC2:
 
         mov             #0x8e1c, &DMEM_212
 	mov   #data_aRni_0x5f12, r8
-	add                @r8+, aRni_EDE   ;# Write 0x5f12+0x8e1c=0xed2e to memory @0x0212
-	add                @r8+, aRni_EDE   ;# Write 0x6345+0xed2e=0x5073 to memory @0x0212
+	add                @r8+, aRni_EDE+PMEM_LENGTH   ;# Write 0x5f12+0x8e1c=0xed2e to memory @0x0212
+	add                @r8+, aRni_EDE+PMEM_LENGTH   ;# Write 0x6345+0xed2e=0x5073 to memory @0x0212
 
         mov             #0x1541, &DMEM_214
 	mov   #data_aRni_0x3112, r9
@@ -162,7 +144,7 @@ test_xRn_PC:
 
 	mov            #0x2143, &DMEM_220
 	mov   #data_xRn_0x7238, r7
-	add              4(r7), xRn_EDE    ;# Write 0x7238+0x2143=0x937b to memory @0x220
+	add              4(r7), xRn_EDE+PMEM_LENGTH    ;# Write 0x7238+0x2143=0x937b to memory @0x220
 
 	mov            #0x1432, &DMEM_208
 	mov   #data_xRn_0x98b2, r4
@@ -195,7 +177,7 @@ test_EDE_PC:
 
 	mov              #0x058a, &DMEM_216
 	mov              #0x1234, &DMEM_208
-	add      data_EDE_0xb3a9, EDE_EDE     ;# Write 0xb3a9+0x058a=0xb933 to memory @0x216
+	add      data_EDE_0xb3a9, EDE_EDE+PMEM_LENGTH     ;# Write 0xb3a9+0x058a=0xb933 to memory @0x216
 
 	mov              #0xA738, &DMEM_212
 	mov              #0x1234, &DMEM_20A
@@ -228,7 +210,7 @@ test_aEDE_PC:
 
 	mov                #0x6e2f, &DMEM_218
 	mov                #0x1234, &DMEM_208
-	add      &data_aEDE_0x5c1f, aEDE_EDE    ;# Write 0x5c1f+0x6e2f=0xca4e to memory @0x218
+	add      &data_aEDE_0x5c1f, aEDE_EDE+PMEM_LENGTH    ;# Write 0x5c1f+0x6e2f=0xca4e to memory @0x218
 
 	mov                #0x51ca, &DMEM_202
 	mov                #0x1234, &DMEM_20A

@@ -34,64 +34,7 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
-.set    DMEM_BASE, (__data_start     )
-.set    DMEM_200,  (__data_start+0x00)
-.set    DMEM_202,  (__data_start+0x02)
-.set    DMEM_204,  (__data_start+0x04)
-.set    DMEM_206,  (__data_start+0x06)
-.set    DMEM_208,  (__data_start+0x08)
-.set    DMEM_209,  (__data_start+0x09)
-.set    DMEM_20A,  (__data_start+0x0A)
-.set    DMEM_20B,  (__data_start+0x0B)
-.set    DMEM_20C,  (__data_start+0x0C)
-.set    DMEM_20D,  (__data_start+0x0D)
-.set    DMEM_20E,  (__data_start+0x0E)
-.set    DMEM_20F,  (__data_start+0x0F)
-.set    DMEM_210,  (__data_start+0x10)
-.set    DMEM_212,  (__data_start+0x12)
-.set    DMEM_214,  (__data_start+0x14)
-.set    DMEM_216,  (__data_start+0x16)
-.set    DMEM_218,  (__data_start+0x18)
-.set    DMEM_219,  (__data_start+0x19)
-.set    DMEM_21A,  (__data_start+0x1A)
-.set    DMEM_21B,  (__data_start+0x1B)
-.set    DMEM_21C,  (__data_start+0x1C)
-.set    DMEM_21D,  (__data_start+0x1D)
-.set    DMEM_21E,  (__data_start+0x1E)
-.set    DMEM_21F,  (__data_start+0x1F)
-.set    DMEM_220,  (__data_start+0x20)
-.set    DMEM_222,  (__data_start+0x22)
-.set    DMEM_224,  (__data_start+0x24)
-.set    DMEM_226,  (__data_start+0x26)
-.set    DMEM_228,  (__data_start+0x28)
-.set    DMEM_22A,  (__data_start+0x2A)
-.set    DMEM_22C,  (__data_start+0x2C)
-.set    DMEM_22E,  (__data_start+0x2E)
-.set    DMEM_230,  (__data_start+0x30)
-.set    DMEM_232,  (__data_start+0x32)
-.set    DMEM_234,  (__data_start+0x34)
-.set    DMEM_236,  (__data_start+0x36)
-.set    DMEM_238,  (__data_start+0x38)
-.set    DMEM_239,  (__data_start+0x39)
-.set    DMEM_23A,  (__data_start+0x3A)
-.set    DMEM_23B,  (__data_start+0x3B)
-.set    DMEM_23C,  (__data_start+0x3C)
-.set    DMEM_23D,  (__data_start+0x3D)
-.set    DMEM_23E,  (__data_start+0x3E)
-.set    DMEM_23F,  (__data_start+0x3F)
-.set    DMEM_240,  (__data_start+0x40)
-.set    DMEM_242,  (__data_start+0x42)
-.set    DMEM_244,  (__data_start+0x44)
-.set    DMEM_246,  (__data_start+0x46)
-.set    DMEM_248,  (__data_start+0x48)
-.set    DMEM_249,  (__data_start+0x49)
-.set    DMEM_24A,  (__data_start+0x4A)
-.set    DMEM_24B,  (__data_start+0x4B)
-.set    DMEM_24C,  (__data_start+0x4C)
-.set    DMEM_24D,  (__data_start+0x4D)
-.set    DMEM_24E,  (__data_start+0x4E)
-.set    DMEM_24F,  (__data_start+0x4F)
-.set    DMEM_250,  (__data_start+0x50)
+.include "pmem_defs.asm"
 
 .global main
 
@@ -237,25 +180,25 @@ main:
 	mov     #0x0000, r2        ;# Test 1
 	mov     #0x3332, &DMEM_218
 	mov     #0xaaaa, &DMEM_21A
-	rrc     EDE_218            ;# RRC ({C=0, mem0c=0x3332}  => {mem0c=0x1999, C=0})
+	rrc     EDE_218+PMEM_LENGTH            ;# RRC ({C=0, mem0c=0x3332}  => {mem0c=0x1999, C=0})
 	mov          r2, r5
 
 	mov     #0x0000, r2        ;# Test 2
 	mov     #0x3333, &DMEM_21A
 	mov     #0xaaaa, &DMEM_21C
-	rrc     EDE_21A            ;# RRC ({C=0, mem0d=0x3333}  => {mem0d=0x1999, C=1})
+	rrc     EDE_21A+PMEM_LENGTH            ;# RRC ({C=0, mem0d=0x3333}  => {mem0d=0x1999, C=1})
 	mov          r2, r7
 
 	mov     #0x0001, r2        ;# Test 3
 	mov     #0x3332, &DMEM_21C
 	mov     #0xaaaa, &DMEM_21E
-	rrc     EDE_21C            ;# RRC ({C=1, mem0e=0x3332}  => {mem0e=0x9999, C=0})
+	rrc     EDE_21C+PMEM_LENGTH            ;# RRC ({C=1, mem0e=0x3332}  => {mem0e=0x9999, C=0})
 	mov          r2, r9
 
 	mov     #0x0001, r2        ;# Test 4
 	mov     #0x3333, &DMEM_21E
 	mov     #0xaaaa, &DMEM_220
-	rrc     EDE_21E            ;# RRC ({C=1, mem0f=0x3333}  => {mem0f=0x9999, C=1})
+	rrc     EDE_21E+PMEM_LENGTH            ;# RRC ({C=1, mem0f=0x3333}  => {mem0f=0x9999, C=1})
 	mov          r2, r11
 
 	mov     #0x5000, r15
@@ -546,25 +489,25 @@ clear_mem_loop:
 	mov     #0x0000, r2        ;# Test 1
 	mov     #0x2532, &DMEM_230
 	mov     #0xaaaa, &DMEM_232
-	rrc.b   EDE_230            ;# RRC ({C=0, mem18=0x2532}  => {mem18=0x2519, C=0})
+	rrc.b   EDE_230+PMEM_LENGTH            ;# RRC ({C=0, mem18=0x2532}  => {mem18=0x2519, C=0})
 	mov          r2, r5
 
 	mov     #0x0000, r2        ;# Test 2
 	mov     #0x2533, &DMEM_232
 	mov     #0xaaaa, &DMEM_234
-	rrc.b   EDE_232            ;# RRC ({C=0, mem19=0x2533}  => {mem19=0x2519, C=1})
+	rrc.b   EDE_232+PMEM_LENGTH            ;# RRC ({C=0, mem19=0x2533}  => {mem19=0x2519, C=1})
 	mov          r2, r7
 
 	mov     #0x0001, r2        ;# Test 3
 	mov     #0x2532, &DMEM_234
 	mov     #0xaaaa, &DMEM_236
-	rrc.b   EDE_234            ;# RRC ({C=1, mem1a=0x2532}  => {mem1a=0x2599, C=0})
+	rrc.b   EDE_234+PMEM_LENGTH            ;# RRC ({C=1, mem1a=0x2532}  => {mem1a=0x2599, C=0})
 	mov          r2, r9
 
 	mov     #0x0001, r2        ;# Test 4
 	mov     #0x2533, &DMEM_236
 	mov     #0xaaaa, &DMEM_238
-	rrc.b   EDE_236            ;# RRC ({C=1, mem1b=0x2533}  => {mem1b=0x2599, C=1})
+	rrc.b   EDE_236+PMEM_LENGTH            ;# RRC ({C=1, mem1b=0x2533}  => {mem1b=0x2599, C=1})
 	mov          r2, r11
 
 	mov     #0xC000, r15
@@ -579,25 +522,25 @@ clear_mem_loop:
 	mov     #0x0000, r2        ;# Test 1
 	mov     #0x3225, &DMEM_238
 	mov     #0xaaaa, &DMEM_23A
-	rrc.b   EDE_239            ;# RRC ({C=0, mem1c=0x3225}  => {mem1c=0x1925, C=0})
+	rrc.b   EDE_239+PMEM_LENGTH            ;# RRC ({C=0, mem1c=0x3225}  => {mem1c=0x1925, C=0})
 	mov          r2, r5
 
 	mov     #0x0000, r2        ;# Test 2
 	mov     #0x3325, &DMEM_23A
 	mov     #0xaaaa, &DMEM_23C
-	rrc.b   EDE_23B            ;# RRC ({C=0, mem1d=0x3325}  => {mem1d=0x1925, C=1})
+	rrc.b   EDE_23B+PMEM_LENGTH            ;# RRC ({C=0, mem1d=0x3325}  => {mem1d=0x1925, C=1})
 	mov          r2, r7
 
 	mov     #0x0001, r2        ;# Test 3
 	mov     #0x3225, &DMEM_23C
 	mov     #0xaaaa, &DMEM_23E
-	rrc.b   EDE_23D            ;# RRC ({C=1, mem1e=0x3225}  => {mem1e=0x9925, C=0})
+	rrc.b   EDE_23D+PMEM_LENGTH            ;# RRC ({C=1, mem1e=0x3225}  => {mem1e=0x9925, C=0})
 	mov          r2, r9
 
 	mov     #0x0001, r2        ;# Test 4
 	mov     #0x3325, &DMEM_23E
 	mov     #0xaaaa, &DMEM_240
-	rrc.b   EDE_23F            ;# RRC ({C=1, mem1f=0x3325}  => {mem1f=0x9925, C=1})
+	rrc.b   EDE_23F+PMEM_LENGTH            ;# RRC ({C=1, mem1f=0x3325}  => {mem1f=0x9925, C=1})
 	mov          r2, r11
 
 	mov     #0xC001, r15

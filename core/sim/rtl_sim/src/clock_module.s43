@@ -35,16 +35,10 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.include "pmem_defs.asm"
+
 .global main
 
-.set   DMEM_BASE, (__data_start     )
-.set   DMEM_200,  (__data_start+0x00)
-.set   DMEM_250,  (__data_start+0x50)
-
-.set   BCSCTL1, 0x0057
-.set   BCSCTL2, 0x0058
-
-	
 WAIT_FUNC:
 	dec r14
 	jnz WAIT_FUNC

@@ -34,25 +34,7 @@
 /* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
-.set    DMEM_BASE, (__data_start     )
-.set    DMEM_200,  (__data_start+0x00)
-.set    DMEM_202,  (__data_start+0x02)
-.set    DMEM_204,  (__data_start+0x04)
-.set    DMEM_206,  (__data_start+0x06)
-.set    DMEM_208,  (__data_start+0x08)
-.set    DMEM_20A,  (__data_start+0x0A)
-.set    DMEM_20C,  (__data_start+0x0C)
-.set    DMEM_20E,  (__data_start+0x0E)
-.set    DMEM_210,  (__data_start+0x10)
-.set    DMEM_212,  (__data_start+0x12)
-.set    DMEM_214,  (__data_start+0x14)
-.set    DMEM_216,  (__data_start+0x16)
-.set    DMEM_218,  (__data_start+0x18)
-.set    DMEM_21A,  (__data_start+0x1A)
-.set    DMEM_21C,  (__data_start+0x1C)
-.set    DMEM_21E,  (__data_start+0x1E)
-.set    DMEM_220,  (__data_start+0x20)
-.set    DMEM_222,  (__data_start+0x22)
+.include "pmem_defs.asm"
 	
 .global main
 

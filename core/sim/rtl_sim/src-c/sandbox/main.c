@@ -33,10 +33,7 @@
 /* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
-#include <msp430x11x1.h>
-#include <signal.h>                    // Needed for using interrupts with msp430-gcc
-//#include <legacymsp430.h>
-
+#include "omsp_system.h"
 
 volatile char shift_direction = 0x01;  // Global variable
  

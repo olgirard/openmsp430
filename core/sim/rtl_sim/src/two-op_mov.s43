@@ -34,58 +34,7 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
-.set    DMEM_BASE, (__data_start     )
-.set    DMEM_200,  (__data_start+0x00)
-.set    DMEM_202,  (__data_start+0x02)
-.set    DMEM_204,  (__data_start+0x04)
-.set    DMEM_206,  (__data_start+0x06)
-.set    DMEM_208,  (__data_start+0x08)
-.set    DMEM_20A,  (__data_start+0x0A)
-.set    DMEM_20C,  (__data_start+0x0C)
-.set    DMEM_20E,  (__data_start+0x0E)
-.set    DMEM_210,  (__data_start+0x10)
-.set    DMEM_212,  (__data_start+0x12)
-.set    DMEM_214,  (__data_start+0x14)
-.set    DMEM_216,  (__data_start+0x16)
-.set    DMEM_218,  (__data_start+0x18)
-.set    DMEM_21A,  (__data_start+0x1A)
-.set    DMEM_21C,  (__data_start+0x1C)
-.set    DMEM_21E,  (__data_start+0x1E)
-.set    DMEM_220,  (__data_start+0x20)
-.set    DMEM_222,  (__data_start+0x22)
-.set    DMEM_224,  (__data_start+0x24)
-.set    DMEM_226,  (__data_start+0x26)
-.set    DMEM_228,  (__data_start+0x28)
-.set    DMEM_22A,  (__data_start+0x2A)
-.set    DMEM_22C,  (__data_start+0x2C)
-.set    DMEM_22E,  (__data_start+0x2E)
-.set    DMEM_230,  (__data_start+0x30)
-.set    DMEM_232,  (__data_start+0x32)
-.set    DMEM_234,  (__data_start+0x34)
-.set    DMEM_236,  (__data_start+0x36)
-.set    DMEM_238,  (__data_start+0x38)
-.set    DMEM_23A,  (__data_start+0x3A)
-.set    DMEM_23C,  (__data_start+0x3C)
-.set    DMEM_23E,  (__data_start+0x3E)
-.set    DMEM_240,  (__data_start+0x40)
-.set    DMEM_250,  (__data_start+0x50)
-.set    DMEM_252,  (__data_start+0x52)
-.set    DMEM_254,  (__data_start+0x54)
-.set    DMEM_256,  (__data_start+0x56)
-.set    DMEM_258,  (__data_start+0x58)
-.set    DMEM_25A,  (__data_start+0x5A)
-.set    DMEM_25C,  (__data_start+0x5C)
-.set    DMEM_25D,  (__data_start+0x5D)
-.set    DMEM_25E,  (__data_start+0x5E)
-.set    DMEM_25F,  (__data_start+0x5F)
-.set    DMEM_260,  (__data_start+0x60)
-.set    DMEM_261,  (__data_start+0x61)
-.set    DMEM_262,  (__data_start+0x62)
-.set    DMEM_263,  (__data_start+0x63)
-.set    DMEM_264,  (__data_start+0x64)
-.set    DMEM_265,  (__data_start+0x65)
-.set    DMEM_266,  (__data_start+0x66)
-.set    DMEM_267,  (__data_start+0x67)
+.include "pmem_defs.asm"
 	
 .global main
 
@@ -125,7 +74,7 @@ test_Rn_PC:
 	mov     #0x1234, r6
 	mov          r6, 16(r5)    ;# Write 0x1234 to memory @0x0210
 	mov     #0x5678, r7
-	mov          r7, Rn_EDE    ;# Write 0x5678 to memory @0x0200
+	mov          r7, Rn_EDE+PMEM_LENGTH  ;# Write 0x5678 to memory @0x0200
 	mov     #0x9abc, r8
 	mov          r8, &Rn_TONY  ;# Write 0x9abc to memory @0x0204
 
@@ -153,7 +102,7 @@ test_aRn_PC:
 	mov          @r6, 16(r5)    ;# Move memory @0x204 (0x9abc) to memory @0x210
 	mov      #0xfedc, &DMEM_202
 	mov    #DMEM_202, r6
-	mov          @r6, aRn_EDE   ;# Move memory @0x202 (0xfedc) to memory @0x200
+	mov          @r6, aRn_EDE+PMEM_LENGTH   ;# Move memory @0x202 (0xfedc) to memory @0x200
 	mov      #0xf1d2, &DMEM_202
 	mov    #DMEM_202, r6
 	mov          @r6, &aRn_TONY ;# Move memory @0x202 (0xf1d2) to memory @0x204
@@ -188,7 +137,7 @@ test_aRni_PC:
 	mov         @r7+, 16(r8)     ;# Move memory @0x216 (0xdef0) to memory @0x220
 
 	mov    #DMEM_212, r8
-	mov         @r8+, aRni_EDE   ;# Move memory @0x212 (0x5678) to memory @0x200
+	mov         @r8+, aRni_EDE+PMEM_LENGTH   ;# Move memory @0x212 (0x5678) to memory @0x200
 
 	mov    #DMEM_210, r9
 	mov         @r9+, &aRni_TONY ;# Move memory @0x210 (0x1234) to memory @0x214
@@ -212,7 +161,7 @@ test_aRni_PC:
 test_N_PC:
         mov    #DMEM_200, r6
 	mov      #0x5a5a, 48(r6)     ;# Move memory 0x5a5a to memory @0x230
-	mov      #0x1a2b, N_EDE      ;# Move memory 0x1a2b to memory @0x210
+	mov      #0x1a2b, N_EDE+PMEM_LENGTH      ;# Move memory 0x1a2b to memory @0x210
 	mov      #0x3c4d, &N_TONY    ;# Move memory 0x3c4d to memory @0x206
 
 	mov      #0x5000, r15
@@ -247,7 +196,7 @@ test_xRn_PC:
 	mov      #0x7238, &DMEM_204
 	mov      #0x1234, &DMEM_200
         mov    #DMEM_200, r7
-	mov        4(r7), xRn_EDE      ;# Move memory @0x204 (0x7238) to memory @0x220
+	mov        4(r7), xRn_EDE+PMEM_LENGTH      ;# Move memory @0x204 (0x7238) to memory @0x220
 	mov      #0x98b2, &DMEM_216
 	mov      #0x1234, &DMEM_200
         mov    #DMEM_200, r7
@@ -270,12 +219,12 @@ test_xRn_PC:
 	mov      #0xc3d6, &DMEM_200
 	mov      #0x1234, &DMEM_202
 	mov      #0x4321, r4
-	mov      EDE_200, r4          ;# Write 0xc3d6 to R4
+	mov      EDE_200+PMEM_LENGTH, r4          ;# Write 0xc3d6 to R4
 
 	mov #test_EDE_PC, &DMEM_202
 	mov      #0x1234, &DMEM_204
 	mov      #0x3456, r6
-        br       EDE_202
+        br       EDE_202+PMEM_LENGTH
 	nop
 	nop
 	nop
@@ -286,15 +235,15 @@ test_EDE_PC:
         mov    #DMEM_202, r8
 	mov      #0xf712, &DMEM_204
 	mov      #0x1234, &DMEM_206
-	mov      EDE_204, 18(r8)      ;# Move memory @0x204 (0xf712) to memory @0x214
+	mov      EDE_204+PMEM_LENGTH, 18(r8)      ;# Move memory @0x204 (0xf712) to memory @0x214
 
 	mov      #0xb3a9, &DMEM_206
 	mov      #0x1234, &DMEM_208
-	mov      EDE_206, EDE_EDE     ;# Move memory @0x206 (0xb3a9) to memory @0x216
+	mov      EDE_206+PMEM_LENGTH, EDE_EDE+PMEM_LENGTH     ;# Move memory @0x206 (0xb3a9) to memory @0x216
 
 	mov      #0x837A, &DMEM_208
 	mov      #0x1234, &DMEM_20A
-	mov      EDE_208, &EDE_TONY   ;# Move memory @0x208 (0x837A) to memory @0x212
+	mov      EDE_208+PMEM_LENGTH, &EDE_TONY   ;# Move memory @0x208 (0x837A) to memory @0x212
 
 	mov      #0x7000, r15
 
@@ -327,7 +276,7 @@ test_aEDE_PC:
 
 	mov      #0x5c1f, &DMEM_206
 	mov      #0x1234, &DMEM_208
-	mov    &DMEM_206, aEDE_EDE    ;# Move memory @0x206 (0x5c1f) to memory @0x218
+	mov    &DMEM_206, aEDE_EDE+PMEM_LENGTH    ;# Move memory @0x206 (0x5c1f) to memory @0x218
 
 	mov      #0xc16e, &DMEM_208
 	mov      #0x1234, &DMEM_20A
@@ -376,12 +325,12 @@ test_aEDE_PC:
 	mov      #0x0008, 22(r10)         ;# Move +8 to memory @0x218
 	mov      #0xffff, 24(r10)         ;# Move -1 to memory @0x21A
 
-	mov      #0x0000, CONST_EDE0      ;# Move +0 to memory @0x220
-	mov      #0x0001, CONST_EDE1      ;# Move +1 to memory @0x222
-	mov      #0x0002, CONST_EDE2      ;# Move +2 to memory @0x224
-	mov      #0x0004, CONST_EDE4      ;# Move +4 to memory @0x226
-	mov      #0x0008, CONST_EDE8      ;# Move +8 to memory @0x228
-	mov      #0xffff, CONST_EDEm1     ;# Move -1 to memory @0x22A
+	mov      #0x0000, CONST_EDE0+PMEM_LENGTH      ;# Move +0 to memory @0x220
+	mov      #0x0001, CONST_EDE1+PMEM_LENGTH      ;# Move +1 to memory @0x222
+	mov      #0x0002, CONST_EDE2+PMEM_LENGTH      ;# Move +2 to memory @0x224
+	mov      #0x0004, CONST_EDE4+PMEM_LENGTH      ;# Move +4 to memory @0x226
+	mov      #0x0008, CONST_EDE8+PMEM_LENGTH      ;# Move +8 to memory @0x228
+	mov      #0xffff, CONST_EDEm1+PMEM_LENGTH     ;# Move -1 to memory @0x22A
 
 	mov      #0x0000, &CONST_TONY0    ;# Move +0 to memory @0x230
 	mov      #0x0001, &CONST_TONY1    ;# Move +1 to memory @0x232

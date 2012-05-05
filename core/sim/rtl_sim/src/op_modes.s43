@@ -37,31 +37,10 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.include "pmem_defs.asm"
+
 .global main
 
-.set   DMEM_BASE, (__data_start     )
-.set   DMEM_200,  (__data_start+0x00)
-.set   DMEM_250,  (__data_start+0x50)
-
-.set   P1IN,  0x0020
-.set   P1OUT, 0x0021
-.set   P1DIR, 0x0022
-.set   P1IFG, 0x0023
-.set   P1IES, 0x0024
-.set   P1IE,  0x0025
-.set   P1SEL, 0x0026
-.set   P2IN,  0x0028
-.set   P2OUT, 0x0029
-.set   P2DIR, 0x002A
-.set   P2IFG, 0x002B
-.set   P2IES, 0x002C
-.set   P2IE,  0x002D
-.set   P2SEL, 0x002E
-
-.set   BCSCTL1, 0x0057
-.set   BCSCTL2, 0x0058
-
-	
 WAIT_FUNC:
 	dec r14
 	jnz WAIT_FUNC

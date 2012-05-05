@@ -37,59 +37,9 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.include "pmem_defs.asm"
+
 .global main
-
-.set   DMEM_BASE, (__data_start     )
-.set   DMEM_200,  (__data_start+0x00)
-.set   DMEM_202,  (__data_start+0x02)
-.set   DMEM_204,  (__data_start+0x04)
-.set   DMEM_206,  (__data_start+0x06)
-.set   DMEM_208,  (__data_start+0x08)
-.set   DMEM_20A,  (__data_start+0x0A)
-.set   DMEM_20C,  (__data_start+0x0C)
-.set   DMEM_20E,  (__data_start+0x0E)
-.set   DMEM_210,  (__data_start+0x10)
-.set   DMEM_212,  (__data_start+0x12)
-.set   DMEM_214,  (__data_start+0x14)
-.set   DMEM_216,  (__data_start+0x16)
-.set   DMEM_218,  (__data_start+0x18)
-.set   DMEM_21A,  (__data_start+0x1A)
-.set   DMEM_21E,  (__data_start+0x1E)
-.set   DMEM_220,  (__data_start+0x20)
-.set   DMEM_222,  (__data_start+0x22)
-.set   DMEM_224,  (__data_start+0x24)
-.set   DMEM_226,  (__data_start+0x26)
-.set   DMEM_228,  (__data_start+0x28)
-.set   DMEM_22A,  (__data_start+0x2A)
-.set   DMEM_230,  (__data_start+0x30)
-.set   DMEM_232,  (__data_start+0x32)
-.set   DMEM_234,  (__data_start+0x34)
-.set   DMEM_236,  (__data_start+0x36)
-.set   DMEM_238,  (__data_start+0x38)
-.set   DMEM_23A,  (__data_start+0x3A)
-.set   DMEM_240,  (__data_start+0x40)
-.set   DMEM_242,  (__data_start+0x42)
-.set   DMEM_244,  (__data_start+0x44)
-.set   DMEM_246,  (__data_start+0x46)
-.set   DMEM_248,  (__data_start+0x48)
-.set   DMEM_24A,  (__data_start+0x4A)
-.set   DMEM_250,  (__data_start+0x50)
-.set   DMEM_254,  (__data_start+0x54)
-.set   DMEM_256,  (__data_start+0x56)
-.set   DMEM_262,  (__data_start+0x62)
-.set   DMEM_296,  (__data_start+0x96)
-.set   DMEM_2D6,  (__data_start+0xD6)
-
-.set   TACTL,   0x0160
-.set   TAR,     0x0170
-.set   TACCTL0, 0x0162
-.set   TACCR0,  0x0172
-.set   TACCTL1, 0x0164
-.set   TACCR1,  0x0174
-.set   TACCTL2, 0x0166
-.set   TACCR2,  0x0176
-.set   TAIV,    0x012E
-
 
 WAIT_FUNC:
 	dec r14

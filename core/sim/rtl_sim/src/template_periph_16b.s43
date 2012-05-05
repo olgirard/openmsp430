@@ -35,21 +35,9 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
-.global main
+.include "pmem_defs.asm"
 
-.set   DMEM_BASE, (__data_start     )
-.set   DMEM_200,  (__data_start+0x00)
-.set   DMEM_202,  (__data_start+0x02)
-.set   DMEM_204,  (__data_start+0x04)
-.set   DMEM_206,  (__data_start+0x06)
-.set   DMEM_208,  (__data_start+0x08)
-.set   DMEM_20A,  (__data_start+0x0A)
-.set   DMEM_20C,  (__data_start+0x0C)
-.set   DMEM_20E,  (__data_start+0x0E)
-.set   DMEM_210,  (__data_start+0x10)
-.set   DMEM_212,  (__data_start+0x12)
-.set   DMEM_214,  (__data_start+0x14)
-.set   DMEM_216,  (__data_start+0x16)
+.global main
 
 .set   UNUSED_0,  (DMEM_BASE-0x0070-0x0002)
 .set   CNTRL1,    (DMEM_BASE-0x0070+0x0000)

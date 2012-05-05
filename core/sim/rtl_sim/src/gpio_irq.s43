@@ -35,37 +35,9 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.include "pmem_defs.asm"
+
 .global main
-
-.set   DMEM_BASE, (__data_start     )
-.set   DMEM_200,  (__data_start+0x00)
-.set   DMEM_208,  (__data_start+0x08)
-.set   DMEM_210,  (__data_start+0x10)
-.set   DMEM_218,  (__data_start+0x18)
-.set   DMEM_220,  (__data_start+0x20)
-.set   DMEM_228,  (__data_start+0x28)
-.set   DMEM_230,  (__data_start+0x30)
-.set   DMEM_238,  (__data_start+0x38)
-.set   DMEM_240,  (__data_start+0x40)
-.set   DMEM_248,  (__data_start+0x48)
-.set   DMEM_250,  (__data_start+0x50)
-.set   DMEM_258,  (__data_start+0x58)
-.set   DMEM_260,  (__data_start+0x60)
-
-.set   P1IN,  0x0020
-.set   P1OUT, 0x0021
-.set   P1DIR, 0x0022
-.set   P1IFG, 0x0023
-.set   P1IES, 0x0024
-.set   P1IE,  0x0025
-.set   P1SEL, 0x0026
-.set   P2IN,  0x0028
-.set   P2OUT, 0x0029
-.set   P2DIR, 0x002A
-.set   P2IFG, 0x002B
-.set   P2IES, 0x002C
-.set   P2IE,  0x002D
-.set   P2SEL, 0x002E
 
 main:
 	; Disable interrupts

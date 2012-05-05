@@ -34,34 +34,7 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
-.set    DMEM_BASE, (__data_start     )
-.set    DMEM_200,  (__data_start+0x00)
-.set    DMEM_202,  (__data_start+0x02)
-.set    DMEM_204,  (__data_start+0x04)
-.set    DMEM_206,  (__data_start+0x06)
-.set    DMEM_208,  (__data_start+0x08)
-.set    DMEM_209,  (__data_start+0x09)
-.set    DMEM_20A,  (__data_start+0x0A)
-.set    DMEM_20B,  (__data_start+0x0B)
-.set    DMEM_20C,  (__data_start+0x0C)
-.set    DMEM_20D,  (__data_start+0x0D)
-.set    DMEM_20E,  (__data_start+0x0E)
-.set    DMEM_20F,  (__data_start+0x0F)
-.set    DMEM_210,  (__data_start+0x10)
-.set    DMEM_212,  (__data_start+0x12)
-.set    DMEM_214,  (__data_start+0x14)
-.set    DMEM_216,  (__data_start+0x16)
-.set    DMEM_218,  (__data_start+0x18)
-.set    DMEM_219,  (__data_start+0x19)
-.set    DMEM_21A,  (__data_start+0x1A)
-.set    DMEM_21B,  (__data_start+0x1B)
-.set    DMEM_21C,  (__data_start+0x1C)
-.set    DMEM_21D,  (__data_start+0x1D)
-.set    DMEM_21E,  (__data_start+0x1E)
-.set    DMEM_21F,  (__data_start+0x1F)
-.set    DMEM_220,  (__data_start+0x20)
-.set    DMEM_222,  (__data_start+0x22)
-.set    DMEM_224,  (__data_start+0x24)
+.include "pmem_defs.asm"
 
 .global main
 
@@ -155,13 +128,13 @@ main:
 	mov     #0x0102, r2        ;# Test 1
 	mov     #0x7524, &DMEM_218
 	mov     #0xaaaa, &DMEM_21A
-	swpb    EDE_218            ;# SWPB (mem0c=0x7524  => {mem0c=0x2475)
+	swpb    EDE_218+PMEM_LENGTH            ;# SWPB (mem0c=0x7524  => {mem0c=0x2475)
 	mov          r2, r5
 
 	mov     #0x0005, r2        ;# Test 2
 	mov     #0x1cb6, &DMEM_21A
 	mov     #0xaaaa, &DMEM_21C
-	swpb    EDE_21A            ;# SWPB (mem0d=0x1cb6  => {mem0d=0xb61c)
+	swpb    EDE_21A+PMEM_LENGTH            ;# SWPB (mem0d=0x1cb6  => {mem0d=0xb61c)
 	mov          r2, r7
 
 	mov     #0x5000, r15

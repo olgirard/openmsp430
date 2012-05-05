@@ -35,9 +35,7 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
-.set   DMEM_BASE, (__data_start     )
-.set   DMEM_200,  (__data_start+0x00)
-.set   DMEM_250,  (__data_start+0x50)
+.include "pmem_defs.asm"
 
 .global main
 

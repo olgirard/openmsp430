@@ -65,6 +65,7 @@ asmfile=../src/$1.s43;
 verfile=../src/$1.v;
 incfile=../../../rtl/verilog/openMSP430_defines.v;
 linkfile=../bin/template.x;
+headfile=../bin/template_defs.asm;
 submitfile=../src/submit.f;
 if [ $OMSP_SIMULATOR == "isim" ]; then
     submitfile=../src/submit.prj;
@@ -86,6 +87,10 @@ if [ ! -e $linkfile ]; then
     echo "Linker definition file template doesn't exist: $linkfile"
     exit 1
 fi
+if [ ! -e $headfile ]; then
+    echo "Assembler definition file template doesn't exist: $headfile"
+    exit 1
+fi
 
 
 ###############################################################################
@@ -96,7 +101,7 @@ rm -rf *.vcd
 rm -rf *.vpd
 rm -rf *.trn
 rm -rf *.dsn
-rm -rf pmem.*
+rm -rf pmem*
 rm -rf stimulus.v
 
 
@@ -150,7 +155,7 @@ fi
 
 # Compile assembler code
 echo "Compile, link & generate IHEX file (Program Memory: $pmemsize B, Data Memory: $dmemsize B, Peripheral Space: $persize B)..."
-../bin/asm2ihex.sh  pmem pmem.s43 $linkfile $pmemsize $dmemsize $persize
+../bin/asm2ihex.sh  pmem pmem.s43 $linkfile $headfile $pmemsize $dmemsize $persize
 
 # Generate Program memory file
 echo "Convert IHEX file to Verilog MEMH format..."

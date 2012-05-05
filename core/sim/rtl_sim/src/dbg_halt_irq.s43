@@ -35,19 +35,9 @@
 /* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
+.include "pmem_defs.asm"
+
 .global main
-
-.set   DMEM_BASE, (__data_start     )
-.set   DMEM_200,  (__data_start+0x00)
-.set   DMEM_250,  (__data_start+0x50)
-
-.set   P1IN,  0x0020
-.set   P1OUT, 0x0021
-.set   P1DIR, 0x0022
-.set   P1IFG, 0x0023
-.set   P1IES, 0x0024
-.set   P1IE,  0x0025
-.set   P1SEL, 0x0026
 
 main:
 	; Disable interrupts

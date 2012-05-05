@@ -35,12 +35,10 @@
 /* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
+.include "pmem_defs.asm"
+
 .global main
 
-.set   BCSCTL1, 0x0057
-.set   BCSCTL2, 0x0058
-
-	
 WAIT_FUNC:
 	dec r14
 	jnz WAIT_FUNC

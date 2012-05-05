@@ -1,10 +1,9 @@
 # makfile configuration
 NAME            = sandbox
 OBJECTS         = main.o
-#CPU             = msp430x1111
 
-#CFLAGS          = -mmcu=${CPU} -O2 -Wall -g
-CFLAGS          = -O2 -Wall -g
+#CFLAGS          = -O2 -Wall -g                                          # Old flags
+CFLAGS          = -O2 -Wall -g -mcpu=430 -mivcnt=16 -mmpy=none           # Uniarch flags
 
 #switch the compiler (for the internal make rules)
 CC              = msp430-gcc

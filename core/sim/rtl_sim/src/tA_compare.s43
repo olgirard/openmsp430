@@ -35,34 +35,9 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.include "pmem_defs.asm"
+
 .global main
-
-.set   DMEM_BASE, (__data_start     )
-.set   DMEM_200,  (__data_start+0x00)
-.set   DMEM_202,  (__data_start+0x02)
-.set   DMEM_204,  (__data_start+0x04)
-.set   DMEM_206,  (__data_start+0x06)
-.set   DMEM_208,  (__data_start+0x08)
-.set   DMEM_212,  (__data_start+0x12)
-.set   DMEM_214,  (__data_start+0x14)
-.set   DMEM_216,  (__data_start+0x16)
-.set   DMEM_218,  (__data_start+0x18)
-.set   DMEM_222,  (__data_start+0x22)
-.set   DMEM_224,  (__data_start+0x24)
-.set   DMEM_226,  (__data_start+0x26)
-.set   DMEM_228,  (__data_start+0x28)
-.set   DMEM_250,  (__data_start+0x50)
-
-.set   TACTL,   0x0160
-.set   TAR,     0x0170
-.set   TACCTL0, 0x0162
-.set   TACCR0,  0x0172
-.set   TACCTL1, 0x0164
-.set   TACCR1,  0x0174
-.set   TACCTL2, 0x0166
-.set   TACCR2,  0x0176
-.set   TAIV,    0x012E
-
 
 WAIT_FUNC:
 	dec r14

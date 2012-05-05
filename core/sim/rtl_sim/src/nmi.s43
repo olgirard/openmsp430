@@ -34,15 +34,7 @@
 /* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
-.set    DMEM_BASE, (__data_start     )
-.set    DMEM_200,  (__data_start+0x00)
-.set    DMEM_250,  (__data_start+0x50)
-.set    DMEM_252,  (__data_start+0x52)
-.set    DMEM_300,  (__data_start+0x100)
-
-.set    WDTCTL, 0x0120
-.set    IE1,    0x0000
-.set    IFG1,   0x0002
+.include "pmem_defs.asm"
 
 .global main
 

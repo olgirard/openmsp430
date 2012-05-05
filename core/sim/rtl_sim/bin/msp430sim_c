@@ -92,7 +92,7 @@ rm -rf *.vcd
 rm -rf *.vpd
 rm -rf *.trn
 rm -rf *.dsn
-rm -rf pmem.*
+rm -rf pmem*
 rm -rf stimulus.v
 
 

@@ -35,21 +35,10 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
+.include "pmem_defs.asm"
+
 .global main
 
-.set   DMEM_BASE, (__data_start     )
-.set   DMEM_200,  (__data_start+0x00)
-.set   DMEM_202,  (__data_start+0x02)
-.set   DMEM_204,  (__data_start+0x04)
-.set   DMEM_206,  (__data_start+0x06)
-.set   DMEM_208,  (__data_start+0x08)
-.set   DMEM_250,  (__data_start+0x50)
-
-.set   IE1,    0x0000
-.set   IFG1,   0x0002
-.set   WDTCTL, 0x0120
-
-	
 main:
 
         /* --------------   WATCHDOG TEST:  STARTUP SEQUENCE  --------------- */

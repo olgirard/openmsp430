@@ -34,28 +34,7 @@
 /* $LastChangedDate$          */
 /*===========================================================================*/
 
-.set    DMEM_BASE, (__data_start     )
-.set    DMEM_200,  (__data_start+0x00)
-.set    DMEM_212,  (__data_start+0x12)
-.set    DMEM_214,  (__data_start+0x14)
-.set    DMEM_215,  (__data_start+0x15)
-.set    DMEM_216,  (__data_start+0x16)
-.set    DMEM_218,  (__data_start+0x18)
-.set    DMEM_21A,  (__data_start+0x1A)
-.set    DMEM_21C,  (__data_start+0x1C)
-.set    DMEM_21E,  (__data_start+0x1E)
-.set    DMEM_220,  (__data_start+0x20)
-.set    DMEM_221,  (__data_start+0x21)
-.set    DMEM_222,  (__data_start+0x22)
-.set    DMEM_224,  (__data_start+0x24)
-.set    DMEM_225,  (__data_start+0x25)
-.set    DMEM_228,  (__data_start+0x28)
-.set    DMEM_22A,  (__data_start+0x2A)
-.set    DMEM_22C,  (__data_start+0x2C)
-.set    DMEM_22E,  (__data_start+0x2E)
-.set    DMEM_250,  (__data_start+0x50)
-.set    DMEM_252,  (__data_start+0x52)
-.set    DMEM_300,  (__data_start+0x100)
+.include "pmem_defs.asm"
 
 .global main
 
@@ -148,11 +127,11 @@ clear_mem_loop:
 	mov   #DMEM_200, r4
 	mov     #0x8765, &DMEM_21E
 	mov     #0x5555, &DMEM_300
-	push    EDE_21E            ;# PUSH (0x8765  =>  @=0x0240)
+	push    EDE_21E+PMEM_LENGTH            ;# PUSH (0x8765  =>  @=0x0240)
 
 	mov     #0x4321, &DMEM_220
 	mov     #0x5555, &DMEM_300
-	push    EDE_220            ;# PUSH (0x4321  =>  @=0x023E)
+	push    EDE_220+PMEM_LENGTH            ;# PUSH (0x4321  =>  @=0x023E)
 
 	mov     #0x6000, r15
 
@@ -263,11 +242,11 @@ clear_mem_loop:
 	mov   #DMEM_200, r4
 	mov     #0xd10e, &DMEM_21E
 	mov     #0x5555, &DMEM_300
-	push.b  EDE_B_21E          ;# PUSH (0x0e  =>  @=0x0240)
+	push.b  EDE_B_21E+PMEM_LENGTH          ;# PUSH (0x0e  =>  @=0x0240)
 
 	mov     #0xfed0, &DMEM_220
 	mov     #0x5555, &DMEM_300
-	push.b  EDE_B_221          ;# PUSH (0xfe  =>  @=0x023E)
+	push.b  EDE_B_221+PMEM_LENGTH          ;# PUSH (0xfe  =>  @=0x023E)
 
 	mov     #0xD000, r15
 
