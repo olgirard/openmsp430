@@ -1,14 +1,18 @@
 /* Default linker script, for normal executables */
 OUTPUT_FORMAT("elf32-msp430","elf32-msp430","elf32-msp430")
-OUTPUT_ARCH(msp:110)
+OUTPUT_ARCH("msp430")
 MEMORY
 {
   text   (rx)   	: ORIGIN = 0xf800,      LENGTH = 2048
   data   (rwx)  	: ORIGIN = 0x0200, 	LENGTH = 128
   vectors (rw)   	: ORIGIN = 0xffe0,      LENGTH = 32
 }
+__WDTCTL = 0x0120;
+
 SECTIONS
 {
+  PROVIDE (__stack = 0x0280) ;
+
   /* Read-only sections, merged into text segment.  */
   .hash          : { *(.hash)             }
   .dynsym        : { *(.dynsym)           }
@@ -165,7 +169,6 @@ SECTIONS
   .debug_str      0 : { *(.debug_str) }
   .debug_loc      0 : { *(.debug_loc) }
   .debug_macinfo  0 : { *(.debug_macinfo) }
-  PROVIDE (__stack = 0x0280) ;
   PROVIDE (__data_start_rom = _etext) ;
   PROVIDE (__data_end_rom   = _etext + SIZEOF (.data)) ;
   PROVIDE (__noinit_start_rom = _etext + SIZEOF (.data)) ;

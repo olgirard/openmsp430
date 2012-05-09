@@ -8,8 +8,11 @@ MEMORY
   vectors (rw)   	: ORIGIN = 0xffe0,      LENGTH = 0x20
 }
 __WDTCTL = 0x0120;
+
 SECTIONS
 {
+  PROVIDE (__stack = 0x280) ;
+
   /* Read-only sections, merged into text segment.  */
   .hash          : { *(.hash)             }
   .dynsym        : { *(.dynsym)           }
@@ -169,7 +172,6 @@ SECTIONS
   .debug_str      0 : { *(.debug_str) }
   .debug_loc      0 : { *(.debug_loc) }
   .debug_macinfo  0 : { *(.debug_macinfo) }
-  PROVIDE (__stack = 0x280) ;
   PROVIDE (__data_start_rom = _etext) ;
   PROVIDE (__data_end_rom   = _etext + SIZEOF (.data)) ;
   PROVIDE (__noinit_start_rom = _etext + SIZEOF (.data)) ;
