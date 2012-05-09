@@ -130,7 +130,7 @@ wire       [15:0] r15   = dut.openMSP430_0.execution_unit_0.register_file_0.r15;
 
 // Program Memory cells
 //======================
-reg   [15:0] pmem [2047:0];
+reg   [15:0] pmem [0:2047];
 
 // Interrupt vectors
 wire  [15:0] irq_vect_15 = pmem[(1<<(`PMEM_MSB+1))-1];  // RESET Vector

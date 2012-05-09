@@ -40,23 +40,16 @@
 * CONSTANTS
 *********************************************************************************************************
 */
-#include <io.h>
-#include <signal.h>
-#include <iomacros.h>
+#include "omsp_system.h"
 
 typedef unsigned char INT8U;
 typedef unsigned int  INT16U;
 
-
 // Four-Digit, Seven-Segment LED Display driver
-#define DIGIT0_          0x0090
-sfrb (DIGIT0,DIGIT0_);
-#define DIGIT1_          0x0091
-sfrb (DIGIT1,DIGIT1_);
-#define DIGIT2_          0x0092
-sfrb (DIGIT2,DIGIT2_);
-#define DIGIT3_          0x0093
-sfrb (DIGIT3,DIGIT3_);
+#define DIGIT0        (*(volatile unsigned char *)  0x0090)
+#define DIGIT1        (*(volatile unsigned char *)  0x0091)
+#define DIGIT2        (*(volatile unsigned char *)  0x0092)
+#define DIGIT3        (*(volatile unsigned char *)  0x0093)
 
 #define DIGIT_NR         4 /* Total number of seven-segment digits */
 

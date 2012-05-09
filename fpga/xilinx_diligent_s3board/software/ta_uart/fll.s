@@ -32,7 +32,8 @@ fllInit:
         cmp.b   #0, r14                 ; Is min Rsel already selected ?
         jeq     .LfllER                 ; Yes, Rsel can not be increased
         dec.b   &BCSCTL1                ; Decrease Rsel
-.LfllRx:mov.b   #60h, &DCOCTL           ; Center DCO (may be optimized later ?)
+.LfllRx:
+	mov.b   #60h, &DCOCTL           ; Center DCO (may be optimized later ?)
         jmp     .Lwait0                 ; Test DCO again
 .LfllCP:
         mov     &CCR2, r12              ; Read captured value

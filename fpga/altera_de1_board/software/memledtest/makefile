@@ -1,12 +1,11 @@
 # makfile configuration
 NAME            = memledtest
 OBJECTS         = main.o 7seg.o gray.o memtest.o
-CPU             = msp430x1121
 
-CFLAGS          = -mmcu=${CPU} -mforce-hwmul -O2 -Wall -g
+CFLAGS          = -O2 -Wall -g -mcpu=430 -mivcnt=16 -mmpy=16     # Uniarch flags
 
 # use custom linker script
-LDFLAGS         = -mmcu=$(CPU) -Tlink.ld
+LDFLAGS         = -Tlink.ld
 
 #switch the compiler (for the internal make rules)
 CC              = msp430-gcc

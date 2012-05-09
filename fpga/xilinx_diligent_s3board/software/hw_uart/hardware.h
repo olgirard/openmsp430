@@ -1,31 +1,16 @@
 #ifndef HARDWARE_H
 #define HARDWARE_H
 
-#define __msp430_have_port3
-#define __MSP430_HAS_PORT3__
-
-#include <io.h>
-#include <signal.h>
-#include <iomacros.h>
 
 //--------------------------------------------------
 // Hardware UART register address mapping
 //--------------------------------------------------
 
-#define UART_CTL_           0x0080  // UART Control register (8bit)
-sfrb(UART_CTL,UART_CTL_);
-
-#define UART_STAT_          0x0081  // UART Status register (8bit)
-sfrb(UART_STAT,UART_STAT_);
-
-#define UART_BAUD_          0x0082  // UART Baud rate configuration (16bit)
-sfrw(UART_BAUD,UART_BAUD_);
-
-#define UART_TXD_           0x0084  // UART Transmit data register (8bit)
-sfrb(UART_TXD,UART_TXD_);
-
-#define UART_RXD_           0x0085  // UART Receive data register (8bit)
-sfrb(UART_RXD,UART_RXD_);
+#define UART_CTL          (*(volatile unsigned char *) 0x0080)  // UART Control register (8bit)
+#define UART_STAT         (*(volatile unsigned char *) 0x0081)  // UART Status register (8bit)
+#define UART_BAUD         (*(volatile unsigned int  *) 0x0082)  // UART Baud rate configuration (16bit)
+#define UART_TXD          (*(volatile unsigned char *) 0x0084)  // UART Transmit data register (8bit)
+#define UART_RXD          (*(volatile unsigned char *) 0x0085)  // UART Receive data register (8bit)
 
 
 //--------------------------------------------------

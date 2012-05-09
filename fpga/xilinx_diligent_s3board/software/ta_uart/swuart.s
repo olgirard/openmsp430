@@ -1,3 +1,4 @@
+
 #include "hardware.h"
 
 ;variables
@@ -8,11 +9,12 @@
 
 .text
 
-interrupt(TIMERA0_VECTOR)               ;register interrupt vector
+vector_0x0012:
+;interrupt(TIMERA0_VECTOR)               ;register interrupt vector
 ;interrupt handler to receive as Timer_A UART
 .global ccr0                            ;place a label afterwards so
 ccr0:                                   ;that it is used in the listing
-        add     rxbit, r0
+        add     &rxbit, r0
         jmp     .Lrxstart               ;start bit
         jmp     .Lrxdatabit             ;D0
         jmp     .Lrxdatabit             ;D1
@@ -25,10 +27,10 @@ ccr0:                                   ;that it is used in the listing
         
 .Lrxlastbit:                            ;last bit, handle byte
         bit     #SCCI, &CCTL0           ;read last bit
-        rrc.b   rxshift                 ;and save it
-        clr     rxbit                   ;reset state
+        rrc.b   &rxshift                 ;and save it
+        clr     &rxbit                   ;reset state
         mov     #CCIE|CAP|CM_2|CCIS_1|SCS, &CCTL0   ;restore capture mode
-        mov.b   rxshift, rxdata         ;copy received data
+        mov.b   &rxshift, &rxdata         ;copy received data
         bic     #CPUOFF|OSCOFF|SCG0|SCG1, 0(r1) ;exit all lowpower modes
         ;here you might do other things too, like setting a flag
         ;that the wakeup comes from the Timer_A UART. however
@@ -37,17 +39,17 @@ ccr0:                                   ;that it is used in the listing
         reti
 
 .Lrxstart:                              ;startbit, init
-        clr     rxshift                 ;clear input buffer
+        clr     &rxshift                 ;clear input buffer
         add     #(BAUD/2), &CCR0        ;startbit + 1.5 bits -> first bit
         mov     #CCIE|CCIS_1|SCS, &CCTL0;set compare mode, sample bits
         jmp     .Lrxex                  ;set state,...
 
 .Lrxdatabit:                            ;save databit
         bit     #SCCI, &CCTL0           ;measure databit
-        rrc.b   rxshift                 ;rotate in databit
+        rrc.b   &rxshift                 ;rotate in databit
 
 .Lrxex: add     #BAUD, &CCR0            ;one bit delay
-        incd    rxbit                   ;setup next state
+        incd    &rxbit                   ;setup next state
         reti
 
 ; void serPutc(char)

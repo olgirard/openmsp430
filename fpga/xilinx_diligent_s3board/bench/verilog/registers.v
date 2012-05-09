@@ -130,7 +130,7 @@ wire       [15:0] mem280 = {dut.ram_8x512_hi_0.inst.mem[64], dut.ram_8x512_lo_0.
 
 // Program Memory cells
 //======================
-reg   [15:0] pmem [2047:0];
+reg   [15:0] pmem [0:2047];
 
 // Interrupt vectors
 wire  [15:0] irq_vect_15 = pmem[(1<<(`PMEM_MSB+1))-1];  // RESET Vector

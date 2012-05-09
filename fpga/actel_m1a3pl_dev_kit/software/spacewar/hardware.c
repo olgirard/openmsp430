@@ -1,5 +1,4 @@
-#include "msp430x20x3.h"
-#include <signal.h>                    // Needed for using interrupts with msp430-gcc
+#include "omsp_system.h"
 #include "spacewar.h"
 
 //************************************************************
@@ -93,7 +92,7 @@ unsigned int read_a2d(unsigned int next_mux)
 {
   unsigned int last_a2d;  
   
-  if (next_mux==SD16INCH_2) {
+  if (next_mux==0x0002) {
     last_a2d = MY_CNTRL1;
   } else {
     last_a2d = MY_CNTRL2;
@@ -127,6 +126,7 @@ First put the value into the transmit register.  Chip select the DAC.
 Start the automatic SPI transfer.  Wait until the transfer is complete.
 Finally remove the chip select.
 */
+/*
 void set_one(int set_1) 
 {
 
@@ -136,6 +136,7 @@ void set_one(int set_1)
   while ((USIIFG & USICTL1) == 0) ;     // wait until y spi done
   P1OUT |= 0x04;                        // remove chip select
 }
+*/
 
 // ************************************************************
 //

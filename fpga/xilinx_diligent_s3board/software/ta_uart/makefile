@@ -1,10 +1,10 @@
 # makfile configuration
 NAME            = ta_uart
-OBJECTS         = main.o swuart.o fll.o
-CPU             = msp430x1121
+OBJECTS         = main.o swuart.o
 
-ASFLAGS         = -mmcu=${CPU} -mforce-hwmul -x assembler-with-cpp -D_GNU_ASSEMBLER_ -c
-CFLAGS          = -mmcu=${CPU} -mforce-hwmul -O2 -Wall -g
+CPU             = msp430f122
+ASFLAGS         = -mmcu=${CPU}  -x assembler-with-cpp -D_GNU_ASSEMBLER_ -c
+CFLAGS          = -mmcu=${CPU}  -O2 -Wall -g
 
 #switch the compiler (for the internal make rules)
 CC              = msp430-gcc

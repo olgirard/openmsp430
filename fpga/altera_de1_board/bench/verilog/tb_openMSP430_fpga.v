@@ -357,7 +357,7 @@ initial
 
 initial // Timeout
   begin
-     #500000;
+     #1000000;
      $display(" ===============================================");
      $display("|               SIMULATION FAILED               |");
      $display("|              (simulation Timeout)             |");

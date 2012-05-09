@@ -1,10 +1,8 @@
 # makfile configuration
 NAME            = spacewar
 OBJECTS         = bzsin.o  cline.o  compar.o  explode.o  hardware.o  main.o  point.o  reset.o  rocket1.o  rocket2.o  score.o  update.o
-CPU             = msp430x2122
 
-CFLAGS          = -mmcu=${CPU} -O2 -Wall -g
-#CFLAGS          = -mmcu=${CPU} -mforce-hwmul -O2 -Wall -g
+CFLAGS          = -O2 -Wall -g -mcpu=430 -mivcnt=16 -mmpy=none     # Uniarch flags
 
 #switch the compiler (for the internal make rules)
 CC              = msp430-gcc
@@ -20,7 +18,7 @@ download: download-uart
 
 #additional rules for files
 ${NAME}.elf: ${OBJECTS}
-	${CC} -mmcu=${CPU} -o $@ ${OBJECTS}
+	${CC} -T linker.x -o $@ ${OBJECTS}
 
 ${NAME}.a43: ${NAME}.elf
 	msp430-objcopy -O ihex $^ $@

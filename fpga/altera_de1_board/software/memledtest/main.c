@@ -60,8 +60,6 @@ int main(void) {
 	int i;
 
 
-    int o = 0;
-
     WDTCTL = WDTPW | WDTHOLD;          // Disable watchdog timer
 
     P1OUT  = 0x00;                     // Port data output

@@ -1,14 +1,11 @@
 # makfile configuration
 NAME            = hw_uart
 OBJECTS         = main.o
-CPU             = msp430x1121
 
-ASFLAGS         = -mmcu=${CPU} -mforce-hwmul -x assembler-with-cpp -D_GNU_ASSEMBLER_ -c
-CFLAGS          = -mmcu=${CPU} -mforce-hwmul -O2 -Wall -g
+CFLAGS          = -O2 -Wall -g -mcpu=430 -mivcnt=16 -mmpy=16     # Uniarch flags
 
 #switch the compiler (for the internal make rules)
 CC              = msp430-gcc
-AS              = msp430-gcc
 
 .PHONY: all FORCE clean download download-jtag download-bsl dist
 
@@ -22,7 +19,7 @@ download: download-uart
 
 #additional rules for files
 ${NAME}.elf: ${OBJECTS}
-	${CC} -mmcu=${CPU} -o $@ ${OBJECTS}
+	${CC} -Tlinker.x -o $@ ${OBJECTS}
 
 ${NAME}.a43: ${NAME}.elf
 	msp430-objcopy -O ihex $^ $@

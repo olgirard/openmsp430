@@ -30,8 +30,8 @@
 //  July 2006
 //************************************************************
 
+#include "omsp_system.h"
 #include "spacewar.h"
-#include "msp430x20x3.h"
 
 //************************************************************
 // externals
@@ -76,9 +76,9 @@ void play_spacewar(rkt_data *rkt1, rkt_data *rkt2)
 
   while (1) {
     P1OUT ^= 0x01;                          // Toggle P1.0
-    if(flags && time_tick) {                // only do updates on time tick
-      update(rkt1, read_a2d(SD16INCH_2));   // check rkt1's buttons update positions
-      update(rkt2, read_a2d(SD16INCH_4));   // check rkt2's buttons update positions
+    if(flags && time_tick) {                // only104 do updates on time tick
+      update(rkt1, read_a2d(0x0002));       // check rkt1's buttons update positions
+      update(rkt2, read_a2d(0x0004));       // check rkt2's buttons update positions
       compar(rkt1, rkt2);                   // check for collisions or hits
       score(rkt1, rkt2);                    // check for game end, show score
       flags &= ~time_tick;                  // clear time tick flag
@@ -96,10 +96,12 @@ void play_spacewar(rkt_data *rkt1, rkt_data *rkt2)
   Calls a function named play_spacewar.  This extra call reduces code size
 by using registers as the pointers to the structures rkt1 and rkt2.
 */
-void main(void)
+int main(void)
 {
 struct rkt_data rkt1, rkt2;
   
   play_spacewar(&rkt1, &rkt2);              // play the game
+
+  return 1;
 }
 

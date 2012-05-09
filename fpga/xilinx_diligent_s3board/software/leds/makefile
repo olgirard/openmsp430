@@ -1,9 +1,8 @@
 # makfile configuration
 NAME            = leds
 OBJECTS         = main.o 7seg.o
-CPU             = msp430x1121
 
-CFLAGS          = -mmcu=${CPU} -mforce-hwmul -O0 -Wall -g
+CFLAGS          = -O2 -Wall -g -mcpu=430 -mivcnt=16 -mmpy=16     # Uniarch flags
 
 #switch the compiler (for the internal make rules)
 CC              = msp430-gcc
@@ -21,7 +20,7 @@ download: download-uart
 
 #additional rules for files
 ${NAME}.elf: ${OBJECTS}
-	${CC} -mmcu=${CPU} -o $@ ${OBJECTS}
+	${CC} -Tlinker.x -o $@ ${OBJECTS}
 
 ${NAME}.a43: ${NAME}.elf
 	msp430-objcopy -O ihex $^ $@

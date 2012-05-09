@@ -3,7 +3,6 @@
 // spacewar.h
 //
 //
-#include <iomacros.h>
 
 #define full_shields 6      // 6 hits on rkt to win
 #define ammo 2              // # photon torpedos per rocket- only memory for 2
@@ -16,18 +15,6 @@
 #define fire_bit 1          // fire button is pressed
 #define time_tick 1         // 10 ms timer tick for system time
 
-#define MY_DAC_X_      0x0190
-sfrw (MY_DAC_X,MY_DAC_X_);
-#define MY_DAC_X_STAT_ 0x0192
-sfrw (MY_DAC_X_STAT,MY_DAC_X_STAT_);
-#define MY_CNTRL1_     0x0194
-sfrw (MY_CNTRL1,MY_CNTRL1_);
-#define MY_CNTRL2_     0x0196
-sfrw (MY_CNTRL2,MY_CNTRL2_);
-#define MY_DAC_Y_      0x01A0
-sfrw (MY_DAC_Y,MY_DAC_Y_);
-#define MY_DAC_Y_STAT_ 0x01A2
-sfrw (MY_DAC_Y_STAT,MY_DAC_Y_STAT_);
 
 /* Description:
 The structure contain all the data for each rocket.  Two of these structures

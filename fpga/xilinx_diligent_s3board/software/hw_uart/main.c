@@ -1,3 +1,4 @@
+#include "omsp_system.h"
 #include "hardware.h"
 #include <stdlib.h>
 #include <stdio.h>
