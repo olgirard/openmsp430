@@ -21,7 +21,7 @@
 /* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA        */
 /*                                                                           */
 /*===========================================================================*/
-/*                                 SANDBOX                                   */
+/*                             OMSP_FUNC C FILE                              */
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /* Author(s):                                                                */
@@ -33,51 +33,19 @@
 /* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
-initial
-   begin
-      $display(" ===============================================");
-      $display("|                 START SIMULATION              |");
-      $display(" ===============================================");
-      repeat(5) @(posedge mclk);
-      stimulus_done = 0;
+#include "omsp_func.h"
 
-      //---------------------------------------
-      // Check CPU configuration
-      //---------------------------------------
-      if ((`PMEM_SIZE !== 24576) || (`DMEM_SIZE !== 16384))
-        begin
-           $display(" ===============================================");
-           $display("|               SIMULATION ERROR                |");
-           $display("|                                               |");
-           $display("|  Core must be configured for:                 |");
-           $display("|               - 24kB program memory           |");
-           $display("|               - 16kB data memory              |");
-           $display(" ===============================================");
-           $finish;        
-        end
+//--------------------------------------------------//
+//                 putChar function                 //
+//            (Send a byte to the Port-1)           //
+//--------------------------------------------------//
+int putchar (int txdata) {
 
+  // Write the output character to the Port-1
+  P1OUT  = txdata;
 
-      //---------------------------------------
-      // Generate stimulus
-      //---------------------------------------
+  // Toggle Port-2[0] to signal new byte
+  P2OUT ^= 0x01;
 
-      repeat(1000) @(posedge mclk);
-      p1_din = 8'h01;
-      repeat(10) @(posedge mclk);
-      p1_din = 8'h00;
-      repeat(1000) @(posedge mclk);
-      p1_din = 8'h01;
-      repeat(10) @(posedge mclk);
-      p1_din = 8'h00;
-      repeat(1000) @(posedge mclk);
-
-      stimulus_done = 1;
-
-      $display(" ===============================================");
-      $display("|               SIMULATION DONE                 |");
-      $display("|       (stopped through verilog stimulus)      |");
-      $display(" ===============================================");
-      $finish;
-
-   end
-
+  return 0;
+}

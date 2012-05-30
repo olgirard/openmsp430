@@ -1,5 +1,9 @@
 #!/bin/bash
 
+###############################################################################
+#                               Configuration                                 #
+###############################################################################
+
 # Enable/Disable waveform dumping
 OMSP_NODUMP=0
 export OMSP_NODUMP
@@ -14,6 +18,35 @@ export OMSP_NODUMP
 OMSP_SIMULATOR=iverilog
 export OMSP_SIMULATOR
 
+###############################################################################
+#                            Parameter Check                                  #
+###############################################################################
+EXPECTED_ARGS=1
+if [ $# -ne $EXPECTED_ARGS ]; then
+    echo "ERROR    : wrong number of arguments"
+    echo "USAGE    : run_c <test name>"
+    echo "Example  : run_c sandbox"
+    echo ""
+    echo "Available tests:"
+    echo -ne "                 "
+    ls ../src-c/
+    echo ""
+  exit 1
+fi
 
-../bin/msp430sim_c sandbox
+###############################################################################
+#                     Check if the required files exist                       #
+###############################################################################
+softdir=../src-c/$1;
 
+if [ ! -e $softdir ]; then
+    echo "ERROR: test directory doesn't exist: $softdir"
+    echo ""
+    echo "Available tests:"
+    echo -ne "                 "
+    ls ../src-c/
+    echo ""
+    exit 1
+fi
+
+../bin/msp430sim_c $1

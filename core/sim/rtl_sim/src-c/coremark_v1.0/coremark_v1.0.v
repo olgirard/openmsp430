@@ -32,7 +32,17 @@
 /* $LastChangedBy: olivier.girard $                                          */
 /* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
+`define NO_TIMEOUT
 
+time mclk_start_time, mclk_end_time;
+real mclk_period,     mclk_frequency;
+
+time coremark_start_time, coremark_end_time;
+real coremark_per_sec;
+real coremark_per_mhz;
+
+integer Number_Of_Iterations;
+  
 initial
    begin
       $display(" ===============================================");
@@ -44,6 +54,7 @@ initial
       //---------------------------------------
       // Check CPU configuration
       //---------------------------------------
+
       if ((`PMEM_SIZE !== 24576) || (`DMEM_SIZE !== 16384))
         begin
            $display(" ===============================================");
@@ -56,21 +67,61 @@ initial
            $finish;        
         end
 
+      //---------------------------------------
+      // Number of benchmark iteration
+      // (Must match the C-code value)
+      //---------------------------------------
+
+      Number_Of_Iterations = 1;
+
 
       //---------------------------------------
-      // Generate stimulus
+      // Measure clock period
+      //---------------------------------------
+      repeat(100) @(posedge mclk);
+      $timeformat(-9, 3, " ns", 10);
+      @(posedge mclk);
+      mclk_start_time = $time;
+      @(posedge mclk);
+      mclk_end_time = $time;
+      @(posedge mclk);
+      mclk_period    = mclk_end_time-mclk_start_time;
+      mclk_frequency = 1000/mclk_period;
+      $display("\nINFO-VERILOG: openMSP430 System clock frequency %f MHz", mclk_frequency);
+
+      //---------------------------------------
+      // Measure Dhrystone run time
       //---------------------------------------
 
-      repeat(1000) @(posedge mclk);
-      p1_din = 8'h01;
-      repeat(10) @(posedge mclk);
-      p1_din = 8'h00;
-      repeat(1000) @(posedge mclk);
-      p1_din = 8'h01;
-      repeat(10) @(posedge mclk);
-      p1_din = 8'h00;
-      repeat(1000) @(posedge mclk);
+      // Detect beginning of run
+      @(posedge p2_dout[1]);
+      coremark_start_time = $time;
+      $timeformat(-3, 3, " ms", 10);
+      $display("INFO-VERILOG: CoreMark loop started at %t ", coremark_start_time);
+ 
+      // Detect end of run
+      @(negedge p2_dout[1]);
+      coremark_end_time = $time;
+      $timeformat(-3, 3, " ms", 10);
+      $display("INFO-VERILOG: Coremark loop ended   at %t ",   coremark_end_time);
+ 
+      // Compute results
+      $timeformat(-9, 3, " ns", 10);
+      coremark_per_sec = coremark_end_time - coremark_start_time;
+      coremark_per_sec = 1000000000 / coremark_per_sec;
+      coremark_per_sec = Number_Of_Iterations*coremark_per_sec;
+      coremark_per_mhz = coremark_per_sec / mclk_frequency;
 
+      // Report results
+      $display("\INFO-VERILOG: CoreMark ticks      : %d",     {p6_din, p5_din, p4_din, p3_din});
+      $display("\INFO-VERILOG: CoreMark per second : %f",     coremark_per_sec);
+      $display("\INFO-VERILOG: CoreMark per MHz    : %f\n\n", coremark_per_mhz);
+
+      //---------------------------------------
+      // Wait for the end of C-code execution
+      //---------------------------------------
+      @(posedge p2_dout[7]);
+ 
       stimulus_done = 1;
 
       $display(" ===============================================");
@@ -81,3 +132,14 @@ initial
 
    end
 
+// Display stuff from the C-program
+always @(p2_dout[0])
+  begin
+     $write("%s", p1_dout);
+  end
+
+
+// Time tick counter
+always @(negedge mclk or posedge puc_rst)
+  if (puc_rst)         {p6_din, p5_din, p4_din, p3_din} <= 32'h0000_0000;
+  else if (p2_dout[1]) {p6_din, p5_din, p4_din, p3_din} <= {p6_din, p5_din, p4_din, p3_din} + 32'h1;

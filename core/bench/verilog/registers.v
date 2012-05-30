@@ -130,22 +130,22 @@ wire       [15:0] mem27E = dmem_0.mem[63];
 // Interrupt vectors
 //======================
 
-wire       [15:0] irq_vect_15 = pmem_0.mem[(1<<(`PMEM_MSB+1))-1];  // RESET Vector
-wire       [15:0] irq_vect_14 = pmem_0.mem[(1<<(`PMEM_MSB+1))-2];  // NMI
-wire       [15:0] irq_vect_13 = pmem_0.mem[(1<<(`PMEM_MSB+1))-3];  // IRQ 13
-wire       [15:0] irq_vect_12 = pmem_0.mem[(1<<(`PMEM_MSB+1))-4];  // IRQ 12
-wire       [15:0] irq_vect_11 = pmem_0.mem[(1<<(`PMEM_MSB+1))-5];  // IRQ 11
-wire       [15:0] irq_vect_10 = pmem_0.mem[(1<<(`PMEM_MSB+1))-6];  // IRQ 10
-wire       [15:0] irq_vect_09 = pmem_0.mem[(1<<(`PMEM_MSB+1))-7];  // IRQ  9
-wire       [15:0] irq_vect_08 = pmem_0.mem[(1<<(`PMEM_MSB+1))-8];  // IRQ  8
-wire       [15:0] irq_vect_07 = pmem_0.mem[(1<<(`PMEM_MSB+1))-9];  // IRQ  7
-wire       [15:0] irq_vect_06 = pmem_0.mem[(1<<(`PMEM_MSB+1))-10]; // IRQ  6
-wire       [15:0] irq_vect_05 = pmem_0.mem[(1<<(`PMEM_MSB+1))-11]; // IRQ  5
-wire       [15:0] irq_vect_04 = pmem_0.mem[(1<<(`PMEM_MSB+1))-12]; // IRQ  4
-wire       [15:0] irq_vect_03 = pmem_0.mem[(1<<(`PMEM_MSB+1))-13]; // IRQ  3
-wire       [15:0] irq_vect_02 = pmem_0.mem[(1<<(`PMEM_MSB+1))-14]; // IRQ  2
-wire       [15:0] irq_vect_01 = pmem_0.mem[(1<<(`PMEM_MSB+1))-15]; // IRQ  1
-wire       [15:0] irq_vect_00 = pmem_0.mem[(1<<(`PMEM_MSB+1))-16]; // IRQ  0
+wire       [15:0] irq_vect_15 = pmem_0.mem[(`PMEM_SIZE>>1)-1];  // RESET Vector
+wire       [15:0] irq_vect_14 = pmem_0.mem[(`PMEM_SIZE>>1)-2];  // NMI
+wire       [15:0] irq_vect_13 = pmem_0.mem[(`PMEM_SIZE>>1)-3];  // IRQ 13
+wire       [15:0] irq_vect_12 = pmem_0.mem[(`PMEM_SIZE>>1)-4];  // IRQ 12
+wire       [15:0] irq_vect_11 = pmem_0.mem[(`PMEM_SIZE>>1)-5];  // IRQ 11
+wire       [15:0] irq_vect_10 = pmem_0.mem[(`PMEM_SIZE>>1)-6];  // IRQ 10
+wire       [15:0] irq_vect_09 = pmem_0.mem[(`PMEM_SIZE>>1)-7];  // IRQ  9
+wire       [15:0] irq_vect_08 = pmem_0.mem[(`PMEM_SIZE>>1)-8];  // IRQ  8
+wire       [15:0] irq_vect_07 = pmem_0.mem[(`PMEM_SIZE>>1)-9];  // IRQ  7
+wire       [15:0] irq_vect_06 = pmem_0.mem[(`PMEM_SIZE>>1)-10]; // IRQ  6
+wire       [15:0] irq_vect_05 = pmem_0.mem[(`PMEM_SIZE>>1)-11]; // IRQ  5
+wire       [15:0] irq_vect_04 = pmem_0.mem[(`PMEM_SIZE>>1)-12]; // IRQ  4
+wire       [15:0] irq_vect_03 = pmem_0.mem[(`PMEM_SIZE>>1)-13]; // IRQ  3
+wire       [15:0] irq_vect_02 = pmem_0.mem[(`PMEM_SIZE>>1)-14]; // IRQ  2
+wire       [15:0] irq_vect_01 = pmem_0.mem[(`PMEM_SIZE>>1)-15]; // IRQ  1
+wire       [15:0] irq_vect_00 = pmem_0.mem[(`PMEM_SIZE>>1)-16]; // IRQ  0
 
 // Interrupt detection
 wire              nmi_detect  = dut.frontend_0.nmi_pnd;

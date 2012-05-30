@@ -32,7 +32,16 @@
 /* $LastChangedBy: olivier.girard $                                          */
 /* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
+`define NO_TIMEOUT
 
+time mclk_start_time, mclk_end_time;
+real mclk_period,     mclk_frequency;
+
+time dhry_start_time, dhry_end_time;
+real dhry_per_sec,    dhry_mips,     dhry_mips_per_mhz;
+
+integer Number_Of_Runs;
+  
 initial
    begin
       $display(" ===============================================");
@@ -44,6 +53,7 @@ initial
       //---------------------------------------
       // Check CPU configuration
       //---------------------------------------
+
       if ((`PMEM_SIZE !== 24576) || (`DMEM_SIZE !== 16384))
         begin
            $display(" ===============================================");
@@ -56,21 +66,60 @@ initial
            $finish;        
         end
 
+      //---------------------------------------
+      // Number of benchmark iteration
+      // (Must match the C-code value)
+      //---------------------------------------
+
+      Number_Of_Runs = 100;
+
 
       //---------------------------------------
-      // Generate stimulus
+      // Measure clock period
+      //---------------------------------------
+      repeat(100) @(posedge mclk);
+      $timeformat(-9, 3, " ns", 10);
+      @(posedge mclk);
+      mclk_start_time = $time;
+      @(posedge mclk);
+      mclk_end_time = $time;
+      @(posedge mclk);
+      mclk_period    = mclk_end_time-mclk_start_time;
+      mclk_frequency = 1000/mclk_period;
+      $display("\nINFO-VERILOG: openMSP430 System clock frequency %f MHz\n", mclk_frequency);
+
+      //---------------------------------------
+      // Measure Dhrystone run time
       //---------------------------------------
 
-      repeat(1000) @(posedge mclk);
-      p1_din = 8'h01;
-      repeat(10) @(posedge mclk);
-      p1_din = 8'h00;
-      repeat(1000) @(posedge mclk);
-      p1_din = 8'h01;
-      repeat(10) @(posedge mclk);
-      p1_din = 8'h00;
-      repeat(1000) @(posedge mclk);
+      // Detect beginning of run
+      @(posedge p3_dout[0]);
+      dhry_start_time = $time;
+      $timeformat(-3, 3, " ms", 10);
+      $display("\nINFO-VERILOG: Dhrystone loop started at %t ", dhry_start_time);
+ 
+      // Detect end of run
+      @(negedge p3_dout[0]);
+      dhry_end_time = $time;
+      $timeformat(-3, 3, " ms", 10);
+      $display("INFO-VERILOG: Dhrystone loop ended   at %t ",   dhry_end_time);
+ 
+      // Compute results
+      $timeformat(-9, 3, " ns", 10);
+      dhry_per_sec      = (Number_Of_Runs*1000000000)/(dhry_end_time - dhry_start_time);
+      dhry_mips         = dhry_per_sec / 1757;
+      dhry_mips_per_mhz = dhry_mips / mclk_frequency;
 
+      // Report results
+      $display("\INFO-VERILOG: Dhrystone per second : %f",   dhry_per_sec);
+      $display("\INFO-VERILOG: DMIPS                : %f",   dhry_mips);
+      $display("\INFO-VERILOG: DMIPS/MHz            : %f\n", dhry_mips_per_mhz);
+
+      //---------------------------------------
+      // Wait for the end of C-code execution
+      //---------------------------------------
+      @(posedge p4_dout[0]);
+ 
       stimulus_done = 1;
 
       $display(" ===============================================");
@@ -81,3 +130,8 @@ initial
 
    end
 
+// Display stuff from the C-program
+always @(p2_dout[0])
+  begin
+     $write("%s", p1_dout);
+  end

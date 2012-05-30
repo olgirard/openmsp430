@@ -6,10 +6,9 @@ MEMORY {
   peripheral_8bit  : ORIGIN = 0x0010, LENGTH = 0x00f0
   peripheral_16bit : ORIGIN = 0x0100, LENGTH = 0x0100
 
-  ram (wx)         : ORIGIN = 0x0200, LENGTH = 128
-  rom (rx)         : ORIGIN = 0xf800, LENGTH = 2048-32
-
-  vectors          : ORIGIN = 0xffe0, LENGTH = 32
+  ram (wx)         : ORIGIN = 0x0200, LENGTH = 0x4000
+  rom (rx)         : ORIGIN = 0xA000, LENGTH = 0x6000-0x20
+  vectors          : ORIGIN = 0xffe0, LENGTH = 0x0020
 
   /* Remaining banks are absent */
   bsl              : ORIGIN = 0x0000, LENGTH = 0x0000
@@ -35,6 +34,7 @@ __OP2    = 0x0138;
 __RESLO  = 0x013A;
 __RESHI  = 0x013C;
 __SUMEXT = 0x013E;
+__P1OUT  = 0x0021;
 
 SECTIONS
 {
