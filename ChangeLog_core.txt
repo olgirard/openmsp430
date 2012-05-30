@@ -1,3 +1,8 @@
+2012-05-30 [r145]  
+
+	* Add Dhrystone and CoreMark benchmarks to the simulation
+	  environment.
+
 2012-05-09 [r142]  
 
 	* Beautify the linker script examples.
