@@ -125,20 +125,6 @@ mkdir  ./log
 ../bin/msp430sim mpy_basic                | tee ./log/mpy_basic.log
 
 
-grep SKIPPED ./log/*.log
-grep FAILED  ./log/*.log
-echo ""
-echo " ================================"
-echo -n "| Number of passed patterns : "
-cat ./log/*.log | grep -c PASSED
-echo -n "| Number of failed patterns : "
-cat ./log/*.log | grep -c FAILED
-echo -n "| Number of skipped patterns: "
-cat ./log/*.log | grep -c SKIPPED
-echo "|--------------------------------"
-echo -n "| Number of patterns:        "
-ls -1 ./log/*.log | wc -l
-echo " ================================"
-echo " Make sure passed == total"
-echo ""
-echo ""
+# Report regression results
+../bin/parse_results
+

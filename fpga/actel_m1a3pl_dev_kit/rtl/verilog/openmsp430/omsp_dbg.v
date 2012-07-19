@@ -36,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
+// $Rev: 134 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $LastChangedDate: 2012-03-22 21:31:06 +0100 (Thu, 22 Mar 2012) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -420,8 +420,8 @@ always @ (posedge dbg_clk or posedge dbg_rst)
 
 wire        mem_cnt_wr  = reg_wr[MEM_CNT];
 
-wire [15:0] mem_cnt_dec = (mem_cnt==16'h0000)         ? 16'h0000 :
-                          (dbg_mem_acc | dbg_reg_acc) ? 16'hffff : 16'h0000;
+wire [15:0] mem_cnt_dec = (mem_cnt==16'h0000)                       ? 16'h0000 :
+                          (mem_burst & (dbg_mem_acc | dbg_reg_acc)) ? 16'hffff : 16'h0000;
    
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)         mem_cnt <=  16'h0000;

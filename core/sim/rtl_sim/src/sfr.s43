@@ -123,14 +123,14 @@ main:
 	mov   &CPU_ID_HI, r11
 	mov   #0x5001, r15
 
-	mov   0x5555,     &CPU_ID_LO
+	mov   0x5554,     &CPU_ID_LO
 	mov   0xAAAA,     &CPU_ID_HI
 	mov   &CPU_ID_LO, r10
 	mov   &CPU_ID_HI, r11
 	mov   #0x5002, r15
 		
 	mov   0xAAAA,     &CPU_ID_LO
-	mov   0x5555,     &CPU_ID_HI
+	mov   0x5554,     &CPU_ID_HI
 	mov   &CPU_ID_LO, r10
 	mov   &CPU_ID_HI, r11		
 	mov   #0x5003, r15

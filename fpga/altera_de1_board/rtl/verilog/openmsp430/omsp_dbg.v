@@ -420,8 +420,8 @@ always @ (posedge dbg_clk or posedge dbg_rst)
 
 wire        mem_cnt_wr  = reg_wr[MEM_CNT];
 
-wire [15:0] mem_cnt_dec = (mem_cnt==16'h0000)         ? 16'h0000 :
-                          (dbg_mem_acc | dbg_reg_acc) ? 16'hffff : 16'h0000;
+wire [15:0] mem_cnt_dec = (mem_cnt==16'h0000)                       ? 16'h0000 :
+                          (mem_burst & (dbg_mem_acc | dbg_reg_acc)) ? 16'hffff : 16'h0000;
    
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)         mem_cnt <=  16'h0000;
