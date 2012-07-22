@@ -59,6 +59,7 @@
 // Program Memory Size:
 //                     Uncomment the required memory size
 //-------------------------------------------------------
+//`define PMEM_SIZE_CUSTOM
 //`define PMEM_SIZE_59_KB
 //`define PMEM_SIZE_55_KB
 //`define PMEM_SIZE_54_KB
@@ -78,6 +79,7 @@
 // Data Memory Size:
 //                     Uncomment the required memory size
 //-------------------------------------------------------
+//`define DMEM_SIZE_CUSTOM
 //`define DMEM_SIZE_32_KB
 //`define DMEM_SIZE_24_KB
 //`define DMEM_SIZE_16_KB
@@ -168,6 +170,7 @@
 // shifted up and a custom linker script will therefore
 // be required by the GCC compiler.
 //-------------------------------------------------------
+//`define PER_SIZE_CUSTOM
 //`define PER_SIZE_32_KB
 //`define PER_SIZE_16_KB
 //`define PER_SIZE_8_KB
@@ -230,6 +233,31 @@
 // Note that this feature is not supported by GDB.
 //-------------------------------------------------------
 //`define DBG_HWBRK_RANGE
+
+
+//-------------------------------------------------------
+// Custom Program/Data and Peripheral Memory Spaces
+//-------------------------------------------------------
+// The following values are valid only if the
+// corresponding *_SIZE_CUSTOM defines are uncommented:
+//
+//  - *_SIZE   : size of the section in bytes.
+//  - *_AWIDTH : address port width, this value must allow
+//               to address all WORDS of the section
+//               (i.e. the *_SIZE divided by 2)
+//-------------------------------------------------------
+
+// Custom Program memory (enabled with PMEM_SIZE_CUSTOM)
+`define PMEM_CUSTOM_AWIDTH      10
+`define PMEM_CUSTOM_SIZE      2048
+
+// Custom Data memory    (enabled with DMEM_SIZE_CUSTOM)
+`define DMEM_CUSTOM_AWIDTH       6
+`define DMEM_CUSTOM_SIZE       128
+
+// Custom Peripheral memory  (enabled with PER_SIZE_CUSTOM)
+`define PER_CUSTOM_AWIDTH        8
+`define PER_CUSTOM_SIZE        512
 
 
 //-------------------------------------------------------
@@ -460,6 +488,10 @@
   `define PMEM_AWIDTH       9
   `define PMEM_SIZE      1024
 `endif
+`ifdef PMEM_SIZE_CUSTOM
+  `define PMEM_AWIDTH       `PMEM_CUSTOM_AWIDTH
+  `define PMEM_SIZE         `PMEM_CUSTOM_SIZE
+`endif
 
 // Data Memory Size
 `ifdef DMEM_SIZE_32_KB
@@ -514,6 +546,10 @@
   `define DMEM_AWIDTH        6
   `define DMEM_SIZE        128
 `endif
+`ifdef DMEM_SIZE_CUSTOM
+  `define DMEM_AWIDTH       `DMEM_CUSTOM_AWIDTH
+  `define DMEM_SIZE         `DMEM_CUSTOM_SIZE
+`endif
 
 // Peripheral Memory Size
 `ifdef PER_SIZE_32_KB
@@ -543,6 +579,10 @@
 `ifdef PER_SIZE_512_B
   `define PER_AWIDTH         8
   `define PER_SIZE         512
+`endif
+`ifdef PER_SIZE_CUSTOM
+  `define PER_AWIDTH        `PER_CUSTOM_AWIDTH
+  `define PER_SIZE          `PER_CUSTOM_SIZE
 `endif
 
 // Data Memory Base Adresses

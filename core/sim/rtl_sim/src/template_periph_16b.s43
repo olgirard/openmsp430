@@ -39,12 +39,12 @@
 
 .global main
 
-.set   UNUSED_0,  (DMEM_BASE-0x0070-0x0002)
-.set   CNTRL1,    (DMEM_BASE-0x0070+0x0000)
-.set   CNTRL2,    (DMEM_BASE-0x0070+0x0002)
-.set   CNTRL3,    (DMEM_BASE-0x0070+0x0004)
-.set   CNTRL4,    (DMEM_BASE-0x0070+0x0006)
-.set   UNUSED_1,  (DMEM_BASE-0x0070-0x0008)
+.set   UNUSED_0,  (((DMEM_BASE-0x0070)&0x7ff8)-0x0002)
+.set   CNTRL1,    (((DMEM_BASE-0x0070)&0x7ff8)+0x0000)
+.set   CNTRL2,    (((DMEM_BASE-0x0070)&0x7ff8)+0x0002)
+.set   CNTRL3,    (((DMEM_BASE-0x0070)&0x7ff8)+0x0004)
+.set   CNTRL4,    (((DMEM_BASE-0x0070)&0x7ff8)+0x0006)
+.set   UNUSED_1,  (((DMEM_BASE-0x0070)&0x7ff8)-0x0008)
 
 main:
         /* --------------     TEST RD/WR REGISTER ACCESS     --------------- */

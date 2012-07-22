@@ -201,12 +201,12 @@ initial
       dbg_uart_wr(MEM_CTL,  16'h0003);                        // write register
       repeat(20) @(posedge mclk);
       if (timerA_0.taccr0 !== 16'haed8)  tb_error("====== Peripheral (16b): Write @0x0172 =====");
-      dbg_uart_wr(MEM_ADDR, (`DMEM_BASE-16'h0070+16'h0002));  // select memory address
+      dbg_uart_wr(MEM_ADDR, (((`DMEM_BASE-16'h0070)&16'h7ff8)+16'h0002));  // select memory address
       dbg_uart_wr(MEM_DATA, 16'hdead);                        // write data
       dbg_uart_wr(MEM_CTL,  16'h0003);                        // write memory
       repeat(20) @(posedge mclk);
       if (template_periph_16b_0.cntrl2 !== 16'hdead)  tb_error("====== Peripheral (16b): Write @(DMEM_BASE-0x0070+0x0002) =====");
-      dbg_uart_wr(MEM_ADDR, (`DMEM_BASE-16'h0070+16'h0006));  // select memory address
+      dbg_uart_wr(MEM_ADDR, (((`DMEM_BASE-16'h0070)&16'h7ff8)+16'h0006));  // select memory address
       dbg_uart_wr(MEM_DATA, 16'hbeef);                        // write data
       dbg_uart_wr(MEM_CTL,  16'h0003);                        // write memory
       repeat(20) @(posedge mclk);
@@ -221,12 +221,12 @@ initial
       dbg_uart_wr(MEM_CTL,  16'h0001);                        // read memory
       dbg_uart_rd(MEM_DATA);                                  // read data
       if (dbg_uart_buf !== 16'haed8)  tb_error("====== Peripheral (16b): Read @0x0172 =====");
-      dbg_uart_wr(MEM_ADDR, (`DMEM_BASE-16'h0070+16'h0002));  // select memory address
+      dbg_uart_wr(MEM_ADDR, (((`DMEM_BASE-16'h0070)&16'h7ff8)+16'h0002));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0001);                        // read memory
       dbg_uart_rd(MEM_DATA);                                  // read data
       repeat(20) @(posedge mclk);
       if (dbg_uart_buf !== 16'hdead)  tb_error("====== Peripheral (16b): Read @(DMEM_BASE-0x0070+0x0002) =====");
-      dbg_uart_wr(MEM_ADDR, (`DMEM_BASE-16'h0070+16'h0006));  // select memory address
+      dbg_uart_wr(MEM_ADDR, (((`DMEM_BASE-16'h0070)&16'h7ff8)+16'h0006));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0001);                        // read memory
       dbg_uart_rd(MEM_DATA);                                  // read data
       repeat(20) @(posedge mclk);

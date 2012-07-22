@@ -122,36 +122,22 @@ else
     ln -s $verfile stimulus.v
 fi
 
-# Make local copy of the openMSP403 configuration file and remove comments
-cp  $incfile  ./pmem.inc
-sed -i "/^\/\// s,.*,," pmem.inc
+# Make local copy of the openMSP403 configuration file
+# and prepare it for MSPGCC preprocessing
+cp  $incfile  ./pmem.h
+sed -i 's/`ifdef/#ifdef/g'   ./pmem.h 
+sed -i 's/`else/#else/g'     ./pmem.h 
+sed -i 's/`endif/#endif/g'   ./pmem.h 
+sed -i 's/`define/#define/g' ./pmem.h 
+sed -i 's/`//g'              ./pmem.h 
+sed -i "s/'//g"              ./pmem.h
 
-# Get Program Memory size
-pmemunit=`grep PMEM_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f4`
-pmemsize=`grep PMEM_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f3`
-pmemsize=${pmemsize/p/.}
-if [ $pmemunit == "KB" ]
-  then
-    pmemsize=`echo "pmemsize=$pmemsize * 1024; pmemsize /= 1; pmemsize" | bc`
-fi
+# Use MSPGCC preprocessor to extract the Program, Data
+# and Peripheral memory sizes
+msp430-gcc -E -P -x c ../bin/omsp_config.sh > pmem.sh
 
-# Get Data Memory size
-dmemunit=`grep DMEM_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f4`
-dmemsize=`grep DMEM_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f3`
-dmemsize=${dmemsize/p/.}
-if [ $dmemunit == "KB" ]
-  then
-    dmemsize=`echo "dmemsize=$dmemsize * 1024; dmemsize /= 1; dmemsize" | bc`
-fi
-
-# Get Peripheral Address space size
-perunit=`grep PER_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f4`
-persize=`grep PER_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f3`
-persize=${persize/p/.}
-if [ $perunit == "KB" ]
-  then
-    persize=`echo "persize=$persize * 1024; persize /= 1; persize" | bc`
-fi
+# Source the extracted configuration file
+source pmem.sh
 
 # Compile assembler code
 echo "Compile, link & generate IHEX file (Program Memory: $pmemsize B, Data Memory: $dmemsize B, Peripheral Space: $persize B)..."

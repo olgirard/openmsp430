@@ -513,7 +513,7 @@ template_periph_8b template_periph_8b_0 (
 `ifdef CVER
 template_periph_16b #(15'h0190)             template_periph_16b_0 (
 `else
-template_periph_16b #(.BASE_ADDR(15'd`PER_SIZE-15'h0070)) template_periph_16b_0 (
+template_periph_16b #(.BASE_ADDR((15'd`PER_SIZE-15'h0070) & 15'h7ff8)) template_periph_16b_0 (
 `endif
 // OUTPUTs
     .per_dout     (per_dout_temp_16b), // Peripheral data output

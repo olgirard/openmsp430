@@ -119,18 +119,22 @@ else
     ln -s $verfile stimulus.v
 fi
 
-# Make local copy of the openMSP403 configuration file and remove comments
-cp  $incfile  ./pmem.inc
-sed -i "/^\/\// s,.*,," pmem.inc
+# Make local copy of the openMSP403 configuration file
+# and prepare it for MSPGCC preprocessing
+cp  $incfile  ./pmem.h
+sed -i 's/`ifdef/#ifdef/g'   ./pmem.h 
+sed -i 's/`else/#else/g'     ./pmem.h 
+sed -i 's/`endif/#endif/g'   ./pmem.h 
+sed -i 's/`define/#define/g' ./pmem.h 
+sed -i 's/`//g'              ./pmem.h 
+sed -i "s/'//g"              ./pmem.h
 
-# Get Program memory size
-pmemunit=`grep PMEM_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f4`
-pmemsize=`grep PMEM_SIZE_ pmem.inc | grep -v ifdef | grep -v "//" | cut -d'_' -f3`
-pmemsize=${pmemsize/p/.}
-if [ $pmemunit == "KB" ]
-  then
-    pmemsize=`echo "pmemsize=$pmemsize * 1024; pmemsize /= 1; pmemsize" | bc`
-fi
+# Use MSPGCC preprocessor to extract the Program, Data
+# and Peripheral memory sizes
+msp430-gcc -E -P -x c ../bin/omsp_config.sh > pmem.sh
+
+# Source the extracted configuration file
+source pmem.sh
 
 # Create IHEX file from ELF
 echo "Convert ELF file to IHEX format..."

@@ -179,8 +179,8 @@ wire               fe_pmem_wait  = (~fe_pmem_cen & ~eu_pmem_cen);
 
 // Peripherals
 //--------------------
-wire              dbg_per_en   =  dbg_mem_en & (dbg_mem_addr[15:`PER_AWIDTH+1]=={15-`PER_AWIDTH{1'b0}});
-wire              eu_per_en    =  eu_mb_en   & (eu_mab[14:`PER_AWIDTH]        =={15-`PER_AWIDTH{1'b0}});
+wire              dbg_per_en   =  dbg_mem_en & (dbg_mem_addr[15:1]<(`PER_SIZE>>1));
+wire              eu_per_en    =  eu_mb_en   & (eu_mab<(`PER_SIZE>>1));
 
 wire       [15:0] per_din      =  dbg_mem_en ? dbg_mem_dout               : eu_mdb_out;
 wire        [1:0] per_we       =  dbg_mem_en ? dbg_mem_wr                 : eu_mb_wr;
