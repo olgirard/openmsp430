@@ -1,3 +1,8 @@
+2012-07-22 [r151]  
+
+	* Add possibility to configure custom Program, Data and Peripheral
+	  memory sizes.
+
 2012-07-19 [r149]  
 
 	* Update simulation regression result parser. Fixed failing SFR
