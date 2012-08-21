@@ -3,13 +3,12 @@
 
 ;variables
 .data
-        .comm   rxdata,1,1              ;char var
+;        .comm   rxdata,1,1              ;char var
         .comm   rxshift,1,1             ;char var
         .comm   rxbit,2,2               ;short var, aligned
 
 .text
 
-vector_0x0012:
 ;interrupt(TIMERA0_VECTOR)               ;register interrupt vector
 ;interrupt handler to receive as Timer_A UART
 .global ccr0                            ;place a label afterwards so
@@ -30,13 +29,15 @@ ccr0:                                   ;that it is used in the listing
         rrc.b   &rxshift                 ;and save it
         clr     &rxbit                   ;reset state
         mov     #CCIE|CAP|CM_2|CCIS_1|SCS, &CCTL0   ;restore capture mode
-        mov.b   &rxshift, &rxdata         ;copy received data
-        bic     #CPUOFF|OSCOFF|SCG0|SCG1, 0(r1) ;exit all lowpower modes
+;        mov.b   &rxshift, &rxdata         ;copy received data
+;        bic     #CPUOFF|OSCOFF|SCG0|SCG1, 0(r1) ;exit all lowpower modes
         ;here you might do other things too, like setting a flag
         ;that the wakeup comes from the Timer_A UART. however
         ;it should not take longer than one bit time, otherwise
         ;charcetrs will be lost.
-        reti
+;        reti
+        mov.b   &rxshift, r15           ;return received data
+        ret
 
 .Lrxstart:                              ;startbit, init
         clr     &rxshift                 ;clear input buffer
@@ -49,8 +50,10 @@ ccr0:                                   ;that it is used in the listing
         rrc.b   &rxshift                 ;rotate in databit
 
 .Lrxex: add     #BAUD, &CCR0            ;one bit delay
-        incd    &rxbit                   ;setup next state
-        reti
+        incd    &rxbit                  ;setup next state
+;        reti
+        mov     #0xffff, r15            ;return 0xffff
+        ret
 
 ; void serPutc(char)
 ;use an other Capture/Compare than for receiving (full duplex).

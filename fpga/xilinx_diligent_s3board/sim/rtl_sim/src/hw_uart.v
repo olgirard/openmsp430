@@ -4,24 +4,28 @@
 /* Test the Digital I/O interface.                                           */
 /*===========================================================================*/
 
-reg [32*8-1:0] rx_chain;
-integer        rx_offset;
+`define VERY_LONG_TIMEOUT
+
+// Data rate
+parameter UART_FREQ   = 115200;
+integer   UART_PERIOD = 1000000000/UART_FREQ;
 
 
 reg [7:0] rxbuf;
 integer   rxcnt;
-`define   BAUD    140
 
 task uart_rx;
       begin
 	 @(negedge UART_TXD);  
 	 rxbuf = 0;      
-	 repeat(`BAUD*3/2) @(posedge mclk);
+	 #(UART_PERIOD*3/2);
 	 for (rxcnt = 0; rxcnt < 8; rxcnt = rxcnt + 1)
 	   begin
 	      rxbuf = {UART_TXD, rxbuf[7:1]};
-	      repeat(`BAUD) @(posedge mclk);	   
-	end
+	      #(UART_PERIOD);
+	   end
+	 $write("%s", rxbuf);
+	 $fflush();
       end
 endtask
 
@@ -33,17 +37,17 @@ task uart_tx;
       begin
 	 UART_RXD = 1'b1;
 	 txbuf_full = {1'b1, txbuf, 1'b0};
-	 repeat(`BAUD) @(posedge mclk);
+         #(UART_PERIOD);
 	 for (txcnt = 0; txcnt < 10; txcnt = txcnt + 1)
 	   begin
 	      UART_RXD   =  txbuf_full[txcnt];
-//	      txbuf_full = {txbuf_full[8:1], 1'b0};
-	      repeat(`BAUD) @(posedge mclk);	   
+              #(UART_PERIOD);
 	   end
       end
 endtask
 
-
+initial forever uart_rx;
+   
 
 initial
    begin
@@ -52,41 +56,35 @@ initial
       $display(" ===============================================");
       repeat(5) @(posedge CLK_50MHz);
       stimulus_done = 0;
-      rx_chain = 0;
-      rx_offset = 0;
 
-      while (rx_offset<1)
-	begin
-	   uart_rx;
-	   rx_chain = rx_chain | (rxbuf << (31*8-(8*rx_offset)));
-	   rx_offset = rx_offset+1;
-	end
+      UART_RXD = 1'b1;
 
-      repeat(50) @(posedge CLK_50MHz);
-      uart_tx("a");
-      
-//      repeat(5000) @(posedge mclk);
-//      UART_RXD = 1;
-//      repeat(160) @(posedge mclk);
-//      UART_RXD = 0;
-//      repeat(160) @(posedge mclk);
-//      UART_RXD = 1;
-//      repeat(160) @(posedge mclk);
-//      UART_RXD = 0;
-//      repeat(160) @(posedge mclk);
-//      UART_RXD = 1;
-//      repeat(160) @(posedge mclk);
-//      UART_RXD = 0;
-//      repeat(160) @(posedge mclk);
-//      UART_RXD = 1;
-//      repeat(160) @(posedge mclk);
-//      UART_RXD = 0;
-//      repeat(160) @(posedge mclk);
+      // Select hardware uart
+      SW1 = 1'b1;
+      SW0 = 1'b0;
 
+      // Wait for welcome message to be received
+      repeat(120000) @(posedge mclk);
+
+      // Send something
+      uart_tx("B");
+      uart_tx("o");
+      uart_tx("n");
+      uart_tx("j");
+      uart_tx("o");
+      uart_tx("u");
+      uart_tx("r");
+      uart_tx(" ");
+      uart_tx(":");
+      uart_tx("-");
+      uart_tx(")");
+      uart_tx("\n");
+      repeat(10000) @(posedge mclk);
 
       stimulus_done = 1;
-      //repeat(1000) @(posedge mclk);
-      //$finish();
+      repeat(10) @(posedge mclk);
+      $display("\n");
+      $finish();
 
    end
 

@@ -16,16 +16,19 @@ XCOPY ..\..\..\rtl\verilog\coregen\rom_8x2k_hi.ngc  .
 XCOPY ..\..\..\rtl\verilog\coregen\rom_8x2k_lo.ngc  .
 
 :: Copy the Xilinx constraints file
-XCOPY ..\openMSP430_fpga.ucf                        .
+XCOPY ..\scripts\openMSP430_fpga.ucf                .
 
+:: Create link to the TimerA include file
+XCOPY ..\..\..\rtl\verilog\openmsp430\periph\omsp_timerA_defines.v    .
+XCOPY ..\..\..\rtl\verilog\openmsp430\periph\omsp_timerA_undefines.v  .
 
 :: XFLOW
 ::---------------
 
-xflow -p 3S200FT256-4 -implement high_effort.opt    ^
-                      -config    bitgen.opt         ^
-                      -synth     ..\xst_verilog.opt ^
-                      ..\openMSP430_fpga.prj
+xflow -p 3S200FT256-4 -implement high_effort.opt            ^
+                      -config    bitgen.opt                 ^
+                      -synth     ..\scripts\xst_verilog.opt ^
+                      ..\scripts\openMSP430_fpga.prj
 
 :: MANUAL FLOW
 ::---------------
@@ -45,4 +48,7 @@ xflow -p 3S200FT256-4 -implement high_effort.opt    ^
 
 
 cd ..
+
+XCOPY .\WORK\openMSP430_fpga.bit .\bitstreams\.
+
 PAUSE

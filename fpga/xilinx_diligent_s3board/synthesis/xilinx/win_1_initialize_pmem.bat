@@ -42,6 +42,6 @@ DEL /f .\WORK\%MSP430_PROGRAM%.bit
 XCOPY %elffile% .\WORK\
 
 cd .\WORK
-data2mem -bm ..\memory.bmm -bd %MSP430_PROGRAM%.elf -bt openMSP430_fpga.bit -o b %MSP430_PROGRAM%.bit
+data2mem -bm ..\scripts\memory.bmm -bd %MSP430_PROGRAM%.elf -bt openMSP430_fpga.bit -o b %MSP430_PROGRAM%.bit
 cd ..\
 PAUSE

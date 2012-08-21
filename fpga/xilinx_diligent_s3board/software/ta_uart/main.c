@@ -9,6 +9,8 @@ chris <cliechti@gmx.net>
 #include "swuart.h"
 //#include "fll.h"
 
+volatile int rxdata;
+
 /**
 Delay function.
 */
@@ -45,8 +47,8 @@ int main(void) {
 
     P3DIR  = 0xff;
     P3OUT  = 0xff;                      //light LED during init
-    delay(65535);                       //Wait for watch crystal startup
-    delay(65535);
+//    delay(65535);                       //Wait for watch crystal startup
+    delay(10);
 //  fllInit();                          //Init FLL to desired frequency using the 32k768 cystal as reference.
     P3OUT  = 0x00;                      //switch off LED
     
@@ -87,9 +89,9 @@ int main(void) {
                 case '\b':
                     if (pos > 0) {      //is there a char to delete?
                         pos--;          //remove it in buffer
-                        putchar('\b');  //go back
-                        putchar(' ');   //erase on screen
-                        putchar('\b');  //go back
+                        putchar((int)'\b');  //go back
+                        putchar((int)' ');   //erase on screen
+                        putchar((int)'\b');  //go back
                     }
                     break;
                 //other characters
@@ -97,10 +99,20 @@ int main(void) {
                     //only store characters if buffer has space
                     if (pos < sizeof(buf)) {
                         putchar(rxdata);     //echo
-                        buf[pos++] = rxdata; //store
+                        buf[pos++] = (char)rxdata; //store
                     }
             }
         }
     }
 }
 
+interrupt (TIMERA0_VECTOR) INT_ccr0(void) {
+
+  int rx_done;
+  rx_done = ccr0();
+
+  if (rx_done!=-1) {
+    LPM0_EXIT;
+    rxdata = rx_done;
+  }
+}
