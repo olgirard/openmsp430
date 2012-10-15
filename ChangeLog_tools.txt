@@ -1,3 +1,10 @@
+2012-10-15 [r158-159]  
+
+	* Removed unused sourced file...
+
+	* Update software development tools to add support for the I2C
+	  based serial debug interface.
+
 2012-03-22 [r133]  
 
 	* Add support for new CPU version.

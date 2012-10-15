@@ -1,3 +1,8 @@
+2012-10-15 [r154]  
+
+	* The serial debug interface now supports the I2C protocol (in
+	  addition to the UART)
+
 2012-07-22 [r151]  
 
 	* Add possibility to configure custom Program, Data and Peripheral
