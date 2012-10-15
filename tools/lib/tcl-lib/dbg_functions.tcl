@@ -151,7 +151,6 @@ for {set i 0} {$i<128} {incr i} {
 set     scriptDir [file dirname [info script]]
 source $scriptDir/xml.tcl
 source $scriptDir/dbg_uart_generic.tcl
-source $scriptDir/dbg_uart_usb-iss.tcl
 source $scriptDir/dbg_i2c_usb-iss.tcl
 
 
