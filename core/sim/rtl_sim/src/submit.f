@@ -40,6 +40,7 @@
 +incdir+../../../bench/verilog/
 ../../../bench/verilog/tb_openMSP430.v
 ../../../bench/verilog/ram.v
+../../../bench/verilog/io_cell.v
 ../../../bench/verilog/msp_debug.v
 
 

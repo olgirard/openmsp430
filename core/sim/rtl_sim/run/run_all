@@ -80,19 +80,33 @@ mkdir  ./log
 ../bin/msp430sim clock_module_asic_smclk  | tee ./log/clock_module_asic_smclk.log
 ../bin/msp430sim clock_module_asic_lfxt   | tee ./log/clock_module_asic_lfxt.log
 
-# Serial Debug Interface
+# Serial Debug Interface (UART)
 ../bin/msp430sim dbg_uart                 | tee ./log/dbg_uart.log
 ../bin/msp430sim dbg_uart_sync            | tee ./log/dbg_uart_sync.log
-../bin/msp430sim dbg_cpu                  | tee ./log/dbg_cpu.log
-../bin/msp430sim dbg_mem                  | tee ./log/dbg_mem.log
-../bin/msp430sim dbg_hwbrk0               | tee ./log/dbg_hwbrk0.log
-../bin/msp430sim dbg_hwbrk1               | tee ./log/dbg_hwbrk1.log
-../bin/msp430sim dbg_hwbrk2               | tee ./log/dbg_hwbrk2.log
-../bin/msp430sim dbg_hwbrk3               | tee ./log/dbg_hwbrk3.log
-../bin/msp430sim dbg_rdwr                 | tee ./log/dbg_rdwr.log
-../bin/msp430sim dbg_halt_irq             | tee ./log/dbg_halt_irq.log
-../bin/msp430sim dbg_onoff                | tee ./log/dbg_onoff.log
-../bin/msp430sim dbg_onoff_asic           | tee ./log/dbg_onoff_asic.log
+../bin/msp430sim dbg_uart_cpu             | tee ./log/dbg_uart_cpu.log
+../bin/msp430sim dbg_uart_mem             | tee ./log/dbg_uart_mem.log
+../bin/msp430sim dbg_uart_hwbrk0          | tee ./log/dbg_uart_hwbrk0.log
+../bin/msp430sim dbg_uart_hwbrk1          | tee ./log/dbg_uart_hwbrk1.log
+../bin/msp430sim dbg_uart_hwbrk2          | tee ./log/dbg_uart_hwbrk2.log
+../bin/msp430sim dbg_uart_hwbrk3          | tee ./log/dbg_uart_hwbrk3.log
+../bin/msp430sim dbg_uart_rdwr            | tee ./log/dbg_uart_rdwr.log
+../bin/msp430sim dbg_uart_halt_irq        | tee ./log/dbg_uart_halt_irq.log
+../bin/msp430sim dbg_uart_onoff           | tee ./log/dbg_uart_onoff.log
+../bin/msp430sim dbg_uart_onoff_asic      | tee ./log/dbg_uart_onoff_asic.log
+
+# Serial Debug Interface (I2C)
+../bin/msp430sim dbg_i2c                  | tee ./log/dbg_i2c.log
+../bin/msp430sim dbg_i2c_sync             | tee ./log/dbg_i2c_sync.log
+../bin/msp430sim dbg_i2c_cpu              | tee ./log/dbg_i2c_cpu.log
+../bin/msp430sim dbg_i2c_mem              | tee ./log/dbg_i2c_mem.log
+../bin/msp430sim dbg_i2c_hwbrk0           | tee ./log/dbg_i2c_hwbrk0.log
+../bin/msp430sim dbg_i2c_hwbrk1           | tee ./log/dbg_i2c_hwbrk1.log
+../bin/msp430sim dbg_i2c_hwbrk2           | tee ./log/dbg_i2c_hwbrk2.log
+../bin/msp430sim dbg_i2c_hwbrk3           | tee ./log/dbg_i2c_hwbrk3.log
+../bin/msp430sim dbg_i2c_rdwr             | tee ./log/dbg_i2c_rdwr.log
+../bin/msp430sim dbg_i2c_halt_irq         | tee ./log/dbg_i2c_halt_irq.log
+../bin/msp430sim dbg_i2c_onoff            | tee ./log/dbg_i2c_onoff.log
+../bin/msp430sim dbg_i2c_onoff_asic       | tee ./log/dbg_i2c_onoff_asic.log
 
 # SFR test patterns
 ../bin/msp430sim sfr                      | tee ./log/sfr.log
@@ -121,10 +135,13 @@ mkdir  ./log
 ../bin/msp430sim tA_capture               | tee ./log/tA_capture.log
 ../bin/msp430sim tA_clkmux                | tee ./log/tA_clkmux.log
 
+# Simple full duplex UART (8N1 protocol)
+#../bin/msp430sim uart                    | tee ./log/uart.log
+
+
 # Hardware multiplier test patterns
 ../bin/msp430sim mpy_basic                | tee ./log/mpy_basic.log
 
 
 # Report regression results
 ../bin/parse_results
-

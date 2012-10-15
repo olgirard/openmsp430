@@ -54,6 +54,7 @@ initial
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
 `ifdef DBG_EN
+`ifdef DBG_UART
   `ifdef ASIC
       test_nr = 0;
       #1 dbg_en = 0;
@@ -248,6 +249,14 @@ initial
       $display(" ===============================================");
       $finish;
   `endif
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|   (serial debug interface UART not included)  |");
+       $display(" ===============================================");
+       $finish;
+`endif
 `else
 
        $display(" ===============================================");

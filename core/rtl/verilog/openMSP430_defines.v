@@ -205,6 +205,29 @@
 //============================================================================
 
 //-------------------------------------------------------
+// Select serial debug interface protocol
+//-------------------------------------------------------
+//    DBG_UART -> Enable UART (8N1) debug interface
+//    DBG_I2C  -> Enable I2C debug interface
+//-------------------------------------------------------
+`define DBG_UART
+//`define DBG_I2C
+
+
+//-------------------------------------------------------
+// Enable the I2C broadcast address
+//-------------------------------------------------------
+// For multicore systems, a common I2C broadcast address
+// can be given to all oMSP cores in order to
+// synchronously RESET, START, STOP, or STEP all CPUs
+// at once with a single I2C command.
+// If you have a single openMSP430 in your system,
+// this option can stay commented-out.
+//-------------------------------------------------------
+//`define DBG_I2C_BROADCAST
+
+
+//-------------------------------------------------------
 // Number of hardware breakpoint/watchpoint units
 // (each unit contains two hardware addresses available
 // for breakpoints or watchpoints):
@@ -249,7 +272,7 @@
 
 // Custom Program memory (enabled with PMEM_SIZE_CUSTOM)
 `define PMEM_CUSTOM_AWIDTH      10
-`define PMEM_CUSTOM_SIZE      2028
+`define PMEM_CUSTOM_SIZE      2048
 
 // Custom Data memory    (enabled with DMEM_SIZE_CUSTOM)
 `define DMEM_CUSTOM_AWIDTH       6
@@ -775,13 +798,6 @@
 `define DBG_DCO_FREQ  20000000
 `define DBG_UART_CNT ((`DBG_DCO_FREQ/`DBG_UART_BAUD)-1)
 
-// Debug interface selection
-//             `define DBG_UART -> Enable UART (8N1) debug interface
-//             `define DBG_JTAG -> DON'T UNCOMMENT, NOT SUPPORTED
-//
-`define DBG_UART
-//`define DBG_JTAG
-
 // Debug interface input synchronizer
 `define SYNC_DBG_UART_RXD
 
@@ -798,14 +814,13 @@
 // Check configuration
 `ifdef DBG_EN
  `ifdef DBG_UART
-   `ifdef DBG_JTAG
-CONFIGURATION ERROR: JTAG AND UART DEBUG INTERFACE ARE BOTH ENABLED
+   `ifdef DBG_I2C
+CONFIGURATION ERROR: I2C AND UART DEBUG INTERFACE ARE BOTH ENABLED
    `endif
  `else
-   `ifdef DBG_JTAG
-CONFIGURATION ERROR: JTAG INTERFACE NOT SUPPORTED
+   `ifdef DBG_I2C
    `else
-CONFIGURATION ERROR: JTAG OR UART DEBUG INTERFACE SHOULD BE ENABLED
+CONFIGURATION ERROR: I2C OR UART DEBUG INTERFACE SHOULD BE ENABLED
    `endif
  `endif
 `endif

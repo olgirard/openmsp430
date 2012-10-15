@@ -61,6 +61,7 @@ parameter           BRK3_CTL     =  (8'h40 | 8'h14);
 parameter           BRK3_STAT    =  (8'h40 | 8'h15);
 parameter           BRK3_ADDR0   =  (8'h00 | 8'h16);
 parameter           BRK3_ADDR1   =  (8'h00 | 8'h17);
+parameter           CPU_NR       =  (8'h00 | 8'h18);
 
 // Read / Write commands
 parameter           DBG_WR       =   8'h80;

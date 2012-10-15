@@ -47,6 +47,10 @@ reg  [8:0] dmem_size;
 reg  [5:0] pmem_size;
 reg [31:0] dbg_id;
 
+// Set oMSP parameters for later check
+defparam dut.INST_NR  = 8'h12;
+defparam dut.TOTAL_NR = 8'h34;
+
 integer    ii;
 
 
@@ -104,6 +108,7 @@ initial
 	     1       : if (dbg_uart_buf !== dbg_id[31:16]) tb_error("READ 1 ERROR (CPU_ID_HI)");
 	     2       : if (dbg_uart_buf !== 16'h0000)      tb_error("READ 1 ERROR (CPU_CTL)");
 	     3       : if (dbg_uart_buf !== 16'h0005)      tb_error("READ 1 ERROR (CPU_STAT)");
+	    24       : if (dbg_uart_buf !== 16'h3412)      tb_error("READ 1 ERROR (CPU_NR)");
 	     default : if (dbg_uart_buf !== 16'h0000)      tb_error("READ 1 ERROR");
 	   endcase
 	end
@@ -174,6 +179,7 @@ initial
 	    22       : if (dbg_uart_buf !== 16'hFFFF)      tb_error("READ 2 ERROR (BRK3_ADDR0)");
 	    23       : if (dbg_uart_buf !== 16'hFFFF)      tb_error("READ 2 ERROR (BRK3_ADDR1)");
 `endif
+	    24       : if (dbg_uart_buf !== 16'h3412)      tb_error("READ 2 ERROR (CPU_NR)");
 	     default : if (dbg_uart_buf !== 16'h0000)      tb_error("READ 2 ERROR");
 	   endcase
 	end

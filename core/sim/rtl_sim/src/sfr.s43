@@ -136,6 +136,22 @@ main:
 	mov   #0x5003, r15
 
 
+        /* -------   READ/WRITE CPU_NR     ------ */
+
+	mov   #0x6000, r15
+
+	mov   &CPU_NR, r10
+	mov   #0x6001, r15
+
+	mov   0x5554,  &CPU_NR
+	mov   &CPU_NR, r10
+	mov   #0x6002, r15
+		
+	mov   0xAAAA,  &CPU_NR
+	mov   &CPU_NR, r10
+	mov   #0x6003, r15
+
+
 		
         /* ----------------------         END OF TEST        --------------- */
 end_of_test:

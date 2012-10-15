@@ -46,6 +46,7 @@ initial
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
 `ifdef DBG_EN
+`ifdef DBG_UART
       #1 dbg_en = 1;
       repeat(30) @(posedge mclk);
       stimulus_done = 0;
@@ -264,6 +265,13 @@ initial
       stimulus_done = 1;
 `else
 
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|   (serial debug interface UART not included)  |");
+       $display(" ===============================================");
+       $finish;
+`endif
+`else
        $display(" ===============================================");
        $display("|               SIMULATION SKIPPED              |");
        $display("|      (serial debug interface not included)    |");

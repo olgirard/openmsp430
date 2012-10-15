@@ -1,6 +1,7 @@
 
 verilog work ../../../bench/verilog/tb_openMSP430.v
 verilog work ../../../bench/verilog/ram.v
+verilog work ../../../bench/verilog/io_cell.v
 verilog work ../../../bench/verilog/msp_debug.v
 
 verilog work ../../../rtl/verilog/openMSP430_defines.v
@@ -15,6 +16,7 @@ verilog work ../../../rtl/verilog/omsp_mem_backbone.v
 verilog work ../../../rtl/verilog/omsp_watchdog.v
 verilog work ../../../rtl/verilog/omsp_dbg.v
 verilog work ../../../rtl/verilog/omsp_dbg_uart.v
+verilog work ../../../rtl/verilog/omsp_dbg_i2c.v
 verilog work ../../../rtl/verilog/omsp_dbg_hwbrk.v
 verilog work ../../../rtl/verilog/omsp_multiplier.v
 verilog work ../../../rtl/verilog/omsp_sync_reset.v

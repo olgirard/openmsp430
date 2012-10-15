@@ -43,6 +43,7 @@ initial
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
 `ifdef DBG_EN
+`ifdef DBG_UART
 `ifdef DBG_HWBRK_0
       #1 dbg_en = 1;
       repeat(30) @(posedge mclk);
@@ -655,6 +656,14 @@ initial
        $display(" ===============================================");
        $display("|               SIMULATION SKIPPED              |");
        $display("|   (hardware breakpoint unit 0 not included)   |");
+       $display(" ===============================================");
+       $finish;
+`endif
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|   (serial debug interface UART not included)  |");
        $display(" ===============================================");
        $finish;
 `endif

@@ -35,58 +35,65 @@
 /* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
-reg [15:0] r13_bkup;
+.include "pmem_defs.asm"
 
-initial
-   begin
-      $display(" ===============================================");
-      $display("|                 START SIMULATION              |");
-      $display(" ===============================================");
-`ifdef DBG_EN
-      #1 dbg_en = 1;
-      repeat(30) @(posedge mclk);
-      stimulus_done = 0;
+.global main
 
-      // Initialize the debug interface and send the CPU in halt mode
-      dbg_uart_tx(DBG_SYNC);
-
-`ifdef DBG_RST_BRK_EN
-      dbg_uart_wr(CPU_CTL,  16'h0002);  // RUN
-`endif
-
-      // Wait until software initialization is done
-      if (r15!==(`PER_SIZE+16'h0000))
-	@(r15==(`PER_SIZE+16'h0000));
+main:
+	; Disable interrupts
+	dint
+	mov.b #0x00, &P1IE
 
 
-      dbg_uart_wr(CPU_CTL,  16'h0001);  // HALT
-      repeat(150) @(posedge mclk);
-      r13_bkup = r13;
-	
-      // Generate a GPIO interrupt
-      p1_din[0] = 1'b1;
-      repeat(150) @(posedge mclk);
+        /* -------------- PORT 1: TEST INTERRUPT VECTOR  --------------- */
 
-      // Re-start the CPU
-      dbg_uart_wr(CPU_CTL,  16'h0002);  // RUN
-      repeat(150) @(posedge mclk);
+	mov   #DMEM_250, r1     ; Initialize stack
 
-      // Make sure the interrupt was serviced
-      if (r14 !== 16'haaaa) tb_error("====== Interrupt was not properly serviced =====");
-      
-      // Make sure the program resumed execution when coming back from IRQ
-      if (r13 === r13_bkup) tb_error("====== Program didn't properly resumed execution =====");
+	mov.b   #0x0001, &P1IE  ; Enable GPIO interrupt
+
+	eint                    ; Enable Global interrupts
+
+	mov     #0x0000, r13;
+	mov     #0x0000, r14;
+	mov   #DMEM_200, r15;
+infinite_loop:
+	inc     r13
+	bit     #0x0002, &P1IN
+	jz      infinite_loop
 
 
-      p1_din[1] = 1'b1;     
-      stimulus_done = 1;
-`else
+        /* ----------------------         END OF TEST        --------------- */
+end_of_test:
+	nop
+	br #0xffff
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (serial debug interface not included)    |");
-       $display(" ===============================================");
-       $finish;
-`endif
-   end
 
+        /* ----------------------      INTERRUPT ROUTINES    --------------- */
+
+PORT1_VECTOR:
+	mov.b &P1IFG,   0(r15)
+	mov.b  #0x00,   &P1IFG
+	mov    #0xaaaa, r14;
+	reti	
+
+
+
+        /* ----------------------         INTERRUPT VECTORS  --------------- */
+
+.section .vectors, "a"
+.word end_of_test  ; Interrupt  0 (lowest priority)    <unused>
+.word end_of_test  ; Interrupt  1                      <unused>
+.word PORT1_VECTOR ; Interrupt  2                      <unused>
+.word end_of_test  ; Interrupt  3                      <unused>
+.word end_of_test  ; Interrupt  4                      <unused>
+.word end_of_test  ; Interrupt  5                      <unused>
+.word end_of_test  ; Interrupt  6                      <unused>
+.word end_of_test  ; Interrupt  7                      <unused>
+.word end_of_test  ; Interrupt  8                      <unused>
+.word end_of_test  ; Interrupt  9                      <unused>
+.word end_of_test  ; Interrupt 10                      Watchdog timer
+.word end_of_test  ; Interrupt 11                      <unused>
+.word end_of_test  ; Interrupt 12                      <unused>
+.word end_of_test  ; Interrupt 13                      <unused>
+.word end_of_test  ; Interrupt 14                      NMI
+.word main         ; Interrupt 15 (highest priority)   RESET

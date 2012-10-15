@@ -48,6 +48,7 @@
 ../../../rtl/verilog/omsp_watchdog.v
 ../../../rtl/verilog/omsp_dbg.v
 ../../../rtl/verilog/omsp_dbg_uart.v
+../../../rtl/verilog/omsp_dbg_i2c.v
 ../../../rtl/verilog/omsp_dbg_hwbrk.v
 ../../../rtl/verilog/omsp_multiplier.v
 ../../../rtl/verilog/omsp_sync_reset.v

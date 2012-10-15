@@ -43,6 +43,10 @@ reg  [8:0] dmem_size;
 reg  [5:0] pmem_size;
 reg [31:0] dbg_id;
 
+// Set oMSP parameters for later check
+defparam dut.INST_NR  = 8'h12;
+defparam dut.TOTAL_NR = 8'h34;
+
 initial
    begin
       $display(" ===============================================");
@@ -202,6 +206,22 @@ initial
       if (r10 !== dbg_id[15:0])   tb_error("====== CPU_ID_LO incorrect (test 5) =====");
       if (r11 !== dbg_id[31:16])  tb_error("====== CPU_ID_HI incorrect (test 6) =====");
      
+
+      // READ/WRITE CPU_NR
+      //------------------------------
+      @(r15 === 16'h6000);
+
+      @(r15 === 16'h6001);
+      if (r10 !== 16'h3412)       tb_error("====== CPU_NR incorrect (test 1) =====");
+     
+      @(r15 === 16'h6002);
+      if (r10 !== 16'h3412)       tb_error("====== CPU_NR incorrect (test 2) =====");
+     
+      @(r15 === 16'h6003);
+      if (r10 !== 16'h3412)       tb_error("====== CPU_NR incorrect (test 3) =====");
+     
+
+
       stimulus_done = 1;
    end
 
