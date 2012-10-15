@@ -38,7 +38,7 @@ download-uart: all
 	openmsp430-loader.tcl -device /dev/ttyUSB0 -baudrate 115200 ${NAME}.elf
 
 clean:
-	rm -f ${NAME} ${NAME}.a43 ${NAME}.lst *.o
+	rm -f ${NAME} ${NAME}.a43 ${NAME}.lst ${NAME}.elf *.o
 
 #backup archive
 dist:

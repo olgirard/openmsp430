@@ -57,6 +57,7 @@
 `include "../../../rtl/verilog/openmsp430/omsp_watchdog.v"
 `include "../../../rtl/verilog/openmsp430/omsp_dbg.v"
 `include "../../../rtl/verilog/openmsp430/omsp_dbg_uart.v"
+`include "../../../rtl/verilog/openmsp430/omsp_dbg_i2c.v"
 `include "../../../rtl/verilog/openmsp430/omsp_dbg_hwbrk.v"
 `include "../../../rtl/verilog/openmsp430/omsp_multiplier.v"
 `include "../../../rtl/verilog/openmsp430/omsp_sync_reset.v"

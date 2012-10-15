@@ -46,6 +46,9 @@
 //----------------------------------------------------------------------------
 
 // Program Memory sizes
+`ifdef PMEM_SIZE_CUSTOM
+`undef PMEM_SIZE_CUSTOM
+`endif
 `ifdef PMEM_SIZE_59_KB
 `undef PMEM_SIZE_59_KB
 `endif
@@ -90,6 +93,9 @@
 `endif
 
 // Data Memory sizes
+`ifdef DMEM_SIZE_CUSTOM
+`undef DMEM_SIZE_CUSTOM
+`endif
 `ifdef DMEM_SIZE_32_KB
 `undef DMEM_SIZE_32_KB
 `endif
@@ -145,7 +151,36 @@
 // ADVANCED SYSTEM CONFIGURATION (FOR EXPERIENCED USERS)
 //----------------------------------------------------------------------------
 
+// Custom user version number
+`ifdef USER_VERSION
+`undef USER_VERSION
+`endif
+
+// Include/Exclude Watchdog timer
+`ifdef WATCHDOG
+`undef WATCHDOG
+`endif
+
+// Include/Exclude Non-Maskable-Interrupt support
+`ifdef NMI
+`undef NMI
+`endif
+
+// Input synchronizers
+`ifdef SYNC_NMI
+`undef SYNC_NMI
+`endif
+`ifdef SYNC_CPU_EN
+`undef SYNC_CPU_EN
+`endif
+`ifdef SYNC_DBG_EN
+`undef SYNC_DBG_EN
+`endif
+
 // Peripheral Memory Space:
+`ifdef PER_SIZE_CUSTOM
+`undef PER_SIZE_CUSTOM
+`endif
 `ifdef PER_SIZE_32_KB
 `undef PER_SIZE_32_KB
 `endif
@@ -173,24 +208,23 @@
 `undef DBG_RST_BRK_EN
 `endif
 
-// Custom user version number
-`ifdef USER_VERSION
-`undef USER_VERSION
-`endif
-
-// Include/Exclude Watchdog timer
-`ifdef WATCHDOG
-`undef WATCHDOG
-`endif
-
-// Include/Exclude Non-Maskable-Interrupt support
-`ifdef NMI
-`undef NMI
-`endif
 
 //----------------------------------------------------------------------------
 // EXPERT SYSTEM CONFIGURATION ( !!!! EXPERTS ONLY !!!! )
 //----------------------------------------------------------------------------
+
+// Serial Debug interface protocol
+`ifdef DBG_UART
+`undef DBG_UART
+`endif
+`ifdef DBG_I2C
+`undef DBG_I2C
+`endif
+
+// Enable the I2C broadcast address
+`ifdef DBG_I2C_BROADCAST
+`undef DBG_I2C_BROADCAST
+`endif
 
 // Number of hardware breakpoint units
 `ifdef DBG_HWBRK_0
@@ -211,19 +245,13 @@
 `undef DBG_HWBRK_RANGE
 `endif
 
-// Input synchronizers
-`ifdef SYNC_CPU_EN
-`undef SYNC_CPU_EN
-`endif
-`ifdef SYNC_DBG_EN
-`undef SYNC_DBG_EN
-`endif
-`ifdef SYNC_DBG_UART_RXD
-`undef SYNC_DBG_UART_RXD
-`endif
-`ifdef SYNC_NMI
-`undef SYNC_NMI
-`endif
+// Custom Program/Data and Peripheral Memory Spaces
+`undef PMEM_CUSTOM_AWIDTH
+`undef PMEM_CUSTOM_SIZE
+`undef DMEM_CUSTOM_AWIDTH
+`undef DMEM_CUSTOM_SIZE
+`undef PER_CUSTOM_AWIDTH
+`undef PER_CUSTOM_SIZE
 
 // ASIC version
 `ifdef ASIC
@@ -259,6 +287,9 @@
 `ifdef WATCHDOG_MUX
 `undef WATCHDOG_MUX
 `endif
+`ifdef WATCHDOG_NOMUX_ACLK
+`undef WATCHDOG_NOMUX_ACLK
+`endif
 
 // MCLK: Clock divider
 `ifdef MCLK_DIVIDER
@@ -280,11 +311,6 @@
 `undef CPUOFF_EN
 `endif
 
-// LOW POWER MODE: OSCOFF
-`ifdef OSCOFF_EN
-`undef OSCOFF_EN
-`endif
-
 // LOW POWER MODE: SCG0
 `ifdef SCG0_EN
 `undef SCG0_EN
@@ -293,6 +319,11 @@
 // LOW POWER MODE: SCG1
 `ifdef SCG1_EN
 `undef SCG1_EN
+`endif
+
+// LOW POWER MODE: OSCOFF
+`ifdef OSCOFF_EN
+`undef OSCOFF_EN
 `endif
 
 
@@ -705,12 +736,9 @@
 `undef DBG_UART_CNT
 `endif
 
-// Debug interface selection
-`ifdef DBG_UART
-`undef DBG_UART
-`endif
-`ifdef DBG_JTAG
-`undef DBG_JTAG
+// Debug interface input synchronizer
+`ifdef SYNC_DBG_UART_RXD
+`undef SYNC_DBG_UART_RXD
 `endif
 
 // Enable/Disable the hardware breakpoint RANGE mode

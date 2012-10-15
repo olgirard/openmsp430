@@ -48,73 +48,87 @@
 module  omsp_dbg (
 
 // OUTPUTs
-    dbg_freeze,                     // Freeze peripherals
-    dbg_halt_cmd,                   // Halt CPU command
-    dbg_mem_addr,                   // Debug address for rd/wr access
-    dbg_mem_dout,                   // Debug unit data output
-    dbg_mem_en,                     // Debug unit memory enable
-    dbg_mem_wr,                     // Debug unit memory write
-    dbg_reg_wr,                     // Debug unit CPU register write
-    dbg_cpu_reset,                  // Reset CPU from debug interface
-    dbg_uart_txd,                   // Debug interface: UART TXD
+    dbg_cpu_reset,                     // Reset CPU from debug interface
+    dbg_freeze,                        // Freeze peripherals
+    dbg_halt_cmd,                      // Halt CPU command
+    dbg_i2c_sda_out,                   // Debug interface: I2C SDA OUT
+    dbg_mem_addr,                      // Debug address for rd/wr access
+    dbg_mem_dout,                      // Debug unit data output
+    dbg_mem_en,                        // Debug unit memory enable
+    dbg_mem_wr,                        // Debug unit memory write
+    dbg_reg_wr,                        // Debug unit CPU register write
+    dbg_uart_txd,                      // Debug interface: UART TXD
 			     
 // INPUTs
-    cpu_en_s,                       // Enable CPU code execution (synchronous)
-    cpu_id,                         // CPU ID
-    dbg_clk,                        // Debug unit clock
-    dbg_en_s,                       // Debug interface enable (synchronous)
-    dbg_halt_st,                    // Halt/Run status from CPU
-    dbg_mem_din,                    // Debug unit Memory data input
-    dbg_reg_din,                    // Debug unit CPU register data input
-    dbg_rst,                        // Debug unit reset
-    dbg_uart_rxd,                   // Debug interface: UART RXD (asynchronous)
-    decode_noirq,                   // Frontend decode instruction
-    eu_mab,                         // Execution-Unit Memory address bus
-    eu_mb_en,                       // Execution-Unit Memory bus enable
-    eu_mb_wr,                       // Execution-Unit Memory bus write transfer
-    eu_mdb_in,                      // Memory data bus input
-    eu_mdb_out,                     // Memory data bus output
-    exec_done,                      // Execution completed
-    fe_mb_en,                       // Frontend Memory bus enable
-    fe_mdb_in,                      // Frontend Memory data bus input
-    pc,                             // Program counter
-    puc_pnd_set                     // PUC pending set for the serial debug interface
+    cpu_en_s,                          // Enable CPU code execution (synchronous)
+    cpu_id,                            // CPU ID
+    cpu_nr_inst,                       // Current oMSP instance number
+    cpu_nr_total,                      // Total number of oMSP instances-1
+    dbg_clk,                           // Debug unit clock
+    dbg_en_s,                          // Debug interface enable (synchronous)
+    dbg_halt_st,                       // Halt/Run status from CPU
+    dbg_i2c_addr,                      // Debug interface: I2C Address
+    dbg_i2c_broadcast,                 // Debug interface: I2C Broadcast Address (for multicore systems)
+    dbg_i2c_scl,                       // Debug interface: I2C SCL
+    dbg_i2c_sda_in,                    // Debug interface: I2C SDA IN
+    dbg_mem_din,                       // Debug unit Memory data input
+    dbg_reg_din,                       // Debug unit CPU register data input
+    dbg_rst,                           // Debug unit reset
+    dbg_uart_rxd,                      // Debug interface: UART RXD (asynchronous)
+    decode_noirq,                      // Frontend decode instruction
+    eu_mab,                            // Execution-Unit Memory address bus
+    eu_mb_en,                          // Execution-Unit Memory bus enable
+    eu_mb_wr,                          // Execution-Unit Memory bus write transfer
+    eu_mdb_in,                         // Memory data bus input
+    eu_mdb_out,                        // Memory data bus output
+    exec_done,                         // Execution completed
+    fe_mb_en,                          // Frontend Memory bus enable
+    fe_mdb_in,                         // Frontend Memory data bus input
+    pc,                                // Program counter
+    puc_pnd_set                        // PUC pending set for the serial debug interface
 );
 
 // OUTPUTs
 //=========
-output              dbg_freeze;     // Freeze peripherals
-output              dbg_halt_cmd;   // Halt CPU command
-output       [15:0] dbg_mem_addr;   // Debug address for rd/wr access
-output       [15:0] dbg_mem_dout;   // Debug unit data output
-output              dbg_mem_en;     // Debug unit memory enable
-output        [1:0] dbg_mem_wr;     // Debug unit memory write
-output              dbg_reg_wr;     // Debug unit CPU register write
-output              dbg_cpu_reset;  // Reset CPU from debug interface
-output              dbg_uart_txd;   // Debug interface: UART TXD
+output              dbg_cpu_reset;     // Reset CPU from debug interface
+output              dbg_freeze;        // Freeze peripherals
+output              dbg_halt_cmd;      // Halt CPU command
+output              dbg_i2c_sda_out;   // Debug interface: I2C SDA OUT
+output       [15:0] dbg_mem_addr;      // Debug address for rd/wr access
+output       [15:0] dbg_mem_dout;      // Debug unit data output
+output              dbg_mem_en;        // Debug unit memory enable
+output        [1:0] dbg_mem_wr;        // Debug unit memory write
+output              dbg_reg_wr;        // Debug unit CPU register write
+output              dbg_uart_txd;      // Debug interface: UART TXD
 
 // INPUTs
 //=========
-input               cpu_en_s;       // Enable CPU code execution (synchronous)
-input        [31:0] cpu_id;         // CPU ID
-input               dbg_clk;        // Debug unit clock
-input               dbg_en_s;       // Debug interface enable (synchronous)
-input               dbg_halt_st;    // Halt/Run status from CPU
-input        [15:0] dbg_mem_din;    // Debug unit Memory data input
-input        [15:0] dbg_reg_din;    // Debug unit CPU register data input
-input               dbg_rst;        // Debug unit reset
-input               dbg_uart_rxd;   // Debug interface: UART RXD (asynchronous)
-input               decode_noirq;   // Frontend decode instruction
-input        [15:0] eu_mab;         // Execution-Unit Memory address bus
-input               eu_mb_en;       // Execution-Unit Memory bus enable
-input         [1:0] eu_mb_wr;       // Execution-Unit Memory bus write transfer
-input        [15:0] eu_mdb_in;      // Memory data bus input
-input        [15:0] eu_mdb_out;     // Memory data bus output
-input               exec_done;      // Execution completed
-input               fe_mb_en;       // Frontend Memory bus enable
-input        [15:0] fe_mdb_in;      // Frontend Memory data bus input
-input        [15:0] pc;             // Program counter
-input               puc_pnd_set;    // PUC pending set for the serial debug interface
+input               cpu_en_s;          // Enable CPU code execution (synchronous)
+input        [31:0] cpu_id;            // CPU ID
+input         [7:0] cpu_nr_inst;       // Current oMSP instance number
+input         [7:0] cpu_nr_total;      // Total number of oMSP instances-1
+input               dbg_clk;           // Debug unit clock
+input               dbg_en_s;          // Debug interface enable (synchronous)
+input               dbg_halt_st;       // Halt/Run status from CPU
+input         [6:0] dbg_i2c_addr;      // Debug interface: I2C Address
+input         [6:0] dbg_i2c_broadcast; // Debug interface: I2C Broadcast Address (for multicore systems)
+input               dbg_i2c_scl;       // Debug interface: I2C SCL
+input               dbg_i2c_sda_in;    // Debug interface: I2C SDA IN
+input        [15:0] dbg_mem_din;       // Debug unit Memory data input
+input        [15:0] dbg_reg_din;       // Debug unit CPU register data input
+input               dbg_rst;           // Debug unit reset
+input               dbg_uart_rxd;      // Debug interface: UART RXD (asynchronous)
+input               decode_noirq;      // Frontend decode instruction
+input        [15:0] eu_mab;            // Execution-Unit Memory address bus
+input               eu_mb_en;          // Execution-Unit Memory bus enable
+input         [1:0] eu_mb_wr;          // Execution-Unit Memory bus write transfer
+input        [15:0] eu_mdb_in;         // Memory data bus input
+input        [15:0] eu_mdb_out;        // Memory data bus output
+input               exec_done;         // Execution completed
+input               fe_mb_en;          // Frontend Memory bus enable
+input        [15:0] fe_mdb_in;         // Frontend Memory data bus input
+input        [15:0] pc;                // Program counter
+input               puc_pnd_set;       // PUC pending set for the serial debug interface
 
 
 //=============================================================================
@@ -148,7 +162,7 @@ wire        brk3_pnd;
 wire [15:0] brk3_dout;
     
 // Number of registers
-parameter           NR_REG       = 24;
+parameter           NR_REG       = 25;
 
 // Register addresses
 parameter           CPU_ID_LO    = 6'h00;
@@ -183,6 +197,7 @@ parameter           BRK3_STAT    = 6'h15;
 parameter           BRK3_ADDR0   = 6'h16;
 parameter           BRK3_ADDR1   = 6'h17;
 `endif
+parameter           CPU_NR       = 6'h18;
 
 // Register one-hot decoder
 parameter           BASE_D       = {{NR_REG-1{1'b0}}, 1'b1};
@@ -218,6 +233,7 @@ parameter           BRK3_STAT_D  = (BASE_D << BRK3_STAT);
 parameter           BRK3_ADDR0_D = (BASE_D << BRK3_ADDR0);
 parameter           BRK3_ADDR1_D = (BASE_D << BRK3_ADDR1);
 `endif
+parameter           CPU_NR_D     = (BASE_D << CPU_NR);
 
 
 //============================================================================
@@ -263,6 +279,7 @@ always @(dbg_addr_in)
     BRK3_ADDR0:  reg_dec  =  BRK3_ADDR0_D;
     BRK3_ADDR1:  reg_dec  =  BRK3_ADDR1_D;
 `endif
+    CPU_NR    :  reg_dec  =  CPU_NR_D;
   // pragma coverage off
     default:     reg_dec  =  {NR_REG{1'b0}};
   // pragma coverage on
@@ -294,6 +311,17 @@ wire  [NR_REG-1:0] reg_rd    = reg_dec & {NR_REG{reg_read}};
 //              -------------------------------------------------------------------
 
 // This register is assigned in the SFR module
+
+
+// CPU_NR Register
+//-----------------
+//    -------------------------------------------------------------------
+//   | 15  14  13  12  11  10   9   8  |  7   6   5   4   3   2   1   0  |
+//   |---------------------------------+---------------------------------|
+//   |            CPU_TOTAL_NR         |           CPU_INST_NR           |
+//    -------------------------------------------------------------------
+
+wire [15:0] cpu_nr = {cpu_nr_total, cpu_nr_inst};
 
 
 // CPU_CTL Register
@@ -614,6 +642,7 @@ wire [15:0] mem_ctl_rd   = {8'h00, mem_ctl_full}  & {16{reg_rd[MEM_CTL]}};
 wire [15:0] mem_data_rd  = mem_data               & {16{reg_rd[MEM_DATA]}};
 wire [15:0] mem_addr_rd  = mem_addr               & {16{reg_rd[MEM_ADDR]}};
 wire [15:0] mem_cnt_rd   = mem_cnt                & {16{reg_rd[MEM_CNT]}};
+wire [15:0] cpu_nr_rd    = cpu_nr                 & {16{reg_rd[CPU_NR]}};
 
 wire [15:0] dbg_dout = cpu_id_lo_rd |
                        cpu_id_hi_rd |
@@ -626,9 +655,10 @@ wire [15:0] dbg_dout = cpu_id_lo_rd |
                        brk0_dout    |
                        brk1_dout    |
                        brk2_dout    |
-                       brk3_dout;
+                       brk3_dout    |
+                       cpu_nr_rd;
 
-// Tell UART/JTAG interface that the data is ready to be read
+// Tell UART/I2C interface that the data is ready to be read
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)                       dbg_rd_rdy  <=  1'b0;
   else if (mem_burst | mem_burst_rd) dbg_rd_rdy  <= (dbg_reg_rd | dbg_mem_rd_dly);
@@ -703,7 +733,7 @@ always @(posedge dbg_clk or posedge dbg_rst)
   else if (mem_burst_start) mem_burst <= 1'b1;
   else if (mem_burst_end)   mem_burst <= 1'b0;
 
-// Control signals for UART/JTAG interface
+// Control signals for UART/I2C interface
 assign mem_burst_rd = (mem_burst_start & ~mem_ctl[1]);
 assign mem_burst_wr = (mem_burst_start &  mem_ctl[1]);
 
@@ -783,43 +813,70 @@ always @(posedge dbg_clk or posedge dbg_rst)
 omsp_dbg_uart dbg_uart_0 (
 
 // OUTPUTs
-    .dbg_addr     (dbg_addr),      // Debug register address
-    .dbg_din      (dbg_din),       // Debug register data input
-    .dbg_rd       (dbg_rd),        // Debug register data read
-    .dbg_uart_txd (dbg_uart_txd),  // Debug interface: UART TXD
-    .dbg_wr       (dbg_wr),        // Debug register data write
+    .dbg_addr         (dbg_addr),         // Debug register address
+    .dbg_din          (dbg_din),          // Debug register data input
+    .dbg_rd           (dbg_rd),           // Debug register data read
+    .dbg_uart_txd     (dbg_uart_txd),     // Debug interface: UART TXD
+    .dbg_wr           (dbg_wr),           // Debug register data write
 			     
 // INPUTs
-    .dbg_clk      (dbg_clk),       // Debug unit clock
-    .dbg_dout     (dbg_dout),      // Debug register data output
-    .dbg_rd_rdy   (dbg_rd_rdy),    // Debug register data is ready for read
-    .dbg_rst      (dbg_rst),       // Debug unit reset
-    .dbg_uart_rxd (dbg_uart_rxd),  // Debug interface: UART RXD
-    .mem_burst    (mem_burst),     // Burst on going
-    .mem_burst_end(mem_burst_end), // End TX/RX burst
-    .mem_burst_rd (mem_burst_rd),  // Start TX burst
-    .mem_burst_wr (mem_burst_wr),  // Start RX burst
-    .mem_bw       (mem_bw)         // Burst byte width
+    .dbg_clk          (dbg_clk),          // Debug unit clock
+    .dbg_dout         (dbg_dout),         // Debug register data output
+    .dbg_rd_rdy       (dbg_rd_rdy),       // Debug register data is ready for read
+    .dbg_rst          (dbg_rst),          // Debug unit reset
+    .dbg_uart_rxd     (dbg_uart_rxd),     // Debug interface: UART RXD
+    .mem_burst        (mem_burst),        // Burst on going
+    .mem_burst_end    (mem_burst_end),    // End TX/RX burst
+    .mem_burst_rd     (mem_burst_rd),     // Start TX burst
+    .mem_burst_wr     (mem_burst_wr),     // Start RX burst
+    .mem_bw           (mem_bw)            // Burst byte width
 );
 
 `else
-assign dbg_addr     =  6'h00;
-assign dbg_din      = 16'h0000;
-assign dbg_rd       =  1'b0;
-assign dbg_uart_txd =  1'b0;
-assign dbg_wr       =  1'b0;
+    assign dbg_uart_txd    =  1'b1;
+  `ifdef DBG_I2C
+  `else
+    assign dbg_addr        =  6'h00;
+    assign dbg_din         = 16'h0000;
+    assign dbg_rd          =  1'b0;
+    assign dbg_wr          =  1'b0;
+  `endif
 `endif
 
-   
 //=============================================================================
-// 10)  JTAG COMMUNICATION
+// 10)  I2C COMMUNICATION
 //=============================================================================
-`ifdef DBG_JTAG
-JTAG INTERFACE IS NOT SUPPORTED YET
+`ifdef DBG_I2C
+omsp_dbg_i2c dbg_i2c_0 (
+
+// OUTPUTs
+    .dbg_addr          (dbg_addr),          // Debug register address
+    .dbg_din           (dbg_din),           // Debug register data input
+    .dbg_i2c_sda_out   (dbg_i2c_sda_out),   // Debug interface: I2C SDA OUT
+    .dbg_rd            (dbg_rd),            // Debug register data read
+    .dbg_wr            (dbg_wr),            // Debug register data write
+
+// INPUTs
+    .dbg_clk           (dbg_clk),           // Debug unit clock
+    .dbg_dout          (dbg_dout),          // Debug register data output
+    .dbg_i2c_addr      (dbg_i2c_addr),      // Debug interface: I2C Address
+    .dbg_i2c_broadcast (dbg_i2c_broadcast), // Debug interface: I2C Broadcast Address (for multicore systems)
+    .dbg_i2c_scl       (dbg_i2c_scl),       // Debug interface: I2C SCL
+    .dbg_i2c_sda_in    (dbg_i2c_sda_in),    // Debug interface: I2C SDA IN
+    .dbg_rd_rdy        (dbg_rd_rdy),        // Debug register data is ready for read
+    .dbg_rst           (dbg_rst),           // Debug unit reset
+    .mem_burst         (mem_burst),         // Burst on going
+    .mem_burst_end     (mem_burst_end),     // End TX/RX burst
+    .mem_burst_rd      (mem_burst_rd),      // Start TX burst
+    .mem_burst_wr      (mem_burst_wr),      // Start RX burst
+    .mem_bw            (mem_bw)             // Burst byte width
+);
+
 `else
+    assign dbg_i2c_sda_out =  1'b1;
 `endif
 
-endmodule // dbg
+endmodule // omsp_dbg
 
 `ifdef OMSP_NO_INCLUDE
 `else

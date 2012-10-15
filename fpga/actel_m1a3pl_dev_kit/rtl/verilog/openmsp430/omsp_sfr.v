@@ -37,9 +37,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
+// $Rev: 154 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $LastChangedDate: 2012-10-15 22:44:20 +0200 (Mon, 15 Oct 2012) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -58,6 +58,8 @@ module  omsp_sfr (
     wdtifg_sw_set,                // Watchdog-timer interrupt flag software set
 
 // INPUTs
+    cpu_nr_inst,                  // Current oMSP instance number
+    cpu_nr_total,                 // Total number of oMSP instances-1
     mclk,                         // Main system clock
     nmi,                          // Non-maskable interrupt (asynchronous)
     nmi_acc,                      // Non-Maskable interrupt request accepted
@@ -83,6 +85,8 @@ output              wdtifg_sw_set;// Watchdog-timer interrupt flag software set
 
 // INPUTs
 //=========
+input         [7:0] cpu_nr_inst;  // Current oMSP instance number
+input         [7:0] cpu_nr_total; // Total number of oMSP instances-1
 input               mclk;         // Main system clock
 input               nmi;          // Non-maskable interrupt (asynchronous)
 input               nmi_acc;      // Non-Maskable interrupt request accepted
@@ -104,13 +108,14 @@ input               wdtnmies;     // Watchdog-timer NMI edge selection
 parameter       [14:0] BASE_ADDR   = 15'h0000;
 
 // Decoder bit width (defines how many bits are considered for address decoding)
-parameter              DEC_WD      =  3;
+parameter              DEC_WD      =  4;
 
 // Register addresses offset
 parameter [DEC_WD-1:0] IE1         =  'h0,
                        IFG1        =  'h2,
                        CPU_ID_LO   =  'h4,
-                       CPU_ID_HI   =  'h6;
+                       CPU_ID_HI   =  'h6,
+                       CPU_NR      =  'h8;
 
 // Register one-hot decoder utilities
 parameter              DEC_SZ      =  (1 << DEC_WD);
@@ -120,7 +125,8 @@ parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 parameter [DEC_SZ-1:0] IE1_D       = (BASE_REG << IE1),
                        IFG1_D      = (BASE_REG << IFG1),
                        CPU_ID_LO_D = (BASE_REG << CPU_ID_LO),
-                       CPU_ID_HI_D = (BASE_REG << CPU_ID_HI);
+                       CPU_ID_HI_D = (BASE_REG << CPU_ID_HI),
+                       CPU_NR_D    = (BASE_REG << CPU_NR);
 
 
 //============================================================================
@@ -137,7 +143,8 @@ wire [DEC_WD-1:0] reg_addr     =  {1'b0, per_addr[DEC_WD-2:0]};
 wire [DEC_SZ-1:0] reg_dec      = (IE1_D        &  {DEC_SZ{(reg_addr==(IE1       >>1))}})  |
                                  (IFG1_D       &  {DEC_SZ{(reg_addr==(IFG1      >>1))}})  |
                                  (CPU_ID_LO_D  &  {DEC_SZ{(reg_addr==(CPU_ID_LO >>1))}})  |
-                                 (CPU_ID_HI_D  &  {DEC_SZ{(reg_addr==(CPU_ID_HI >>1))}});
+                                 (CPU_ID_HI_D  &  {DEC_SZ{(reg_addr==(CPU_ID_HI >>1))}})  |
+                                 (CPU_NR_D     &  {DEC_SZ{(reg_addr==(CPU_NR    >>1))}});
 
 // Read/Write probes
 wire              reg_lo_write =  per_we[0] & reg_sel;
@@ -248,6 +255,17 @@ assign      cpu_id       = {pmem_size,
                             cpu_version};
 
 
+// CPU_NR Register (READ ONLY)
+//-----------------------------
+//    -------------------------------------------------------------------
+//   | 15  14  13  12  11  10   9   8  |  7   6   5   4   3   2   1   0  |
+//   |---------------------------------+---------------------------------|
+//   |            CPU_TOTAL_NR         |           CPU_INST_NR           |
+//    -------------------------------------------------------------------
+
+wire [15:0] cpu_nr = {cpu_nr_total, cpu_nr_inst};
+
+
 //============================================================================
 // 4) DATA OUTPUT GENERATION
 //============================================================================
@@ -257,11 +275,13 @@ wire [15:0] ie1_rd        = {8'h00, (ie1  &  {8{reg_rd[IE1]}})}  << (8 & {4{IE1[
 wire [15:0] ifg1_rd       = {8'h00, (ifg1 &  {8{reg_rd[IFG1]}})} << (8 & {4{IFG1[0]}});
 wire [15:0] cpu_id_lo_rd  = cpu_id[15:0]  & {16{reg_rd[CPU_ID_LO]}};
 wire [15:0] cpu_id_hi_rd  = cpu_id[31:16] & {16{reg_rd[CPU_ID_HI]}};
+wire [15:0] cpu_nr_rd     = cpu_nr        & {16{reg_rd[CPU_NR]}};
 
 wire [15:0] per_dout =  ie1_rd       |
                         ifg1_rd      |
                         cpu_id_lo_rd |
-                        cpu_id_hi_rd;
+                        cpu_id_hi_rd |
+                        cpu_nr_rd;
 
 
 //=============================================================================
