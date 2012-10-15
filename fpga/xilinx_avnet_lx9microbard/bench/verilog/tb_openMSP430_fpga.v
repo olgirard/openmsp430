@@ -72,7 +72,6 @@ wire              UART_TXD;
 // UART
 wire 	          PMOD1_P1;
 reg               PMOD1_P4;
-reg               PMOD1_P8;
 
 // Core debug signals
 wire   [8*32-1:0] i_state;
@@ -156,7 +155,6 @@ initial
      SW1           = 1'b0;
      UART_RXD      = 1'b1;  // UART
      PMOD1_P4      = 1'b1;
-     PMOD1_P8      = 1'b0;
   end
 
 //
@@ -318,7 +316,7 @@ openMSP430_fpga dut (
      .PMOD1_P3        (),
      .PMOD1_P4        (PMOD1_P4),    // Serial Debug Interface RX
      .PMOD1_P7        (),
-     .PMOD1_P8        (PMOD1_P8),    // Serial Debug Interface enable
+     .PMOD1_P8        (),
      .PMOD1_P9        (),
      .PMOD1_P10       (),
 

@@ -84,6 +84,7 @@
 ../../../rtl/verilog/openmsp430/omsp_dbg.v
 ../../../rtl/verilog/openmsp430/omsp_dbg_hwbrk.v
 ../../../rtl/verilog/openmsp430/omsp_dbg_uart.v
+../../../rtl/verilog/openmsp430/omsp_dbg_i2c.v
 ../../../rtl/verilog/openmsp430/omsp_watchdog.v
 ../../../rtl/verilog/openmsp430/omsp_multiplier.v
 ../../../rtl/verilog/openmsp430/omsp_sync_reset.v

@@ -13,11 +13,11 @@ initial
       stimulus_done = 0;
 
       repeat(100) @(posedge CLK_40MHz);
-      PMOD1_P8 = 1;
+ //     PMOD1_P8 = 1;
       repeat(500) @(posedge CLK_40MHz);
-      PMOD1_P8 = 0;
+ //     PMOD1_P8 = 0;
       repeat(100) @(posedge CLK_40MHz);
-      PMOD1_P8 = 1;
+ //     PMOD1_P8 = 1;
       
 
       repeat(500) @(posedge CLK_40MHz);

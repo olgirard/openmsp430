@@ -29,6 +29,7 @@ verilog work ../../../rtl/verilog/openmsp430/omsp_clock_module.v
 verilog work ../../../rtl/verilog/openmsp430/omsp_dbg.v
 verilog work ../../../rtl/verilog/openmsp430/omsp_dbg_hwbrk.v
 verilog work ../../../rtl/verilog/openmsp430/omsp_dbg_uart.v
+verilog work ../../../rtl/verilog/openmsp430/omsp_dbg_i2c.v
 verilog work ../../../rtl/verilog/openmsp430/omsp_watchdog.v
 verilog work ../../../rtl/verilog/openmsp430/omsp_multiplier.v
 verilog work ../../../rtl/verilog/openmsp430/omsp_sync_reset.v
