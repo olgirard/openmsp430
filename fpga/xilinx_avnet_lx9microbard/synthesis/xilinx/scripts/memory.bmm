@@ -1,0 +1,10 @@
+ADDRESS_SPACE blockrom RAMB16 [0x0000:0x0fff]
+
+  BUS_BLOCK
+
+      ram_16x2k_pmem/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[1].ram.r/s6_noinit.ram/SP.SIMPLE_PRIM18.ram  [7:0]  LOC = X0Y22;
+      ram_16x2k_pmem/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/s6_noinit.ram/SP.SIMPLE_PRIM18.ram [15:8]  LOC = X0Y20;
+
+  END_BUS_BLOCK;
+
+END_ADDRESS_SPACE;
