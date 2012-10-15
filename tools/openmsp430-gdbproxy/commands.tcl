@@ -48,36 +48,36 @@ proc rspParse {sock rsp_cmd} {
     set cmd_tail [string range $rsp_cmd 1 [string length $rsp_cmd]]
 
     switch -exact -- [string index $rsp_cmd 0] {
-	"!"     {set rsp_answer "OK"}
-	"?"     {set rsp_answer [rsp_stop_reply $sock "?"]}
-	"A"     {}
-	"b"     {}
-	"c"     {set rsp_answer [rsp_c $sock $cmd_tail]}
-	"C"     {set rsp_answer [rsp_c $sock $cmd_tail]}
-	"D"     {}
-	"F"     {}
-	"g"     {set rsp_answer [rsp_g]}
-	"G"     {set rsp_answer [rsp_G $cmd_tail]}
-	"H"     {set rsp_answer ""}
-	"i"     {}
-	"I"     {}
-	"k"     {set rsp_answer [rsp_k $cmd_tail]}
-	"m"     {set rsp_answer [rsp_m $cmd_tail]}
-	"M"     {set rsp_answer [rsp_M $cmd_tail]}
-	"p"     {}
-	"P"     {}
-	"q"     {set rsp_answer [rsp_q $sock $cmd_tail]}
-	"Q"     {}
-	"R"     {}
-	"s"     {set rsp_answer [rsp_s $sock $cmd_tail]}
-	"S"     {set rsp_answer [rsp_s $sock $cmd_tail]}
-	"t"     {}
-	"T"     {}
-	"v"     {}
-	"X"     {}
-	"z"     {set rsp_answer [rsp_z $sock $cmd_tail]}
-	"Z"     {set rsp_answer [rsp_Z $sock $cmd_tail]}
-	default {}
+        "!"     {set rsp_answer "OK"}
+        "?"     {set rsp_answer [rsp_stop_reply $sock "?"]}
+        "A"     {}
+        "b"     {}
+        "c"     {set rsp_answer [rsp_c $sock $cmd_tail]}
+        "C"     {set rsp_answer [rsp_c $sock $cmd_tail]}
+        "D"     {}
+        "F"     {}
+        "g"     {set rsp_answer [rsp_g]}
+        "G"     {set rsp_answer [rsp_G $cmd_tail]}
+        "H"     {set rsp_answer ""}
+        "i"     {}
+        "I"     {}
+        "k"     {set rsp_answer [rsp_k $cmd_tail]}
+        "m"     {set rsp_answer [rsp_m $cmd_tail]}
+        "M"     {set rsp_answer [rsp_M $cmd_tail]}
+        "p"     {}
+        "P"     {}
+        "q"     {set rsp_answer [rsp_q $sock $cmd_tail]}
+        "Q"     {}
+        "R"     {}
+        "s"     {set rsp_answer [rsp_s $sock $cmd_tail]}
+        "S"     {set rsp_answer [rsp_s $sock $cmd_tail]}
+        "t"     {}
+        "T"     {}
+        "v"     {}
+        "X"     {}
+        "z"     {set rsp_answer [rsp_z $sock $cmd_tail]}
+        "Z"     {set rsp_answer [rsp_Z $sock $cmd_tail]}
+        default {}
     }
 
 
@@ -96,15 +96,17 @@ proc rspParse {sock rsp_cmd} {
 #-----------------------------------------------------------------------------#
 proc rsp_g {} {
     
+    global CpuNr
+
     # Read register value
-    set reg_val [ReadRegAll]
+    set reg_val [ReadRegAll $CpuNr]
 
     # Format answer
     set rsp_answer ""
     for {set i 0} {$i < [llength $reg_val]} {incr i} {
 
-	regexp {0x(..)(..)} [lindex $reg_val $i] match msb lsb
-	append rsp_answer "$lsb$msb"
+        regexp {0x(..)(..)} [lindex $reg_val $i] match msb lsb
+        append rsp_answer "$lsb$msb"
     }
 
     return $rsp_answer
@@ -115,19 +117,21 @@ proc rsp_g {} {
 #-----------------------------------------------------------------------------#
 proc rsp_G {cmd} {
     
+    global CpuNr
+
     # Format register value
     set num_reg [expr [string length $cmd]/4]
 
     set reg_val ""
     for {set i 0} {$i < $num_reg} {incr i} {
 
-	set lsb "[string index $cmd [expr $i*4+0]][string index $cmd [expr $i*4+1]]"
-	set msb "[string index $cmd [expr $i*4+2]][string index $cmd [expr $i*4+3]]"
-	lappend reg_val "0x$msb$lsb"
+        set lsb "[string index $cmd [expr $i*4+0]][string index $cmd [expr $i*4+1]]"
+        set msb "[string index $cmd [expr $i*4+2]][string index $cmd [expr $i*4+3]]"
+        lappend reg_val "0x$msb$lsb"
     }
 
     # Write registers
-    WriteRegAll $reg_val
+    WriteRegAll $CpuNr $reg_val
 
     return "OK"
 }
@@ -137,8 +141,10 @@ proc rsp_G {cmd} {
 #-----------------------------------------------------------------------------#
 proc rsp_k {cmd} {
     
+    global CpuNr
+
     # Reset & Stop CPU
-    ExecutePOR_Halt
+    ExecutePOR_Halt $CpuNr
  
     return "-1"
 }
@@ -149,6 +155,7 @@ proc rsp_k {cmd} {
 proc rsp_M {cmd} {
     
     global mem_breakpoint
+    global CpuNr
     
     # Parse command
     regexp {(.*),(.*):(.*)} $cmd match addr length data
@@ -158,26 +165,26 @@ proc rsp_M {cmd} {
     # Format data
     set mem_val ""
     for {set i 0} {$i<$length} {incr i} {
-	lappend mem_val "0x[string range $data [expr $i*2] [expr $i*2+1]]"
+        lappend mem_val "0x[string range $data [expr $i*2] [expr $i*2+1]]"
     }
 
     # Write memory
     if {$length==2} {
-	regexp {(..)(..)} $data match data_lo data_hi
-        WriteMem      0 "0x$addr" "0x${data_hi}${data_lo}"
+        regexp {(..)(..)} $data match data_lo data_hi
+        WriteMem       $CpuNr 0 "0x$addr" "0x${data_hi}${data_lo}"
     } else {
-	WriteMemQuick8  "0x$addr" $mem_val
+        WriteMemQuick8 $CpuNr   "0x$addr" $mem_val
     }
 
     # Eventually re-set the software breakpoints in case they have been overwritten
     set addr_start [format %d "0x$addr"]
     foreach {brk_addr brk_val} [array get mem_breakpoint] {
-	set brk_addr_dec    [format %d "0x$brk_addr"]
-	set brk_addr_offset [expr $brk_addr_dec-$addr_start]
-	if {(0<=$brk_addr_offset) && ($brk_addr_offset<=$length)} {
-	    set mem_breakpoint($brk_addr) [lindex $mem_val $brk_addr_offset]
-	    WriteMem 0 "0x$brk_addr" 0x4343
-	}
+        set brk_addr_dec    [format %d "0x$brk_addr"]
+        set brk_addr_offset [expr $brk_addr_dec-$addr_start]
+        if {(0<=$brk_addr_offset) && ($brk_addr_offset<=$length)} {
+            set mem_breakpoint($brk_addr) [lindex $mem_val $brk_addr_offset]
+            WriteMem $CpuNr 0 "0x$brk_addr" 0x4343
+        }
     }
 
     return "OK"
@@ -190,6 +197,7 @@ proc rsp_M {cmd} {
 proc rsp_m {cmd} {
     
     global mem_breakpoint
+    global CpuNr
 
     # Parse command
     regexp {(.*),(.*)} $cmd match addr length
@@ -197,17 +205,17 @@ proc rsp_m {cmd} {
     set length [format %d   "0x$length"]
 
     # Read memory
-    set data [ReadMemQuick8  "0x$addr" $length]
+    set data [ReadMemQuick8  $CpuNr "0x$addr" $length]
     
 
     # Eventually replace read data by the original software breakpoint value
     set addr_start [format %d "0x$addr"]
     foreach {brk_addr brk_val} [array get mem_breakpoint] {
-	set brk_addr_dec    [format %d "0x$brk_addr"]
-	set brk_addr_offset [expr $brk_addr_dec-$addr_start]
-	if {(0<=$brk_addr_offset) && ($brk_addr_offset<=$length)} {
-	    set data [lreplace $data $brk_addr_offset $brk_addr_offset "0x$mem_breakpoint($brk_addr)"]
-	}
+        set brk_addr_dec    [format %d "0x$brk_addr"]
+        set brk_addr_offset [expr $brk_addr_dec-$addr_start]
+        if {(0<=$brk_addr_offset) && ($brk_addr_offset<=$length)} {
+            set data [lreplace $data $brk_addr_offset $brk_addr_offset "0x$mem_breakpoint($brk_addr)"]
+        }
     }
 
     # Format data
@@ -224,47 +232,48 @@ proc rsp_m {cmd} {
 proc rsp_Z {sock cmd} {
 
     global mem_breakpoint
+    global CpuNr
 
     # Parse command
     regexp {(.),(.*),(.*)} $cmd match type addr length
     set addr   [format %04x "0x$addr"]
 
     switch -exact -- $type {
-	"0"     {# Memory breakpoint
- 	         set mem_breakpoint($addr) [ReadMem 0 "0x$addr"]
-	         WriteMem 0 "0x$addr" 0x4343
-	         return "OK"
+        "0"     {# Memory breakpoint
+                 set mem_breakpoint($addr) [ReadMem $CpuNr 0 "0x$addr"]
+                 WriteMem $CpuNr 0 "0x$addr" 0x4343
+                 return "OK"
                 }
 
-	"1"     {# Hardware breakpoint
-	         if {[SetHWBreak 1 [format "0x%04x" 0x$addr] 1 0]} {
-		     return "OK"
-		 }
-	         return ""
+        "1"     {# Hardware breakpoint
+                 if {[SetHWBreak $CpuNr 1 [format "0x%04x" 0x$addr] 1 0]} {
+                     return "OK"
+                 }
+                 return ""
                 }
 
-	"2"     {# Write watchpoint
-	         if {[SetHWBreak 0 [format "0x%04x" 0x$addr] 0 1]} {
-		     return "OK"
-		 }
-	         return ""
+        "2"     {# Write watchpoint
+                 if {[SetHWBreak $CpuNr 0 [format "0x%04x" 0x$addr] 0 1]} {
+                     return "OK"
+                 }
+                 return ""
                 }
 
-	"3"     {# Read watchpoint
-	         if {[SetHWBreak 0 [format "0x%04x" 0x$addr] 1 0]} {
-		     return "OK"
-		 }
-	         return ""
+        "3"     {# Read watchpoint
+                 if {[SetHWBreak $CpuNr 0 [format "0x%04x" 0x$addr] 1 0]} {
+                     return "OK"
+                 }
+                 return ""
                 }
 
-	"4"     {# Access watchpoint
-	         if {[SetHWBreak 0 [format "0x%04x" 0x$addr] 1 1]} {
-		     return "OK"
-		 }
-	         return ""
+        "4"     {# Access watchpoint
+                 if {[SetHWBreak $CpuNr 0 [format "0x%04x" 0x$addr] 1 1]} {
+                     return "OK"
+                 }
+                 return ""
                 }
 
-	default {return ""}
+        default {return ""}
     }
 }
 
@@ -274,47 +283,48 @@ proc rsp_Z {sock cmd} {
 proc rsp_z {sock cmd} {
 
     global mem_breakpoint
+    global CpuNr
 
     # Parse command
     regexp {(.),(.*),(.*)} $cmd match type addr length
     set addr   [format %04x "0x$addr"]
 
     switch -exact -- $type {
-	"0"     {# Memory breakpoint
-	         WriteMem 0 "0x$addr" $mem_breakpoint($addr)
-	         unset mem_breakpoint($addr)
-	         return "OK"
+        "0"     {# Memory breakpoint
+                 WriteMem $CpuNr 0 "0x$addr" $mem_breakpoint($addr)
+                 unset mem_breakpoint($addr)
+                 return "OK"
                 }
 
-	"1"     {# Hardware breakpoint
-	         if {[ClearHWBreak 1 [format "0x%04x" 0x$addr]]} {
-		     return "OK"
-		 }
-	         return ""
+        "1"     {# Hardware breakpoint
+                 if {[ClearHWBreak $CpuNr 1 [format "0x%04x" 0x$addr]]} {
+                     return "OK"
+                 }
+                 return ""
                 }
 
-	"2"     {# Write watchpoint
-	         if {[ClearHWBreak 0 [format "0x%04x" 0x$addr]]} {
-		     return "OK"
-		 }
-	         return ""
+        "2"     {# Write watchpoint
+                 if {[ClearHWBreak $CpuNr 0 [format "0x%04x" 0x$addr]]} {
+                     return "OK"
+                 }
+                 return ""
                 }
 
-	"3"     {# Read watchpoint
-	         if {[ClearHWBreak 0 [format "0x%04x" 0x$addr]]} {
-		     return "OK"
-		 }
-	         return ""
+        "3"     {# Read watchpoint
+                 if {[ClearHWBreak $CpuNr 0 [format "0x%04x" 0x$addr]]} {
+                     return "OK"
+                 }
+                 return ""
                 }
 
-	"4"     {# Access watchpoint
-	         if {[ClearHWBreak 0 [format "0x%04x" 0x$addr]]} {
-		     return "OK"
-		 }
-	         return ""
+        "4"     {# Access watchpoint
+                 if {[ClearHWBreak $CpuNr 0 [format "0x%04x" 0x$addr]]} {
+                     return "OK"
+                 }
+                 return ""
                 }
 
-	default {return ""}
+        default {return ""}
     }
 }
 
@@ -323,17 +333,19 @@ proc rsp_z {sock cmd} {
 #-----------------------------------------------------------------------------#
 proc rsp_c {sock cmd} {
     
+    global CpuNr
+
     # Set address if required
     if {$cmd!=""} {
-	set cmd [format %04x "0x$cmd"]
-	SetPC "0x$cmd"
+        set cmd [format %04x "0x$cmd"]
+        SetPC $CpuNr "0x$cmd"
     }
 
     # Clear status
-    ClrStatus
+    ClrStatus  $CpuNr
 
     # Continue
-    ReleaseCPU
+    ReleaseCPU $CpuNr
 
 
     return [rsp_stop_reply $sock "c"]
@@ -344,20 +356,22 @@ proc rsp_c {sock cmd} {
 #-----------------------------------------------------------------------------#
 proc rsp_s {sock cmd} {
     
+    global CpuNr
+
     # Set address if required
     if {$cmd!=""} {
-	set cmd [format %04x "0x$cmd"]
-	SetPC "0x$cmd"
+        set cmd [format %04x "0x$cmd"]
+        SetPC $CpuNr "0x$cmd"
     }
 
     # Clear status
-    ClrStatus
+    ClrStatus $CpuNr
 
     # Read current PC value
-    set pc [ReadReg 0]
+    set pc [ReadReg $CpuNr 0]
 
     # Incremental step
-    StepCPU
+    StepCPU $CpuNr
 
     return [rsp_stop_reply $sock "s" $pc]
 }
@@ -370,40 +384,42 @@ proc rsp_s {sock cmd} {
 #-----------------------------------------------------------------------------#
 proc rsp_stop_reply {sock cmd {opt_val "0"}} {
 
+    global CpuNr
+
     # Wait until halted
-    while {![IsHalted]} {
+    while {![IsHalted $CpuNr]} {
 
-	# Wait a few milliseconds to prevent the gui from freezing
-	after 100 {set end 1}
-	vwait end
+        # Wait a few milliseconds to prevent the gui from freezing
+        after 100 {set end 1}
+        vwait end
 
-	# Check if we are interrupted by GDB
-	fconfigure $sock -blocking 0
-	set break_char [read -nonewline $sock]
-	fconfigure $sock -blocking 1
-	binary scan $break_char H* break_char
-	if {$break_char=="03"} {
-	    putsVerbose "--> BREAK"
-	    HaltCPU
-	}
+        # Check if we are interrupted by GDB
+        fconfigure $sock -blocking 0
+        set break_char [read -nonewline $sock]
+        fconfigure $sock -blocking 1
+        binary scan $break_char H* break_char
+        if {$break_char=="03"} {
+            putsVerbose "--> BREAK"
+            HaltCPU $CpuNr
+        }
     }
 
     # Read some important registers
-    set pc [ReadReg 0]
+    set pc [ReadReg $CpuNr 0]
     regexp {0x(..)(..)} $pc match pc_hi pc_lo
-    set r4 [ReadReg 4]
+    set r4 [ReadReg $CpuNr 4]
     regexp {0x(..)(..)} $r4 match r4_hi r4_lo
 
-	# In case of a single step command, make sure that the PC
-	# value changes. If not, return an error otherwise GDB will
-	# end-up in an infinite loop.
-	if {$cmd == "s"} {
-		if {$opt_val == $pc} {
-			return "E05"
-		}
-	}
-	#return "S05"
-	return "T0500:$pc_lo$pc_hi;04:$r4_lo$r4_hi;"
+        # In case of a single step command, make sure that the PC
+        # value changes. If not, return an error otherwise GDB will
+        # end-up in an infinite loop.
+        if {$cmd == "s"} {
+                if {$opt_val == $pc} {
+                        return "E05"
+                }
+        }
+        #return "S05"
+        return "T0500:$pc_lo$pc_hi;04:$r4_lo$r4_hi;"
 }
 
 
@@ -414,10 +430,10 @@ proc rsp_q {sock cmd} {
     
        switch -regexp -- $cmd {
 
-	"C"       {set rsp_answer ""}
-	"Offsets" {set rsp_answer "Text=0;Data=0;Bss=0"}
-	"Rcmd,.+" {set rsp_answer [rsp_qRcmd $sock $cmd]}
-	default   {set rsp_answer ""}
+        "C"       {set rsp_answer ""}
+        "Offsets" {set rsp_answer "Text=0;Data=0;Bss=0"}
+        "Rcmd,.+" {set rsp_answer [rsp_qRcmd $sock $cmd]}
+        default   {set rsp_answer ""}
     }
     return $rsp_answer
 }
@@ -433,20 +449,22 @@ proc rsp_q {sock cmd} {
 #-----------------------------------------------------------------------------#
 proc rsp_qRcmd {sock cmd} {
 
+    global CpuNr
+
     regsub {^Rcmd,} $cmd {} cmd
     set cmd [binary format H* $cmd];  # Convert hex to ascii
 
     switch -exact -- $cmd {
-	"erase all" {;# Convert ascii to hex
-	             binary scan "Erasing target program memory..." H* text1
-	             binary scan " Erased OK\n"                     H* text2
-	             ;# Execute erase command
-	             sendRSPpacket $sock "O$text1"
-	             EraseROM
-	             sendRSPpacket $sock "O$text2"
-	             set rsp_answer "OK"
+        "erase all" {;# Convert ascii to hex
+                     binary scan "Erasing target program memory..." H* text1
+                     binary scan " Erased OK\n"                     H* text2
+                     ;# Execute erase command
+                     sendRSPpacket $sock "O$text1"
+                     EraseROM $CpuNr
+                     sendRSPpacket $sock "O$text2"
+                     set rsp_answer "OK"
                     }
-	default     {set rsp_answer "OK"}
+        default     {set rsp_answer "OK"}
     }
 
     return $rsp_answer

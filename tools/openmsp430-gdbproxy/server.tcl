@@ -48,38 +48,40 @@ proc startServer { } {
 
     global server
     if {![info exists server(socket)]} {
-	putsLog "Open socket on port $server(port) ... " 1
-	if {[catch {socket -server clientAccept $server(port)} server(socket)]} {
-	    putsLog "failed"
-	    putsLog "ERROR: $server(socket)."
-	    unset server(socket)
-	    return 0
-	}
-	putsLog "done"
-	putsLog "INFO: Waiting on TCP port $server(port)"
+        putsLog "Open socket on port $server(port) ... " 1
+        if {[catch {socket -server clientAccept $server(port)} server(socket)]} {
+            putsLog "failed"
+            putsLog "ERROR: $server(socket)."
+            unset server(socket)
+            return 0
+        }
+        putsLog "done"
+        putsLog "INFO: Waiting on TCP port $server(port)"
     } else {
-	putsLog "Server is already up."
+        putsLog "Server is already up."
     }
     return 1
 }
 
 proc stopServer { } {
-    global serial_status
+    global omsp_info
     global server
+    global CpuNr
 
     if {[info exists server(socket)]} {
-	set port [lindex [fconfigure $server(socket) -sockname] 2]
-	putsLog "Stop server (port $port)"
-	close $server(socket)
-	unset server(socket)
+        set port [lindex [fconfigure $server(socket) -sockname] 2]
+        putsLog "Stop server (port $port)"
+        close $server(socket)
+        unset server(socket)
     }
-    if {$serial_status} {
-	ReleaseDevice 0xfffe
+    if {$omsp_info($CpuNr,connected)} {
+        ReleaseDevice $CpuNr 0xfffe
     }
 }
 
 proc clientAccept {sock addr port} {
     global clients
+    global CpuNr
 
     putsLog "Accept client: $addr ($port)\n"
 
@@ -87,57 +89,57 @@ proc clientAccept {sock addr port} {
     fconfigure $sock -buffering none
     fileevent  $sock readable [list receiveRSPpacket $sock]
 
-    InitBreakUnits
+    InitBreakUnits $CpuNr
 }
 
 proc startServerGUI { } {
-    global serial_device
-    global hw_break
+    global omsp_conf
     global omsp_info
+    global CpuNr
 
     # Connect to device
-    if {![GetDevice]} {
-	.info.cpu.con   configure -text "Connection problem" -fg red
-	putsLog "ERROR: Could not open \"$serial_device\""
-    putsLog ""
-    putsLog "         -------------------------------------------------------------"
-    putsLog "       !!!! Please consider the following options:                  !!!!"
-	putsLog "       !!!!                                                         !!!!"
-	putsLog "       !!!!      - check the physical connection to the board.      !!!!"
-	putsLog "       !!!!      - adjust the serial connection baudrate.           !!!!"
-    putsLog "       !!!!      - don't forget to reset the serial debug interface !!!!"
-    putsLog "       !!!!        between each attempt.                            !!!!"
-    putsLog "         -------------------------------------------------------------"
-    putsLog ""
-	return 0
+    if {![GetDevice $CpuNr]} {
+        .info.cpu.con   configure -text "Connection problem" -fg red
+        putsLog "ERROR: Could not open \"$omsp_conf(device)\""
+        putsLog ""
+        putsLog "         -------------------------------------------------------------"
+        putsLog "       !!!! Please consider the following options:                  !!!!"
+        putsLog "       !!!!                                                         !!!!"
+        putsLog "       !!!!      - check the physical connection to the board.      !!!!"
+        putsLog "       !!!!      - adjust the serial connection baudrate.           !!!!"
+        putsLog "       !!!!      - don't forget to reset the serial debug interface !!!!"
+        putsLog "       !!!!        between each attempt.                            !!!!"
+        putsLog "         -------------------------------------------------------------"
+        putsLog ""
+        return 0
     }
 
-    if {$omsp_info(alias)==""} {
-	.info.cpu.con   configure -text "Connected" -fg "\#00ae00"
+    if {$omsp_info($CpuNr,alias)==""} {
+        .info.cpu.con   configure -text "Connected" -fg "\#00ae00"
     } else {
-	.info.cpu.con   configure -text "Connected to $omsp_info(alias)" -fg "\#00ae00"
+        .info.cpu.con   configure -text "Connected to $omsp_info($CpuNr,alias)" -fg "\#00ae00"
     }
 
     # Display info
     putsLog "INFO: Sucessfully connected with the openMSP430 target."
-    set sizes [GetCPU_ID_SIZE]
-    if {$omsp_info(asic)} {
-	putsLog "INFO: CPU Version              - $omsp_info(cpu_ver) / ASIC"
+    set sizes [GetCPU_ID_SIZE $CpuNr]
+    if {$omsp_info($CpuNr,asic)} {
+        putsLog "INFO: CPU Version              - $omsp_info($CpuNr,cpu_ver) / ASIC"
     } else {
-	putsLog "INFO: CPU Version              - $omsp_info(cpu_ver) / FPGA"
+        putsLog "INFO: CPU Version              - $omsp_info($CpuNr,cpu_ver) / FPGA"
     }
-    putsLog "INFO: User Version             - $omsp_info(user_ver)"
-    if {$omsp_info(cpu_ver)==1} {
-	putsLog "INFO: Hardware Multiplier      - --"
-    } elseif {$omsp_info(mpy)} {
-	putsLog "INFO: Hardware Multiplier      - Yes"
+    putsLog "INFO: User Version             - $omsp_info($CpuNr,user_ver)"
+    if {$omsp_info($CpuNr,cpu_ver)==1} {
+        putsLog "INFO: Hardware Multiplier      - --"
+    } elseif {$omsp_info($CpuNr,mpy)} {
+        putsLog "INFO: Hardware Multiplier      - Yes"
     } else {
-	putsLog "INFO: Hardware Multiplier      - No"
+        putsLog "INFO: Hardware Multiplier      - No"
     }
-    putsLog "INFO: Program Memory Size      - $omsp_info(pmem_size) B"
-    putsLog "INFO: Data Memory Size         - $omsp_info(dmem_size) B"
-    putsLog "INFO: Peripheral Address Space - $omsp_info(per_size) B"
-    putsLog "INFO: $hw_break(num) Hardware Break/Watch-point unit(s) detected"
+    putsLog "INFO: Program Memory Size      - $omsp_info($CpuNr,pmem_size) B"
+    putsLog "INFO: Data Memory Size         - $omsp_info($CpuNr,dmem_size) B"
+    putsLog "INFO: Peripheral Address Space - $omsp_info($CpuNr,per_size) B"
+    putsLog "INFO: $omsp_info($CpuNr,hw_break) Hardware Break/Watch-point unit(s) detected"
     putsLog ""
 
     # Activate Load TCL script section
@@ -150,20 +152,29 @@ proc startServerGUI { } {
     .info.cpu.more           configure -state normal
 
     # Reset & Stop CPU
-    ExecutePOR_Halt
+    ExecutePOR_Halt $CpuNr
 
     # Start server for GDB
     if {![startServer]} {
-	.info.server.con configure -text "Connection problem" -fg red
-	return 0
+        .info.server.con configure -text "Connection problem" -fg red
+        return 0
     }
     .info.server.con     configure -text "Running" -fg "\#00ae00"
 
     # Disable gui entries
-    .connect.config.serial_port.p1      configure -state disabled	
-    .connect.config.serial_baudrate.p2  configure -state disabled
-    .connect.config.server_port.p       configure -state disabled
-    .connect.start.but                  configure -state disabled
+    .connect.cfg.if.config1.adapter.p1       configure -state disabled
+    .connect.cfg.if.config2.adapter.p2       configure -state disabled
+    .connect.cfg.if.config1.serial_port.p1   configure -state disabled
+    .connect.cfg.if.config2.serial_port.p2   configure -state disabled
+    .connect.cfg.ad.server_port.p0           configure -state disabled
+    .connect.cfg.ad.server_port.p1           configure -state disabled
+    .connect.cfg.ad.server_port.p2           configure -state disabled
+    .connect.cfg.ad.server_port.p3           configure -state disabled
+    .connect.cfg.ad.i2c_addr.s0              configure -state disabled
+    .connect.cfg.ad.i2c_addr.s1              configure -state disabled
+    .connect.cfg.ad.i2c_addr.s2              configure -state disabled
+    .connect.cfg.ad.i2c_addr.s3              configure -state disabled
+    .connect.cfg.ad.i2c_nr.s                 configure -state disabled
 }
 
 ###############################################################################
@@ -174,6 +185,8 @@ proc startServerGUI { } {
 
 proc receiveRSPpacket {sock} {
 
+    global CpuNr
+
     # Get client info
     set ip   [lindex [fconfigure $sock -peername] 0]
     set port [lindex [fconfigure $sock -peername] 2]
@@ -183,47 +196,47 @@ proc receiveRSPpacket {sock} {
     set rsp_cmd [getDebugChar $sock]
     set rsp_sum ""
     if {[string eq $rsp_cmd "\$"]} {
-	set rx_packet 1
-	set rsp_cmd ""
+        set rx_packet 1
+        set rsp_cmd ""
     } else {
-	binary scan $rsp_cmd H* rsp_cmd
-	if {$rsp_cmd=="03"} {
-	    putsVerbose "--> BREAK"
-	    HaltCPU
-	}
+        binary scan $rsp_cmd H* rsp_cmd
+        if {$rsp_cmd=="03"} {
+            putsVerbose "--> BREAK"
+            HaltCPU $CpuNr
+        }
     }
     # Receive packet
     while {$rx_packet} {
-	set char [getDebugChar $sock]
-	if {$char==-1} {
-	    set    rx_packet 0
-	} elseif {[string eq $char "\#"]} {
-	    set    rx_packet 0
-	    set    rsp_sum   [getDebugChar $sock]
-	    append rsp_sum   [getDebugChar $sock]
+        set char [getDebugChar $sock]
+        if {$char==-1} {
+            set    rx_packet 0
+        } elseif {[string eq $char "\#"]} {
+            set    rx_packet 0
+            set    rsp_sum   [getDebugChar $sock]
+            append rsp_sum   [getDebugChar $sock]
  
-	    # Re-calculate the checksum
-	    set    tmp_sum   [RSPcheckSum  $rsp_cmd]
+            # Re-calculate the checksum
+            set    tmp_sum   [RSPcheckSum  $rsp_cmd]
 
-	    # Acknowledge and analyse the packet
-	    if {[string eq $rsp_sum $tmp_sum]} {
-		putDebugChar $sock "+"
+            # Acknowledge and analyse the packet
+            if {[string eq $rsp_sum $tmp_sum]} {
+                putDebugChar $sock "+"
 
-		# Remove escape characters
-		set rsp_cmd [removeEscapeChar $rsp_cmd]
-		putsVerbose "+ w $rsp_cmd"
+                # Remove escape characters
+                set rsp_cmd [removeEscapeChar $rsp_cmd]
+                putsVerbose "+ w $rsp_cmd"
 
-		# Parse packet and send back the answer
-		set rsp_answer [rspParse $sock $rsp_cmd]
-		if {$rsp_answer != "-1"} {
-		    sendRSPpacket $sock $rsp_answer
-		}
-	    } else {
-		putDebugChar $sock "-"
-	    }
-	} else {
-	    append rsp_cmd $char
-	}
+                # Parse packet and send back the answer
+                set rsp_answer [rspParse $sock $rsp_cmd]
+                if {$rsp_answer != "-1"} {
+                    sendRSPpacket $sock $rsp_answer
+                }
+            } else {
+                putDebugChar $sock "-"
+            }
+        } else {
+            append rsp_cmd $char
+        }
     }
 }
 
@@ -242,16 +255,16 @@ proc sendRSPpacket {sock rsp_cmd} {
     # Send the packet until the "+" aknowledge is received
     set send_ok 0
     while {!$send_ok} {
-	putDebugChar $sock "$rsp_packet"
-	set char [getDebugChar $sock]
+        putDebugChar $sock "$rsp_packet"
+        set char [getDebugChar $sock]
 
-	putsVerbose "$char r $rsp_cmd"
+        putsVerbose "$char r $rsp_cmd"
 
-	if {$char==-1} {
-	    set    send_ok 1
-	} elseif {[string eq $char "+"]} {
-	    set    send_ok 1
-	}
+        if {$char==-1} {
+            set    send_ok 1
+        } elseif {[string eq $char "+"]} {
+            set    send_ok 1
+        }
     }
 }
 
@@ -266,8 +279,8 @@ proc RSPcheckSum {rsp_cmd} {
 
     set    rsp_sum   0
     for {set i 0} {$i<[string length $rsp_cmd]} {incr i} {
-	scan [string index $rsp_cmd $i] "%c" char_val
-	set rsp_sum [expr $rsp_sum+$char_val]
+        scan [string index $rsp_cmd $i] "%c" char_val
+        set rsp_sum [expr $rsp_sum+$char_val]
     }
     set rsp_sum [format %02x [expr $rsp_sum%256]]
 
@@ -311,13 +324,13 @@ proc getDebugChar {sock} {
     set port [lindex [fconfigure $sock -peername] 2]
 
     if {[eof $sock] || [catch {set char [read $sock 1]}]} {
-	# end of file or abnormal connection drop
-	close $sock
-	putsLog "Connection closed: $ip ($port)\n"
-	unset clients(addr,$sock)
-	return -1
+        # end of file or abnormal connection drop
+        close $sock
+        putsLog "Connection closed: $ip ($port)\n"
+        unset clients(addr,$sock)
+        return -1
     } else {
-	return $char
+        return $char
     }
 }
 
@@ -338,7 +351,7 @@ proc displayMore  { } {
 
     # Destroy windows if already existing
     if {[lsearch -exact [winfo children .] .omsp_extra_info]!=-1} {
-	destroy .omsp_extra_info
+        destroy .omsp_extra_info
     }
 
     # Create master window
@@ -349,8 +362,8 @@ proc displayMore  { } {
 
     # Title
     set title "openMSP430"
-    if {$omsp_info(alias)!=""} {
-	set title $omsp_info(alias)
+    if {$omsp_info($CpuNr,alias)!=""} {
+        set title $omsp_info($CpuNr,alias)
     }
     label  .omsp_extra_info.title  -text "$title"   -anchor center -fg "\#00ae00" -font {-weight bold -size 16}
     pack   .omsp_extra_info.title  -side top -padx {20 20} -pady {20 10}
@@ -371,45 +384,45 @@ proc displayMore  { } {
     # Fill the text widget will configuration info
     .omsp_extra_info.extra.text tag configure bold -font {-family TkFixedFont -weight bold}
     .omsp_extra_info.extra.text insert end         "Configuration\n\n" bold
-    .omsp_extra_info.extra.text insert end [format "CPU Version                : %5s\n" $omsp_info(cpu_ver)]
-    .omsp_extra_info.extra.text insert end [format "User Version               : %5s\n" $omsp_info(user_ver)]
-    if {$omsp_info(cpu_ver)==1} {
+    .omsp_extra_info.extra.text insert end [format "CPU Version                : %5s\n" $omsp_info($CpuNr,cpu_ver)]
+    .omsp_extra_info.extra.text insert end [format "User Version               : %5s\n" $omsp_info($CpuNr,user_ver)]
+    if {$omsp_info($CpuNr,cpu_ver)==1} {
     .omsp_extra_info.extra.text insert end [format "Implementation             : %5s\n" --]
-    } elseif {$omsp_info(asic)==0} {
+    } elseif {$omsp_info($CpuNr,asic)==0} {
     .omsp_extra_info.extra.text insert end [format "Implementation             : %5s\n" FPGA]
-    } elseif {$omsp_info(asic)==1} {
+    } elseif {$omsp_info($CpuNr,asic)==1} {
     .omsp_extra_info.extra.text insert end [format "Implementation             : %5s\n" ASIC]
     }
-    if {$omsp_info(mpy)==1} {
+    if {$omsp_info($CpuNr,mpy)==1} {
     .omsp_extra_info.extra.text insert end [format "Hardware Multiplier support: %5s\n" Yes]
-    } elseif {$omsp_info(mpy)==0} {
+    } elseif {$omsp_info($CpuNr,mpy)==0} {
     .omsp_extra_info.extra.text insert end [format "Hardware Multiplier support: %5s\n" No]
     } else {
     .omsp_extra_info.extra.text insert end [format "Hardware Multiplier support: %5s\n" --]
     }
-    .omsp_extra_info.extra.text insert end [format "Program memory size        : %5s B\n" $omsp_info(pmem_size)]
-    .omsp_extra_info.extra.text insert end [format "Data memory size           : %5s B\n" $omsp_info(dmem_size)]
-    .omsp_extra_info.extra.text insert end [format "Peripheral address space   : %5s B\n" $omsp_info(per_size)]
-    if {$omsp_info(alias)==""} {
+    .omsp_extra_info.extra.text insert end [format "Program memory size        : %5s B\n" $omsp_info($CpuNr,pmem_size)]
+    .omsp_extra_info.extra.text insert end [format "Data memory size           : %5s B\n" $omsp_info($CpuNr,dmem_size)]
+    .omsp_extra_info.extra.text insert end [format "Peripheral address space   : %5s B\n" $omsp_info($CpuNr,per_size)]
+    if {$omsp_info($CpuNr,alias)==""} {
     .omsp_extra_info.extra.text insert end [format "Alias                      : %5s\n\n\n" None]
     } else {
-    .omsp_extra_info.extra.text insert end [format "Alias                      : %5s\n\n\n" $omsp_info(alias)]
+    .omsp_extra_info.extra.text insert end [format "Alias                      : %5s\n\n\n" $omsp_info($CpuNr,alias)]
     }
 
     .omsp_extra_info.extra.text insert end         "Extra Info\n\n" bold
 
-    if {$omsp_info(alias)!=""} {
+    if {$omsp_info($CpuNr,alias)!=""} {
 
-	set aliasEXTRA  [lsort -increasing [array names omsp_info -glob "extra,*"]]
-	if {[llength $aliasEXTRA]} {
+        set aliasEXTRA  [lsort -increasing [array names omsp_info -glob "extra,*"]]
+        if {[llength $aliasEXTRA]} {
 
-	    foreach currentEXTRA $aliasEXTRA {
-		regexp {^.+,.+,(.+)$} $currentEXTRA whole_match extraATTR
-		.omsp_extra_info.extra.text insert end     [format "%-15s: %s\n" $extraATTR  $omsp_info($currentEXTRA)]
-	    }
-	    .omsp_extra_info.extra.text insert end         "\n\n"
-	}
+            foreach currentEXTRA $aliasEXTRA {
+                regexp {^.+,.+,(.+)$} $currentEXTRA whole_match extraATTR
+                .omsp_extra_info.extra.text insert end     [format "%-15s: %s\n" $extraATTR  $omsp_info($CpuNr,$currentEXTRA)]
+            }
+            .omsp_extra_info.extra.text insert end         "\n\n"
+        }
     } else {
-	.omsp_extra_info.extra.text insert end  "No alias found in 'omsp_alias.xml' file"
+        .omsp_extra_info.extra.text insert end  "No alias found in 'omsp_alias.xml' file"
     }
 }

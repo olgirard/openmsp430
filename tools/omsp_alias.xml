@@ -5,17 +5,50 @@
 
      <!--  ===============================================================  -->
      <!-- ||                                                             || -->
-     <!-- ||            oMSP-Xilinx-Example (CPU version 3)              || -->
+     <!-- ||                 Avnet Spartan6 LX9 Microboard               || -->
      <!-- ||                                                             || -->
      <!--  ===============================================================  -->
-     <omsp:alias val="oMSP-Xilinx-Example-CPUv3">
+     <omsp:alias val="Avnet Spartan6 LX9 Microboard">
 
           <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
           <!-- | openMSP430 core configuration to be matched | -->
           <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
           <omsp:configuration>
+                <omsp:user_ver>2</omsp:user_ver>
                 <omsp:cpu_ver>3</omsp:cpu_ver>
+                <omsp:asic>0</omsp:asic>
+                <omsp:mpy>1</omsp:mpy>
+                <omsp:pmem_size>4096</omsp:pmem_size>
+                <omsp:dmem_size>1024</omsp:dmem_size>
+                <omsp:per_size>512</omsp:per_size>
+          </omsp:configuration>
+
+          <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
+          <!-- |                  Extra info                 | -->
+          <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
+          <omsp:extra_info>
+                <omsp:Description>This is an example implementation of the openMSP430 core on a Xilinx Spartan6 FPGA</omsp:Description>
+                <omsp:Contact>Olivier GIRARD</omsp:Contact>
+                <omsp:Email>olgirard@googlemail.com</omsp:Email>
+                <omsp:URL>http://opencores.org/project,openmsp430</omsp:URL>
+          </omsp:extra_info>
+
+     </omsp:alias>
+
+
+     <!--  ===============================================================  -->
+     <!-- ||                                                             || -->
+     <!-- ||            Diligent Spartan3 Starter Kit                    || -->
+     <!-- ||                                                             || -->
+     <!--  ===============================================================  -->
+     <omsp:alias val="Diligent Spartan3 Starter Kit">
+
+          <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
+          <!-- | openMSP430 core configuration to be matched | -->
+          <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
+          <omsp:configuration>
                 <omsp:user_ver>1</omsp:user_ver>
+                <omsp:cpu_ver>3</omsp:cpu_ver>
                 <omsp:asic>0</omsp:asic>
                 <omsp:mpy>1</omsp:mpy>
                 <omsp:pmem_size>4096</omsp:pmem_size>
@@ -28,38 +61,6 @@
           <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
           <omsp:extra_info>
                 <omsp:Description>This is an example implementation of the openMSP430 core on a Xilinx Spartan3 FPGA</omsp:Description>
-                <omsp:Contact>Olivier GIRARD</omsp:Contact>
-                <omsp:Email>olgirard@googlemail.com</omsp:Email>
-                <omsp:URL>http://opencores.org/project,openmsp430</omsp:URL>
-          </omsp:extra_info>
-
-     </omsp:alias>
-
-
-     <!--  ===============================================================  -->
-     <!-- ||                                                             || -->
-     <!-- ||               oMSP-FPGA-Example (CPU version 1)             || -->
-     <!-- ||                                                             || -->
-     <!--  ===============================================================  -->
-     <omsp:alias val="oMSP-FPGA-Example-CPUv1">
-
-          <!--  ++++++++++++++++++++++++++++++++++++++++++++++  -->
-          <!-- | openMSP430 core configuration to be matched  | -->
-          <!-- |                                              | -->
-          <!-- | Note: for CPU version 1, identification is   | -->
-          <!-- |       based on pmem_size and dmem_size only. | -->
-          <!--  ++++++++++++++++++++++++++++++++++++++++++++++  -->
-          <omsp:configuration>
-                <omsp:cpu_ver>1</omsp:cpu_ver>
-                <omsp:pmem_size>4096</omsp:pmem_size>
-                <omsp:dmem_size>1024</omsp:dmem_size>
-          </omsp:configuration>
-
-          <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
-          <!-- |                  Extra info                 | -->
-          <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
-          <omsp:extra_info>
-                <omsp:Description>This is an example implementation of the openMSP430 core on a Xilinx/Altera/Actel FPGA</omsp:Description>
                 <omsp:Contact>Olivier GIRARD</omsp:Contact>
                 <omsp:Email>olgirard@googlemail.com</omsp:Email>
                 <omsp:URL>http://opencores.org/project,openmsp430</omsp:URL>

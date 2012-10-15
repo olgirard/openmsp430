@@ -34,52 +34,8 @@
 # $LastChangedDate$
 #------------------------------------------------------------------------------
 
-global serial_baudrate
-global serial_device
+global omsp_conf
 global omsp_info
-
-###############################################################################
-#                            PARAMETER CHECK                                  #
-###############################################################################
-
-proc help {} {
-    puts ""
-    puts "USAGE   : openmsp430-loader.tcl \[-device <communication device>\] \[-baudrate <communication speed>\] <elf/ihex-file>"
-    puts ""
-    puts "Examples: openmsp430-loader.tcl -device /dev/ttyUSB0 -baudrate  9600  leds.elf"
-    puts "          openmsp430-loader.tcl -device COM2:        -baudrate 38400  ta_uart.ihex"
-    puts ""
-}
-
-# Default values
-set serial_device   /dev/ttyUSB0
-set serial_baudrate 115200
-set elf_file        -1
-set bin_file        "[clock clicks].bin"
-
-# Parse arguments
-for {set i 0} {$i < $argc} {incr i} {
-    switch -exact -- [lindex $argv $i] {
-	-device   {set serial_device   [lindex $argv [expr $i+1]]; incr i}
-	-baudrate {set serial_baudrate [lindex $argv [expr $i+1]]; incr i}
-	default   {set elf_file        [lindex $argv $i]}
-    }
-}
-
-# Make sure arugments were specified
-if {[string eq $elf_file -1]} {
-    puts "ERROR: ELF/IHEX file isn't specified"
-    help
-    exit 1   
-}
-
-# Make sure the elf file exists
-if {![file exists $elf_file]} {
-    puts "ERROR: Specified ELF/IHEX file doesn't exist"
-    help
-    exit 1   
-}
-
 
 ###############################################################################
 #                            SOURCE LIBRARIES                                 #
@@ -94,6 +50,104 @@ set lib_path [file dirname $current_file]/../lib/tcl-lib
 
 # Source library
 source $lib_path/dbg_functions.tcl
+source $lib_path/dbg_utils.tcl
+
+
+###############################################################################
+#                            PARAMETER CHECK                                  #
+###############################################################################
+#proc GetAllowedSpeeds
+
+proc help {} {
+    puts ""
+    puts "USAGE   : openmsp430-loader.tcl \[-device   <communication port>\]"
+    puts "                                \[-adaptor  <adaptor type>\]"
+    puts "                                \[-speed    <communication speed>\]"
+    puts "                                \[-i2c_addr <cpu address>\]           <elf/ihex-file>"
+    puts ""
+    puts "DEFAULT : <communication port>  = /dev/ttyUSB0"
+    puts "          <adaptor type>        = uart_generic"
+    puts "          <communication speed> = 115200 (for UART) / I2C_S_100KHZ (for I2C)"
+    puts "          <core address>        = 42"
+    puts ""
+    puts "EXAMPLES: openmsp430-loader.tcl -device /dev/ttyUSB0 -adaptor uart_generic -speed 9600  leds.elf"
+    puts "          openmsp430-loader.tcl -device COM2:        -adaptor i2c_usb-iss  -speed I2C_S_100KHZ -i2c_addr 75 ta_uart.ihex"
+    puts ""
+}
+
+# Default values
+set omsp_conf(interface)  uart_generic
+set omsp_conf(device)     /dev/ttyUSB0
+set omsp_conf(baudrate)   [lindex [GetAllowedSpeeds] 1]
+set omsp_conf(0,cpuaddr)  42
+set elf_file              -1
+set bin_file              "[clock clicks].bin"
+
+# Parse arguments
+for {set i 0} {$i < $argc} {incr i} {
+    switch -exact -- [lindex $argv $i] {
+        -device   {set omsp_conf(device)    [lindex $argv [expr $i+1]]; incr i}
+        -adaptor  {set omsp_conf(interface) [lindex $argv [expr $i+1]]; incr i}
+        -speed    {set omsp_conf(baudrate)  [lindex $argv [expr $i+1]]; incr i}
+        -i2c_addr {set omsp_conf(0,cpuaddr) [lindex $argv [expr $i+1]]; incr i}
+        default   {set elf_file             [lindex $argv $i]}
+    }
+}
+
+# Make sure arugments were specified
+if {[string eq $elf_file -1]} {
+    puts "\nERROR: ELF/IHEX file isn't specified"
+    help
+    exit 1   
+}
+
+# Make sure the elf file exists
+if {![file exists $elf_file]} {
+    puts "\nERROR: Specified ELF/IHEX file doesn't exist"
+    help
+    exit 1   
+}
+
+# Make sure the selected adptor is valid
+if {![string eq $omsp_conf(interface) "uart_generic"] &
+    ![string eq $omsp_conf(interface) "i2c_usb-iss"]} {
+    puts "\nERROR: Specified adaptor is not valid (should be \"uart_generic\" or \"i2c_usb-iss\")"
+    help
+    exit 1   
+}
+
+# Make sure the I2C address is an integer
+if {![string is integer $omsp_conf(0,cpuaddr)]} {
+    puts "\nERROR: Specified I2C address is not an integer"
+    help
+    exit 1   
+}
+
+# Make sure the I2C address is valid
+if {($omsp_conf(0,cpuaddr)<8) | ($omsp_conf(0,cpuaddr)>119)} {
+    puts "\nERROR: Specified I2C address should lay between 7 and 120"
+    help
+    exit 1   
+}
+
+# If the selected interface is a UART, make sure the selected speed is an integer
+if {[string eq $omsp_conf(interface) "uart_generic"]} {
+    if {![string is integer $omsp_conf(baudrate)]} {
+        puts "\nERROR: Specified UART communication speed is not an integer"
+        help
+        exit 1   
+    }
+} elseif {[string eq $omsp_conf(interface) "i2c_usb-iss"]} {
+    if {[lsearch [lindex [GetAllowedSpeeds] 2] $omsp_conf(baudrate)]==-1} {
+        puts "\nERROR: Specified I2C communication speed is not valid."
+        puts "         Allowed values are:"
+        foreach allowedVal [lindex [GetAllowedSpeeds] 2] {
+            puts "                              - $allowedVal"
+        }
+        puts ""
+        exit 1   
+    }
+}
 
 
 ###############################################################################
@@ -105,7 +159,7 @@ set fileType [file extension $elf_file]
 set fileType [string tolower $fileType]
 regsub {\.} $fileType {} fileType
 if {![string eq $fileType "ihex"] & ![string eq $fileType "hex"] & ![string eq $fileType "elf"]} {
-    puts "ERROR: [string toupper $fileType] file format not supported"
+    puts "\nERROR: [string toupper $fileType] file format not supported"
     return 0
 }
 if {[string eq $fileType "hex"]} {
@@ -126,11 +180,11 @@ set timeout 100
 for {set i 0} {$i <= $timeout} {incr i} {
     after 500
     if {[file exists $bin_file]} {
-	break
+        break
     }
 }
 if {$i>=$timeout} {
-    puts "Timeout: ELF to BIN file conversion problem with \"msp430-objcopy\" executable"
+    puts "\nTimeout: ELF to BIN file conversion problem with \"msp430-objcopy\" executable"
     puts "$errMsg"
     exit 1
 }
@@ -162,23 +216,27 @@ for {set i 0} {$i < $hex_size} {set i [expr $i+4]} {
 ###############################################################################
 
 # Connect to target and stop CPU
-puts -nonewline "Connecting with the openMSP430 ($serial_device, $serial_baudrate\ bps)... "
+puts            ""
+puts -nonewline "Connecting with the openMSP430 ($omsp_conf(device), $omsp_conf(baudrate)\ bps)... "
 flush stdout
-if {![GetDevice]} {
+if {![GetDevice 0]} {
     puts "failed"
-    puts "Could not open $serial_device"
+    puts "Could not open $omsp_conf(device)"
     puts "Available serial ports are:"
-    foreach port [dbg_list_uart] {
+    foreach port [utils::uart_port_list] {
     puts "                             -  $port"
+    }
+    if {[string eq $omsp_conf(interface) "i2c_usb-iss"]} {
+        puts "\nMake sure the specified I2C device address is correct: $omsp_conf(0,cpuaddr)\n"
     }
     exit 1
 }
-ExecutePOR_Halt
+ExecutePOR_Halt 0
 puts "done"
-set sizes [GetCPU_ID_SIZE]
+set sizes [GetCPU_ID_SIZE 0]
 
-if {$omsp_info(alias)!=""} {
-    puts "Connected: target device identified as $omsp_info(alias)."
+if {$omsp_info(0,alias)!=""} {
+    puts "Connected: target device identified as $omsp_info(0,alias)."
 }
 puts "Connected: target device has [lindex $sizes 0]B Program Memory and [lindex $sizes 1]B Data Memory"
 puts ""
@@ -193,17 +251,19 @@ if {[lindex $sizes 0] != [expr $hex_size/2]} {
 set StartAddr [format "0x%04x" [expr 0x10000-$byte_size]]
 puts -nonewline "Load Program Memory... "
 flush stdout
-WriteMemQuick $StartAddr $DataArray
+WriteMemQuick 0 $StartAddr $DataArray
+after 500
 puts "done"
 
 # Check Data
 puts -nonewline "Verify Program Memory... "
 flush stdout
-if {[VerifyMem $StartAddr $DataArray 1]} {
+if {[VerifyMem 0 $StartAddr $DataArray 1]} {
     puts "done"
 } else {
     puts "ERROR"
+    exit 1
 }
 
 # Release device
-ReleaseDevice 0xfffe
+ReleaseDevice 0 0xfffe
