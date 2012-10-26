@@ -996,10 +996,10 @@ proc selectCPU {CpuNr_next} {
     set overstrike  [font actual $font -overstrike];
 
     # Create normal font
-    set font_normal "-family $family -size $size -weight normal -slant $slant -underline $underline -overstrike $overstrike"
+    set font_normal "-family \"$family\" -size $size -weight normal -slant $slant -underline $underline -overstrike $overstrike"
 
     # Create bold font
-    set font_bold   "-family $family -size $size -weight bold   -slant $slant -underline $underline -overstrike $overstrike"
+    set font_bold   "-family \"$family\" -size $size -weight bold   -slant $slant -underline $underline -overstrike $overstrike"
 
     if {$CpuNr_next==0} {
         .menu.cpu0     configure -relief sunken  -font $font_bold   -fg "\#00ae00" -activeforeground "\#00ae00"
