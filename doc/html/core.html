@@ -1,5 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html><head><title>openMSP430 Core</title></head><body>
+<html><head><title>openMSP430 Core</title></head>
+<body>
 <h3>Table of content</h3>
 <ul>
 	<li><a href="#1.%20Introduction">1. Introduction</a></li>
@@ -11,14 +12,20 @@
    	   <li><a href="#2.1.2%20Limitations">                   2.1.2 Limitations</a></li>
    	   <li><a href="#2.1.3%20Configuration">                 2.1.3 Configuration</a></li>
    	   <ul>
-   	        <li><a href="#2.1.3.1%20Basic%20System%20Configuration">    2.1.3.1 Basic System Configuration</a></li>
-   	        <li><a href="#2.1.3.2%20Advanced%20System%20Configuration"> 2.1.3.2 Advanced System Configuration</a></li>
-   	        <li><a href="#2.1.3.3%20Expert%20System%20Configuration">   2.1.3.3 Expert System Configuration</a></li>
+   	        <li><a href="#2.1.3.1%20Basic%20System%20Configuration">          2.1.3.1 Basic System Configuration</a></li>
+   	        <li><a href="#2.1.3.2%20Advanced%20System%20Configuration">       2.1.3.2 Advanced System Configuration</a></li>
+   	        <li><a href="#2.1.3.3%20Expert%20System%20Configuration">         2.1.3.3 Expert System Configuration</a></li>
+   	        <li><a href="#2.1.3.4%20Parameters%20For%20Multi-Core%20Systems"> 2.1.3.4 Parameters For Multi-Core Systems</a></li>
    	   </ul>
    	   <li><a href="#2.1.4%20Memory%20mapping">                2.1.4 Memory mapping</a></li>
    	   <li><a href="#2.1.5%20Pinout">                        2.1.5 Pinout</a></li>
    	   <li><a href="#2.1.6%20Instruction%20Cycles%20and%20Lengths">2.1.6 Instruction Cycles and Lengths</a></li>
    	   <li><a href="#2.1.7%20Serial%20Debug%20Interface">        2.1.7 Serial Debug Interface</a></li>
+           <li><a href="#2.1.8%20Benchmark%20results"> 2.1.8 Benchmark results</a></li>
+           <ul>
+                <li><a href="#2.1.8.1%20Dhrystone">2.1.8.1 Dhrystone</a></li>
+                <li><a href="#2.1.8.2%20CoreMark">2.1.8.2 CoreMark</a></li>
+           </ul>
 		</ul>
   	   </li>	
       <li><a href="#2.2_System_Peripherals">        2.2 System Peripherals</a>
@@ -88,7 +95,7 @@ integration.
 
 The following diagram shows the openMSP430 design structure:
 <br><br>
-<img src="usercontent,img,1267738921" alt="CPU Structure" title="CPU Structure" width="80%">
+<img src="http://opencores.org/usercontent,img,1354053264" alt="CPU Structure" title="CPU Structure" width="80%">
 <br>
 <ul>
 	<li><b>Frontend</b>: This module performs the instruction Fetch and Decode tasks. It also contains the execution state machine.</li>
@@ -97,8 +104,8 @@ Containing the ALU and the register file, this module executes the
 current decoded instruction according to the execution state.</li>
 	<li><b>Serial Debug Interface</b>:
 Contains all the required logic for a Nexus class 3 debugging unit
-(without trace). Communication with the host is done with a standard
-two-wire 8N1 serial interface.</li>
+(without trace). Communication with the host is performed with a standard
+two-wire interface following either the UART 8N1 or I<sup>2</sup>C serial protocol.</li>
    <li><b>Memory backbone</b>: This block
 performs a simple arbitration between the frontend and execution-unit
 for program, data and peripheral memory access.</li>
@@ -159,6 +166,7 @@ The basic system can be adjusted with the following set of defines in order to m
 //&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 Uncomment the required memory size<br>
 //-------------------------------------------------------<br>
+//`define PMEM_SIZE_CUSTOM<br>
 //`define PMEM_SIZE_59_KB<br>
 //`define PMEM_SIZE_55_KB<br>
 //`define PMEM_SIZE_54_KB<br>
@@ -179,6 +187,7 @@ Uncomment the required memory size<br>
 //&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 Uncomment the required memory size<br>
 //-------------------------------------------------------<br>
+//`define DMEM_SIZE_CUSTOM<br>
 //`define DMEM_SIZE_32_KB<br>
 //`define DMEM_SIZE_24_KB<br>
 //`define DMEM_SIZE_16_KB<br>
@@ -206,6 +215,9 @@ The only design considerations at this stage are:
 	<li>Make sure that the program and data memories have the correct size :-P</li>
 	<li>The sum of program, data and peripheral memory space <b>MUST NOT</b> exceed 64 kB</li>
 </ul>
+<br> 
+<b><u>Note:</u></b> when selected, custom memory sizes can be specified in the "Expert System Configuration" section.
+<br> 
 <br> 
 
 <a name="2.1.3.2 Advanced System Configuration"></a>
@@ -288,6 +300,7 @@ In this section, some additional features are available in order to match the ne
 // shifted up and a custom linker script will therefore<br>
 // be required by the GCC compiler.<br>
 //-------------------------------------------------------<br>
+//`define PER_SIZE_CUSTOM<br>
 //`define PER_SIZE_32_KB<br>
 //`define PER_SIZE_16_KB<br>
 //`define PER_SIZE_8_KB<br>
@@ -317,6 +330,9 @@ modify this section.</li>
 	<li>The sum of program, data and peripheral memory space <b>MUST NOT</b> exceed 64 kB</li>
 </ul>
 <br>
+<b><u>Note:</u></b> when selected, custom peripheral memory space can be specified in the "Expert System Configuration" section.
+<br> 
+<br> 
 <a name="2.1.3.3 Expert System Configuration"></a>
 <h4>2.1.3.3 Expert System Configuration</h4>
 In this section, you will find configuration options which are
@@ -345,6 +361,29 @@ you have a good reason to do so... and if you know what<br>
 //<br>
 //============================================================================<br>
       <br>
+//-------------------------------------------------------<br>
+// Select serial debug interface protocol<br>
+//-------------------------------------------------------<br>
+//&nbsp;&nbsp;&nbsp; DBG_UART -&gt; Enable UART (8N1) debug interface<br>
+//&nbsp;&nbsp;&nbsp; DBG_I2C&nbsp; -&gt; Enable I2C debug interface<br>
+//-------------------------------------------------------<br>
+`define DBG_UART<br>
+//`define DBG_I2C<br>
+      <br>
+      <br>
+//-------------------------------------------------------<br>
+// Enable the I2C broadcast address<br>
+//-------------------------------------------------------<br>
+// For multicore systems, a common I2C broadcast address<br>
+// can be given to all oMSP cores in order to<br>
+// synchronously RESET, START, STOP, or STEP all CPUs<br>
+// at once with a single I2C command.<br>
+// If you have a single openMSP430 in your system,<br>
+// this option can stay commented-out.<br>
+//-------------------------------------------------------<br>
+//`define DBG_I2C_BROADCAST<br>
+      <br>
+<br>
 //-------------------------------------------------------<br>// Number of hardware breakpoint/watchpoint units<br>
 // (each unit contains two hardware addresses available<br>
 // for breakpoints or watchpoints):<br>
@@ -376,6 +415,31 @@ you have a good reason to do so... and if you know what<br>
       <br>
       <br>
 //-------------------------------------------------------<br>
+// Custom Program/Data and Peripheral Memory Spaces<br>
+//-------------------------------------------------------<br>
+// The following values are valid only if the<br>
+// corresponding *_SIZE_CUSTOM defines are uncommented:<br>
+//<br>
+//  - *_SIZE   : size of the section in bytes.<br>
+//  - *_AWIDTH : address port width, this value must allow<br>
+//               to address all WORDS of the section<br>
+//               (i.e. the *_SIZE divided by 2)<br>
+//-------------------------------------------------------<br>
+<br>
+// Custom Program memory (enabled with PMEM_SIZE_CUSTOM)<br>
+`define PMEM_CUSTOM_AWIDTH      10<br>
+`define PMEM_CUSTOM_SIZE      2048<br>
+<br>
+// Custom Data memory    (enabled with DMEM_SIZE_CUSTOM)<br>
+`define DMEM_CUSTOM_AWIDTH       6<br>
+`define DMEM_CUSTOM_SIZE       128<br>
+<br>
+// Custom Peripheral memory  (enabled with PER_SIZE_CUSTOM)<br>
+`define PER_CUSTOM_AWIDTH        8<br>
+`define PER_CUSTOM_SIZE        512<br>
+<br>
+<br>
+//-------------------------------------------------------<br>
 // ASIC version<br>
 //-------------------------------------------------------<br>
 // When uncommented, this define will enable the<br>
@@ -392,6 +456,60 @@ Design consideration at this stage are:
 </ul>
 <br>
 All remaining defines located after the ASIC section in the <b><i>openMSP430_defines.v</i></b> file are system constants and <b>MUST NOT</b> be edited.
+<br> 
+<br> 
+<a name="2.1.3.4 Parameters For Multi-Core Systems"></a>
+<h4>2.1.3.4 Parameters For Multi-Core Systems</h4>
+
+In addition to the define file, two Verilog parameters are available to facilitate software development on multi-core systems.<br> 
+For example, in a dual-core openMSP430 system, the cores can be instantiated as following:
+<br>
+<br>
+<table border="0" cellpadding="0" cellspacing="4">
+<tbody><tr>
+<td width="35"><br></td>
+<td bgcolor="#d0d0d0" width="3"><br></td>
+<td width="15"><br></td>
+<td>
+	<code>
+		          openMSP430 #(.INST_NR (<strong>0</strong>), .TOTAL_NR(<strong>1</strong>)) openMSP430_core_0 (
+		      <br>...
+		      <br>);
+		      <br>
+		      <br>openMSP430 #(.INST_NR (<strong>1</strong>), .TOTAL_NR(<strong>1</strong>)) openMSP430_core_1 (
+		      <br>...
+		      <br>);
+	</code>
+</td>
+</tr>
+</tbody>
+</table>
+<br>
+The values of these parameters are then directly accessible through the CPU_NR register of the SFR peripheral.<br>
+For example, if both cores share the same program memory, the software can take advantage of this information as following:
+<br><br>
+<table border="0" cellpadding="0" cellspacing="4">
+<tbody><tr>
+<td width="35"><br></td>
+<td bgcolor="#d0d0d0" width="3"><br></td>
+<td width="15"><br></td>
+<td>
+	<code>
+		           "...
+		      <br>int main(void) {
+		      <br>&nbsp;&nbsp;if (CPU_NR==<strong>0x0100</strong>) {
+		      <br>&nbsp;&nbsp;&nbsp;&nbsp;main_core_0();&nbsp;// Main routine call for core 0
+		      <br>&nbsp;&nbsp;}
+		      <br>&nbsp;&nbsp;if (CPU_NR==<strong>0x0101</strong>) {
+		      <br>&nbsp;&nbsp;&nbsp;&nbsp;main_core_1();&nbsp;// Main routine call for core 1
+		      <br>&nbsp;&nbsp;}
+		      <br>}
+		      <br>..."
+	</code>
+</td>
+</tr>
+</tbody>
+</table>
 <br><br>
 
 <a name="2.1.4 Memory mapping"></a>
@@ -780,7 +898,50 @@ or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
 	     <td style="vertical-align: top; text-align: center;">&lt;async&gt;<br>
       </td>
 <td> Debug interface: UART RXD (asynchronous)                         </td>
-	</tr><tr align="center">
+	</tr><tr>
+      <td style="vertical-align: top;">dbg_i2c_addr<br>
+      </td>
+      <td style="vertical-align: top;"> Input</td>
+      <td style="vertical-align: top;"> 7</td>
+      <td style="vertical-align: top; text-align: center;">mclk</td>
+      <td style="vertical-align: top;">Debug interface: I2C Address<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">dbg_i2c_broadcast<br>
+      </td>
+      <td style="vertical-align: top;"> Input</td>
+      <td style="vertical-align: top;"> 7</td>
+      <td style="vertical-align: top; text-align: center;">mclk</td>
+      <td style="vertical-align: top;">Debug interface: I2C Broadcast Address (for multicore systems)<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">dbg_i2c_scl<br>
+      </td>
+      <td style="vertical-align: top;"> Input</td>
+      <td style="vertical-align: top;"> 1</td>
+      <td style="vertical-align: top; text-align: center;">&lt;async&gt;</td>
+      <td style="vertical-align: top;">Debug interface: I2C SCL (asynchronous)</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">dbg_i2c_sda_in<br>
+      </td>
+      <td style="vertical-align: top;"> Input</td>
+      <td style="vertical-align: top;"> 1</td>
+      <td style="vertical-align: top; text-align: center;">&lt;async&gt;</td>
+      <td style="vertical-align: top;">Debug interface: I2C SDA IN (asynchronous)</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">dbg_i2c_sda_out<br>
+      </td>
+      <td style="vertical-align: top;"> Output</td>
+      <td style="vertical-align: top;"> 1</td>
+      <td style="vertical-align: top; text-align: center;">mclk</td>
+      <td style="vertical-align: top;">Debug interface: I2C SDA OUT<br>
+      </td>
+    </tr>
+<tr align="center">
       <td colspan="5" rowspan="1" style="vertical-align: top;"><b><i>Scan</i></b></td>
     </tr>
     <tr>
@@ -910,6 +1071,101 @@ All jump instructions require one code word, and take two CPU cycles to execute,
 
 All the details about the Serial Debug Interface are located <a href="http://opencores.org/project,openmsp430,serial%20debug%20interface">here</a>.<br>
 <br>
+
+<a name="2.1.8 Benchmark results"></a>
+<h3>2.1.8 Benchmark results</h3>
+
+<a name="2.1.8.1 Dhrystone"></a>
+<h4>2.1.8.1 Dhrystone (DMIPS/MHz)</h4>
+Dhrystone is known for being susceptible to compiler optimizations (among other issues).<br>However,
+as it is still quite a popular metric, some results are provided here
+(ranging from 0.30 to 0.45 DMIPS/MHz depending on the compiler version
+and options).<br>
+Note that the used C-code is available in the repository <a href="http://opencores.org/websvn,listing?repname=openmsp430&amp;path=%2Fopenmsp430%2Ftrunk%2Fcore%2Fsim%2Frtl_sim%2Fsrc-c%2Fdhrystone_v2.1%2F#path_openmsp430_trunk_core_sim_rtl_sim_src-c_dhrystone_v2.1_">here</a> and <a href="http://opencores.org/websvn,listing?repname=openmsp430&amp;path=%2Fopenmsp430%2Ftrunk%2Fcore%2Fsim%2Frtl_sim%2Fsrc-c%2Fdhrystone_4mcu%2F#path_openmsp430_trunk_core_sim_rtl_sim_src-c_dhrystone_4mcu_">here</a>.<br>
+<br>
+
+<table style="text-align: left; width: 40%;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="text-align: center;" colspan="1" rowspan="2"><span style="font-weight: bold;">Dhrystone flavor</span></td>
+      <td style="font-weight: bold; text-align: right;">Compiler options</td>    
+      <td colspan="1" rowspan="2" style="vertical-align: top; text-align: center; font-weight: bold;">-Os</td>
+      <td colspan="1" rowspan="2" style="vertical-align: top; text-align: center; font-weight: bold;">-O2</td>
+      <td colspan="1" rowspan="2" style="vertical-align: top; text-align: center; font-weight: bold;">-O3</td>
+    </tr>
+    <tr align="left">
+      <td style="font-weight: bold;">Compiler version
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center;" colspan="1" rowspan="2">Dhrystone v2.1<br>
+                     (<a href="http://ftp.unicamp.br/pub/unix-c/benchmark/system/">common version</a>)</td>
+      <td style="text-align: left;">mspgcc v4.4.5</td>
+      <td style="text-align: center;">0.30</td>
+      <td style="text-align: center;">0.32</td>
+      <td style="text-align: center;">0.33</td>
+    </tr>
+    <tr>
+      <td style="text-align: left;">mspgcc v4.6.3</td>
+      <td style="text-align: center;">0.37</td>
+      <td style="text-align: center;">0.39</td>
+      <td style="text-align: center;">0.40</td>
+    </tr>
+    <tr>
+      <td style="text-align: center;" colspan="1" rowspan="2">Dhrystone v2.1<br>
+                     (<a href="http://www.ecrostech.com/Other/Resources/Dhrystone.htm">MCU adapted</a>)</td>
+      <td style="text-align: left;">mspgcc v4.4.5</td>
+      <td style="text-align: center;">0.30</td>
+      <td style="text-align: center;">0.30</td>
+      <td style="text-align: center;">0.31</td>
+    </tr>
+    <tr>
+      <td style="text-align: left;">mspgcc v4.6.3</td>
+      <td style="text-align: center;">0.37</td>
+      <td style="text-align: center;">0.44</td>
+      <td style="text-align: center;">0.45</td>
+    </tr>
+  </tbody>
+</table>
+
+<a name="2.1.8.2 CoreMark"></a>
+<h4>2.1.8.2 CoreMark (CoreMark/MHz)</h4>
+CoreMark tries to address most of Dhrystone's pitfall by preventing the
+compiler to optimize some code away and using "real-life" algorithm.<br>
+Note that the used C-code is available in the repository <a href="http://opencores.org/websvn,listing?repname=openmsp430&amp;path=%2Fopenmsp430%2Ftrunk%2Fcore%2Fsim%2Frtl_sim%2Fsrc-c%2Fcoremark_v1.0%2F#path_openmsp430_trunk_core_sim_rtl_sim_src-c_coremark_v1.0_">here</a>.<br>
+<br>
+
+<table style="text-align: left; width: 40%;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="text-align: center;" colspan="1" rowspan="2"><br>
+</td>
+      <td style="font-weight: bold; text-align: right;">Compiler options</td>
+      <td colspan="1" rowspan="2" style="vertical-align: top; text-align: center; font-weight: bold;">-Os</td>
+      <td colspan="1" rowspan="2" style="vertical-align: top; text-align: center; font-weight: bold;">-O2</td>
+      <td colspan="1" rowspan="2" style="vertical-align: top; text-align: center; font-weight: bold;">-O3</td>
+    </tr>
+    <tr align="left">
+      <td style="font-weight: bold;">Compiler version</td>
+    </tr>
+    <tr>
+      <td style="text-align: center;" colspan="1" rowspan="2">CoreMark v1.0<br>
+                     (<a href="http://www.coremark.org/">official version</a>)</td>
+      <td style="text-align: left;">mspgcc v4.4.5</td>
+      <td style="text-align: center;">0.78</td>
+      <td style="text-align: center;">0.85</td>
+      <td style="text-align: center;">0.83</td>
+    </tr>
+    <tr>
+      <td style="text-align: left;">mspgcc v4.6.3</td>
+      <td style="text-align: center;">0.74</td>
+      <td style="text-align: center;">0.91</td>
+      <td style="text-align: center;">0.87</td>
+    </tr>
+  </tbody>
+</table>
+<br>
+
 <a name="2.2_System_Peripherals"></a>
 <h2>2.2 System Peripherals</h2>
 In addition to the CPU core itself, several peripherals are also
@@ -1066,7 +1322,7 @@ section.<br>
 <b><sup><font color="#ff0000">1</font></sup></b>: These fields are not available if the NMI is excluded (see <i>openMSP430_defines.v</i> )<br>
 <b><sup><font color="#ff0000">2</font></sup></b>: These fields are not available if the Watchdog is excluded (see <i>openMSP430_defines.v</i> )<br>
 <br>
-In addition, two 16-bit read-only registers have been added in order
+In addition, three 16-bit read-only registers have been added in order
 to let the software know with which version of the openMSP430 it is
 running:<br>
 <br>
@@ -1101,7 +1357,13 @@ running:<br>
 <td colspan="6"><font size="-5">PMEM_SIZE</font></td>
 <td colspan="9"><font size="-5">DMEM_SIZE</font></td>
 <td colspan="1"><font size="-5">MPY</font></td>
-</tr>
+</tr><tr>
+      <td style="vertical-align: top; text-align: center;"><small>CPU_NR</small></td>
+      <td style="vertical-align: top; text-align: center;"><small>0x0008</small></td>
+      <td colspan="8" rowspan="1" style="vertical-align: top; text-align: center;"><font size="-5">CPU_TOTAL_NR</font></td>
+      <td colspan="8" rowspan="1" style="vertical-align: top; text-align: center;"><font size="-5">CPU_INST_NR</font></td>
+    </tr>
+
 </tbody>
 </table>
 <br>
@@ -1136,10 +1398,18 @@ running:<br>
    <td>&nbsp;</td><td valign="top"><li><b>PMEM_SIZE</b></li></td>
    <td>: Progam memory size for the current implementation (byte size = PMEM_SIZE*1024)</td>
 </tr>
+<tr>
+   <td>&nbsp;</td><td valign="top"><li><b>CPU_INST_NR</b></li></td>
+   <td>: Current oMSP instance number (for multicore systems)</td>
+</tr>
+<tr>
+   <td>&nbsp;</td><td valign="top"><li><b>CPU_TOTAL_NR</b></li></td>
+   <td>: Total number of oMSP instances-1 (for multicore systems)</td>
+</tr>
 </tbody>
 </table>
 <br>
-<span style="font-weight: bold; text-decoration: underline;">Note:</span> attentive readers will have noted that <span style="font-style: italic;">CPU_ID_LO</span> and <span style="font-style: italic;">CPU_ID_HI</span> are identical to the Serial Debug Interface register counterparts.<br>
+<span style="font-weight: bold; text-decoration: underline;">Note:</span> attentive readers will have noted that <span style="font-style: italic;">CPU_ID_LO</span>, <span style="font-style: italic;">CPU_ID_HI</span> and <span style="font-style: italic;">CPU_NR</span> are identical to the Serial Debug Interface register counterparts.<br>
 <a name="2.2.2 Watchdog Timer"></a>
 <h3>2.2.4 Watchdog Timer</h3>
 

@@ -1,9 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html><head>
-  <title>openMSP430 Software Development Tools</title>
-
-  
-</head><body>
+<html><head><title>openMSP430 Software Development Tools</title></head><body>
 <h3>Table of content</h3>
 
 <ul>
@@ -49,19 +45,46 @@ needs to be installed on your system.<br>
 <br>
 
 In order to connect the host PC to the openMSP430 serial debug
-interface, a serial cable is required.<br>
+interface, a UART or I2C serial cable/adapter is required.<br>
 
 Typically, the following solutions will suit any kind of development
-board:<br>
+board:<br><br>
+<table style="text-align: left; width: 50%; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    
+<tr>
+      <td style="vertical-align: top; text-align: center;"><strong>UART</strong><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><strong>I<sup>2</sup>C</strong><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: left;">
+      <span style="font-weight: bold;"><br><a href="http://www.ftdichip.com/Products/Cables/USBRS232.htm">
+USB to RS232 converter:</a></span><br>
+      <br>
+      <div style="text-align: center;"><img src="http://opencores.org/usercontent,img,1353274537" alt="USB to RS232" title="USB to RS232" width="25%">
+      <br>
+      </div>
 
-<ul>
+      <a href="http://www.ftdichip.com/Products/Cables/USBTTLSerial.htm"><span style="font-weight: bold;">
+USB to Serial TTL converter:</span></a><br><br>
+      <div style="text-align: center;"><img src="http://opencores.org/usercontent,img,1353274560" alt="USB to Serial TTL" title="USB to Serial TTL" width="25%">
+      <br>
 
-  <li><a href="http://www.ftdichip.com/Products/Cables/USBRS232.htm">USB
-to RS232 converter</a></li>
-  <li><a href="http://www.ftdichip.com/Products/Cables/USBTTLSerial.htm">USB
-to Serial TTL converter</a><br>
-  </li>
-</ul>
+      </div>
+</td>
+      <td style="vertical-align: top; text-align: left;"><br>
+      <a href="http://www.robot-electronics.co.uk/htm/usb_iss_tech.htm"><span style="font-weight: bold;">Devantech USB-ISS adapter:</span></a><br><br>
+      <div style="text-align: center;"><img src="http://opencores.org/usercontent,img,1353274507" alt="USB to I2C adapter" title="USB to I2C adapter" width="75%">
+      <br>
+
+      </div>
+</td>
+    </tr>
+  </tbody>
+</table>
+<ul></ul>
 
 <a name="2. openmsp430-loader"></a>
 <h1>2. openmsp430-loader</h1>
@@ -89,15 +112,30 @@ The program can be called with the following syntax:
       </td>
       <td width="15"><br>
       </td>
-      <td> <code>openmsp430-loader.tcl [-device &lt;communication
-device&gt;] [-baudrate &lt;communication speed&gt;]
-&lt;elf/ihex-file&gt;
+      <td> <code><br>
+USAGE&nbsp;&nbsp; : openmsp430-loader.tcl [-device&nbsp;&nbsp; &lt;communication port&gt;]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[-adaptor&nbsp; &lt;adaptor type&gt;]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[-speed&nbsp;&nbsp;&nbsp; &lt;communication speed&gt;]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+[-i2c_addr &lt;cpu
+address&gt;]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;elf/ihex-file&gt;<br>
       <br>
+DEFAULT : &lt;communication port&gt;&nbsp; = /dev/ttyUSB0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;adaptor
+type&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = uart_generic<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;communication speed&gt; = 115200 (for UART) / I2C_S_100KHZ (for I2C)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;core address&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; = 42<br>
       <br>
-Examples: openmsp430-loader.tcl -device /dev/ttyUSB0 -baudrate 9600
-leds.elf<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;openmsp430-loader.tcl
--device COM2: -baudrate 38400 ta_uart.ihex </code>
+EXAMPLES: openmsp430-loader.tcl -device /dev/ttyUSB0 -adaptor uart_generic -speed 9600&nbsp; leds.elf<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+openmsp430-loader.tcl -device
+COM2:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -adaptor
+i2c_usb-iss&nbsp; -speed I2C_S_100KHZ -i2c_addr 75 ta_uart.ihex<br>
+      <br>
+ </code>
       </td>
     </tr>
   </tbody>
@@ -109,13 +147,12 @@ These screenshots show the script in action under Linux and Windows:
 <br>
 
 <br>
-
-<img src="usercontent,img,1306525377" alt="openmsp430-loader Linux" title="openmsp430-loader Linux" width="75%">
+<img src="http://opencores.org/usercontent,img,1353618648" alt="openmsp430-loader Linux" title="openmsp430-loader Linux" width="100%">
 <br>
 
 <br>
 
-<img src="usercontent,img,1249244501" alt="openmsp430-loader Windows" title="openmsp430-loader Windows" width="75%">
+<img src="http://opencores.org/usercontent,img,1249244501" alt="openmsp430-loader Windows" title="openmsp430-loader Windows" width="75%">
 <br>
 
 <a name="3. openmsp430-minidebug"></a>
@@ -126,8 +163,7 @@ simple interaction with the openMSP430:
 <br>
 
 <br>
-
-<img src="usercontent,img,1306665243" alt="openmsp430-minidebug" title="openmsp430-minidebug" width="75%">
+<img src="http://opencores.org/usercontent,img,1353618607" alt="openmsp430-minidebug" title="openmsp430-minidebug" width="75%">
 <br>
 
 <br>
@@ -170,7 +206,7 @@ Schematically the communication flow looks as following:
 
 <br>
 
-<img src="usercontent,img,1248897690" alt="GDB Proxy flow" title="GDB Proxy flow" width="40%">
+<img src="http://opencores.org/usercontent,img,1248897690" alt="GDB Proxy flow" title="GDB Proxy flow" width="40%">
 <br>
 
 <br>
@@ -181,8 +217,7 @@ simple graphical interface:
 <br>
 
 <br>
-
-<img src="usercontent,img,1306525816" alt="gdbproxy" title="gdbproxy" width="60%">
+<img src="http://opencores.org/usercontent,img,1353618690" alt="gdbproxy" title="gdbproxy" width="60%">
 <br>
 
 <br>
@@ -192,12 +227,12 @@ with the Eclipse and DDD graphical frontends: <br>
 
 <br>
 
-<img src="usercontent,img,1320787180" alt="gdbproxy-Eclipse" title="gdbproxy-Eclipse" width="100%">
+<img src="http://opencores.org/usercontent,img,1320787180" alt="gdbproxy-Eclipse" title="gdbproxy-Eclipse" width="100%">
 <br>
 
 <br>
 
-<img src="usercontent,img,1306526049" alt="gdbproxy-DDD" title="gdbproxy-DDD" width="100%">
+<img src="http://opencores.org/usercontent,img,1306526049" alt="gdbproxy-DDD" title="gdbproxy-DDD" width="100%">
 <br>
 
 <br>
@@ -1232,7 +1267,7 @@ Memory Size: 59 kB</i></b></td>
     <tr>
       <td style="vertical-align: top; text-align: center;">msp430x1491<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">59 kB<br>
+      <td style="vertical-align: top; text-align: center;">60 kB<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2048 B<br>
       </td>
@@ -1241,7 +1276,7 @@ Memory Size: 59 kB</i></b></td>
     <tr>
       <td style="vertical-align: top; text-align: center;">msp430x149<br>
       </td>
-      <td style="vertical-align: top; text-align: center;">59 kB<br>
+      <td style="vertical-align: top; text-align: center;">60 kB<br>
       </td>
       <td style="vertical-align: top; text-align: center;">2048 B<br>
       </td>

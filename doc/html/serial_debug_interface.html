@@ -1,10 +1,13 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html><head><title>openMSP430 Serial Debug Interface</title></head><body>
+<html><head><title>openMSP430 Serial Debug Interface</title>
+
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8"></head><body>
 <a name="TOC"></a>
 <h3>Table of content</h3>
 <ul>
-	<li><a href="#1.%20Introduction">                          1. Introduction</a></li>
-	<li><a href="#2.%20Debug%20Unit">                            2. Debug Unit</a>
+	<li><strong><a href="#1.%20Introduction">                          1. Introduction</a></strong></li>
+	<li><strong><a href="#2.%20Debug%20Unit">                            2. Debug Unit</a></strong>
 	<ul>
       <li><a href="#2.1%20Register%20Mapping">                  2.1 Register Mapping</a></li>
       <li><a href="#2.2%20CPU%20Control/Status%20Registers">      2.2 CPU Control/Status Registers</a></li>
@@ -12,6 +15,7 @@
    	   <li><a href="#2.2.1%20CPU_ID">                       2.2.1 CPU_ID</a></li>
       	<li><a href="#2.2.2%20CPU_CTL">                      2.2.2 CPU_CTL</a></li>
       	<li><a href="#2.2.3%20CPU_STAT">                     2.2.3 CPU_STAT</a></li>
+      	<li><a href="#2.2.4%20CPU_NR">                       2.2.4 CPU_NR</a></li>
 		</ul>
       <li><a href="#2.3%20Memory%20Access%20Registers">           2.3 Memory Access Registers</a></li>
 		<ul>
@@ -29,7 +33,7 @@
 		</ul>
 	</ul>
   	</li>	
-	<li><a href="#3.%20Debug%20Communication%20Interface:%20UART">   3. Debug Communication Interface: UART</a>
+	<li><strong><a href="#3.%20Debug%20Communication%20Interface:%20UART">   3. Debug Communication Interface: UART</a></strong>
 		<ul>
    	   <li><a href="#3.1%20Serial%20communication%20protocol:%208N1">       3.1 Serial communication protocol: 8N1</a></li>
       	<li><a href="#3.2%20Synchronization%20frame">                    3.2 Synchronization frame</a></li>
@@ -45,7 +49,25 @@
       		<li><a href="#3.4.2%20Read%20Burst%20access">                   3.4.2 Read Burst access</a></li>
 			</ul>
 		</ul>
-</li></ul>
+   </li>
+	<li><strong><a href="#4.%20Debug%20Communication%20Interface:%20I2C">   4. Debug Communication Interface: I2C</a></strong>
+		<ul>
+   	   <li><a href="#4.1%20I2C%20communication%20protocol">       4.1 I2C communication protocol</a></li>
+      	<li><a href="#4.2%20Synchronization%20frame">                    4.2 Synchronization frame</a></li>
+      	<li><a href="#4.3%20Read/Write%20access%20to%20the%20debug%20registers"> 4.3 Read/Write access to the debug registers</a></li>
+			<ul>
+   	   	<li><a href="#4.3.1%20Command%20Frame">                       4.3.1 Command Frame</a></li>
+      		<li><a href="#4.3.2%20Write%20access">                        4.3.2 Write access</a></li>
+      		<li><a href="#4.3.3%20Read%20access">                         4.3.3 Read access</a></li>
+			</ul>
+      	<li><a href="#4.4%20Read/Write%20burst%20implementation%20for%20the%20CPU%20Memory%20access">4.4 Read/Write burst implementation for the CPU Memory access</a></li>
+			<ul>
+   	   	<li><a href="#4.4.1%20Write%20Burst%20access">                  4.4.1 Write Burst access</a></li>
+      		<li><a href="#4.4.2%20Read%20Burst%20access">                   4.4.2 Read Burst access</a></li>
+			</ul>
+		</ul>
+   </li>
+</ul>
 
 <a name="1. Introduction"></a>
 <h1>1. Introduction</h1>
@@ -54,21 +76,91 @@ in-system software debugging. In that case, the communication
 with the host computer is typically built on a JTAG or Spy-Bi-Wire
 serial protocol. However, the global debug architecture from the MSP430
 is unfortunately poorly documented on the web (and is also probably
-tightly linked with the internal core architecture).
+tightly linked with the internal core micro-architecture).
 <br><br>A custom module has therefore been implemented for the
-openMSP430. The communication with the host is done with a simple two-wire RS232
-cable (8N1 serial protocol) and the debug unit provides all the
-required features for Nexus Class 3 debugging (beside trace), namely: <ul>
-	<li>CPU control (run, stop, step, reset).</li>
-	<li>Software &amp; hardware breakpoint support.</li>
-  <li>Hardware watchpoint support.<br>
-  </li>
+openMSP430. The communication with the host is done with a simple two-wire cable following either the UART or I<sup>2</sup>C serial protocol (interface is selectable in the <a href="http://opencores.org/project,openmsp430,core#2.1.3.3%20Expert%20System%20Configuration">Expert System Configuraiton</a> section).
+<br><br>The debug unit provides all required features for Nexus Class 3 debugging (beside trace), namely: <br>
+<br>
+<table style="text-align: left; width: 50%; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr align="center">
+      <td style="vertical-align: top;"><span style="font-weight: bold;"><strong>Debug unit features</strong></span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">
+      <ul>
+<li>CPU control (run, stop, step, reset).</li><li>Software &amp; hardware breakpoint.</li><li>Hardware watchpoint.<br>
+  </li><li>Memory read/write on-the-fly (no need to halt execution).</li><li>CPU registers read/write on-the-fly (no need to halt execution).</li>
+      </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<ul></ul>
 
-	<li>Memory read/write on-the-fly (no need to halt execution).</li>
-	<li>CPU registers read/write on-the-fly (no need to halt execution).</li>
-</ul>
+Depending on the selected serial interface, the following features are available:<br>
+<br>
+<table style="text-align: left; width: 50%; margin-left: auto; margin-right: auto;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr align="center">
+      <td colspan="2" rowspan="1" style="vertical-align: top;"><span style="font-weight: bold;"><strong>Debug interface features</strong></span><br>
+      </td>
+    </tr>
+<tr>
+      <td style="vertical-align: top; text-align: center;"><strong>UART</strong><br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><strong>I<sup>2</sup>C</strong><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; text-align: left;">
+      <span style="font-weight: bold;"><br>
+Strengths:</span><br>
+<ul>
+        
+        <li>No extra hardware required for most FPGA boards (almost all come with a UART interface, either <a href="http://www.ftdichip.com/Products/Cables/USBRS232.htm">RS232 or USB</a> based).</li>
 
-<a name="2. Debug Unit"></a>
+        
+        <li>Possibility to use <a href="http://www.ftdichip.com/Products/Cables/USBTTLSerial.htm">USB to serial TTL</a> cables.</li>
+
+      </ul><span style="font-weight: bold;">Weaknesses:</span><br>
+      <ul>
+        <li>Need to reset the debug interface after cable insertion.</li>
+        <li>For ASICs, no possibility to change the MCLK frequency during a debug session.<br>
+        </li>
+      </ul>
+
+</td>
+      <td style="vertical-align: top; text-align: left;"><br>
+      <span style="font-weight: bold;">Strengths:</span><br>
+<ul>
+        
+        <li>Very stable interface (synchronous protocol, no synchronization frame required).</li>
+
+        
+        <li>Multi-core chip support with a single I2C
+interface (i.e. TWO pins)... in such a system, each openMSP430 instance has its own I2C device address.</li>
+        <li>Possibility to combine the openMSP430 debug interface with
+an already existing "functional" I2C interface... effectively creating
+a ZERO
+wire serial debug interface.</li>
+        <li>Affordable <a href="http://www.robot-electronics.co.uk/htm/usb_iss_tech.htm">USB-ISS adapter</a> (~23€).</li>
+</ul><span style="font-weight: bold;">Weaknesses:</span><br>
+      <ul>
+        <li>Extra I2C adapter required (<a href="http://www.robot-electronics.co.uk/htm/usb_iss_tech.htm">USB-ISS</a> currently supported)<br>
+</li>
+      </ul>
+      <br>
+
+</td>
+    </tr>
+  </tbody>
+</table>
+
+<a name="2. Debug Unit"></a><br>
+
 <div style="text-align: right;"><a href="#TOC">Top</a></div>
 <h1>2. Debug Unit</h1>
 
@@ -277,6 +369,13 @@ The following table summarize the complete debug register set accessible through
 <td><small>0x17</small></td>
 <td colspan="16"><font size="-5">BRK_ADDR1[15:0]</font></td>
 </tr>
+<tr align="center">
+<td><small><a href="#2.2.4%20CPU_NR">CPU_NR</a></small></td>
+<td><small>0x18</small></td>
+<td colspan="8"><small>CPU_TOTAL_NR</small></td>
+<td colspan="8"><small>CPU_INST_NR</small></td>
+</tr>
+
 </tbody></table>
 
 <a name="2.2 CPU Control/Status Registers"></a>
@@ -449,19 +548,19 @@ This 8 bit read-write register gives the global status of the debug interface. A
 <table border="0">
 <tbody><tr>
    <td>&nbsp;</td><td valign="top"><li><b>HWBRK3_PND</b></li></td>
-   <td>: This bit reflects if one of the Hardware Breakpoint Unit 3 status bit is set (i.e. BRK3_STAT&#8800;0).</td>
+   <td>: This bit reflects if one of the Hardware Breakpoint Unit 3 status bit is set (i.e. BRK3_STAT≠0).</td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>HWBRK2_PND</b></li></td>
-   <td>: This bit reflects if one of the Hardware Breakpoint Unit 2 status bit is set (i.e. BRK2_STAT&#8800;0).</td>
+   <td>: This bit reflects if one of the Hardware Breakpoint Unit 2 status bit is set (i.e. BRK2_STAT≠0).</td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>HWBRK1_PND</b></li></td>
-   <td>: This bit reflects if one of the Hardware Breakpoint Unit 1 status bit is set (i.e. BRK1_STAT&#8800;0).</td>
+   <td>: This bit reflects if one of the Hardware Breakpoint Unit 1 status bit is set (i.e. BRK1_STAT≠0).</td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>HWBRK0_PND</b></li></td>
-   <td>: This bit reflects if one of the Hardware Breakpoint Unit 0 status bit is set (i.e. BRK0_STAT&#8800;0).</td>
+   <td>: This bit reflects if one of the Hardware Breakpoint Unit 0 status bit is set (i.e. BRK0_STAT≠0).</td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>SWBRK_PND</b></li></td>
@@ -483,7 +582,61 @@ This 8 bit read-write register gives the global status of the debug interface. A
    </td>
 </tr>
 </tbody></table>
+<a name="2.2.4 CPU_NR"></a>
+<h3>2.2.4 CPU_NR</h3>
 
+This 16 bit read only register gives useful information for multi-core systems.
+<br>
+<br>
+
+<table border="1">
+
+<tbody><tr align="center">
+<td rowspan="2"><b><small>Register Name</small></b></td>
+<td rowspan="2"><b><small>Address</small></b></td>
+<td colspan="16"><b><small>Bit Field</small></b></td>
+</tr>
+<tr align="center">
+<td><small>15</small></td><td><small>14</small></td>
+<td><small>13</small></td><td><small>12</small></td>
+<td><small>11</small></td><td><small>10</small></td>
+<td><small> 9</small></td><td><small> 8</small></td>
+<td><small> 7</small></td><td><small> 6</small></td>
+<td><small> 5</small></td><td><small> 4</small></td>
+<td><small> 3</small></td><td><small> 2</small></td>
+<td><small> 1</small></td><td><small> 0</small></td>
+</tr>
+    <tr>
+      <td style="vertical-align: top; text-align: center;"><small>CPU_NR</small></td>
+      <td style="vertical-align: top; text-align: center;"><small>0x18</small></td>
+      <td colspan="8" rowspan="1" style="vertical-align: top; text-align: center;"><font size="-5">CPU_TOTAL_NR</font></td>
+      <td colspan="8" rowspan="1" style="vertical-align: top; text-align: center;"><font size="-5">CPU_INST_NR</font></td>
+    </tr>
+
+
+</tbody>
+</table>
+
+<br>
+
+<table border="0">
+
+<tbody><tr>
+   <td>&nbsp;</td><td valign="top"><li><b>CPU_TOTAL_NR</b></li></td>
+   <td>: <span style="color: rgb(0, 0, 0); font-family: 'Times New Roman'; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium; display: inline ! important; float: none;">Total number of oMSP instances -1 (for multicore systems)</span>.</td>
+</tr>
+<tr>
+   <td>&nbsp;</td><td valign="top"><li><b>CPU_INST_NR</b></li></td>
+   <td>: <span style="color: rgb(0, 0, 0); font-family: 'Times New Roman'; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium; display: inline ! important; float: none;">Current oMSP instance number (for multicore systems)</span>.</td>
+</tr>
+
+
+
+
+
+
+</tbody>
+</table>
 <a name="2.3 Memory Access Registers"></a>
 <div style="text-align: right;"><a href="#TOC">Top</a></div>
 <h2>2.3 Memory Access Registers</h2>
@@ -503,7 +656,7 @@ The following four registers enable single and burst read/write access to both C
   		<li>set MEM_DATA with the data to be written</li>
 		<li>set MEM_CTL (in particular RD/WR=1 and START=1)</li>
   	</ol>
-   <li>burst read/write access (MEM_CNT&#8800;0):</li>
+   <li>burst read/write access (MEM_CNT≠0):</li>
 	<ul>
    	<li>burst access are optimized for the communication interface used (i.e. for the UART).
    	The burst sequence are therefore described in the corresponding section (<a href="#3.4%20Read/Write%20burst%20implementation%20for%20the%20CPU%20Memory%20access">3.4 Read/Write burst implementation for the CPU Memory access</a>)</li>
@@ -577,7 +730,7 @@ register is set to 0x00.
 Memory or CPU-Register address to be used for the next read/write
 transfer. After a POR, this register is set to 0x0000.
 <br>
-<strong>Note:</strong> in case of burst (i.e. MEM_CNT&#8800;0), this register
+<strong>Note:</strong> in case of burst (i.e. MEM_CNT≠0), this register
 specifies the first address of the burst transfer and will be
 incremented automatically as the burst goes (by 1 for 8-bit access and
 by 2 for 16-bit access).
@@ -688,7 +841,7 @@ being optimized for the communication interface, more details are given
 </tr>
 <tr>
    <td>&nbsp;</td><td>&nbsp;</td>
-   <td>&nbsp;&nbsp;&#8800;0 -
+   <td>&nbsp;&nbsp;≠0 -
 specifies the burst size for the next transfer (i.e number of data
 access). This field will be automatically decremented as the burst goes.</td>
 </tr>
@@ -736,7 +889,7 @@ This 8 bit read-write register controls the hardware breakpoint unit x. After a 
 </tr>
 <tr>
    <td>&nbsp;</td><td>&nbsp;</td>
-   <td>&nbsp;&nbsp;1 - Address match on BRK_ADDR0&#8594;BRK_ADDR1 range (range mode)
+   <td>&nbsp;&nbsp;1 - Address match on BRK_ADDR0→BRK_ADDR1 range (range mode)
    <br><font color="red"><b>Note</b>: range mode is not supported by the core unless the `DBG_HWBRK_RANGE define is set to 1'b1 in the <i>openMSP430_define.v</i> file.</font></td>
 
 </tr>
@@ -806,14 +959,14 @@ writing 1 to it. After a POR, this register is set to 0x00.
    <td>&nbsp;</td><td valign="top"><li><b>RANGE_WR</b></li></td>
    <td>:
 This bit is set whenever the CPU performs a write access within the
-BRKx_ADDR0&#8594;BRKx_ADDR1 range (valid if RANGE_MODE=1 and
+BRKx_ADDR0→BRKx_ADDR1 range (valid if RANGE_MODE=1 and
 ACCESS_MODE[1]=1).</td>
 </tr>
 <tr>
    <td>&nbsp;</td><td valign="top"><li><b>RANGE_RD</b></li></td>
    <td>:
 This bit is set whenever the CPU performs a read access within the
-BRKx_ADDR0&#8594;BRKx_ADDR1 range (valid if RANGE_MODE=1 and
+BRKx_ADDR0→BRKx_ADDR1 range (valid if RANGE_MODE=1 and
 ACCESS_MODE[0]=1). <br><font color="red"><b>Note</b>: range mode is not supported by the core unless the `DBG_HWBRK_RANGE define is set to 1'b1 in the <i>openMSP430_define.v</i> file.</font></td>
 </tr>
 <tr>
@@ -919,7 +1072,7 @@ the program or data address bus. After a POR, this register is set to
 <h1>3. Debug Communication Interface: UART</h1>With its UART interface,
 the openMSP430 debug unit can communicate with the host computer using
 a simple RS232 cable (connected to the <a href="http://opencores.org/project,openmsp430,core#2.1.5%20Pinout">dbg_uart_txd</a> and <a href="http://opencores.org/project,openmsp430,core#2.1.5%20Pinout">dbg_uart_rxd</a> ports of the IP).<br>Typically, a <a href="http://www.google.com/search?q=usb+to+rs232+converter">USB to RS232</a> or <a href="http://www.ftdichip.com/Products/Cables/USBTTLSerial.htm">USB to serial TTL</a>
-cable will provide a reliable communication link between your host PC
+cable will provides a reliable communication link between your host PC
 and the openMSP430 (speed being typically limited by the cable length).
 <a name="3.1 Serial communication protocol: 8N1"></a>
 <h2>3.1 Serial communication protocol: 8N1</h2>
@@ -1005,5 +1158,83 @@ A read burst transaction looks like this:
 <br>
 <img src="usercontent,img,1247430449" alt="Debug Read Burst Transaction" title="Debug Read Burst Transaction">
 
+<a name="4. Debug Communication Interface: I2C"></a>
 <div style="text-align: right;"><a href="#TOC">Top</a></div>
+<h1>4. Debug Communication Interface: I2C</h1>
+With its I2C interface, the openMSP430 debug unit can communicate with the host computer using
+an I2C adapter (connected to the <a href="http://opencores.org/project,openmsp430,core#2.1.5%20Pinout">dbg_i2c_scl</a> and <a href="http://opencores.org/project,openmsp430,core#2.1.5%20Pinout">dbg_i2c_sda_in / dbg_i2c_sda_out</a> ports of the IP).<br>Currently, the <a href="http://www.robot-electronics.co.uk/acatalog/USB_I2C.html">USB-ISS</a>
+adapter from Devantech (Robot Electronics) is supported by the software
+development tools and provides a reliable communication link between
+your host PC
+and the openMSP430.
+<a name="4.1 I2C communication protocol"></a>
+<h2>4.1 I2C communication protocol</h2>
+There are plenty tutorials on Internet regarding the I2C protocol (see the official <a href="http://www.nxp.com/documents/user_manual/UM10204.pdf">I2C specification</a> for more info).<br>
+A simple byte read or write frame looks as following:<br>
+<br>
+<img src="usercontent,img,1352582784" alt="I2C Protocol" title="I2C Protocol" width="80%">
+<br><a name="4.2 Synchronization frame"></a>
+<h2>4.2 Synchronization frame</h2>
+Unlike the UART interface, the I2C is a synchronous communication protocol.<br>
+A synchronization frame is therefore not required.<br><br>
+
+<a name="4.3 Read/Write access to the debug registers"></a>
+<h2>4.3 Read/Write access to the debug registers</h2>
+In order to perform a read / write access to a debug register, the host needs to send a command frame to the openMSP430.<br>In
+case of write access, this command frame will be followed by 1 or 2
+data frames and in case of read access, the openMSP430 will send 1 or 2
+data frames after receiving the command.
+<a name="4.3.1 Command Frame"></a>
+<h3>4.3.1 Command Frame</h3>
+The command frame looks as following:
+<br>
+<img src="usercontent,img,1352584261" alt="Debug command frame" title="Debug command frame" width="100%">
+<br>
+<table border="0">
+<tbody><tr>
+   <td>&nbsp;</td><td valign="top"><li><b>WR</b></li></td>
+   <td>: Perform a Write access when set. Read otherwise.</td>
+</tr>
+<tr>
+   <td>&nbsp;</td><td valign="top"><li><b>B/W</b></li></td>
+   <td>: Perform a 8-bit data access when set (one data frame). 16-bit otherwise (two data frame).</td></tr><tr>
+</tr>
+<tr>
+   <td>&nbsp;</td><td valign="top"><li><b>Address</b></li></td>
+   <td>: Debug register address.</td></tr><tr>
+</tr>
+</tbody></table>
+
+<a name="4.3.2 Write access"></a>
+<h3>4.3.2 Write access</h3>
+A write access transaction looks like this:
+<br>
+<img src="usercontent,img,1352586896" alt="I2C Debug Write Transaction" title="I2C Debug Write Transaction" width="100%">
+
+<a name="4.3.3 Read access"></a>
+<h3>4.3.3 Read access</h3>
+A read access transaction looks like this:
+<br>
+<img src="usercontent,img,1352586064" alt="I2C Debug Read Transaction" title="I2C Debug Read Transaction" width="100%">
+
+<a name="4.4 Read/Write burst implementation for the CPU Memory access"></a>
+<h2>4.4 Read/Write burst implementation for the CPU Memory access</h2>In
+order to optimize the data burst transactions for the I2C, read/write
+access are not done by reading or writing the MEM_DATA register.<br>
+Instead, the data transfer starts immediately after the MEM_CTL.START bit has been set. 
+
+<a name="4.4.1 Write Burst access"></a>
+<h3>4.4.1 Write Burst access</h3>
+A write burst transaction looks like this:
+<br>
+<img src="usercontent,img,1352673100" alt="I2C Debug Write Burst Transaction" title="I2C Debug Write Burst Transaction" width="100%">
+
+<a name="4.4.2 Read Burst access"></a>
+<h3>4.4.2 Read Burst access</h3>
+A read burst transaction looks like this:
+<br>
+<img src="usercontent,img,1352672466" alt="I2C Debug Read Burst Transaction" title="I2C Debug Read Burst Transaction" width="100%">
+
+<div style="text-align: right;"><a href="#TOC">Top</a></div>
+
 </body></html>

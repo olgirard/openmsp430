@@ -1,19 +1,20 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html><head><title>openMSP430 Integration and Connectivity</title>
-
-
-<meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta http-equiv="content-type" content="text/html; charset=utf-8"></head><body><br>
+<html><head><title>openMSP430 Integration and Connectivity</title></head><body><br>
 <a name="TOC"></a>
 <h3>Table of content</h3>
 <ul>
 	<li><a href="#1.%20Overview">              1. Overview</a></li>
 	<li><a href="#2.%20Clocks">                2. Clocks</a></li>	
 	<li><a href="#3.%20Resets">                3. Resets</a></li>	
-	<li><a href="#4.%20Program%20Memory">        4. Program Memory</a></li>	
-	<li><a href="#5.%20Data%20Memory">           5. Data Memory</a></li>	
+	<li><a href="#4.%20Program%20Memory">      4. Program Memory</a></li>	
+	<li><a href="#5.%20Data%20Memory">         5. Data Memory</a></li>	
 	<li><a href="#6.%20Peripherals">           6. Peripherals</a></li>	
 	<li><a href="#7.%20Interrupts">            7. Interrupts</a></li>	
 	<li><a href="#8.%20Serial%20Debug%20Interface">8. Serial Debug Interface</a></li>	
+	<ul>
+ 	   <li><a href="#8.1%20UART">                  8.1 UART Configuration</a></li>
+     	<li><a href="#8.2%20I2C">                   8.2 I2C Configuration</a></li>
+	</ul>
 </ul>
 
 <a name="1. Overview"></a>
@@ -23,7 +24,7 @@ core interfaces in order to facilitate its integration within an ASIC
 or FPGA.<br><br>The
 following diagram shows an overview of the openMSP430 core connectivity
 in an FPGA system (i.e. all ASIC specific pins are left unused):<br><br>
-<img src="usercontent,img,1319891132" alt="Core Integration" title="Core Integration" width="100%">
+<img src="http://opencores.org/usercontent,img,1353268529" alt="Core Integration" title="Core Integration" width="100%">
 <br><br>
 The full pinout of the core is summarized in the following table.<br>
 <br>
@@ -323,20 +324,58 @@ or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
 <td> Freeze peripherals                                               </td>
 	</tr>
 	<tr> 
-	     <td> <a href="#8.%20Serial%20Debug%20Interface">dbg_uart_txd</a>           </td>
+	     <td> <a href="#8.1%20UART">dbg_uart_txd</a>           </td>
 	     <td style="text-align: center;"> Output                                                           </td>
 	     <td style="text-align: center;"> 1                                                                </td>
 	     <td style="vertical-align: top; text-align: center;">mclk</td>
 <td> Debug interface: UART TXD                                        </td>
 	</tr>
 	<tr> 
-	     <td> <a href="#8.%20Serial%20Debug%20Interface">dbg_uart_rxd</a>           </td>
+	     <td> <a href="#8.1%20UART">dbg_uart_rxd</a>           </td>
 	     <td style="text-align: center;"> Input                                                            </td>
 	     <td style="text-align: center;"> 1                                                                </td>
 	     <td style="vertical-align: top; text-align: center;">&lt;async&gt;<br>
       </td>
 <td> Debug interface: UART RXD (asynchronous)                         </td>
-	</tr><tr align="center">
+	</tr><tr>
+      <td><a href="#8.2%20I2C">dbg_i2c_addr</a></td>
+      <td style="text-align: center;">Input</td>
+      <td style="text-align: center;"> 1</td>
+      <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+ <td> Debug interface: I2C Address </td>
+    </tr>
+    <tr>
+      <td><a href="#8.2%20I2C">dbg_i2c_broadcast</a></td>
+      <td style="text-align: center;">Input</td>
+      <td style="text-align: center;"> 1</td>
+      <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+ <td> Debug interface: I2C Broadcast Address (for multicore only) </td>
+    </tr>
+    <tr>
+      <td><a href="#8.2%20I2C">dbg_i2c_scl</a></td>
+      <td style="text-align: center;">Input</td>
+      <td style="text-align: center;"> 1</td>
+      <td style="vertical-align: top; text-align: center;">&lt;async&gt;</td>
+ <td> Debug interface: I2C SCL </td>
+    </tr>
+    <tr>
+      <td><a href="#8.2%20I2C">dbg_i2c_sda_in</a></td>
+      <td style="text-align: center;">Input</td>
+      <td style="text-align: center;"> 1</td>
+      <td style="vertical-align: top; text-align: center;">&lt;async&gt;</td>
+<td> Debug interface: I2C SDA input </td>
+    </tr>
+    <tr>
+      <td><a href="#8.2%20I2C">dbg_i2c_sda_out</a></td>
+      <td style="text-align: center;">Output</td>
+      <td style="text-align: center;"> 1</td>
+      <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+ <td> Debug interface: I2C SDA output </td>
+    </tr>
+<tr align="center">
       <td colspan="5" rowspan="1" style="vertical-align: top;"><b><i>Scan</i></b></td>
     </tr>
     <tr>
@@ -377,12 +416,12 @@ debug interface and to use software breakpoints.<br><b><sup><font color="#ff0000
 
 The different clocks in the design are managed by the Basic Clock Module as following in the FPGA configuration:
 <br><br>
-<img src="usercontent,img,1319831724" alt="Clock structure diagram" title="Clock structure diagram" width="75%">
+<img src="http://opencores.org/usercontent,img,1319831724" alt="Clock structure diagram" title="Clock structure diagram" width="75%">
 <br>
 <br>
 or as following in the ASIC configuration:<br>
 <br>
-<img src="usercontent,img,1319832480" alt="Clock structure diagram" title="Clock structure diagram" width="75%">
+<img src="http://opencores.org/usercontent,img,1319832480" alt="Clock structure diagram" title="Clock structure diagram" width="75%">
 <br>
 <ul>
 	<li>
@@ -400,11 +439,7 @@ in an FPGA system, if ACLK_EN or SMCLK_EN are going to be used in the project (f
 through the Watchdog or TimerA peripherals), then this port needs to be
 connected to a clock running at least two time slower as DCO_CLK
 (typically 32kHz). It can be connected to 0 or 1 otherwise.<br>
-<meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8"><title></title><meta name="generator" content="Bluefish 2.0.1" ><style type="text/css">
-	<!--
-		@page { margin: 0.79in }
-		P { margin-bottom: 0in }
-	--></style>
+
 In an ASIC, if ACLK or SMCLK are used and if the clock muxes are
 included, then this port can be connected to any kind of clock source
 (it doesn't need to be low-frequency. The name was just
@@ -422,7 +457,7 @@ these two clock enable signals can be used in order to emulate the
 original ACLK and SMCLK from the MSP430 specification when the core is
 targeting an FPGA.<br>
 	    An example of this can be found in the Watchdog and TimerA modules, where it is implemented as following:<br><br>
-<img src="usercontent,img,1246434793" alt="Clock implementation example" title="Clock implementation example"><br>
+<img src="http://opencores.org/usercontent,img,1246434793" alt="Clock implementation example" title="Clock implementation example"><br>
 </li>
 </ul>
 <ul>
@@ -443,7 +478,7 @@ MUST always be generated from the MCLK clock domain. </li>
 As an FPGA system illustration, the following waveform shows the different
 clocks where the software running on the openMSP430 configures the
 BCSCTL1 and BCSCTL2 registers so that <i>ACLK_EN</i> and <i>SMCLK_EN</i> are respectively running at <i>LFXT_CLK/2</i> and <i>DCO_CLK/4</i>.<br><br>
-<img src="usercontent,img,1263320613" alt="Waveforms: Clocks - Jan 12. 2010" title="Waveforms: Clocks - Jan 12. 2010" width="100%">
+<img src="http://opencores.org/usercontent,img,1263320613" alt="Waveforms: Clocks - Jan 12. 2010" title="Waveforms: Clocks - Jan 12. 2010" width="100%">
 <br><br>
 
 <a name="3. Resets"></a>
@@ -463,7 +498,7 @@ a general rule, this signal should be used as the reset of the <i>MCLK</i> clock
 	</li>
 </ul>
 The following waveform illustrates this:<br><br>
-<img src="usercontent,img,1263320655" alt="Waveforms: Resets - Jan 12. 2010" title="Waveforms: Resets - Jan 12. 2010" width="100%">
+<img src="http://opencores.org/usercontent,img,1263320655" alt="Waveforms: Resets - Jan 12. 2010" title="Waveforms: Resets - Jan 12. 2010" width="100%">
  <br><br>
 
 <a name="4. Program Memory"></a>
@@ -509,7 +544,7 @@ write on the upper byte. Note that these signals are LOW ACTIVE. <br><br>
 </ul>
 The following waveform illustrates some read accesses of the program
 memory (write access are illustrated in the data memory section):<br><br>
-<img src="usercontent,img,1263320706" alt="Waveforms: Program memory - Jan " title="Waveforms: Program memory - Jan " width="100%">
+<img src="http://opencores.org/usercontent,img,1263320706" alt="Waveforms: Program memory - Jan " title="Waveforms: Program memory - Jan " width="100%">
 <br><br>	
 <a name="5. Data Memory"></a>	
 <div style="text-align: right;"><a href="#TOC">Top</a></div>
@@ -545,7 +580,7 @@ write on the upper byte. Note that these signals are LOW ACTIVE. <br><br>
 	</li>
 </ul>
 The following waveform illustrates some read/write access to the data memory:<br><br>
-<img src="usercontent,img,1263320770" alt="Waveforms: Data memory - Jan 12." title="Waveforms: Data memory - Jan 12." width="100%">
+<img src="http://opencores.org/usercontent,img,1263320770" alt="Waveforms: Data memory - Jan 12." title="Waveforms: Data memory - Jan 12." width="100%">
 <br><br>
 	
 <a name="6. Peripherals"></a>	
@@ -594,7 +629,7 @@ the upper byte. Note that these signals are HIGH ACTIVE. <br><br>
 	</li>
 </ul>
 The following waveform illustrates some read/write access to the peripheral registers:<br><br>
-<img src="usercontent,img,1263320825" alt="Waveforms: Peripherals - Jan 12." title="Waveforms: Peripherals - Jan 12." width="100%">
+<img src="http://opencores.org/usercontent,img,1263320825" alt="Waveforms: Peripherals - Jan 12." title="Waveforms: Peripherals - Jan 12." width="100%">
 <br><br>
 
 	
@@ -717,7 +752,7 @@ the <i>IRQ_ACC</i> bus can be used by using the bit matching the corresponding <
 	</li>
 </ul>
 The following waveform illustrates a TAIV interrupt issued by the Timer-A, which is connected to <i>IRQ[8]</i> :<br><br>
-<img src="usercontent,img,1263320861" alt="Waveforms: Interrupts - Jan 12. " title="Waveforms: Interrupts - Jan 12. " width="100%">
+<img src="http://opencores.org/usercontent,img,1263320861" alt="Waveforms: Interrupts - Jan 12. " title="Waveforms: Interrupts - Jan 12. " width="100%">
 
 <br><br>
 
@@ -726,7 +761,7 @@ The following waveform illustrates a TAIV interrupt issued by the Timer-A, which
 <div style="text-align: right;"><a href="#TOC">Top</a></div>
 <h1>8. Serial Debug Interface</h1>
 The serial debug interface module provides a two-wires communication
-bus for remote debugging and an additional freeze signal which might be
+bus (UART or I2C) for remote debugging and an additional freeze signal which might be
 useful for some peripherals (typically timers).<br>
 <br>
 <ul>
@@ -743,12 +778,46 @@ free-running counter. This prevents the CPU from being reseted by the
 watchdog every times the user stops the CPU during a debugging session.
 <br><br>
 	</li>
+</ul>
+<a name="8.1 UART"></a>	
+<h2>8.1 UART Configuration</h2>
+<ul>
 	<li>
 	    <b><font color="#00b000">DBG_UART_TXD</font>&nbsp;/&nbsp;<font color="#0000b0">DBG_UART_RXD</font></b>: these signals are typically connected to an RS-232 transceiver and will allow a PC to communicate with the openMSP430 core.
 	    <br><br>
 	</li>
 </ul>
-The following waveform shows some communication traffic on the serial bus :<br><br>
-<img src="usercontent,img,1263320887" alt="Waveforms: SDI - Jan 12. 2010" title="Waveforms: SDI - Jan 12. 2010" width="100%">
+The following waveform shows some communication traffic on the UART serial bus :<br><br>
+<img src="http://opencores.org/usercontent,img,1263320887" alt="Waveforms: SDI - Jan 12. 2010" title="Waveforms: SDI - Jan 12. 2010" width="100%">
 <br><br>
+<a name="8.2 I2C"></a>	
+<h2>8.2 I2C Configuration</h2>
+<ul>
+	<li>
+	    <b><font color="#0000b0">DBG_I2C_ADDR</font></b>: I2C Device address of the oMSP core (between 8 and 119). In a multi-core configuration each core has its own address.
+	    <br><br>
+	</li>
+	<li>
+	    <b><font color="#0000b0">DBG_I2C_BROADCAST</font></b>:
+I2C Device broadcast address of the oMSP core (between 8 and 119). In a
+multi-core configuration all cores have the same broadcast address. <br><br>
+	</li>
+	<li>
+	    <b><font color="#0000b0">DBG_I2C_SCL</font></b>: I2C bus clock input (SCL).
+	    <br><br>
+	</li>
+	<li>
+	    <b><font color="#00b000">DBG_I2C_SDA_OUT</font>&nbsp;/&nbsp;<font color="#0000b0">DBG_I2C_SDA_IN</font></b>: these signals are connected to the SDA I/O cell as following:<br><br>
+    <div style="text-align: center;"><img src="http://opencores.org/usercontent,img,1353268717" alt="I2C SDA IO Connect" title="I2C SDA IO Connect" width="50%">
+	    <br>
+    </div>
+<br>
+	</li>
+</ul>
+
+The following waveform shows some communication traffic on the I2C serial bus :<br><br>
+<img src="http://opencores.org/usercontent,img,1353272928" alt="Waveforms: SDI I2C" title="Waveforms: SDI I2C" width="100%">
+<br><br>
+<div style="text-align: right;"><a href="#TOC">Top</a></div>
+
 </body></html>
