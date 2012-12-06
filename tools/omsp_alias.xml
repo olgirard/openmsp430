@@ -8,7 +8,7 @@
      <!-- ||                 Avnet Spartan6 LX9 Microboard               || -->
      <!-- ||                                                             || -->
      <!--  ===============================================================  -->
-     <omsp:alias val="Avnet Spartan6 LX9 Microboard">
+     <omsp:alias val="Avnet Spartan6 LX9 Microboard       !!! Dual core oMSP !!!">
 
           <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
           <!-- | openMSP430 core configuration to be matched | -->
@@ -18,8 +18,8 @@
                 <omsp:cpu_ver>3</omsp:cpu_ver>
                 <omsp:asic>0</omsp:asic>
                 <omsp:mpy>1</omsp:mpy>
-                <omsp:pmem_size>4096</omsp:pmem_size>
-                <omsp:dmem_size>1024</omsp:dmem_size>
+                <omsp:pmem_size>16384</omsp:pmem_size>
+                <omsp:dmem_size>4096</omsp:dmem_size>
                 <omsp:per_size>512</omsp:per_size>
           </omsp:configuration>
 
@@ -27,7 +27,7 @@
           <!-- |                  Extra info                 | -->
           <!--  +++++++++++++++++++++++++++++++++++++++++++++  -->
           <omsp:extra_info>
-                <omsp:Description>This is an example implementation of the openMSP430 core on a Xilinx Spartan6 FPGA</omsp:Description>
+                <omsp:Description>This is an example implementation of a dual-core openMSP430 core on a Avnet Spartan6 LX9 Microboard</omsp:Description>
                 <omsp:Contact>Olivier GIRARD</omsp:Contact>
                 <omsp:Email>olgirard@googlemail.com</omsp:Email>
                 <omsp:URL>http://opencores.org/project,openmsp430</omsp:URL>

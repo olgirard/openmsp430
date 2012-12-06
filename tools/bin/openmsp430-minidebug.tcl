@@ -147,7 +147,17 @@ proc connect_openMSP430 {} {
     global omsp_nr
     global CpuNr
 
-    set connection_status [GetDevice $CpuNr]
+    set connection_sum 0
+    for {set ii 0} {$ii < $omsp_nr} {incr ii} {
+        set connection_ok  [GetDevice $ii]
+        set connection_sum [expr $connection_sum + $connection_ok]
+        if {$connection_ok==0} {
+            set error_msg "Could not connect to Core $ii"
+        }
+    }
+    if {$connection_sum==$omsp_nr} {
+        set connection_status 1
+    }
 
     if {$connection_status} {
         set mem_sizes [GetCPU_ID_SIZE $CpuNr]
@@ -266,7 +276,10 @@ proc connect_openMSP430 {} {
         }
 
     } else {
-        .ctrl.connect.info.l1.con         configure -text "Connection problem" -fg red
+        for {set ii 0} {$ii < $omsp_nr} {incr ii} {
+            set omsp_info($ii,connected) 0
+        }
+        .ctrl.connect.info.l1.con         configure -text $error_msg -fg red
     }
 }
 
@@ -1207,7 +1220,7 @@ proc updateAdvancedConfiguration {{w ""} {sel ""}} {
 
         } elseif {$temp_if=="I2C"} {
 
-            .omsp_adapt_config.main.i2c.cpunr.s configure -state disabled
+            .omsp_adapt_config.main.i2c.cpunr.s configure -state normal
 #           .omsp_adapt_config.main.i2c.cpunr.s configure -state normal
             .omsp_adapt_config.main.i2c.cpu0.s  configure -state normal
 
