@@ -1,3 +1,8 @@
+2012-12-06 [r169]  
+
+	* Update the Mini-debugger with multi-core support. Up to quad core
+	  systems are now supported by the GUI.
+
 2012-10-26 [r163]  
 
 	* Fixed font handling problem
