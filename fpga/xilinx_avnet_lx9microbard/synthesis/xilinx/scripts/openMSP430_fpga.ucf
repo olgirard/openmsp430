@@ -50,9 +50,14 @@
 ############################################################################
 
 # ROM Block Assignments
-INST "ram_16x2k_pmem/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/s6_noinit.ram/SP.SIMPLE_PRIM18.ram"  LOC = "RAMB16_X0Y20";
-INST "ram_16x2k_pmem/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[1].ram.r/s6_noinit.ram/SP.SIMPLE_PRIM18.ram"  LOC = "RAMB16_X0Y22";
-#INST "ram_16x2k_pmem/B8"  LOC = "RAMB16_X0Y22"; 
+INST "ram_16x8k_dp_pmem_shared/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[4].ram.r/s6_noinit.ram/TRUE_DP.PRIM18.ram"  LOC = "RAMB16_X0Y18";
+INST "ram_16x8k_dp_pmem_shared/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[0].ram.r/s6_noinit.ram/TRUE_DP.PRIM18.ram"  LOC = "RAMB16_X0Y10";
+INST "ram_16x8k_dp_pmem_shared/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[5].ram.r/s6_noinit.ram/TRUE_DP.PRIM18.ram"  LOC = "RAMB16_X0Y24";
+INST "ram_16x8k_dp_pmem_shared/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[1].ram.r/s6_noinit.ram/TRUE_DP.PRIM18.ram"  LOC = "RAMB16_X0Y16";
+INST "ram_16x8k_dp_pmem_shared/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[6].ram.r/s6_noinit.ram/TRUE_DP.PRIM18.ram"  LOC = "RAMB16_X0Y22";
+INST "ram_16x8k_dp_pmem_shared/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[2].ram.r/s6_noinit.ram/TRUE_DP.PRIM18.ram"  LOC = "RAMB16_X0Y14";
+INST "ram_16x8k_dp_pmem_shared/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[7].ram.r/s6_noinit.ram/TRUE_DP.PRIM18.ram"  LOC = "RAMB16_X0Y20";
+INST "ram_16x8k_dp_pmem_shared/U0/xst_blk_mem_generator/gnativebmg.native_blk_mem_gen/valid.cstr/ramloop[3].ram.r/s6_noinit.ram/TRUE_DP.PRIM18.ram"  LOC = "RAMB16_X0Y12";
 
 
 ############################################################################

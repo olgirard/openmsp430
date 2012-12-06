@@ -11,8 +11,9 @@ mkdir WORK
 cd ./WORK
 
 # Create links for RAM & ROM ngc files
-ln -s ../../../rtl/verilog/coregen/ram_16x512.ngc .
-ln -s ../../../rtl/verilog/coregen/ram_16x2k.ngc  .
+ln -s ../../../rtl/verilog/coregen/ram_16x1k_sp.ngc  .
+ln -s ../../../rtl/verilog/coregen/ram_16x1k_dp.ngc  .
+ln -s ../../../rtl/verilog/coregen/ram_16x8k_dp.ngc  .
 
 # Create links for Chipscope ngc files
 ln -s ../../../rtl/verilog/coregen_chipscope/chipscope_icon.ngc .

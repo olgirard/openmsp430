@@ -3,8 +3,8 @@ OUTPUT_FORMAT("elf32-msp430","elf32-msp430","elf32-msp430")
 OUTPUT_ARCH("msp430")
 MEMORY
 {
-  text   (rx)   	: ORIGIN = 0xF000,      LENGTH = 0x1000
-  data   (rwx)  	: ORIGIN = 0x0200, 	LENGTH = 0x400
+  text   (rx)   	: ORIGIN = 0xC000,      LENGTH = 0x4000
+  data   (rwx)  	: ORIGIN = 0x0200, 	LENGTH = 0x800
   vectors (rw)   	: ORIGIN = 0xffe0,      LENGTH = 0x20
 }
 __WDTCTL = 0x0120;

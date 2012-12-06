@@ -41,9 +41,11 @@
 ../../../bench/verilog/tb_openMSP430_fpga.v
 ../../../bench/verilog/msp_debug.v
 ../../../bench/verilog/glbl.v
-../../../bench/verilog/ram_16x512.v
-../../../bench/verilog/ram_16x2k.v
-../../../bench/verilog/ram.v
+../../../bench/verilog/ram_16x8k_dp.v
+../../../bench/verilog/ram_16x1k_dp.v
+../../../bench/verilog/ram_dp.v
+../../../bench/verilog/ram_16x1k_sp.v
+../../../bench/verilog/ram_sp.v
 
 
 //=============================================================================
@@ -63,6 +65,7 @@
 +incdir+../../../rtl/verilog/
 ../../../rtl/verilog/openMSP430_fpga.v
 ../../../rtl/verilog/omsp_system_0.v
+../../../rtl/verilog/omsp_system_1.v
 ../../../rtl/verilog/io_mux.v
 ../../../rtl/verilog/omsp_uart.v
 

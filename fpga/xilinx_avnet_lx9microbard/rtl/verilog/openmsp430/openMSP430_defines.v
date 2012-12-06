@@ -68,10 +68,10 @@
 //`define PMEM_SIZE_41_KB
 //`define PMEM_SIZE_32_KB
 //`define PMEM_SIZE_24_KB
-//`define PMEM_SIZE_16_KB
+`define PMEM_SIZE_16_KB
 //`define PMEM_SIZE_12_KB
 //`define PMEM_SIZE_8_KB
-`define PMEM_SIZE_4_KB
+//`define PMEM_SIZE_4_KB
 //`define PMEM_SIZE_2_KB
 //`define PMEM_SIZE_1_KB
 
@@ -86,10 +86,10 @@
 //`define DMEM_SIZE_10_KB
 //`define DMEM_SIZE_8_KB
 //`define DMEM_SIZE_5_KB
-//`define DMEM_SIZE_4_KB
+`define DMEM_SIZE_4_KB
 //`define DMEM_SIZE_2p5_KB
 //`define DMEM_SIZE_2_KB
-`define DMEM_SIZE_1_KB
+//`define DMEM_SIZE_1_KB
 //`define DMEM_SIZE_512_B
 //`define DMEM_SIZE_256_B
 //`define DMEM_SIZE_128_B
@@ -224,7 +224,7 @@
 // If you have a single openMSP430 in your system,
 // this option can stay commented-out.
 //-------------------------------------------------------
-//`define DBG_I2C_BROADCAST
+`define DBG_I2C_BROADCAST
 
 
 //-------------------------------------------------------

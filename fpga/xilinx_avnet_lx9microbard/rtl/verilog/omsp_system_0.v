@@ -22,13 +22,15 @@
 //
 //----------------------------------------------------------------------------
 // 
-// *File Name: openMSP430_fpga.v
+// *File Name: omsp_system_1.v
 // 
 // *Module Description:
-//                      openMSP430 FPGA Top-level for the Avnet LX9 Microboard
+//                      openMSP430 System 0.
+//                      This core is dedicated to communication and
+//                      display (i.e. UART, LEDs and 7-segment modport)
+//                      It can also read the switches value.
 //
 // *Author(s):
-//              - Ricardo Ribalda,    ricardo.ribalda@gmail.com
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
@@ -39,10 +41,6 @@ module omsp_system_0 (
 // Clock & Reset
     dco_clk,                               // Fast oscillator (fast clock)
     reset_n,                               // Reset Pin (low active, asynchronous and non-glitchy)
-
-// Serial Debug Interface (UART)
-    dbg_uart_rxd,                          // Debug interface: UART RXD (asynchronous)
-    dbg_uart_txd,                          // Debug interface: UART TXD
 
 // Serial Debug Interface (I2C)
     dbg_i2c_addr,                          // Debug interface: I2C Address
@@ -78,10 +76,6 @@ module omsp_system_0 (
 input                dco_clk;              // Fast oscillator (fast clock)
 input                reset_n;              // Reset Pin (low active, asynchronous and non-glitchy)
 
-// Serial Debug Interface (UART)
-input                dbg_uart_rxd;         // Debug interface: UART RXD (asynchronous)
-output               dbg_uart_txd;         // Debug interface: UART TXD
-
 // Serial Debug Interface (I2C)
 input          [6:0] dbg_i2c_addr;         // Debug interface: I2C Address
 input          [6:0] dbg_i2c_broadcast;    // Debug interface: I2C Broadcast Address (for multicore systems)
@@ -109,7 +103,7 @@ output               uart_txd;             // UART Data Transmit (TXD)
 
 // Switches & LEDs
 input          [3:0] switch;               // Input switches
-output         [3:0] led;                  // LEDs
+output         [1:0] led;                  // LEDs
 
    
 //=============================================================================
@@ -124,8 +118,6 @@ wire               puc_rst;
 
 // Debug interface
 wire               dbg_freeze;
-wire               dbg_uart_txd;
-wire               dbg_uart_rxd;
 
 // Data memory
 wire [`DMEM_MSB:0] dmem_addr;
@@ -176,14 +168,14 @@ wire        [15:0] per_dout_uart;
 //=============================================================================
 
 openMSP430 #(.INST_NR (0),
-             .TOTAL_NR(0)) openMSP430_0 (
+             .TOTAL_NR(1)) openMSP430_0 (
 
 // OUTPUTs
     .aclk              (),                   // ASIC ONLY: ACLK
     .aclk_en           (aclk_en),            // FPGA ONLY: ACLK enable
     .dbg_freeze        (dbg_freeze),         // Freeze peripherals
     .dbg_i2c_sda_out   (dbg_i2c_sda_out),    // Debug interface: I2C SDA OUT
-    .dbg_uart_txd      (dbg_uart_txd),       // Debug interface: UART TXD
+    .dbg_uart_txd      (),                   // Debug interface: UART TXD
     .dco_enable        (),                   // ASIC ONLY: Fast oscillator enable
     .dco_wkup          (),                   // ASIC ONLY: Fast oscillator wake-up (asynchronous)
     .dmem_addr         (dmem_addr),          // Data Memory address
@@ -213,7 +205,7 @@ openMSP430 #(.INST_NR (0),
     .dbg_i2c_broadcast (dbg_i2c_broadcast),  // Debug interface: I2C Broadcast Address (for multicore systems)
     .dbg_i2c_scl       (dbg_i2c_scl),        // Debug interface: I2C SCL
     .dbg_i2c_sda_in    (dbg_i2c_sda_in),     // Debug interface: I2C SDA IN
-    .dbg_uart_rxd      (dbg_uart_rxd),       // Debug interface: UART RXD (asynchronous)
+    .dbg_uart_rxd      (1'b1),               // Debug interface: UART RXD (asynchronous)
     .dco_clk           (dco_clk),            // Fast oscillator (fast clock)
     .dmem_dout         (dmem_dout),          // Data Memory data output
     .irq               (irq_bus),            // Maskable interrupts
@@ -282,7 +274,7 @@ omsp_gpio #(.P1_EN(1),
 );
 
 // Assign LEDs
-assign  led         = p2_dout[3:0] & p2_dout_en[3:0];
+assign  led         = p2_dout[1:0] & p2_dout_en[1:0];
 
 // Assign Switches
 assign  p1_din[7:4] = 4'h0;
@@ -373,12 +365,12 @@ assign irq_bus  =  {1'b0,         // Vector 13  (0xFFFA)
                     irq_ta1,      // Vector  8  (0xFFF0)
                     irq_uart_rx,  // Vector  7  (0xFFEE)
                     irq_uart_tx,  // Vector  6  (0xFFEC)
-                    1'b0,         // Vector  5  (0xFFEA)
-                    1'b0,         // Vector  4  (0xFFE8)
+                    1'b0,         // Vector  5  (0xFFEA) - Reserved (Timer-A 0 from system 1)
+                    1'b0,         // Vector  4  (0xFFE8) - Reserved (Timer-A 1 from system 1)
                     irq_port2,    // Vector  3  (0xFFE6)
                     irq_port1,    // Vector  2  (0xFFE4)
-                    1'b0,         // Vector  1  (0xFFE2)
-                    1'b0};        // Vector  0  (0xFFE0)
+                    1'b0,         // Vector  1  (0xFFE2) - Reserved (Port 2 from system 1)
+                    1'b0};        // Vector  0  (0xFFE0) - Reserved (Port 1 from system 1)
 
 
 endmodule // omsp_system_0

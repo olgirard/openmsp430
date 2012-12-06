@@ -59,26 +59,29 @@ int main(void) {
     //IE1 |= 0x01;
     //eint();                            //enable interrupts
 
+    if (CPU_NR==0x0100) { 
+      delay(0x000f, 0xffff);
+    } 
 
     while (1) {                         // Main loop, never ends...
 
+      P2OUT = 0x00;
+      delay(0x000f, 0xffff);
+
       P2OUT = 0x01;
-      delay(0x0007, 0xffff);
+      delay(0x000f, 0xffff);
 
       P2OUT = 0x02;
-      delay(0x0007, 0xffff);
+      delay(0x000f, 0xffff);
 
-      P2OUT = 0x06;
-      delay(0x0007, 0xffff);
+      P2OUT = 0x03;
+      delay(0x000f, 0xffff);
 
-      P2OUT = 0x04;
-      delay(0x0007, 0xffff);
+      P2OUT = 0x02;
+      delay(0x000f, 0xffff);
 
-      P2OUT = 0x08;
-      delay(0x0007, 0xffff);
-
-      P2OUT = 0x09;
-      delay(0x0007, 0xffff);
+      P2OUT = 0x01;
+      delay(0x000f, 0xffff);
 
     }
 }

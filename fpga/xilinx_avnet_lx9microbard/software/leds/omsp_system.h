@@ -79,8 +79,9 @@
 #define  IE1         (*(volatile unsigned char *) 0x0000)
 #define  IFG1        (*(volatile unsigned char *) 0x0002)
 
-#define  CPU_ID_LO   (*(volatile unsigned char *) 0x0004)
-#define  CPU_ID_HI   (*(volatile unsigned char *) 0x0006)
+#define  CPU_ID_LO   (*(volatile unsigned int  *) 0x0004)
+#define  CPU_ID_HI   (*(volatile unsigned int  *) 0x0006)
+#define  CPU_NR      (*(volatile unsigned int  *) 0x0008)
 
 
 //----------------------------------------------------------

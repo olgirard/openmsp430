@@ -39,11 +39,13 @@
 
 `include "../../../rtl/verilog/openMSP430_fpga.v"
 `include "../../../rtl/verilog/omsp_system_0.v"
+`include "../../../rtl/verilog/omsp_system_1.v"
 `include "../../../rtl/verilog/io_mux.v"
 //`include "../../../rtl/verilog/driver_7segment.v"
 `include "../../../rtl/verilog/omsp_uart.v"
-`include "../../../rtl/verilog/coregen/ram_16x2k.v"
-`include "../../../rtl/verilog/coregen/ram_16x512.v"
+`include "../../../rtl/verilog/coregen/ram_16x1k_sp.v"
+`include "../../../rtl/verilog/coregen/ram_16x1k_dp.v"
+`include "../../../rtl/verilog/coregen/ram_16x8k_dp.v"
 `include "../../../rtl/verilog/coregen_chipscope/chipscope_ila.v"
 `include "../../../rtl/verilog/coregen_chipscope/chipscope_icon.v"
 

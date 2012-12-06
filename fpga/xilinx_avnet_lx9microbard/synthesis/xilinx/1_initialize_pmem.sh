@@ -48,7 +48,7 @@ cd ./WORK
 
 # Generate memory file
 msp430-objcopy -O ihex ../$elffile ./$1.ihex
-../scripts/ihex2mem.tcl -ihex $1.ihex -out $1.mem -mem_size 4096
+../scripts/ihex2mem.tcl -ihex $1.ihex -out $1.mem -mem_size 16384
 
 # Update bitstream
 data2mem -bm ../scripts/memory.bmm -bd $1.mem -bt openMSP430_fpga.bit -o b $1.bit

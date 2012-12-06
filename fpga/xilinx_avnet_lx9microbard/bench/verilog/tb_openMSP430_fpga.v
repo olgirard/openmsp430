@@ -74,13 +74,21 @@ wire 	          PMOD1_P1;
 reg               PMOD1_P4;
 
 // Core debug signals
-wire   [8*32-1:0] i_state;
-wire   [8*32-1:0] e_state;
-wire       [31:0] inst_cycle;
-wire   [8*32-1:0] inst_full;
-wire       [31:0] inst_number;
-wire       [15:0] inst_pc;
-wire   [8*32-1:0] inst_short;
+wire   [8*32-1:0] omsp0_i_state;
+wire   [8*32-1:0] omsp0_e_state;
+wire       [31:0] omsp0_inst_cycle;
+wire   [8*32-1:0] omsp0_inst_full;
+wire       [31:0] omsp0_inst_number;
+wire       [15:0] omsp0_inst_pc;
+wire   [8*32-1:0] omsp0_inst_short;
+
+wire   [8*32-1:0] omsp1_i_state;
+wire   [8*32-1:0] omsp1_e_state;
+wire       [31:0] omsp1_inst_cycle;
+wire   [8*32-1:0] omsp1_inst_full;
+wire       [31:0] omsp1_inst_number;
+wire       [15:0] omsp1_inst_pc;
+wire   [8*32-1:0] omsp1_inst_short;
 
 // Testbench variables
 integer           i;
@@ -93,7 +101,8 @@ reg               stimulus_done;
 //------------------------------
 
 // CPU & Memory registers
-`include "registers.v"
+`include "registers_omsp0.v"
+`include "registers_omsp1.v"
 
 // Verilog stimulus
 `include "stimulus.v"
@@ -108,9 +117,9 @@ initial
       #10 $readmemh("./pmem.mem", pmem);
 
       // Update Xilinx memory banks
-      for (i=0; i<2048; i=i+1)
+      for (i=0; i<8192; i=i+1)
 	begin
-	   dut.ram_16x2k_pmem.ram_inst.mem[i] = pmem[i];
+	   dut.ram_16x8k_dp_pmem_shared.ram_dp_inst.mem[i] = pmem[i];
 	end
   end
 
@@ -334,20 +343,34 @@ openMSP430_fpga dut (
 
 // Debug utility signals
 //----------------------------------------
-msp_debug msp_debug_0 (
+msp_debug msp_debug_omsp0 (
 
 // OUTPUTs
-    .e_state      (e_state),       // Execution state
-    .i_state      (i_state),       // Instruction fetch state
-    .inst_cycle   (inst_cycle),    // Cycle number within current instruction
-    .inst_full    (inst_full),     // Currently executed instruction (full version)
-    .inst_number  (inst_number),   // Instruction number since last system reset
-    .inst_pc      (inst_pc),       // Instruction Program counter
-    .inst_short   (inst_short),    // Currently executed instruction (short version)
+    .e_state      (omsp0_e_state),       // Execution state
+    .i_state      (omsp0_i_state),       // Instruction fetch state
+    .inst_cycle   (omsp0_inst_cycle),    // Cycle number within current instruction
+    .inst_full    (omsp0_inst_full),     // Currently executed instruction (full version)
+    .inst_number  (omsp0_inst_number),   // Instruction number since last system reset
+    .inst_pc      (omsp0_inst_pc),       // Instruction Program counter
+    .inst_short   (omsp0_inst_short),    // Currently executed instruction (short version)
 
 // INPUTs
-    .mclk         (mclk),          // Main system clock
-    .puc_rst      (puc_rst)        // Main system reset
+    .core_select  (0)                    // Core selection
+);
+
+msp_debug msp_debug_omsp1 (
+
+// OUTPUTs
+    .e_state      (omsp1_e_state),       // Execution state
+    .i_state      (omsp1_i_state),       // Instruction fetch state
+    .inst_cycle   (omsp1_inst_cycle),    // Cycle number within current instruction
+    .inst_full    (omsp1_inst_full),     // Currently executed instruction (full version)
+    .inst_number  (omsp1_inst_number),   // Instruction number since last system reset
+    .inst_pc      (omsp1_inst_pc),       // Instruction Program counter
+    .inst_short   (omsp1_inst_short),    // Currently executed instruction (short version)
+
+// INPUTs
+    .core_select  (1)                    // Core selection
 );
 
 //
@@ -385,7 +408,7 @@ initial // Timeout
 
 initial // Normal end of test
   begin
-     @(inst_pc===16'hffff)
+     @(omsp0_inst_pc===16'hffff)
      $display(" ===============================================");
      if (error!=0)
        begin
