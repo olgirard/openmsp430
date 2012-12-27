@@ -1,3 +1,10 @@
+2012-12-27 [r172]  
+
+	* GDB-Proxy now supports multi-core systems as well as hardware and
+	  software memory breakpoints. It is to be noted that in a
+	  multi-core environment, software breakpoints can be configured
+	  for shared or dedicated program memory topologies.
+
 2012-12-06 [r169]  
 
 	* Update the Mini-debugger with multi-core support. Up to quad core
