@@ -1045,7 +1045,7 @@ proc SetHWBreak {CpuNr Type Addr Rd Wr} {
     set cpuaddr  $omsp_conf($CpuNr,cpuaddr)
 
     # Compute the BRKx_CTL corresponding value
-    set brk_ctl_ref [format "0x02%x" [expr 8*$Type+4+2*$Wr+$Rd]]
+    set brk_ctl_ref [format "0x%02x" [expr 8*$Type+4+2*$Wr+$Rd]]
 
     # First look for utilized units with correct BRKx_CTL attributes
     for {set i 0} {$i<$omsp_info($CpuNr,hw_break)} {incr i} {
