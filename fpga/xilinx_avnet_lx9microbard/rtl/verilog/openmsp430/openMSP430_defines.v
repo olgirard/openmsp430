@@ -241,8 +241,8 @@
 // (i.e. Flash/OTP/ROM/...) or when you are interested
 // in data breakpoints.
 //-------------------------------------------------------
-//`define  DBG_HWBRK_0
-//`define  DBG_HWBRK_1
+`define  DBG_HWBRK_0
+`define  DBG_HWBRK_1
 //`define  DBG_HWBRK_2
 //`define  DBG_HWBRK_3
 
