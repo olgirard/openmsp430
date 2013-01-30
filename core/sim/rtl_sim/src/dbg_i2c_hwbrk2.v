@@ -161,8 +161,8 @@ initial
       repeat(100) @(posedge mclk);
 
       // CHECK
-      if (r0 !== ('h10000-`PMEM_SIZE+'h18))           tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ: test 1 =====");
-      if (mem200 !== 16'h0001)       tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ: test 2 =====");
+      if (r0 !== ('h10000-`PMEM_SIZE+'h0C))           tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ: test 1 =====");
+      if (mem200 !== 16'h0000)       tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ: test 2 =====");
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0041) tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ: test 3 =====");
       dbg_i2c_rd(BRK2_STAT);
@@ -176,7 +176,7 @@ initial
       repeat(100) @(posedge mclk);
 
       // RE-CHECK
-      if (r0 !== ('h10000-`PMEM_SIZE+'h1C))           tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ: test 6 =====");
+      if (r0 !== ('h10000-`PMEM_SIZE+'h14))           tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ: test 6 =====");
       if (mem200 !== 16'h0001)       tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ: test 7 =====");
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0041) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ: test 8 =====");
@@ -192,7 +192,7 @@ initial
 
       // CHECK
       if (r0 !== ('h10000-`PMEM_SIZE+'h18))           tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ: test 11 =====");
-      if (mem200 !== 16'h0002)       tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ: test 12 =====");
+      if (mem200 !== 16'h0001)       tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ: test 12 =====");
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0041) tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ: test 13 =====");
       dbg_i2c_rd(BRK2_STAT);
@@ -344,8 +344,8 @@ initial
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0041) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ/WRITE: test 13 =====");
       dbg_i2c_rd(BRK2_STAT);
-      if (dbg_i2c_buf !== 16'h0002) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ/WRITE: test 14 =====");
-      dbg_i2c_wr(BRK2_STAT, 16'h0002);
+      if (dbg_i2c_buf !== 16'h0003) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ/WRITE: test 14 =====");
+      dbg_i2c_wr(BRK2_STAT, 16'h0003);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ/WRITE: test 15 =====");
 
@@ -359,8 +359,8 @@ initial
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0041) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ/WRITE: test 18 =====");
       dbg_i2c_rd(BRK2_STAT);
-      if (dbg_i2c_buf !== 16'h0008) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ/WRITE: test 19 =====");
-      dbg_i2c_wr(BRK2_STAT, 16'h0008);
+      if (dbg_i2c_buf !== 16'h000C) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ/WRITE: test 19 =====");
+      dbg_i2c_wr(BRK2_STAT, 16'h000C);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ/WRITE: test 20 =====");
 
@@ -415,8 +415,8 @@ initial
       repeat(100) @(posedge mclk);
 
       // CHECK
-      if (r0 !== ('h10000-`PMEM_SIZE+'h18))           tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - READ: test 1 =====");
-      if (mem200 !== 16'h0001)       tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - READ: test 2 =====");
+      if (r0 !== ('h10000-`PMEM_SIZE+'h08))           tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - READ: test 1 =====");
+      if (mem200 !== 16'h0000)       tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - READ: test 2 =====");
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0041) tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - READ: test 3 =====");
       dbg_i2c_rd(BRK2_STAT);
@@ -430,8 +430,8 @@ initial
       repeat(100) @(posedge mclk);
 
       // RE-CHECK
-      if (r0 !== ('h10000-`PMEM_SIZE+'h18))           tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ: test 6 =====");
-      if (mem200 !== 16'h0002)       tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ: test 7 =====");
+      if (r0 !== ('h10000-`PMEM_SIZE+'h0C))           tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ: test 6 =====");
+      if (mem200 !== 16'h0000)       tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ: test 7 =====");
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0041) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ: test 8 =====");
       dbg_i2c_rd(BRK2_STAT);
@@ -590,8 +590,8 @@ initial
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0041) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 13 =====");
       dbg_i2c_rd(BRK2_STAT);
-      if (dbg_i2c_buf !== 16'h0020) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 14 =====");
-      dbg_i2c_wr(BRK2_STAT, 16'h0020);
+      if (dbg_i2c_buf !== 16'h0030) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 14 =====");
+      dbg_i2c_wr(BRK2_STAT, 16'h0030);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 15 =====");
 
@@ -605,8 +605,8 @@ initial
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0041) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 18 =====");
       dbg_i2c_rd(BRK2_STAT);
-      if (dbg_i2c_buf !== 16'h0020) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 19 =====");
-      dbg_i2c_wr(BRK2_STAT, 16'h0020);
+      if (dbg_i2c_buf !== 16'h0030) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 19 =====");
+      dbg_i2c_wr(BRK2_STAT, 16'h0030);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 20 =====");
 
@@ -635,8 +635,8 @@ initial
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0041) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 28 =====");
       dbg_i2c_rd(BRK2_STAT);
-      if (dbg_i2c_buf !== 16'h0020) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 29 =====");
-      dbg_i2c_wr(BRK2_STAT, 16'h0020);
+      if (dbg_i2c_buf !== 16'h0030) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 29 =====");
+      dbg_i2c_wr(BRK2_STAT, 16'h0030);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ/WRITE: test 30 =====");
 

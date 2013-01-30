@@ -135,44 +135,40 @@ initial
 `ifdef DBG_HWBRK_0
    `ifdef DBG_HWBRK_RANGE
 	     8       : if (dbg_i2c_buf !== 16'h001F)      tb_error("READ 2 ERROR (BRK0_CTL)");
-	     9       : if (dbg_i2c_buf !== 16'h0010)      tb_error("READ 2 ERROR (BRK0_STAT)");
    `else
 	     8       : if (dbg_i2c_buf !== 16'h000F)      tb_error("READ 2 ERROR (BRK0_CTL)");
-	     9       : if (dbg_i2c_buf !== 16'h0005)      tb_error("READ 2 ERROR (BRK0_STAT)");
    `endif
+	     9       : if (dbg_i2c_buf !== 16'h0000)      tb_error("READ 2 ERROR (BRK0_STAT)");
 	    10       : if (dbg_i2c_buf !== 16'hFFFF)      tb_error("READ 2 ERROR (BRK0_ADDR0)");
 	    11       : if (dbg_i2c_buf !== 16'hFFFF)      tb_error("READ 2 ERROR (BRK0_ADDR1)");
 `endif
 `ifdef DBG_HWBRK_1
    `ifdef DBG_HWBRK_RANGE
 	    12       : if (dbg_i2c_buf !== 16'h001F)      tb_error("READ 2 ERROR (BRK1_CTL)");
-	    13       : if (dbg_i2c_buf !== 16'h0010)      tb_error("READ 2 ERROR (BRK1_STAT)");
    `else
 	    12       : if (dbg_i2c_buf !== 16'h000F)      tb_error("READ 2 ERROR (BRK1_CTL)");
-	    13       : if (dbg_i2c_buf !== 16'h0005)      tb_error("READ 2 ERROR (BRK1_STAT)");
    `endif
+	    13       : if (dbg_i2c_buf !== 16'h0000)      tb_error("READ 2 ERROR (BRK1_STAT)");
 	    14       : if (dbg_i2c_buf !== 16'hFFFF)      tb_error("READ 2 ERROR (BRK1_ADDR0)");
 	    15       : if (dbg_i2c_buf !== 16'hFFFF)      tb_error("READ 2 ERROR (BRK1_ADDR1)");
 `endif
 `ifdef DBG_HWBRK_2
    `ifdef DBG_HWBRK_RANGE
 	    16       : if (dbg_i2c_buf !== 16'h001F)      tb_error("READ 2 ERROR (BRK2_CTL)");
-	    17       : if (dbg_i2c_buf !== 16'h0010)      tb_error("READ 2 ERROR (BRK2_STAT)");
    `else
 	    16       : if (dbg_i2c_buf !== 16'h000F)      tb_error("READ 2 ERROR (BRK2_CTL)");
-	    17       : if (dbg_i2c_buf !== 16'h0005)      tb_error("READ 2 ERROR (BRK2_STAT)");
    `endif
+	    17       : if (dbg_i2c_buf !== 16'h0000)      tb_error("READ 2 ERROR (BRK2_STAT)");
 	    18       : if (dbg_i2c_buf !== 16'hFFFF)      tb_error("READ 2 ERROR (BRK2_ADDR0)");
 	    19       : if (dbg_i2c_buf !== 16'hFFFF)      tb_error("READ 2 ERROR (BRK2_ADDR1)");
 `endif
 `ifdef DBG_HWBRK_3
    `ifdef DBG_HWBRK_RANGE
 	    20       : if (dbg_i2c_buf !== 16'h001F)      tb_error("READ 2 ERROR (BRK3_CTL)");
-	    21       : if (dbg_i2c_buf !== 16'h0010)      tb_error("READ 2 ERROR (BRK3_STAT)");
    `else
 	    20       : if (dbg_i2c_buf !== 16'h000F)      tb_error("READ 2 ERROR (BRK3_CTL)");
-	    21       : if (dbg_i2c_buf !== 16'h0005)      tb_error("READ 2 ERROR (BRK3_STAT)");
    `endif
+	    21       : if (dbg_i2c_buf !== 16'h0000)      tb_error("READ 2 ERROR (BRK3_STAT)");
 	    22       : if (dbg_i2c_buf !== 16'hFFFF)      tb_error("READ 2 ERROR (BRK3_ADDR0)");
 	    23       : if (dbg_i2c_buf !== 16'hFFFF)      tb_error("READ 2 ERROR (BRK3_ADDR1)");
 `endif
