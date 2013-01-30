@@ -58,13 +58,10 @@ module  omsp_dbg_hwbrk (
     dbg_clk,                 // Debug unit clock
     dbg_din,                 // Debug register data input
     dbg_rst,                 // Debug unit reset
+    decode_noirq,            // Frontend decode instruction
     eu_mab,                  // Execution-Unit Memory address bus
     eu_mb_en,                // Execution-Unit Memory bus enable
     eu_mb_wr,                // Execution-Unit Memory bus write transfer
-    eu_mdb_in,               // Memory data bus input
-    eu_mdb_out,              // Memory data bus output
-    exec_done,               // Execution completed
-    fe_mb_en,                // Frontend Memory bus enable
     pc                       // Program counter
 );
 
@@ -81,13 +78,10 @@ input    [3:0] brk_reg_wr;   // Hardware break/watch-point register write select
 input          dbg_clk;      // Debug unit clock
 input   [15:0] dbg_din;      // Debug register data input
 input          dbg_rst;      // Debug unit reset
+input          decode_noirq; // Frontend decode instruction
 input   [15:0] eu_mab;       // Execution-Unit Memory address bus
 input          eu_mb_en;     // Execution-Unit Memory bus enable
 input    [1:0] eu_mb_wr;     // Execution-Unit Memory bus write transfer
-input   [15:0] eu_mdb_in;    // Memory data bus input
-input   [15:0] eu_mdb_out;   // Memory data bus output
-input          exec_done;    // Execution completed
-input          fe_mb_en;     // Frontend Memory bus enable
 input   [15:0] pc;           // Program counter
 
 
@@ -219,14 +213,10 @@ wire        equ_d_addr1 = eu_mb_en & (eu_mab==brk_addr1) & ~brk_ctl[`BRK_RANGE];
 wire        equ_d_range = eu_mb_en & ((eu_mab>=brk_addr0) & (eu_mab<=brk_addr1)) & 
                           brk_ctl[`BRK_RANGE] & `HWBRK_RANGE;
 
-reg         fe_mb_en_buf;
-always @ (posedge dbg_clk or posedge dbg_rst)
-  if (dbg_rst)  fe_mb_en_buf <=  1'b0;
-  else          fe_mb_en_buf <=  fe_mb_en;
 
-wire        equ_i_addr0 = fe_mb_en_buf & (pc==brk_addr0) & ~brk_ctl[`BRK_RANGE];
-wire        equ_i_addr1 = fe_mb_en_buf & (pc==brk_addr1) & ~brk_ctl[`BRK_RANGE];
-wire        equ_i_range = fe_mb_en_buf & ((pc>=brk_addr0) & (pc<=brk_addr1)) &
+wire        equ_i_addr0 = decode_noirq & (pc==brk_addr0) & ~brk_ctl[`BRK_RANGE];
+wire        equ_i_addr1 = decode_noirq & (pc==brk_addr1) & ~brk_ctl[`BRK_RANGE];
+wire        equ_i_range = decode_noirq & ((pc>=brk_addr0) & (pc<=brk_addr1)) &
                           brk_ctl[`BRK_RANGE] & `HWBRK_RANGE;
 
 
@@ -244,23 +234,10 @@ wire d_addr1_wr =  equ_d_addr1 & ~brk_ctl[`BRK_I_EN] &  |eu_mb_wr;
 wire d_range_wr =  equ_d_range & ~brk_ctl[`BRK_I_EN] &  |eu_mb_wr;
 
 // Detect DATA read access
-// Whenever an "ADD r9. &0x200" instruction is executed, &0x200 will be read
-// before being written back. In that case, the read flag should not be set.
-// In general, We should here make sure no write access occures during the
-// same instruction cycle before setting the read flag.
-reg [2:0] d_rd_trig;
-always @ (posedge dbg_clk or posedge dbg_rst)
-  if (dbg_rst)        d_rd_trig <=  3'h0;
-  else if (exec_done) d_rd_trig <=  3'h0;
-  else                d_rd_trig <=  {equ_d_range & ~brk_ctl[`BRK_I_EN] & ~|eu_mb_wr,
-                                     equ_d_addr1 & ~brk_ctl[`BRK_I_EN] & ~|eu_mb_wr,
-                                     equ_d_addr0 & ~brk_ctl[`BRK_I_EN] & ~|eu_mb_wr};
+wire d_addr0_rd =  equ_d_addr0 & ~brk_ctl[`BRK_I_EN] & ~|eu_mb_wr;
+wire d_addr1_rd =  equ_d_addr1 & ~brk_ctl[`BRK_I_EN] & ~|eu_mb_wr;
+wire d_range_rd =  equ_d_range & ~brk_ctl[`BRK_I_EN] & ~|eu_mb_wr;
    
-wire d_addr0_rd =  d_rd_trig[0] & exec_done & ~d_addr0_wr;
-wire d_addr1_rd =  d_rd_trig[1] & exec_done & ~d_addr1_wr;
-wire d_range_rd =  d_rd_trig[2] & exec_done & ~d_range_wr;
-
-
 // Set flags
 assign addr0_rd_set = brk_ctl[`BRK_MODE_RD] & (d_addr0_rd  | i_addr0_rd);
 assign addr0_wr_set = brk_ctl[`BRK_MODE_WR] &  d_addr0_wr;

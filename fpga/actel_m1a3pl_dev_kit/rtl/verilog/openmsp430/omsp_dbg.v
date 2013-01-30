@@ -36,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 154 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2012-10-15 22:44:20 +0200 (Mon, 15 Oct 2012) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -79,10 +79,6 @@ module  omsp_dbg (
     eu_mab,                            // Execution-Unit Memory address bus
     eu_mb_en,                          // Execution-Unit Memory bus enable
     eu_mb_wr,                          // Execution-Unit Memory bus write transfer
-    eu_mdb_in,                         // Memory data bus input
-    eu_mdb_out,                        // Memory data bus output
-    exec_done,                         // Execution completed
-    fe_mb_en,                          // Frontend Memory bus enable
     fe_mdb_in,                         // Frontend Memory data bus input
     pc,                                // Program counter
     puc_pnd_set                        // PUC pending set for the serial debug interface
@@ -122,10 +118,6 @@ input               decode_noirq;      // Frontend decode instruction
 input        [15:0] eu_mab;            // Execution-Unit Memory address bus
 input               eu_mb_en;          // Execution-Unit Memory bus enable
 input         [1:0] eu_mb_wr;          // Execution-Unit Memory bus write transfer
-input        [15:0] eu_mdb_in;         // Memory data bus input
-input        [15:0] eu_mdb_out;        // Memory data bus output
-input               exec_done;         // Execution completed
-input               fe_mb_en;          // Frontend Memory bus enable
 input        [15:0] fe_mdb_in;         // Frontend Memory data bus input
 input        [15:0] pc;                // Program counter
 input               puc_pnd_set;       // PUC pending set for the serial debug interface
@@ -434,9 +426,9 @@ wire        mem_addr_wr  = reg_wr[MEM_ADDR];
 wire        dbg_mem_acc  = (|dbg_mem_wr | (dbg_rd_rdy & ~mem_ctl[2]));
 wire        dbg_reg_acc  = ( dbg_reg_wr | (dbg_rd_rdy &  mem_ctl[2]));
    
-wire [15:0] mem_addr_inc = (mem_cnt==16'h0000)         ? 16'h0000 :
-                           (dbg_mem_acc & ~mem_bw)     ? 16'h0002 :
-                           (dbg_mem_acc | dbg_reg_acc) ? 16'h0001 : 16'h0000;
+wire [15:0] mem_addr_inc = (mem_cnt==16'h0000)                       ? 16'h0000 : 
+                           (mem_burst &  dbg_mem_acc & ~mem_bw)      ? 16'h0002 : 
+                           (mem_burst & (dbg_mem_acc | dbg_reg_acc)) ? 16'h0001 : 16'h0000; 
    
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)          mem_addr <=  16'h0000;
@@ -477,24 +469,21 @@ wire [3:0] brk0_reg_wr = {reg_wr[BRK0_ADDR1],
 omsp_dbg_hwbrk dbg_hwbr_0 (
 
 // OUTPUTs
-    .brk_halt   (brk0_halt),   // Hardware breakpoint command
-    .brk_pnd    (brk0_pnd),    // Hardware break/watch-point pending
-    .brk_dout   (brk0_dout),   // Hardware break/watch-point register data input
+    .brk_halt     (brk0_halt),    // Hardware breakpoint command
+    .brk_pnd      (brk0_pnd),     // Hardware break/watch-point pending
+    .brk_dout     (brk0_dout),    // Hardware break/watch-point register data input
 			     
 // INPUTs
-    .brk_reg_rd (brk0_reg_rd), // Hardware break/watch-point register read select
-    .brk_reg_wr (brk0_reg_wr), // Hardware break/watch-point register write select
-    .dbg_clk    (dbg_clk),     // Debug unit clock
-    .dbg_din    (dbg_din),     // Debug register data input
-    .dbg_rst    (dbg_rst),     // Debug unit reset
-    .eu_mab     (eu_mab),      // Execution-Unit Memory address bus
-    .eu_mb_en   (eu_mb_en),    // Execution-Unit Memory bus enable
-    .eu_mb_wr   (eu_mb_wr),    // Execution-Unit Memory bus write transfer
-    .eu_mdb_in  (eu_mdb_in),   // Memory data bus input
-    .eu_mdb_out (eu_mdb_out),  // Memory data bus output
-    .exec_done  (exec_done),   // Execution completed
-    .fe_mb_en   (fe_mb_en),    // Frontend Memory bus enable
-    .pc         (pc)           // Program counter
+    .brk_reg_rd   (brk0_reg_rd),  // Hardware break/watch-point register read select
+    .brk_reg_wr   (brk0_reg_wr),  // Hardware break/watch-point register write select
+    .dbg_clk      (dbg_clk),      // Debug unit clock
+    .dbg_din      (dbg_din),      // Debug register data input
+    .dbg_rst      (dbg_rst),      // Debug unit reset
+    .decode_noirq (decode_noirq), // Frontend decode instruction
+    .eu_mab       (eu_mab),       // Execution-Unit Memory address bus
+    .eu_mb_en     (eu_mb_en),     // Execution-Unit Memory bus enable
+    .eu_mb_wr     (eu_mb_wr),     // Execution-Unit Memory bus write transfer
+    .pc           (pc)            // Program counter
 );
 
 `else
@@ -519,24 +508,21 @@ wire [3:0] brk1_reg_wr = {reg_wr[BRK1_ADDR1],
 omsp_dbg_hwbrk dbg_hwbr_1 (
 
 // OUTPUTs
-    .brk_halt   (brk1_halt),   // Hardware breakpoint command
-    .brk_pnd    (brk1_pnd),    // Hardware break/watch-point pending
-    .brk_dout   (brk1_dout),   // Hardware break/watch-point register data input
+    .brk_halt     (brk1_halt),    // Hardware breakpoint command
+    .brk_pnd      (brk1_pnd),     // Hardware break/watch-point pending
+    .brk_dout     (brk1_dout),    // Hardware break/watch-point register data input
 			     
 // INPUTs
-    .brk_reg_rd (brk1_reg_rd), // Hardware break/watch-point register read select
-    .brk_reg_wr (brk1_reg_wr), // Hardware break/watch-point register write select
-    .dbg_clk    (dbg_clk),     // Debug unit clock
-    .dbg_din    (dbg_din),     // Debug register data input
-    .dbg_rst    (dbg_rst),     // Debug unit reset
-    .eu_mab     (eu_mab),      // Execution-Unit Memory address bus
-    .eu_mb_en   (eu_mb_en),    // Execution-Unit Memory bus enable
-    .eu_mb_wr   (eu_mb_wr),    // Execution-Unit Memory bus write transfer
-    .eu_mdb_in  (eu_mdb_in),   // Memory data bus input
-    .eu_mdb_out (eu_mdb_out),  // Memory data bus output
-    .exec_done  (exec_done),   // Execution completed
-    .fe_mb_en   (fe_mb_en),    // Frontend Memory bus enable
-    .pc         (pc)           // Program counter
+    .brk_reg_rd   (brk1_reg_rd),  // Hardware break/watch-point register read select
+    .brk_reg_wr   (brk1_reg_wr),  // Hardware break/watch-point register write select
+    .dbg_clk      (dbg_clk),      // Debug unit clock
+    .dbg_din      (dbg_din),      // Debug register data input
+    .dbg_rst      (dbg_rst),      // Debug unit reset
+    .decode_noirq (decode_noirq), // Frontend decode instruction
+    .eu_mab       (eu_mab),       // Execution-Unit Memory address bus
+    .eu_mb_en     (eu_mb_en),     // Execution-Unit Memory bus enable
+    .eu_mb_wr     (eu_mb_wr),     // Execution-Unit Memory bus write transfer
+    .pc           (pc)            // Program counter
 );
 
 `else
@@ -561,24 +547,21 @@ wire [3:0] brk2_reg_wr = {reg_wr[BRK2_ADDR1],
 omsp_dbg_hwbrk dbg_hwbr_2 (
 
 // OUTPUTs
-    .brk_halt   (brk2_halt),   // Hardware breakpoint command
-    .brk_pnd    (brk2_pnd),    // Hardware break/watch-point pending
-    .brk_dout   (brk2_dout),   // Hardware break/watch-point register data input
+    .brk_halt     (brk2_halt),    // Hardware breakpoint command
+    .brk_pnd      (brk2_pnd),     // Hardware break/watch-point pending
+    .brk_dout     (brk2_dout),    // Hardware break/watch-point register data input
 			     
 // INPUTs
-    .brk_reg_rd (brk2_reg_rd), // Hardware break/watch-point register read select
-    .brk_reg_wr (brk2_reg_wr), // Hardware break/watch-point register write select
-    .dbg_clk    (dbg_clk),     // Debug unit clock
-    .dbg_din    (dbg_din),     // Debug register data input
-    .dbg_rst    (dbg_rst),     // Debug unit reset
-    .eu_mab     (eu_mab),      // Execution-Unit Memory address bus
-    .eu_mb_en   (eu_mb_en),    // Execution-Unit Memory bus enable
-    .eu_mb_wr   (eu_mb_wr),    // Execution-Unit Memory bus write transfer
-    .eu_mdb_in  (eu_mdb_in),   // Memory data bus input
-    .eu_mdb_out (eu_mdb_out),  // Memory data bus output
-    .exec_done  (exec_done),   // Execution completed
-    .fe_mb_en   (fe_mb_en),    // Frontend Memory bus enable
-    .pc         (pc)           // Program counter
+    .brk_reg_rd   (brk2_reg_rd),  // Hardware break/watch-point register read select
+    .brk_reg_wr   (brk2_reg_wr),  // Hardware break/watch-point register write select
+    .dbg_clk      (dbg_clk),      // Debug unit clock
+    .dbg_din      (dbg_din),      // Debug register data input
+    .dbg_rst      (dbg_rst),      // Debug unit reset
+    .decode_noirq (decode_noirq), // Frontend decode instruction
+    .eu_mab       (eu_mab),       // Execution-Unit Memory address bus
+    .eu_mb_en     (eu_mb_en),     // Execution-Unit Memory bus enable
+    .eu_mb_wr     (eu_mb_wr),     // Execution-Unit Memory bus write transfer
+    .pc           (pc)            // Program counter
 );
 
 `else
@@ -603,24 +586,21 @@ wire [3:0] brk3_reg_wr = {reg_wr[BRK3_ADDR1],
 omsp_dbg_hwbrk dbg_hwbr_3 (
 
 // OUTPUTs
-    .brk_halt   (brk3_halt),   // Hardware breakpoint command
-    .brk_pnd    (brk3_pnd),    // Hardware break/watch-point pending
-    .brk_dout   (brk3_dout),   // Hardware break/watch-point register data input
+    .brk_halt     (brk3_halt),    // Hardware breakpoint command
+    .brk_pnd      (brk3_pnd),     // Hardware break/watch-point pending
+    .brk_dout     (brk3_dout),    // Hardware break/watch-point register data input
 			     
 // INPUTs
-    .brk_reg_rd (brk3_reg_rd), // Hardware break/watch-point register read select
-    .brk_reg_wr (brk3_reg_wr), // Hardware break/watch-point register write select
-    .dbg_clk    (dbg_clk),     // Debug unit clock
-    .dbg_din    (dbg_din),     // Debug register data input
-    .dbg_rst    (dbg_rst),     // Debug unit reset
-    .eu_mab     (eu_mab),      // Execution-Unit Memory address bus
-    .eu_mb_en   (eu_mb_en),    // Execution-Unit Memory bus enable
-    .eu_mb_wr   (eu_mb_wr),    // Execution-Unit Memory bus write transfer
-    .eu_mdb_in  (eu_mdb_in),   // Memory data bus input
-    .eu_mdb_out (eu_mdb_out),  // Memory data bus output
-    .exec_done  (exec_done),   // Execution completed
-    .fe_mb_en   (fe_mb_en),    // Frontend Memory bus enable
-    .pc         (pc)           // Program counter
+    .brk_reg_rd   (brk3_reg_rd),  // Hardware break/watch-point register read select
+    .brk_reg_wr   (brk3_reg_wr),  // Hardware break/watch-point register write select
+    .dbg_clk      (dbg_clk),      // Debug unit clock
+    .dbg_din      (dbg_din),      // Debug register data input
+    .dbg_rst      (dbg_rst),      // Debug unit reset
+    .decode_noirq (decode_noirq), // Frontend decode instruction
+    .eu_mab       (eu_mab),       // Execution-Unit Memory address bus
+    .eu_mb_en     (eu_mb_en),     // Execution-Unit Memory bus enable
+    .eu_mb_wr     (eu_mb_wr),     // Execution-Unit Memory bus write transfer
+    .pc           (pc)            // Program counter
 );
 
 `else

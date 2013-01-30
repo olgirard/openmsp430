@@ -36,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 154 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2012-10-15 22:44:20 +0200 (Mon, 15 Oct 2012) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -580,10 +580,6 @@ omsp_dbg dbg_0 (
     .eu_mab            (eu_mab),            // Execution-Unit Memory address bus
     .eu_mb_en          (eu_mb_en),          // Execution-Unit Memory bus enable
     .eu_mb_wr          (eu_mb_wr),          // Execution-Unit Memory bus write transfer
-    .eu_mdb_in         (eu_mdb_in),         // Memory data bus input
-    .eu_mdb_out        (eu_mdb_out),        // Memory data bus output
-    .exec_done         (exec_done),         // Execution completed
-    .fe_mb_en          (fe_mb_en),          // Frontend Memory bus enable
     .fe_mdb_in         (fe_mdb_in),         // Frontend Memory data bus input
     .pc                (pc),                // Program counter
     .puc_pnd_set       (puc_pnd_set)        // PUC pending set for the serial debug interface

@@ -324,22 +324,25 @@ omsp_alu alu_0 (
 //=============================================================================
 
 // Detect memory read/write access
-assign      mb_en     = ((e_state==`E_IRQ_1)  & ~inst_irq_rst)        |
-                        ((e_state==`E_IRQ_3)  & ~inst_irq_rst)        |
-                        ((e_state==`E_SRC_RD) & ~inst_as[`IMM])       |
-                         (e_state==`E_SRC_WR)                         |
+wire        mb_rd_det = ((e_state==`E_SRC_RD) & ~inst_as[`IMM])       |
                         ((e_state==`E_EXEC)   &  inst_so[`RETI])      |
                         ((e_state==`E_DST_RD) & ~inst_type[`INST_SO]
-                                              & ~inst_mov)            |
-                         (e_state==`E_DST_WR);
+                                              & ~inst_mov);
+
+wire        mb_wr_det = ((e_state==`E_IRQ_1)  & ~inst_irq_rst)        |
+                        ((e_state==`E_IRQ_3)  & ~inst_irq_rst)        |
+                        ((e_state==`E_DST_WR) & ~inst_so[`RETI])      |
+                         (e_state==`E_SRC_WR);
 
 wire  [1:0] mb_wr_msk =  inst_alu[`EXEC_NO_WR]  ? 2'b00 :
                         ~inst_bw                ? 2'b11 :
                          alu_out_add[0]         ? 2'b10 : 2'b01;
-assign      mb_wr     = ({2{(e_state==`E_IRQ_1)}}  |
-                         {2{(e_state==`E_IRQ_3)}}  |
-                         {2{(e_state==`E_DST_WR)}} |
-                         {2{(e_state==`E_SRC_WR)}}) & mb_wr_msk;
+
+assign      mb_en     = mb_rd_det | mb_wr_det;
+
+assign      mb_wr     = ({2{mb_wr_det}}) & mb_wr_msk;
+
+
 
 // Memory address bus
 assign      mab       = alu_out_add[15:0];
