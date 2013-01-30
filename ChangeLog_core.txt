@@ -1,3 +1,15 @@
+2013-01-30 [r175]  
+
+	* Update hardware breakpoint unit with the followings: - fixed
+	  hardware breakpoint bug with CALL instructions. - modified data
+	  read watchpoint behavior to also trigger with read/modify/write
+	  instructions. - removed unused ports.
+
+2013-01-30 [r174]  
+
+	* Cleanup dmem_wr generation logic. Important note: this is not a
+	  bug fix, only beautification.
+
 2012-10-15 [r154]  
 
 	* The serial debug interface now supports the I2C protocol (in
