@@ -1,30 +1,14 @@
 /* Default linker script, for normal executables */
 OUTPUT_FORMAT("elf32-msp430")
 OUTPUT_ARCH("msp430")
-MEMORY {
-  sfr              : ORIGIN = 0x0000, LENGTH = 0x0010
-  peripheral_8bit  : ORIGIN = 0x0010, LENGTH = 0x00f0
-  peripheral_16bit : ORIGIN = 0x0100, LENGTH = 0x0100
-
-  ram (wx)         : ORIGIN = 0x0200, LENGTH = 0x4000
-  rom (rx)         : ORIGIN = 0xA000, LENGTH = 0x6000-0x20
-  vectors          : ORIGIN = 0xffe0, LENGTH = 0x0020
-
-  /* Remaining banks are absent */
-  bsl              : ORIGIN = 0x0000, LENGTH = 0x0000
-  infomem          : ORIGIN = 0x0000, LENGTH = 0x0000
-  infob            : ORIGIN = 0x0000, LENGTH = 0x0000
-  infoa            : ORIGIN = 0x0000, LENGTH = 0x0000
-  infoc            : ORIGIN = 0x0000, LENGTH = 0x0000
-  infod            : ORIGIN = 0x0000, LENGTH = 0x0000
-  ram2 (wx)        : ORIGIN = 0x0000, LENGTH = 0x0000
-  ram_mirror (wx)  : ORIGIN = 0x0000, LENGTH = 0x0000
-  usbram (wx)      : ORIGIN = 0x0000, LENGTH = 0x0000
-  far_rom          : ORIGIN = 0x00000000, LENGTH = 0x00000000
+MEMORY
+{
+  data    (rwx)  	: ORIGIN = 0x0200, 	LENGTH = 0x4000
+  text    (rx)   	: ORIGIN = 0xa000,      LENGTH = 0x6000-0x20
+  vectors (rw)  	: ORIGIN = 0xffe0,      LENGTH = 0x20
 }
-REGION_ALIAS("REGION_TEXT", rom);
-REGION_ALIAS("REGION_DATA", ram);
-REGION_ALIAS("REGION_FAR_ROM", far_rom);
+REGION_ALIAS("REGION_TEXT", text);
+REGION_ALIAS("REGION_DATA", data);
 __WDTCTL = 0x0120;
 __MPY    = 0x0130;
 __MPYS   = 0x0132;
@@ -34,150 +18,146 @@ __OP2    = 0x0138;
 __RESLO  = 0x013A;
 __RESHI  = 0x013C;
 __SUMEXT = 0x013E;
-__P1OUT  = 0x0021;
 
 SECTIONS
 {
   /* Read-only sections, merged into text segment.  */
-  .hash            : { *(.hash)          }
-  .dynsym          : { *(.dynsym)        }
-  .dynstr          : { *(.dynstr)        }
-  .gnu.version     : { *(.gnu.version)   }
-  .gnu.version_d   : { *(.gnu.version_d) }
-  .gnu.version_r   : { *(.gnu.version_r) }
-  .rel.init      : { *(.rel.init)  }
+  .hash          : { *(.hash)             }
+  .dynsym        : { *(.dynsym)           }
+  .dynstr        : { *(.dynstr)           }
+  .gnu.version   : { *(.gnu.version)      }
+  .gnu.version_d   : { *(.gnu.version_d)  }
+  .gnu.version_r   : { *(.gnu.version_r)  }
+  .rel.init      : { *(.rel.init) }
   .rela.init     : { *(.rela.init) }
-  .rel.fini      : { *(.rel.fini)  }
+  .rel.text      :
+    {
+      *(.rel.text)
+      *(.rel.text.*)
+      *(.rel.gnu.linkonce.t*)
+    }
+  .rela.text     :
+    {
+      *(.rela.text)
+      *(.rela.text.*)
+      *(.rela.gnu.linkonce.t*)
+    }
+  .rel.fini      : { *(.rel.fini) }
   .rela.fini     : { *(.rela.fini) }
-  .rel.text      : { *(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)        }
-  .rela.text     : { *(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)     }
-  .rel.rodata    : { *(.rel.rodata .rel.rodata.* .rel.gnu.linkonce.r.*)    }
-  .rela.rodata   : { *(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r.*) }
-  .rel.data      : { *(.rel.data .rel.data.* .rel.gnu.linkonce.d.*)        }
-  .rela.data     : { *(.rela.data .rela.data.* .rela.gnu.linkonce.d.*)     }
-  .rel.bss       : { *(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*)          }
-  .rela.bss      : { *(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*)       }
-  .rel.ctors     : { *(.rel.ctors)  }
-  .rela.ctors    : { *(.rela.ctors) }
-  .rel.dtors     : { *(.rel.dtors)  }
-  .rela.dtors    : { *(.rela.dtors) }
-  .rel.got       : { *(.rel.got)    }
-  .rela.got      : { *(.rela.got)   }
-  .rel.plt       : { *(.rel.plt)    }
-  .rela.plt      : { *(.rela.plt)   }
+  .rel.rodata    :
+    {
+      *(.rel.rodata)
+      *(.rel.rodata.*)
+      *(.rel.gnu.linkonce.r*)
+    }
+  .rela.rodata   :
+    {
+      *(.rela.rodata)
+      *(.rela.rodata.*)
+      *(.rela.gnu.linkonce.r*)
+    }
+  .rel.data      :
+    {
+      *(.rel.data)
+      *(.rel.data.*)
+      *(.rel.gnu.linkonce.d*)
+    }
+  .rela.data     :
+    {
+      *(.rela.data)
+      *(.rela.data.*)
+      *(.rela.gnu.linkonce.d*)
+    }
+  .rel.ctors     : { *(.rel.ctors)        }
+  .rela.ctors    : { *(.rela.ctors)       }
+  .rel.dtors     : { *(.rel.dtors)        }
+  .rela.dtors    : { *(.rela.dtors)       }
+  .rel.got       : { *(.rel.got)          }
+  .rela.got      : { *(.rela.got)         }
+  .rel.bss       : { *(.rel.bss)          }
+  .rela.bss      : { *(.rela.bss)         }
+  .rel.plt       : { *(.rel.plt)          }
+  .rela.plt      : { *(.rela.plt)         }
+  /* Internal text space.  */
   .text :
   {
-     . = ALIGN(2);
-     KEEP(*(.init .init.*))
-     KEEP(*(.init0))  /* Start here after reset.               */
-     KEEP(*(.init1))  /* User definable.                       */
-     KEEP(*(.init2))  /* Initialize stack.                     */
-     KEEP(*(.init3))  /* Initialize hardware, user definable.  */
-     KEEP(*(.init4))  /* Copy data to .data, clear bss.        */
-     KEEP(*(.init5))  /* User definable.                       */
-     KEEP(*(.init6))  /* C++ constructors.                     */
-     KEEP(*(.init7))  /* User definable.                       */
-     KEEP(*(.init8))  /* User definable.                       */
-     KEEP(*(.init9))  /* Call main().                          */
-     KEEP(*(.fini9))  /* Falls into here after main(). User definable.  */
-     KEEP(*(.fini8))  /* User definable.                           */
-     KEEP(*(.fini7))  /* User definable.                           */
-     KEEP(*(.fini6))  /* C++ destructors.                          */
-     KEEP(*(.fini5))  /* User definable.                           */
-     KEEP(*(.fini4))  /* User definable.                           */
-     KEEP(*(.fini3))  /* User definable.                           */
-     KEEP(*(.fini2))  /* User definable.                           */
-     KEEP(*(.fini1))  /* User definable.                           */
-     KEEP(*(.fini0))  /* Infinite loop after program termination.  */
-     KEEP(*(.fini .fini.*))
-     . = ALIGN(2);
+    . = ALIGN(2);
+    *(.init)
+    *(.init0)  /* Start here after reset.  */
+    *(.init1)
+    *(.init2)  /* Copy data loop  */
+    *(.init3)
+    *(.init4)  /* Clear bss  */
+    *(.init5)
+    *(.init6)  /* C++ constructors.  */
+    *(.init7)
+    *(.init8)
+    *(.init9)  /* Call main().  */
      __ctors_start = . ;
-     KEEP(*(.ctors))
+     *(.ctors)
      __ctors_end = . ;
      __dtors_start = . ;
-     KEEP(*(.dtors))
+     *(.dtors)
      __dtors_end = . ;
-     . = ALIGN(2);
-    *(.text .text.* .gnu.linkonce.t.*)
-     . = ALIGN(2);
-  }  > REGION_TEXT
+    . = ALIGN(2);
+    *(.text)
+    . = ALIGN(2);
+    *(.text.*)
+    . = ALIGN(2);
+    *(.fini9)  /*   */
+    *(.fini8)
+    *(.fini7)
+    *(.fini6)  /* C++ destructors.  */
+    *(.fini5)
+    *(.fini4)
+    *(.fini3)
+    *(.fini2)
+    *(.fini1)
+    *(.fini0)  /* Infinite loop after program termination.  */
+    *(.fini)
+  }  > text
   .rodata   :
   {
      . = ALIGN(2);
     *(.rodata .rodata.* .gnu.linkonce.r.*)
      . = ALIGN(2);
-  }  > REGION_TEXT
+  }  > text
    _etext = .; /* Past last read-only (loadable) segment */
-  .data   :
+  .data   : AT (ADDR (.text) + SIZEOF (.text) + SIZEOF (.rodata) )
   {
-     . = ALIGN(2);
      PROVIDE (__data_start = .) ;
-    *(.data .data.* .gnu.linkonce.d.*)
-     . = ALIGN(2);
-     _edata = . ;  /* Past last read-write (loadable) segment */
-  }  > REGION_DATA AT > REGION_TEXT
+    . = ALIGN(2);
+    *(.data)
+    . = ALIGN(2);
+    *(.gnu.linkonce.d*)
+    . = ALIGN(2);
+     _edata = . ;
+  }  > data
    PROVIDE (__data_load_start = LOADADDR(.data) );
    PROVIDE (__data_size = SIZEOF(.data) );
-  .bss   :
+  .bss  SIZEOF(.data) + ADDR(.data) :
   {
      PROVIDE (__bss_start = .) ;
-    *(.bss .bss.*)
+    *(.bss)
     *(COMMON)
-     . = ALIGN(2);
      PROVIDE (__bss_end = .) ;
-  }  > REGION_DATA
+     _end = . ;
+  }  > data
    PROVIDE (__bss_size = SIZEOF(.bss) );
-  .noinit   :
+  .noinit  SIZEOF(.bss) + ADDR(.bss) :
   {
      PROVIDE (__noinit_start = .) ;
-    *(.noinit .noinit.*)
-     . = ALIGN(2);
+    *(.noinit)
+    *(COMMON)
      PROVIDE (__noinit_end = .) ;
-  }  > REGION_DATA
-   . = ALIGN(2);
-   _end = . ;   /* Past last write (loadable) segment */
-  .infomem   :
-  {
-    *(.infomem)
-     . = ALIGN(2);
-    *(.infomem.*)
-  }  > infomem
-  .infomemnobits   :
-  {
-    *(.infomemnobits)
-     . = ALIGN(2);
-    *(.infomemnobits.*)
-  }  > infomem
-  .infoa   :
-  {
-    *(.infoa .infoa.*)
-  }  > infoa
-  .infob   :
-  {
-    *(.infob .infob.*)
-  }  > infob
-  .infoc   :
-  {
-    *(.infoc .infoc.*)
-  }  > infoc
-  .infod   :
-  {
-    *(.infod .infod.*)
-  }  > infod
+     _end = . ;
+  }  > data
   .vectors  :
   {
      PROVIDE (__vectors_start = .) ;
-    KEEP(*(.vectors*))
+    *(.vectors*)
      _vectors_end = . ;
   }  > vectors
-  .fartext :
-  {
-     . = ALIGN(2);
-    *(.fartext)
-     . = ALIGN(2);
-    *(.fartext.*)
-     _efartext = .;
-  }  > REGION_FAR_ROM
   /* Stabs for profiling information*/
   .profiler 0 : { *(.profiler) }
   /* Stabs debugging sections.  */
@@ -208,10 +188,7 @@ SECTIONS
   .debug_str      0 : { *(.debug_str) }
   .debug_loc      0 : { *(.debug_loc) }
   .debug_macinfo  0 : { *(.debug_macinfo) }
-  /* DWARF 3 */
-  .debug_pubtypes 0 : { *(.debug_pubtypes) }
-  .debug_ranges   0 : { *(.debug_ranges) }
-   PROVIDE (__stack = ORIGIN(ram) + LENGTH(ram));
-   PROVIDE (__data_start_rom = _etext);
-   PROVIDE (__data_end_rom   = _etext + SIZEOF (.data));
+  PROVIDE (__stack = ORIGIN(data) + LENGTH(data));
+  PROVIDE (__data_start_rom = _etext) ;
+  PROVIDE (__data_end_rom   = _etext + SIZEOF (.data)) ;
 }

@@ -1,18 +1,26 @@
 /* Default linker script, for normal executables */
-OUTPUT_FORMAT("elf32-msp430","elf32-msp430","elf32-msp430")
+OUTPUT_FORMAT("elf32-msp430")
 OUTPUT_ARCH("msp430")
 MEMORY
 {
-  text   (rx)   	: ORIGIN = 0xC000,      LENGTH = 0x4000
-  data   (rwx)  	: ORIGIN = 0x0200, 	LENGTH = 0x800
-  vectors (rw)   	: ORIGIN = 0xffe0,      LENGTH = 0x20
+  data    (rwx)  	: ORIGIN = 0x0200, 	LENGTH = 0x800
+  text    (rx)   	: ORIGIN = 0xc000,      LENGTH = 0x4000-0x20
+  vectors (rw)  	: ORIGIN = 0xffe0,      LENGTH = 0x20
 }
+REGION_ALIAS("REGION_TEXT", text);
+REGION_ALIAS("REGION_DATA", data);
 __WDTCTL = 0x0120;
+__MPY    = 0x0130;
+__MPYS   = 0x0132;
+__MAC    = 0x0134;
+__MACS   = 0x0136;
+__OP2    = 0x0138;
+__RESLO  = 0x013A;
+__RESHI  = 0x013C;
+__SUMEXT = 0x013E;
 
 SECTIONS
 {
-  PROVIDE (__stack = 0x600) ;
-
   /* Read-only sections, merged into text segment.  */
   .hash          : { *(.hash)             }
   .dynsym        : { *(.dynsym)           }
@@ -107,9 +115,15 @@ SECTIONS
     *(.fini1)
     *(.fini0)  /* Infinite loop after program termination.  */
     *(.fini)
-     _etext = . ;
   }  > text
-  .data   : AT (ADDR (.text) + SIZEOF (.text))
+  .rodata   :
+  {
+     . = ALIGN(2);
+    *(.rodata .rodata.* .gnu.linkonce.r.*)
+     . = ALIGN(2);
+  }  > text
+   _etext = .; /* Past last read-only (loadable) segment */
+  .data   : AT (ADDR (.text) + SIZEOF (.text) + SIZEOF (.rodata) )
   {
      PROVIDE (__data_start = .) ;
     . = ALIGN(2);
@@ -119,8 +133,8 @@ SECTIONS
     . = ALIGN(2);
      _edata = . ;
   }  > data
-    PROVIDE (__data_load_start = LOADADDR(.data) );
-    PROVIDE (__data_size = SIZEOF(.data) );
+   PROVIDE (__data_load_start = LOADADDR(.data) );
+   PROVIDE (__data_size = SIZEOF(.data) );
   .bss  SIZEOF(.data) + ADDR(.data) :
   {
      PROVIDE (__bss_start = .) ;
@@ -129,7 +143,7 @@ SECTIONS
      PROVIDE (__bss_end = .) ;
      _end = . ;
   }  > data
-    PROVIDE (__bss_size = SIZEOF(.bss) );
+   PROVIDE (__bss_size = SIZEOF(.bss) );
   .noinit  SIZEOF(.bss) + ADDR(.bss) :
   {
      PROVIDE (__noinit_start = .) ;
@@ -144,6 +158,8 @@ SECTIONS
     *(.vectors*)
      _vectors_end = . ;
   }  > vectors
+  /* Stabs for profiling information*/
+  .profiler 0 : { *(.profiler) }
   /* Stabs debugging sections.  */
   .stab 0 : { *(.stab) }
   .stabstr 0 : { *(.stabstr) }
@@ -172,8 +188,7 @@ SECTIONS
   .debug_str      0 : { *(.debug_str) }
   .debug_loc      0 : { *(.debug_loc) }
   .debug_macinfo  0 : { *(.debug_macinfo) }
+  PROVIDE (__stack = ORIGIN(data) + LENGTH(data));
   PROVIDE (__data_start_rom = _etext) ;
   PROVIDE (__data_end_rom   = _etext + SIZEOF (.data)) ;
-  PROVIDE (__noinit_start_rom = _etext + SIZEOF (.data)) ;
-  PROVIDE (__noinit_end_rom = _etext + SIZEOF (.data) + SIZEOF (.noinit)) ;
 }
