@@ -55,7 +55,7 @@ initial
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef OSCOFF_EN
      `ifdef MCLK_MUX
     

@@ -55,7 +55,7 @@ initial
       $display(" ===============================================");
 `ifdef DBG_EN
 `ifdef DBG_UART
-  `ifdef ASIC
+  `ifdef ASIC_CLOCKING
       test_nr = 0;
       #1 dbg_en = 0;
       repeat(30) @(posedge dco_clk);

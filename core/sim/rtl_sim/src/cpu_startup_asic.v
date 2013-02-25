@@ -69,7 +69,7 @@ initial
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
       //  ####  CPU_EN=0  ####  DBG_EN=0  ####  RESET_N=0  ####  //
       test_nr = 0;
 

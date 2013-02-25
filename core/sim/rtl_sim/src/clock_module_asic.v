@@ -76,7 +76,7 @@ initial
 
       force tb_openMSP430.dut.wdt_reset = 1'b0;
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
 
       // MCLK GENERATION: SELECTING DCO_CLK
       //--------------------------------------------------------
@@ -533,7 +533,7 @@ initial
       bcsctl1_mask = 16'h0000;
       bcsctl2_mask = 16'h0000;
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef ACLK_DIVIDER
       bcsctl1_mask = bcsctl1_mask | 16'h0030;
   `endif  
@@ -547,7 +547,7 @@ initial
 `ifdef MCLK_DIVIDER
       bcsctl2_mask = bcsctl2_mask | 16'h0030;
 `endif
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef SMCLK_MUX
       bcsctl2_mask = bcsctl2_mask | 16'h0008;
   `endif

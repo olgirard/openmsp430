@@ -50,7 +50,7 @@ always @(negedge smclk)
   smclk_cnt <= smclk_cnt+1;
 
 integer aclk_cnt;
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
 always @(negedge aclk)
   aclk_cnt <= aclk_cnt+1;
 `else
@@ -63,7 +63,7 @@ always @(inst_number)
   inst_cnt <= inst_cnt+1;
 
 reg watchdog_clock;
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef WATCHDOG_MUX
        always @(posedge lfxt_clk or negedge lfxt_clk) watchdog_clock <= lfxt_clk;
   `else
@@ -106,7 +106,7 @@ initial
 
       @(r15==16'h1000);
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef WATCHDOG_MUX
     `ifdef ACLK_DIVIDER
       repeat(5) @(posedge watchdog_clock);
@@ -135,7 +135,7 @@ initial
 	   smclk_cnt   = 0;
 	   aclk_cnt    = 0;
 	   inst_cnt    = 0;
-           `ifdef ASIC
+           `ifdef ASIC_CLOCKING
              `ifdef WATCHDOG_MUX
 	         repeat(62) @(posedge watchdog_clock);
       	         jj = 2;

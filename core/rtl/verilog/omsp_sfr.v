@@ -299,7 +299,7 @@ wire nmi_pol = nmi ^ wdtnmies;
 // Pulse capture and synchronization
 //-----------------------------------
 `ifdef SYNC_NMI
-  `ifdef ASIC
+  `ifdef ASIC_CLOCKING
    // Glitch free reset for the event capture
    reg    nmi_capture_rst;
    always @(posedge mclk or posedge puc_rst)
@@ -351,7 +351,7 @@ assign      nmi_edge  = ~nmi_dly & nmi_s;
 wire        nmi_pnd   = nmiifg & nmie;
 
 // NMI wakeup
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
 wire        nmi_wkup;
 omsp_and_gate and_nmi_wkup (.y(nmi_wkup), .a(nmi_capture ^ nmi_dly), .b(nmie));
 `else

@@ -59,7 +59,7 @@ initial
       repeat(5) @(posedge smclk);
       stimulus_done = 0;
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
      
       //--------------------------------------------------------
       // SMCLK GENERATION - LFXT_CLK INPUT

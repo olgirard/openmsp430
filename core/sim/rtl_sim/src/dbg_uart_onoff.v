@@ -47,7 +47,7 @@ initial
       $display(" ===============================================");
 `ifdef DBG_EN
 `ifdef DBG_UART
-  `ifdef ASIC
+  `ifdef ASIC_CLOCKING
       $display(" ===============================================");
       $display("|               SIMULATION SKIPPED              |");
       $display("|   (this test is not supported in ASIC mode)   |");

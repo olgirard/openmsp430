@@ -61,7 +61,7 @@ initial
 
       force tb_openMSP430.dut.wdt_reset = 1'b0;
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
      
       //--------------------------------------------------------
       // MCLK GENERATION - LFXT_CLK INPUT

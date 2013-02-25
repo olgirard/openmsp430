@@ -92,7 +92,7 @@ initial
       wkup[3] = 0;
 
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
 
       // SCG1   (<=> R2[7]): turn off SMCLK
       //--------------------------------------------------------

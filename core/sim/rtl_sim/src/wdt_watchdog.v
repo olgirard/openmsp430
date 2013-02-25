@@ -67,7 +67,7 @@ initial
       if (mem208 !== 16'h6924) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6924 (CONFIG 2) =====");
     `else
       if (mem200 !== 16'h6920) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6920 (CONFIG 3) =====");
-      `ifdef ASIC
+      `ifdef ASIC_CLOCKING
       if (mem202 !== 16'h69f3) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x69f3 (CONFIG 3-ASIC) =====");
       if (mem204 !== 16'h6971) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6971 (CONFIG 3-ASIC) =====");
       if (mem206 !== 16'h69a2) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x69a2 (CONFIG 3-ASIC) =====");
@@ -95,7 +95,7 @@ initial
       if (mem208 !== 16'h6904) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6904 (CONFIG 5) =====");
     `else
       if (mem200 !== 16'h6900) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6900 (CONFIG 6) =====");
-      `ifdef ASIC
+      `ifdef ASIC_CLOCKING
       if (mem202 !== 16'h6993) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6993 (CONFIG 6-ASIC) =====");
       if (mem204 !== 16'h6911) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6911 (CONFIG 6-ASIC) =====");
       if (mem206 !== 16'h6982) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6982 (CONFIG 6-ASIC) =====");
@@ -109,7 +109,7 @@ initial
   `endif
 `endif
   
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef WATCHDOG_MUX
   `else
     `ifdef WATCHDOG_NOMUX_ACLK
@@ -123,7 +123,7 @@ initial
       //--------------------------------------------------------
 
       @(mem250===16'h2000);
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
       if (mem200 !== 16'h000B) tb_error("====== WATCHDOG MODE /64: @0x200 != 0x000B =====");
 `else
       if (mem200 !== 16'h000A) tb_error("====== WATCHDOG MODE /64: @0x200 != 0x000A =====");
@@ -136,7 +136,7 @@ initial
       //--------------------------------------------------------
 
       @(mem250===16'h3000);
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
       if (mem202 !== 16'h0056) tb_error("====== WATCHDOG MODE /512: @0x202 != 0x0056 =====");
 `else
       if (mem202 !== 16'h0055) tb_error("====== WATCHDOG MODE /512: @0x202 != 0x0055 =====");
@@ -149,7 +149,7 @@ initial
       //--------------------------------------------------------
 
       @(mem250===16'h4000);
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
       if (mem204 !== 16'h0556) tb_error("====== WATCHDOG MODE /8192: @0x204 != 0x0556 =====");
 `else
       if (mem204 !== 16'h0555) tb_error("====== WATCHDOG MODE /8192: @0x204 != 0x0555 =====");
@@ -162,7 +162,7 @@ initial
       //--------------------------------------------------------
 
       @(mem250===16'h5000);
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
       if (mem206 !== 16'h1556) tb_error("====== WATCHDOG MODE /32768: @0x206 != 0x1556 =====");
 `else
       if (mem206 !== 16'h1555) tb_error("====== WATCHDOG MODE /32768: @0x206 != 0x1555 =====");

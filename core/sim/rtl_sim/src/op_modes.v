@@ -57,7 +57,7 @@ initial
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
       $display(" ===============================================");
       $display("|               SIMULATION SKIPPED              |");
       $display("|   (this test is not supported in ASIC mode)   |");

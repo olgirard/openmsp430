@@ -65,7 +65,7 @@ initial
       r5_counter   = 0;
       repeat(1024) @(negedge mclk);
       if (mclk_counter !== 1024)        tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK - TEST 1 =====");
-   `ifdef ASIC
+   `ifdef ASIC_CLOCKING
      `ifdef WATCHDOG_MUX
         `ifdef SMCLK_DIVIDER
             if (r5_counter   !== 7)     tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK - TEST 2 =====");
@@ -102,7 +102,7 @@ initial
       r5_counter   = 0;
       repeat(7815) @(negedge mclk);
       if (mclk_counter !== 7815)         tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK - TEST 1 =====");
-   `ifdef ASIC
+   `ifdef ASIC_CLOCKING
      `ifdef WATCHDOG_MUX
             if (r5_counter      !== 4)   tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - ACLK - TEST 2 =====");
      `else

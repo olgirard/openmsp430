@@ -99,7 +99,7 @@ initial
       wkup[3] = 0;
 
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
       
       // ACTIVE
       //--------------------------------------------------------

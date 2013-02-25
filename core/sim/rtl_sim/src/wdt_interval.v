@@ -67,7 +67,7 @@ initial
       if (r8 !== 16'h6924) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6924 (CONFIG 2) =====");
     `else
       if (r4 !== 16'h6920) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6920 (CONFIG 3) =====");
-      `ifdef ASIC
+      `ifdef ASIC_CLOCKING
       if (r5 !== 16'h69f3) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x69f3 (CONFIG 3-ASIC) =====");
       if (r6 !== 16'h6971) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6971 (CONFIG 3-ASIC) =====");
       if (r7 !== 16'h69a2) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x69a2 (CONFIG 3-ASIC) =====");
@@ -95,7 +95,7 @@ initial
       if (r8 !== 16'h6904) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6904 (CONFIG 5) =====");
     `else
       if (r4 !== 16'h6900) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6900 (CONFIG 6) =====");
-      `ifdef ASIC
+      `ifdef ASIC_CLOCKING
       if (r5 !== 16'h6993) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6993 (CONFIG 6-ASIC) =====");
       if (r6 !== 16'h6911) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6911 (CONFIG 6-ASIC) =====");
       if (r7 !== 16'h6982) tb_error("====== WATCHDOG RD/WR ACCESS: WDTCTL != 0x6982 (CONFIG 6-ASIC) =====");
@@ -121,7 +121,7 @@ initial
       @(r15==16'h2000);
       if (r5 !== 16'h3401) tb_error("====== WATCHDOG INTERVAL MODE /64: R5 != 0x3401 =====");
       if (r6 !== 16'h0000) tb_error("====== WATCHDOG INTERVAL MODE /64: R6 != 0x0000 =====");
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef WATCHDOG_MUX
       if (r7 !== 16'h000E) tb_error("====== WATCHDOG INTERVAL MODE /64: R7 != 0x000E (CONFIG 1) =====");
   `else
@@ -145,7 +145,7 @@ initial
       if (r7 !== 16'h0000) tb_error("====== WATCHDOG INTERVAL MODE /64 NO IRQ: R7 != 0x0000 =====");
       if (r8 !== 16'h0000) tb_error("====== WATCHDOG INTERVAL MODE /64 NO IRQ: R8 != 0x0000 =====");
       
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef WATCHDOG_MUX
   `else
     `ifdef WATCHDOG_NOMUX_ACLK
@@ -175,7 +175,7 @@ initial
       @(r15==16'h3000);
       if (r5 !== 16'h3403) tb_error("====== WATCHDOG INTERVAL MODE /512: R5 != 0x3403 =====");
       if (r6 !== 16'h0000) tb_error("====== WATCHDOG INTERVAL MODE /512: R6 != 0x0000 =====");
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
       if (r7 !== 16'h0068) tb_error("====== WATCHDOG INTERVAL MODE /512: R7 != 0x0068 =====");
 `else
       if (r7 !== 16'h0066) tb_error("====== WATCHDOG INTERVAL MODE /512: R7 != 0x0066 =====");
@@ -190,7 +190,7 @@ initial
       @(r15==16'h4000);
       if (r5 !== 16'h3404) tb_error("====== WATCHDOG INTERVAL MODE /8192: R5 != 0x3404 =====");
       if (r6 !== 16'h0000) tb_error("====== WATCHDOG INTERVAL MODE /8192: R6 != 0x0000 =====");
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
       if (r7 !== 16'h0668) tb_error("====== WATCHDOG INTERVAL MODE /8192: R7 != 0x0668 =====");
 `else
       if (r7 !== 16'h0667) tb_error("====== WATCHDOG INTERVAL MODE /8192: R7 != 0x0667 =====");
@@ -205,7 +205,7 @@ initial
       @(r15==16'h5000);
       if (r5 !== 16'h3405) tb_error("====== WATCHDOG INTERVAL MODE /32768: R5 != 0x3405 =====");
       if (r6 !== 16'h0000) tb_error("====== WATCHDOG INTERVAL MODE /32768: R6 != 0x0000 =====");
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
       if (r7 !== 16'h199B) tb_error("====== WATCHDOG INTERVAL MODE /32768: R7 != 0x199B =====");
 `else
       if (r7 !== 16'h199A) tb_error("====== WATCHDOG INTERVAL MODE /32768: R7 != 0x199A =====");

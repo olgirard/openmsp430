@@ -104,7 +104,7 @@ initial
 
       //$display("dco_clk_cnt: %d / mclk_cnt: %d / smclk_cnt: %d / aclk_cnt: %d / inst_cnt: %d ", dco_clk_cnt, mclk_cnt, smclk_cnt, aclk_cnt, inst_cnt);
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
       
       // ACTIVE
       //--------------------------------------------------------

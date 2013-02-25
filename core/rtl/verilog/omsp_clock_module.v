@@ -194,7 +194,7 @@ reg  [7:0] bcsctl1;
 wire       bcsctl1_wr  = BCSCTL1[0] ? reg_hi_wr[BCSCTL1] : reg_lo_wr[BCSCTL1];
 wire [7:0] bcsctl1_nxt = BCSCTL1[0] ? per_din[15:8]      : per_din[7:0];
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef ACLK_DIVIDER
 wire [7:0] divax_mask = 8'h30;
   `else
@@ -225,7 +225,7 @@ wire [7:0] divmx_mask = 8'h30;
 `else
 wire [7:0] divmx_mask = 8'h00;
 `endif
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef SMCLK_MUX
 wire [7:0] sels_mask  = 8'h08;
   `else
@@ -263,7 +263,7 @@ wire [15:0] per_dout =  bcsctl1_rd   |
 // 5)  DCO_CLK / LFXT_CLK INTERFACES (WAKEUP, ENABLE, ...)
 //=============================================================================
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
    wire cpuoff_and_mclk_enable;
    omsp_and_gate and_cpuoff_mclk_en (.y(cpuoff_and_mclk_enable), .a(cpuoff), .b(mclk_enable));
 `endif
@@ -376,7 +376,7 @@ wire cpu_en_wkup;
 // Note: unlike the original MSP430 specification,
 //       we allow to switch off the LFXT even
 //       if it is selected by MCLK or SMCLK.
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
 
 `ifdef OSCOFF_EN
 
@@ -526,7 +526,7 @@ assign lfxt_wkup   = 1'b0;
 // Synchronize CPU_EN signal to the SMCLK domain
 //----------------------------------------------
 // Note: the synchronizer is only required if there is a SMCLK_MUX
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef SMCLK_MUX
      wire cpu_en_sm_s;
      omsp_sync_cell sync_cell_cpu_sm_en (
@@ -625,7 +625,7 @@ omsp_clock_gate clock_gate_mclk (
 
 // ASIC MODE
 //----------------------------
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
 
   `ifdef ACLK_DIVIDER
     `ifdef LFXT_DOMAIN
@@ -758,7 +758,7 @@ assign nodiv_smclk = dco_clk;
 
 // ASIC MODE
 //----------------------------
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef SMCLK_MUX
 
     // Synchronizers
@@ -916,7 +916,7 @@ wire  smclk  = mclk;
 // Serial Debug Interface Clock gate
 //------------------------------------------------
 `ifdef DBG_EN
-  `ifdef ASIC
+  `ifdef ASIC_CLOCKING
   omsp_clock_gate clock_gate_dbg_clk (
       .gclk        (dbg_clk),
       .clk         (mclk),
