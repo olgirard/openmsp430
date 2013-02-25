@@ -209,7 +209,7 @@ wire        r2_v   = alu_stat_wr[3] ? alu_stat[3]          :
 wire        mclk_r2 = mclk;
 `endif
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
    `ifdef CPUOFF_EN
    wire [15:0] cpuoff_mask = 16'h0010;
    `else

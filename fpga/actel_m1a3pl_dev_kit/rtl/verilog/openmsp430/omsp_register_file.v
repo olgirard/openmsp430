@@ -36,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 130 $
+// $Rev: 103 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2012-03-01 22:45:40 +0100 (Thu, 01 Mar 2012) $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -209,7 +209,7 @@ wire        r2_v   = alu_stat_wr[3] ? alu_stat[3]          :
 wire        mclk_r2 = mclk;
 `endif
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
    `ifdef CPUOFF_EN
    wire [15:0] cpuoff_mask = 16'h0010;
    `else

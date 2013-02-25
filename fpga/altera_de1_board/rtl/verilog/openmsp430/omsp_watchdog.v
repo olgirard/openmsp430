@@ -176,7 +176,7 @@ parameter [7:0] WDTNMIES_MASK = 8'h40;
 parameter [7:0] WDTNMIES_MASK = 8'h00;
 `endif
 
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
   `ifdef WATCHDOG_MUX
 parameter [7:0] WDTSSEL_MASK  = 8'h04;
   `else
@@ -229,7 +229,7 @@ wire [15:0] per_dout   =  wdtctl_rd;
 //=============================================================================
 // 5)  WATCHDOG TIMER (ASIC IMPLEMENTATION)
 //=============================================================================
-`ifdef ASIC
+`ifdef ASIC_CLOCKING
 
 // Watchdog clock source selection
 //---------------------------------

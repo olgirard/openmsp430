@@ -263,6 +263,11 @@
 // ASIC SYSTEM CONFIGURATION ( !!!! EXPERTS ONLY !!!! )
 //----------------------------------------------------------------------------
 
+// ASIC/FPGA-like clocking
+`ifdef ASIC_CLOCKING
+`undef ASIC_CLOCKING
+`endif
+
 // Fine grained clock gating
 `ifdef CLOCK_GATING
 `undef CLOCK_GATING
