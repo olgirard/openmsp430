@@ -1,6 +1,8 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html><head>
-  <title>openMSP430 ASIC Implementation</title>
+<html><head><title>openMSP430 ASIC Implementation</title>
+
+
+  
 
   
   
@@ -22,9 +24,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
   
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-
-</head><body>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"></head><body>
 <h3>Table of content</h3>
 
 <ul>
@@ -124,7 +124,7 @@ Synthesis to P&amp;R is the best way to go.<br>
 Whenever the "<span style="font-weight: bold; font-style: italic;">`define
 ASIC</span>" statement of the <a style="font-style: italic;" href="http://opencores.org/project,openmsp430,core#2.1.3.3%20Expert%20System%20Configuration">Expert
 System Configuration</a> section is uncommented, all ASIC specific
-configuration options are enabled. <br>
+configuration options are enabled.<br>
 
 <a name="2_1_Basic_Clock_Module"></a>
 <h2>2.1 Basic Clock Module</h2>
@@ -134,7 +134,44 @@ support <span class="Apple-style-span" style="color: rgb(0, 0, 0); font-family: 
 described
 in the<span class="Apple-converted-space">&nbsp;</span><a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's
 Guide</a><span class="Apple-converted-space">&nbsp;</span>(Chapter 4).<br>
-All these options are highlighted in the following diagram and
+</span><br>
+In particular,  the <span style="font-weight: bold; font-style: italic;">ASIC_CLOCKING</span>
+option activates all advancd clocking options (note that formal equivalence with
+the FPGA version is achieved by commenting this option out):<br>
+<br>
+
+
+<table border="0" cellpadding="0" cellspacing="4">
+
+
+  <tbody>
+    <tr>
+      <td width="35"><br>
+      </td>
+      <td bgcolor="#d0d0d0" width="3"><br>
+      </td>
+      <td width="15"><br>
+      </td>
+      <td> <code>//===============================================================<br>
+// ASIC CLOCKING<br>
+//===============================================================<br>
+      <br>
+//-------------------------------------------------------<br>
+// When uncommented, this define will enable the ASIC<br>
+// architectural clock gating as well as the advanced low<br>
+// power modes support (most common).<br>
+// Comment this out in order to get FPGA-like clocking.<br>
+//-------------------------------------------------------<br>
+`define ASIC_CLOCKING<br>
+<br>
+      </code></td>
+    </tr>
+  </tbody>
+</table>
+
+
+<br>
+<span class="Apple-style-span" style="color: rgb(0, 0, 0); font-family: 'Times New Roman'; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;">All these advanced clocking options are highlighted in the following diagram and
 discussed below:<br>
 <br>
 </span>
@@ -323,7 +360,7 @@ implemented as following:<br>
 
 <br>
 
-<div style="text-align: center;"><img alt="Clock Divider" src="http://opencores.org/usercontent,img,1322310000"  width="50%"><br>
+<div style="text-align: center;"><img alt="Clock Divider" src="http://opencores.org/usercontent,img,1322310000" width="50%"><br>
 </div>
 
 <br>
@@ -497,7 +534,7 @@ and in particular the DCO oscillator being switched-off:<br>
 instruction:</li>
 </ul>
 
-<img alt="Entering LPM1 with BIS" src="http://opencores.org/usercontent,img,1322600748"  width="100%"><br>
+<img alt="Entering LPM1 with BIS" src="http://opencores.org/usercontent,img,1322600748" width="100%"><br>
 
 <ul>
 
@@ -524,7 +561,7 @@ particular the DCO oscillator wake-up sequence:<br>
 
 <br>
 
-<img alt="Wakeup from LPM1" src="http://opencores.org/usercontent,img,1322602185"  width="100%"><br>
+<img alt="Wakeup from LPM1" src="http://opencores.org/usercontent,img,1322602185" width="100%"><br>
 
 <br>
 
@@ -680,7 +717,7 @@ generation as an example, it is implemented using the <span style="font-weight: 
 
 <br>
 
-<div style="text-align: center;"><img alt="DFT Reset" src="http://opencores.org/usercontent,img,1330808995"  width="50%"><br>
+<div style="text-align: center;"><img alt="DFT Reset" src="http://opencores.org/usercontent,img,1330808995" width="50%"><br>
 </div>
 
 <a name="3_2_Clock_Gates"></a>
@@ -859,7 +896,7 @@ As a consequence, you can feel free to use:<br>
   </li>
 </ul>
 
-<div style="text-align: center;"><img alt="Clock Gate NAND2" src="http://opencores.org/usercontent,img,1328475770"  width="30%"><br>
+<div style="text-align: center;"><img alt="Clock Gate NAND2" src="http://opencores.org/usercontent,img,1328475770" width="30%"><br>
 </div>
 
 <br>
