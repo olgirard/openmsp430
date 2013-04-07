@@ -37,7 +37,7 @@
 // FPGA Specific modules
 //=============================================================================
 
-`include "../../../rtl/verilog/openMSP430_fpga.v"
+`include "../../../rtl/verilog/OpenMSP430_fpga.v"
 `include "../../../rtl/verilog/io_mux.v"
 `include "../../../rtl/verilog/driver_7segment.v"
 `include "../../../rtl/verilog/ram16x512.v"    // altera DE1 specific modules
