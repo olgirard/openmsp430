@@ -1,3 +1,8 @@
+2013-04-08 [r186]  
+
+	* Fixed Hardware Multiplier byte operations bug:
+	  http://opencores.org/bug,assign,2247
+
 2013-02-25 [r180]  
 
 	* Add new ASIC_CLOCKING configuration option to allow ASIC
