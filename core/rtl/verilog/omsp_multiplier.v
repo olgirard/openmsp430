@@ -121,29 +121,31 @@ wire  early_read;
 //============================================================================
 
 // Local register selection
-wire              reg_sel   =  per_en & (per_addr[13:DEC_WD-1]==BASE_ADDR[14:DEC_WD]);
+wire              reg_sel     =  per_en & (per_addr[13:DEC_WD-1]==BASE_ADDR[14:DEC_WD]);
 
 // Register local address
-wire [DEC_WD-1:0] reg_addr  =  {per_addr[DEC_WD-2:0], 1'b0};
+wire [DEC_WD-1:0] reg_addr    =  {per_addr[DEC_WD-2:0], 1'b0};
 
 // Register address decode
-wire [DEC_SZ-1:0] reg_dec   =  (OP1_MPY_D   &  {DEC_SZ{(reg_addr == OP1_MPY  )}})  |
-                               (OP1_MPYS_D  &  {DEC_SZ{(reg_addr == OP1_MPYS )}})  |
-                               (OP1_MAC_D   &  {DEC_SZ{(reg_addr == OP1_MAC  )}})  |
-                               (OP1_MACS_D  &  {DEC_SZ{(reg_addr == OP1_MACS )}})  |
-                               (OP2_D       &  {DEC_SZ{(reg_addr == OP2      )}})  |
-                               (RESLO_D     &  {DEC_SZ{(reg_addr == RESLO    )}})  |
-                               (RESHI_D     &  {DEC_SZ{(reg_addr == RESHI    )}})  |
-                               (SUMEXT_D    &  {DEC_SZ{(reg_addr == SUMEXT   )}});
+wire [DEC_SZ-1:0] reg_dec     =  (OP1_MPY_D   &  {DEC_SZ{(reg_addr == OP1_MPY  )}})  |
+                                 (OP1_MPYS_D  &  {DEC_SZ{(reg_addr == OP1_MPYS )}})  |
+                                 (OP1_MAC_D   &  {DEC_SZ{(reg_addr == OP1_MAC  )}})  |
+                                 (OP1_MACS_D  &  {DEC_SZ{(reg_addr == OP1_MACS )}})  |
+                                 (OP2_D       &  {DEC_SZ{(reg_addr == OP2      )}})  |
+                                 (RESLO_D     &  {DEC_SZ{(reg_addr == RESLO    )}})  |
+                                 (RESHI_D     &  {DEC_SZ{(reg_addr == RESHI    )}})  |
+                                 (SUMEXT_D    &  {DEC_SZ{(reg_addr == SUMEXT   )}});
 		   
 // Read/Write probes
-wire              reg_write =  |per_we & reg_sel;
-wire              reg_read  = ~|per_we & reg_sel;
+wire              reg_write   =  |per_we & reg_sel;
+wire              reg_read    = ~|per_we & reg_sel;
 
 // Read/Write vectors
-wire [DEC_SZ-1:0] reg_wr    = reg_dec & {DEC_SZ{reg_write}};
-wire [DEC_SZ-1:0] reg_rd    = reg_dec & {DEC_SZ{reg_read}};
+wire [DEC_SZ-1:0] reg_wr      = reg_dec & {DEC_SZ{reg_write}};
+wire [DEC_SZ-1:0] reg_rd      = reg_dec & {DEC_SZ{reg_read}};
 
+// Masked input data for byte access
+wire       [15:0] per_din_msk =  per_din & {{8{per_we[1]}}, 8'hff};
 
 //============================================================================
 // 3) REGISTERS
@@ -169,9 +171,9 @@ wire        mclk_op1 = mclk;
 always @ (posedge mclk_op1 or posedge puc_rst)
   if (puc_rst)      op1 <=  16'h0000;
 `ifdef CLOCK_GATING
-  else              op1 <=  per_din;
+  else              op1 <=  per_din_msk;
 `else
-  else if (op1_wr)  op1 <=  per_din;
+  else if (op1_wr)  op1 <=  per_din_msk;
 `endif
 
 wire [15:0] op1_rd  = op1;
@@ -194,9 +196,9 @@ wire        mclk_op2 = mclk;
 always @ (posedge mclk_op2 or posedge puc_rst)
   if (puc_rst)      op2 <=  16'h0000;
 `ifdef CLOCK_GATING
-  else              op2 <=  per_din;
+  else              op2 <=  per_din_msk;
 `else
-  else if (op2_wr)  op2 <=  per_din;
+  else if (op2_wr)  op2 <=  per_din_msk;
 `endif
 
 wire [15:0] op2_rd  = op2;
@@ -220,7 +222,7 @@ wire        mclk_reslo = mclk;
 
 always @ (posedge mclk_reslo or posedge puc_rst)
   if (puc_rst)         reslo <=  16'h0000;
-  else if (reslo_wr)   reslo <=  per_din;
+  else if (reslo_wr)   reslo <=  per_din_msk;
   else if (result_clr) reslo <=  16'h0000;
 `ifdef CLOCK_GATING
   else                 reslo <=  reslo_nxt;
@@ -249,7 +251,7 @@ wire        mclk_reshi = mclk;
 
 always @ (posedge mclk_reshi or posedge puc_rst)
   if (puc_rst)         reshi <=  16'h0000;
-  else if (reshi_wr)   reshi <=  per_din;
+  else if (reshi_wr)   reshi <=  per_din_msk;
   else if (result_clr) reshi <=  16'h0000;
 `ifdef CLOCK_GATING
   else                 reshi <=  reshi_nxt;

@@ -629,7 +629,7 @@ main:
 	nop
 	nop
 
-        /* --------------         RD/WR ACCESS OPERANDS     --------------- */
+        /* --------------    16-BIT RD/WR ACCESS OPERANDS   --------------- */
 
 	mov #0x1234,   &MPY
 	mov #0x5678,   &OP2
@@ -690,6 +690,65 @@ main:
 	nop
 	nop
 	nop
+
+        /* --------------    8-BIT RD/WR ACCESS OPERANDS   --------------- */
+
+	mov   #0x1234,  &MPY
+	mov   &MPY,     r10
+	mov.b #0xab,    &MPY
+	mov   &MPY,     r11
+	nop
+	mov   #0x0001,  r15
+	nop
+
+	mov   #0x5678,  &MPYS
+	mov   &MPYS,    r10
+	mov.b #0xbc,    &MPYS
+	mov   &MPYS,    r11
+	nop
+	mov   #0x0002,  r15
+	nop
+
+	mov   #0x9abc,  &MAC
+	mov   &MAC,     r10
+	mov.b #0xde,    &MAC
+	mov   &MAC,     r11
+	nop
+	mov   #0x0003,  r15
+	nop
+
+	mov   #0xdef0,  &MACS
+	mov   &MACS,    r10
+	mov.b #0xed,    &MACS
+	mov   &MACS,    r11
+	nop
+	mov   #0x0004,  r15
+	nop
+
+	mov   #0x4321,  &OP2
+	mov   &OP2,     r10
+	mov.b #0xdc,    &OP2
+	mov   &OP2,     r11
+	nop
+	mov   #0x0005,  r15
+	nop
+
+	mov   #0x8765,  &RESLO
+	mov   &RESLO,   r10
+	mov.b #0xcb,    &RESLO
+	mov   &RESLO,   r11
+	nop
+	mov   #0x0006,  r15
+	nop
+
+	mov   #0xcba9,  &RESHI
+	mov   &RESHI,   r10
+	mov.b #0xba,    &RESHI
+	mov   &RESHI,   r11
+	nop
+	mov   #0x0007,  r15
+	nop
+
 
         /* ----------------------         END OF TEST        --------------- */
 end_of_test:
