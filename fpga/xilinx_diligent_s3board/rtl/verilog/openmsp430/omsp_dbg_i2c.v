@@ -464,3 +464,8 @@ assign shift_tx_val = (dbg_state==TX_BYTE_HI) ? dbg_dout[15:8] :
                                                 dbg_dout[7:0];
 
 endmodule
+
+`ifdef OMSP_NO_INCLUDE
+`else
+`include "openMSP430_undefines.v"
+`endif

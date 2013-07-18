@@ -40,6 +40,10 @@
 // $LastChangedBy: olivier.girard $
 // $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
+`ifdef OMSP_NO_INCLUDE
+`else
+`include "openMSP430_defines.v"
+`endif
 
 module  omsp_wakeup_cell (
 
@@ -103,6 +107,7 @@ always @(posedge wkup_clk or posedge wkup_rst)
 
 endmodule // omsp_wakeup_cell
 
-
-
-
+`ifdef OMSP_NO_INCLUDE
+`else
+`include "openMSP430_undefines.v"
+`endif
