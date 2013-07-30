@@ -1,3 +1,7 @@
+2013-07-30 [r190]  
+
+	* Remove dummy memory read access for CMP and BIT instructions.
+
 2013-07-18 [r188]  
 
 	* Add missing include commands for the define and undefine files in
