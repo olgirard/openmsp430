@@ -36,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
+// $Rev: 174 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $LastChangedDate: 2013-01-30 22:18:42 +0100 (Wed, 30 Jan 2013) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -338,7 +338,7 @@ wire  [1:0] mb_wr_msk =  inst_alu[`EXEC_NO_WR]  ? 2'b00 :
                         ~inst_bw                ? 2'b11 :
                          alu_out_add[0]         ? 2'b10 : 2'b01;
 
-assign      mb_en     = mb_rd_det | mb_wr_det;
+assign      mb_en     = mb_rd_det | (mb_wr_det & ~inst_alu[`EXEC_NO_WR]);
 
 assign      mb_wr     = ({2{mb_wr_det}}) & mb_wr_msk;
 

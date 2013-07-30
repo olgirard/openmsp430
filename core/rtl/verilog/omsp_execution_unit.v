@@ -338,7 +338,7 @@ wire  [1:0] mb_wr_msk =  inst_alu[`EXEC_NO_WR]  ? 2'b00 :
                         ~inst_bw                ? 2'b11 :
                          alu_out_add[0]         ? 2'b10 : 2'b01;
 
-assign      mb_en     = mb_rd_det | mb_wr_det;
+assign      mb_en     = mb_rd_det | (mb_wr_det & ~inst_alu[`EXEC_NO_WR]);
 
 assign      mb_wr     = ({2{mb_wr_det}}) & mb_wr_msk;
 
