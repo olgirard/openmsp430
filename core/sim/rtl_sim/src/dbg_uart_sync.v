@@ -225,13 +225,13 @@ initial
       dbg_uart_wr(CPU_CTL,  16'h0002);
 
       // Generate an IRQ
-      wkup[0]   = 1'b1;
+      wkup[0]            = 1'b1;
       @(negedge mclk);
-      irq[0]    = 1'b1;
-      @(negedge irq_acc[0])
+      irq[`IRQ_NR-16]    = 1'b1;
+      @(negedge irq_acc[`IRQ_NR-16])
       @(negedge mclk);
-      wkup[0]   = 1'b0;
-      irq[0]    = 1'b0;
+      wkup[0]            = 1'b0;
+      irq[`IRQ_NR-16]    = 1'b0;
       
       repeat(10) @(posedge mclk);
 

@@ -200,9 +200,9 @@ initial
       test_nr = 8;
 
       // Generate IRQ to terminate the test pattern
-      irq[1] = 1'b1;
+      irq[`IRQ_NR-15] = 1'b1;
       @(r13);
-      irq[1] = 1'b0;
+      irq[`IRQ_NR-15] = 1'b0;
       
       stimulus_done = 1;
 

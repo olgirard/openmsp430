@@ -65,12 +65,12 @@ initial
       #(6000);
       if (inst_cnt !==16'h0000)  tb_error("====== NMI rising edge: CPU is not sleeping =====");
 
-      wkup[0]   = 1'b1;
+      wkup[0]            = 1'b1;
       @(negedge mclk)
-      irq[0]    = 1'b1;
-      @(negedge irq_acc[0])
-      wkup[0]   = 1'b0;
-      irq[0]    = 1'b0;
+      irq[`IRQ_NR-16]    = 1'b1;
+      @(negedge irq_acc[`IRQ_NR-16])
+      wkup[0]            = 1'b0;
+      irq[`IRQ_NR-16]    = 1'b0;
       
       @(r15==16'h1002);
       nmi       = 1'b0;
@@ -182,12 +182,12 @@ initial
       #(2000);
       if (inst_cnt !==16'h0000)  tb_error("====== NMI nested: CPU is not sleeping =====");
       #(2000);
-      wkup[0]   = 1'b1;
-      irq[0]    = 1'b1;
-      @(negedge irq_acc[0])
-      wkup[0]   = 1'b0;
-      irq[0]    = 1'b0;
-      nmi       = 1'b1;
+      wkup[0]            = 1'b1;
+      irq[`IRQ_NR-16]    = 1'b1;
+      @(negedge irq_acc[`IRQ_NR-16])
+      wkup[0]            = 1'b0;
+      irq[`IRQ_NR-16]    = 1'b0;
+      nmi                = 1'b1;
 
       @(r15==16'h4002);
       if (r6       !==16'h0001)  tb_error("====== NMI nested: NMI irq was not taken =====");

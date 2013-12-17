@@ -144,9 +144,9 @@ wire               smclk_en;
 reg                reset_n;
 wire               puc_rst;
 reg                nmi;
-reg         [13:0] irq;
-wire        [13:0] irq_acc;
-wire        [13:0] irq_in;
+reg  [`IRQ_NR-3:0] irq;
+wire [`IRQ_NR-3:0] irq_acc;
+wire [`IRQ_NR-3:0] irq_in;
 reg                cpu_en;
 reg         [13:0] wkup;
 wire        [13:0] wkup_in;
@@ -237,10 +237,10 @@ initial
      dco_local_enable = 1'b0;
      forever
        begin
-	  #25;   // 20 MHz
-	  dco_local_enable = (dco_enable===1) ? dco_enable : (dco_wkup===1);
-	  if (dco_local_enable)
-	    dco_clk = ~dco_clk;
+          #25;   // 20 MHz
+          dco_local_enable = (dco_enable===1) ? dco_enable : (dco_wkup===1);
+          if (dco_local_enable)
+            dco_clk = ~dco_clk;
        end
   end
 
@@ -250,10 +250,10 @@ initial
      lfxt_local_enable = 1'b0;
      forever
        begin
-	  #763;  // 655 kHz
-	  lfxt_local_enable = (lfxt_enable===1) ? lfxt_enable : (lfxt_wkup===1);
-	  if (lfxt_local_enable)
-	    lfxt_clk = ~lfxt_clk;
+          #763;  // 655 kHz
+          lfxt_local_enable = (lfxt_enable===1) ? lfxt_enable : (lfxt_wkup===1);
+          if (lfxt_local_enable)
+            lfxt_clk = ~lfxt_clk;
        end
   end
 
@@ -270,7 +270,7 @@ initial
   begin
      error                   = 0;
      stimulus_done           = 1;
-     irq                     = 14'h0000;
+     irq                     = {`IRQ_NR-2{1'b0}};
      nmi                     = 1'b0;
      wkup                    = 14'h0000;
      cpu_en                  = 1'b1;
@@ -444,7 +444,7 @@ omsp_gpio #(.P1_EN(1),
     .p6_dout_en   (p6_dout_en),        // Port 6 data output enable
     .p6_sel       (p6_sel),            // Port 6 function select
     .per_dout     (per_dout_dio),      // Peripheral data output
-			     
+                             
 // INPUTs
     .mclk         (mclk),              // Main system clock
     .p1_din       (p1_din),            // Port 1 data input
@@ -481,7 +481,7 @@ omsp_timerA timerA_0 (
     .aclk_en      (aclk_en),           // ACLK enable (from CPU)
     .dbg_freeze   (dbg_freeze),        // Freeze Timer A counter
     .inclk        (inclk),             // INCLK external timer clock (SLOW)
-    .irq_ta0_acc  (irq_acc[9]),        // Interrupt request TACCR0 accepted
+    .irq_ta0_acc  (irq_acc[`IRQ_NR-7]),// Interrupt request TACCR0 accepted
     .mclk         (mclk),              // Main system clock
     .per_addr     (per_addr),          // Peripheral address
     .per_din      (per_din),           // Peripheral data input
@@ -578,35 +578,35 @@ assign per_dout = per_dout_dio       |
 // Map peripheral interrupts & wakeups
 //----------------------------------------
 
-assign irq_in  = irq  | {1'b0,           // Vector 13  (0xFFFA)
-                         1'b0,           // Vector 12  (0xFFF8)
-                         1'b0,           // Vector 11  (0xFFF6)
-                         1'b0,           // Vector 10  (0xFFF4) - Watchdog -
-                         irq_ta0,        // Vector  9  (0xFFF2)
-                         irq_ta1,        // Vector  8  (0xFFF0)
-                         irq_uart_rx,    // Vector  7  (0xFFEE)
-                         irq_uart_tx,    // Vector  6  (0xFFEC)
-                         1'b0,           // Vector  5  (0xFFEA)
-                         1'b0,           // Vector  4  (0xFFE8)
-                         irq_port2,      // Vector  3  (0xFFE6)
-                         irq_port1,      // Vector  2  (0xFFE4)
-                         1'b0,           // Vector  1  (0xFFE2)
-                         1'b0};          // Vector  0  (0xFFE0)
+assign irq_in  = irq  | {1'b0,                 // Vector 13  (0xFFFA)
+                         1'b0,                 // Vector 12  (0xFFF8)
+                         1'b0,                 // Vector 11  (0xFFF6)
+                         1'b0,                 // Vector 10  (0xFFF4) - Watchdog -
+                         irq_ta0,              // Vector  9  (0xFFF2)
+                         irq_ta1,              // Vector  8  (0xFFF0)
+                         irq_uart_rx,          // Vector  7  (0xFFEE)
+                         irq_uart_tx,          // Vector  6  (0xFFEC)
+                         1'b0,                 // Vector  5  (0xFFEA)
+                         1'b0,                 // Vector  4  (0xFFE8)
+                         irq_port2,            // Vector  3  (0xFFE6)
+                         irq_port1,            // Vector  2  (0xFFE4)
+                         1'b0,                 // Vector  1  (0xFFE2)
+                         {`IRQ_NR-15{1'b0}}};  // Vector  0  (0xFFE0)
 
-assign wkup_in = wkup | {1'b0,           // Vector 13  (0xFFFA)
-                         1'b0,           // Vector 12  (0xFFF8)
-                         1'b0,           // Vector 11  (0xFFF6)
-                         1'b0,           // Vector 10  (0xFFF4) - Watchdog -
-                         1'b0,           // Vector  9  (0xFFF2)
-                         1'b0,           // Vector  8  (0xFFF0)
-                         1'b0,           // Vector  7  (0xFFEE)
-                         1'b0,           // Vector  6  (0xFFEC)
-                         1'b0,           // Vector  5  (0xFFEA)
-                         1'b0,           // Vector  4  (0xFFE8)
-                         1'b0,           // Vector  3  (0xFFE6)
-                         1'b0,           // Vector  2  (0xFFE4)
-                         1'b0,           // Vector  1  (0xFFE2)
-                         1'b0};          // Vector  0  (0xFFE0)
+assign wkup_in = wkup | {1'b0,                 // Vector 13  (0xFFFA)
+                         1'b0,                 // Vector 12  (0xFFF8)
+                         1'b0,                 // Vector 11  (0xFFF6)
+                         1'b0,                 // Vector 10  (0xFFF4) - Watchdog -
+                         1'b0,                 // Vector  9  (0xFFF2)
+                         1'b0,                 // Vector  8  (0xFFF0)
+                         1'b0,                 // Vector  7  (0xFFEE)
+                         1'b0,                 // Vector  6  (0xFFEC)
+                         1'b0,                 // Vector  5  (0xFFEA)
+                         1'b0,                 // Vector  4  (0xFFE8)
+                         1'b0,                 // Vector  3  (0xFFE6)
+                         1'b0,                 // Vector  2  (0xFFE4)
+                         1'b0,                 // Vector  1  (0xFFE2)
+                         1'b0};                // Vector  0  (0xFFE0)
 
 
 //
@@ -626,7 +626,7 @@ io_cell scl_slave_inst (
   .data_out_en (1'b0),                // Output enable
   .data_out    (1'b0)                 // Output
 );
-							   
+                                                           
 io_cell sda_slave_inst (
   .pad         (dbg_sda),             // I/O pad
   .data_in     (dbg_sda_slave_in),    // Input
@@ -642,7 +642,7 @@ io_cell scl_master_inst (
   .data_out_en (!dbg_scl_master),     // Output enable
   .data_out    (1'b0)                 // Output
 );
-								   
+                                                                   
 io_cell sda_master_inst (
   .pad         (dbg_sda),             // I/O pad
   .data_in     (dbg_sda_master_in),   // Input
@@ -726,17 +726,17 @@ initial // Normal end of test
      $display(" ===============================================");
      if (error!=0)
        begin
-	  $display("|               SIMULATION FAILED               |");
-	  $display("|     (some verilog stimulus checks failed)     |");
+          $display("|               SIMULATION FAILED               |");
+          $display("|     (some verilog stimulus checks failed)     |");
        end
      else if (~stimulus_done)
        begin
-	  $display("|               SIMULATION FAILED               |");
-	  $display("|     (the verilog stimulus didn't complete)    |");
+          $display("|               SIMULATION FAILED               |");
+          $display("|     (the verilog stimulus didn't complete)    |");
        end
      else 
        begin
-	  $display("|               SIMULATION PASSED               |");
+          $display("|               SIMULATION PASSED               |");
        end
      $display(" ===============================================");
      $finish;
@@ -750,8 +750,8 @@ initial // Normal end of test
    task tb_error;
       input [65*8:0] error_string;
       begin
-	 $display("ERROR: %s %t", error_string, $time);
-	 error = error+1;
+         $display("ERROR: %s %t", error_string, $time);
+         error = error+1;
       end
    endtask
 

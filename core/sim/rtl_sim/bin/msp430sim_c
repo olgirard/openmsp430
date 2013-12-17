@@ -106,10 +106,11 @@ echo " ======================================================="
 # Make local copy of the openMSP403 configuration file
 # and prepare it for MSPGCC preprocessing
 cp  $incfile  ./pmem.h
-sed -i 's/`ifdef/#ifdef/g'   ./pmem.h 
-sed -i 's/`else/#else/g'     ./pmem.h 
-sed -i 's/`endif/#endif/g'   ./pmem.h 
-sed -i 's/`define/#define/g' ./pmem.h 
+sed -i 's/`ifdef/#ifdef/g'         ./pmem.h 
+sed -i 's/`else/#else/g'           ./pmem.h 
+sed -i 's/`endif/#endif/g'         ./pmem.h 
+sed -i 's/`define/#define/g'       ./pmem.h 
+sed -i 's/`include/\/\/#include/g' ./pmem.h 
 sed -i 's/`//g'              ./pmem.h 
 sed -i "s/'//g"              ./pmem.h
 

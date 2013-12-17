@@ -58,6 +58,8 @@ mkdir  ./log
 # Interrupts & NMI
 ../bin/msp430sim sing-op_reti             | tee ./log/sing-op_reti.log
 ../bin/msp430sim nmi                      | tee ./log/nmi.log
+../bin/msp430sim irq32                    | tee ./log/irq32.log
+../bin/msp430sim irq64                    | tee ./log/irq64.log
 
 # ROM Data Read access
 ../bin/msp430sim two-op_add_rom-rd        | tee ./log/two-op_add_rom-rd.log

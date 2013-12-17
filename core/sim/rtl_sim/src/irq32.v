@@ -21,17 +21,21 @@
 /* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA        */
 /*                                                                           */
 /*===========================================================================*/
-/*                 SINGLE-OPERAND ARITHMETIC: RETI  INSTRUCTION              */
+/*                 IRQ 1 to 16 FOR SYSTEM WITH 32 IRQs                       */
 /*---------------------------------------------------------------------------*/
-/* Test the RETI instruction.                                                */
+/* Test the some IRQs for RTL configuration with more than 16 IRQs:	     */
+/*                                                                           */
+/*           - for 16 IRQ configuration:  test is skipped.                   */
+/*           - for 32 IRQ configuration:  will test IRQ  1 to 16.            */
+/*           - for 64 IRQ configuration:  will test IRQ 32 to 48.            */
 /*                                                                           */
 /* Author(s):                                                                */
 /*             - Olivier Girard,    olgirard@gmail.com                       */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
-/* $Rev$                                                                */
-/* $LastChangedBy$                                          */
-/* $LastChangedDate$          */
+/* $Rev: 95 $                                                                */
+/* $LastChangedBy: olivier.girard $                                          */
+/* $LastChangedDate: 2011-02-24 21:37:57 +0100 (Thu, 24 Feb 2011) $          */
 /*===========================================================================*/
 
 integer    i;
@@ -42,6 +46,8 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
+`ifdef IRQ_NR_GE_32
+
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
@@ -74,9 +80,9 @@ initial
       //--------------------------
       @(r15==16'h3000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-16:0] = {`IRQ_NR-16+1{1'b1}};
+      irq[`IRQ_NR-32:0] = {`IRQ_NR-32+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-16:0] = {`IRQ_NR-16+1{1'b0}};
+      irq[`IRQ_NR-32:0] = {`IRQ_NR-32+1{1'b0}};
 
       @(r15==16'h3001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ  0: SP value      =====");
@@ -90,9 +96,9 @@ initial
       //--------------------------
       @(r15==16'h4000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-15:0] = {`IRQ_NR-15+1{1'b1}};
+      irq[`IRQ_NR-31:0] = {`IRQ_NR-31+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-15:0] = {`IRQ_NR-15+1{1'b0}};
+      irq[`IRQ_NR-31:0] = {`IRQ_NR-31+1{1'b0}};
 
       @(r15==16'h4001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ  1: SP value      =====");
@@ -106,9 +112,9 @@ initial
       //--------------------------
       @(r15==16'h5000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-14:0] = {`IRQ_NR-14+1{1'b1}};
+      irq[`IRQ_NR-30:0] = {`IRQ_NR-30+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-14:0] = {`IRQ_NR-14+1{1'b0}};
+      irq[`IRQ_NR-30:0] = {`IRQ_NR-30+1{1'b0}};
 
       @(r15==16'h5001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ  2: SP value      =====");
@@ -122,9 +128,9 @@ initial
       //--------------------------
       @(r15==16'h6000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-13:0] = {`IRQ_NR-13+1{1'b1}};
+      irq[`IRQ_NR-29:0] = {`IRQ_NR-29+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-13:0] = {`IRQ_NR-13+1{1'b0}};
+      irq[`IRQ_NR-29:0] = {`IRQ_NR-29+1{1'b0}};
 
       @(r15==16'h6001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ  3: SP value      =====");
@@ -138,9 +144,9 @@ initial
       //--------------------------
       @(r15==16'h7000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-12:0] = {`IRQ_NR-12+1{1'b1}};
+      irq[`IRQ_NR-28:0] = {`IRQ_NR-28+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-12:0] = {`IRQ_NR-12+1{1'b0}};
+      irq[`IRQ_NR-28:0] = {`IRQ_NR-28+1{1'b0}};
 
       @(r15==16'h7001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ  4: SP value      =====");
@@ -154,9 +160,9 @@ initial
       //--------------------------
       @(r15==16'h8000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-11:0] = {`IRQ_NR-11+1{1'b1}};
+      irq[`IRQ_NR-27:0] = {`IRQ_NR-27+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-11:0] = {`IRQ_NR-11+1{1'b0}};
+      irq[`IRQ_NR-27:0] = {`IRQ_NR-27+1{1'b0}};
 
       @(r15==16'h8001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ  5: SP value      =====");
@@ -170,9 +176,9 @@ initial
       //--------------------------
       @(r15==16'h9000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-10:0] = {`IRQ_NR-10+1{1'b1}};
+      irq[`IRQ_NR-26:0] = {`IRQ_NR-26+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-10:0] = {`IRQ_NR-10+1{1'b0}};
+      irq[`IRQ_NR-26:0] = {`IRQ_NR-26+1{1'b0}};
 
       @(r15==16'h9001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ  6: SP value      =====");
@@ -186,9 +192,9 @@ initial
       //--------------------------
       @(r15==16'ha000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-9:0] = {`IRQ_NR-9+1{1'b1}};
+      irq[`IRQ_NR-25:0] = {`IRQ_NR-25+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-9:0] = {`IRQ_NR-9+1{1'b0}};
+      irq[`IRQ_NR-25:0] = {`IRQ_NR-25+1{1'b0}};
 
       @(r15==16'ha001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ  7: SP value      =====");
@@ -202,9 +208,9 @@ initial
       //--------------------------
       @(r15==16'hb000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-8:0] = {`IRQ_NR-8+1{1'b1}};
+      irq[`IRQ_NR-24:0] = {`IRQ_NR-24+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-8:0] = {`IRQ_NR-8+1{1'b0}};
+      irq[`IRQ_NR-24:0] = {`IRQ_NR-24+1{1'b0}};
 
       @(r15==16'hb001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ  8: SP value      =====");
@@ -218,9 +224,9 @@ initial
       //--------------------------
       @(r15==16'hc000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-7:0] = {`IRQ_NR-7+1{1'b1}};
+      irq[`IRQ_NR-23:0] = {`IRQ_NR-23+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-7:0] = {`IRQ_NR-7+1{1'b0}};
+      irq[`IRQ_NR-23:0] = {`IRQ_NR-23+1{1'b0}};
 
       @(r15==16'hc001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ  9: SP value      =====");
@@ -234,9 +240,9 @@ initial
       //--------------------------
       @(r15==16'hd000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-6:0] = {`IRQ_NR-6+1{1'b1}};
+      irq[`IRQ_NR-22:0] = {`IRQ_NR-22+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-6:0] = {`IRQ_NR-6+1{1'b0}};
+      irq[`IRQ_NR-22:0] = {`IRQ_NR-22+1{1'b0}};
 
       @(r15==16'hd001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ 10: SP value      =====");
@@ -250,9 +256,9 @@ initial
       //--------------------------
       @(r15==16'he000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-5:0] = {`IRQ_NR-5+1{1'b1}};
+      irq[`IRQ_NR-21:0] = {`IRQ_NR-21+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-5:0] = {`IRQ_NR-5+1{1'b0}};
+      irq[`IRQ_NR-21:0] = {`IRQ_NR-21+1{1'b0}};
 
       @(r15==16'he001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ 11: SP value      =====");
@@ -266,9 +272,9 @@ initial
       //--------------------------
       @(r15==16'hf000);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-4:0] = {`IRQ_NR-4+1{1'b1}};
+      irq[`IRQ_NR-20:0] = {`IRQ_NR-20+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-4:0] = {`IRQ_NR-4+1{1'b0}};
+      irq[`IRQ_NR-20:0] = {`IRQ_NR-20+1{1'b0}};
 
       @(r15==16'hf001);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ 12: SP value      =====");
@@ -282,9 +288,9 @@ initial
       //--------------------------
       @(r15==16'hf100);
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-3:0] = {`IRQ_NR-3+1{1'b1}};
+      irq[`IRQ_NR-19:0] = {`IRQ_NR-19+1{1'b1}};
       repeat(15) @(posedge mclk);
-      irq[`IRQ_NR-3:0] = {`IRQ_NR-3+1{1'b0}};
+      irq[`IRQ_NR-19:0] = {`IRQ_NR-19+1{1'b0}};
 
       @(r15==16'hf101);
       if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ 13: SP value      =====");
@@ -294,30 +300,46 @@ initial
       if (r8    !==(`PER_SIZE+16'h004e)) tb_error("====== IRQ 13: R8 value      =====");
 
 
-      // Test interruption NMI:	 rising edge
-      //--------------------------------------
-  `ifdef NMI
+      // Test interruption 14
+      //--------------------------
       @(r15==16'hf200);
-      repeat(2) @(negedge mclk);
-      nmi       = 1'b1;
-      @(posedge nmi_detect);
-      irq[`IRQ_NR-3:0] = {`IRQ_NR-3+1{1'b1}};
-      repeat(8) @(posedge mclk);
-      nmi       = 1'b0;
       repeat(2) @(posedge mclk);
-      irq[`IRQ_NR-3:0] = {`IRQ_NR-3+1{1'b0}};
+      irq[`IRQ_NR-18:0] = {`IRQ_NR-18+1{1'b1}};
+      repeat(15) @(posedge mclk);
+      irq[`IRQ_NR-18:0] = {`IRQ_NR-18+1{1'b0}};
 
       @(r15==16'hf201);
-      if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== NMI: SP value      =====");
-      if (r2[3] !==1'b1)                 tb_error("====== NMI: GIE value     =====");
-      if (r6    !==16'h0123)             tb_error("====== NMI: R6 value      =====");
-      if (r7    !==16'h0000)             tb_error("====== NMI: R7 value      =====");
-      if (r8    !==(`PER_SIZE+16'h004e)) tb_error("====== NMI: R8 value      =====");
+      if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ 14: SP value      =====");
+      if (r2[3] !==1'b1)                 tb_error("====== IRQ 14: GIE value     =====");
+      if (r6    !==16'hfedc)             tb_error("====== IRQ 14: R6 value      =====");
+      if (r7    !==16'h0000)             tb_error("====== IRQ 14: R7 value      =====");
+      if (r8    !==(`PER_SIZE+16'h004e)) tb_error("====== IRQ 14: R8 value      =====");
 
-      if (r9    !==16'h0000)             tb_error("====== NMI: NMIE   value  =====");
-      if (r10   !==16'h0010)             tb_error("====== NMI: NMIIFG value  =====");
-   `endif
+
+      // Test interruption 15
+      //--------------------------
+      @(r15==16'hf300);
+      repeat(2) @(posedge mclk);
+      irq[`IRQ_NR-17:0] = {`IRQ_NR-17+1{1'b1}};
+      repeat(15) @(posedge mclk);
+      irq[`IRQ_NR-17:0] = {`IRQ_NR-17+1{1'b0}};
+
+      @(r15==16'hf301);
+      if (r1    !==(`PER_SIZE+16'h0052)) tb_error("====== IRQ 15: SP value      =====");
+      if (r2[3] !==1'b1)                 tb_error("====== IRQ 15: GIE value     =====");
+      if (r6    !==16'hba98)             tb_error("====== IRQ 15: R6 value      =====");
+      if (r7    !==16'h0000)             tb_error("====== IRQ 15: R7 value      =====");
+      if (r8    !==(`PER_SIZE+16'h004e)) tb_error("====== IRQ 15: R8 value      =====");
+
 
       stimulus_done = 1;
+`else
+
+       $display(" ===============================================");
+       $display("|               SIMULATION SKIPPED              |");
+       $display("|    (RTL configured to support 16 IRQs only)   |");
+       $display(" ===============================================");
+       $finish;
+`endif
    end
 
