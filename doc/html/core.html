@@ -3,51 +3,32 @@
 <body>
 <h3>Table of content</h3>
 <ul>
-	<li><a href="#1.%20Introduction">1. Introduction</a></li>
-	<li><a href="#2.%20Design">      2. Design</a>
+<li><a href="#1.%20Introduction">						1. Introduction</a></li>
+<li><a href="#2.%20Core">							2. Core</a>
 	<ul>
-      <li><a href="#2.1%20Core">        2.1 Core</a>
+	<li><a href="#2.1%20Design%20structure">				2.1 Design structure</a></li>
+	<li><a href="#2.2%20Limitations">					2.2 Limitations</a></li>
+	<li><a href="#2.3%20Configuration">					2.3 Configuration</a>
 		<ul>
-   	   <li><a href="#2.1.1%20Design%20structure">              2.1.1 Design structure</a></li>
-   	   <li><a href="#2.1.2%20Limitations">                   2.1.2 Limitations</a></li>
-   	   <li><a href="#2.1.3%20Configuration">                 2.1.3 Configuration</a></li>
-   	   <ul>
-   	        <li><a href="#2.1.3.1%20Basic%20System%20Configuration">          2.1.3.1 Basic System Configuration</a></li>
-   	        <li><a href="#2.1.3.2%20Advanced%20System%20Configuration">       2.1.3.2 Advanced System Configuration</a></li>
-   	        <li><a href="#2.1.3.3%20Expert%20System%20Configuration">         2.1.3.3 Expert System Configuration</a></li>
-   	        <li><a href="#2.1.3.4%20Parameters%20For%20Multi-Core%20Systems"> 2.1.3.4 Parameters For Multi-Core Systems</a></li>
-   	   </ul>
-   	   <li><a href="#2.1.4%20Memory%20mapping">                2.1.4 Memory mapping</a></li>
-   	   <li><a href="#2.1.5%20Pinout">                        2.1.5 Pinout</a></li>
-   	   <li><a href="#2.1.6%20Instruction%20Cycles%20and%20Lengths">2.1.6 Instruction Cycles and Lengths</a></li>
-   	   <li><a href="#2.1.7%20Serial%20Debug%20Interface">        2.1.7 Serial Debug Interface</a></li>
-           <li><a href="#2.1.8%20Benchmark%20results"> 2.1.8 Benchmark results</a></li>
-           <ul>
-                <li><a href="#2.1.8.1%20Dhrystone">2.1.8.1 Dhrystone</a></li>
-                <li><a href="#2.1.8.2%20CoreMark">2.1.8.2 CoreMark</a></li>
-           </ul>
+		<li><a href="#2.3.1%20Basic%20System%20Configuration">		2.3.1 Basic System Configuration</a></li>
+		<li><a href="#2.3.2%20Advanced%20System%20Configuration">	2.3.2 Advanced System Configuration</a></li>
+		<li><a href="#2.3.3%20Expert%20System%20Configuration">		2.3.3 Expert System Configuration</a></li>
+		<li><a href="#2.3.4%20Parameters%20For%20Multi-Core%20Systems">	2.3.4 Parameters For Multi-Core Systems</a></li>
 		</ul>
-  	   </li>	
-      <li><a href="#2.2_System_Peripherals">        2.2 System Peripherals</a>
-		
-        <ul>
-
-   	   <li><a href="#2.2.1%20Basic%20Clock%20Module">            2.2.1 Basic Clock Module: FPGA</a></li>
-          <li><a href="#2.2.2_Basic_Clock_Module_ASIC">            2.2.2 Basic Clock Module: ASIC</a></li>
-          <li><a href="#2.2.3_SFR">2.2.3 SFR</a><br>
-          </li>
-
-
-   	   <li><a href="#2.2.2%20Watchdog%20Timer">                2.2.4 Watchdog Timer</a></li>
-          <li><a href="core.html#2.2.5%2016x16%20Hardware%20Multiplier">     2.2.5 16x16 Hardware Multiplier</a></li>
-        </ul>
-</li>
-      <li><a href="#2.3_Peripherals">        2.3 External Peripherals</a></li>
-      <ul>
-        <li><a href="core.html#2.2.3%20Digital%20I/O">2.3.1 Digital I/O (FPGA ONLY)</a></li>
-        <li><a href="core.html#2.2.4%20Timer%20A">                       2.3.2 Timer A (FPGA ONLY)</a></li>
-      </ul>
-</ul></li>	
+	</li>
+	<li><a href="#2.4%20Memory%20mapping">					2.4 Memory mapping</a></li>
+	<li><a href="#2.5%20Interrupt%20mapping">				2.5 Interrupt mapping</a></li>
+	<li><a href="#2.6%20Pinout">						2.6 Pinout</a></li>
+	<li><a href="#2.7%20Instruction%20Cycles%20and%20Lengths">		2.7 Instruction Cycles and Lengths</a></li>
+	<li><a href="#2.8%20Serial%20Debug%20Interface">			2.8 Serial Debug Interface</a></li>
+	<li><a href="#2.9%20Benchmark%20results">				2.9 Benchmark results</a>
+		<ul>
+		<li><a href="#2.9.1%20Dhrystone">				2.9.1 Dhrystone</a></li>
+		<li><a href="#2.9.2%20CoreMark">				2.9.2 CoreMark</a></li>
+		</ul>
+	</li>
+	</ul>
+</li>	
 </ul>
 
 <a name="1. Introduction"></a>
@@ -79,19 +60,13 @@ data memory blocks internally (these are technology dependent hard
 macros which are connected to the IP during chip integration).
 However the core is fully configurable in regard to the supported RAM
 and/or ROM sizes.
-<br><br>In addition to the CPU core itself, several peripherals are
-also provided and can be easily connected to the core during
-integration.
 <br><br>
 
-<a name="2. Design"></a>
-<h1>2. Design</h1>
+<a name="2. Core"></a>
+<h1>2. Core</h1>
 
-<a name="2.1 Core"></a>
-<h2>2.1 Core</h2>
-
-<a name="2.1.1 Design structure"></a>
-<h3>2.1.1 Design structure</h3>
+<a name="2.1 Design structure"></a>
+<h2>2.1 Design structure</h2>
 
 The following diagram shows the openMSP430 design structure:
 <br><br>
@@ -121,8 +96,8 @@ and is therefore located in the core. It can be included or excluded at will
 through a Verilog define.</li>
 </ul>
 
-<a name="2.1.2 Limitations"></a>
-<h3>2.1.2 Limitations</h3>
+<a name="2.2 Limitations"></a>
+<h2>2.2 Limitations</h2>
 
 The known core limitations are the following:
 <br>
@@ -130,15 +105,17 @@ The known core limitations are the following:
 	<li>Instructions can't be executed from the data memory.</li>
 	</ul>
 
-<a name="2.1.3 Configuration"></a>
-<h3>2.1.3 Configuration</h3>
+<a name="2.3 Configuration"></a>
+<h2>2.3 Configuration</h2>
 
 It is possible to configure the openMSP430 core through the <b><i>openMSP430_defines.v</i></b> file located in the <b><i>rtl</i></b> directory (see <a href="http://www.opencores.org/project,openmsp430,file%20and%20directory%20description">file and directory description</a>).<br>In
 this section, three sets of adjustabe user parameters are discussed in
 order to customize the core. A fourth set is available for ASIC
 specific options and will be discussed in the <a href="http://opencores.org/project,openmsp430,asic%20implementation">ASIC implementation</a>
-section. <a name="2.1.3.1 Basic System Configuration"></a>
-<h4>2.1.3.1 Basic System Configuration</h4>
+section.
+
+<a name="2.3.1 Basic System Configuration"></a>
+<h3>2.3.1 Basic System Configuration</h3>
 
 The basic system can be adjusted with the following set of defines in order to match the target system requirements.
 <br><br>
@@ -216,12 +193,12 @@ The only design considerations at this stage are:
 	<li>The sum of program, data and peripheral memory space <b>MUST NOT</b> exceed 64 kB</li>
 </ul>
 <br> 
-<b><u>Note:</u></b> when selected, custom memory sizes can be specified in the "Expert System Configuration" section.
+<b><u>Note:</u></b> when selected, full custom memory sizes can be specified in the "Expert System Configuration" section.
 <br> 
 <br> 
 
-<a name="2.1.3.2 Advanced System Configuration"></a>
-<h4>2.1.3.2 Advanced System Configuration</h4>
+<a name="2.3.2 Advanced System Configuration"></a>
+<h3>2.3.2 Advanced System Configuration</h3>
 
 In this section, some additional features are available in order to match the needs of more experienced users.
 <br><br>
@@ -264,8 +241,19 @@ In this section, some additional features are available in order to match the ne
       <br>
 ///-------------------------------------------------------<br>
 // Include/Exclude Non-Maskable-Interrupt support<br>
-//-------------------------------------------------------<br>
+//--------------------------------------------------------<br>
 `define NMI<br>
+      <br>
+      <br>
+//-------------------------------------------------------<br>
+// Number of available IRQs<br>
+//-------------------------------------------------------<br>
+// Indicates the number of interrupt vectors supported<br>
+// (16, 32 or 64).<br>
+//-------------------------------------------------------<br>
+`define IRQ_16<br>
+//`define IRQ_32<br>
+//`define IRQ_64<br>
       <br>
       <br>
 //-------------------------------------------------------<br>
@@ -330,11 +318,13 @@ modify this section.</li>
 	<li>The sum of program, data and peripheral memory space <b>MUST NOT</b> exceed 64 kB</li>
 </ul>
 <br>
-<b><u>Note:</u></b> when selected, custom peripheral memory space can be specified in the "Expert System Configuration" section.
+<b><u>Note:</u></b> when selected, full custom peripheral memory space can be specified in the "Expert System Configuration" section.
 <br> 
 <br> 
-<a name="2.1.3.3 Expert System Configuration"></a>
-<h4>2.1.3.3 Expert System Configuration</h4>
+
+<a name="2.3.3 Expert System Configuration"></a>
+<h3>2.3.3 Expert System Configuration</h3>
+
 In this section, you will find configuration options which are
 relevant for roughly 0.1% of the users (according to a highly
 reliable market analysis ;-) ).
@@ -452,14 +442,15 @@ you have a good reason to do so... and if you know what<br>
 //`define ASIC<br></code></td></tr></tbody></table><br><br>
 Design consideration at this stage are:
 <ul>
-	<li>This is the expert section... so you know what your are doing anyway right ;-)</li>
+	<li>This is the expert section... so you know what your are doing anyway, right ;-)</li>
 </ul>
 <br>
 All remaining defines located after the ASIC section in the <b><i>openMSP430_defines.v</i></b> file are system constants and <b>MUST NOT</b> be edited.
 <br> 
 <br> 
-<a name="2.1.3.4 Parameters For Multi-Core Systems"></a>
-<h4>2.1.3.4 Parameters For Multi-Core Systems</h4>
+
+<a name="2.3.4 Parameters For Multi-Core Systems"></a>
+<h3>2.3.4 Parameters For Multi-Core Systems</h3>
 
 In addition to the define file, two Verilog parameters are available to facilitate software development on multi-core systems.<br> 
 For example, in a dual-core openMSP430 system, the cores can be instantiated as following:
@@ -512,8 +503,8 @@ For example, if both cores share the same program memory, the software can take 
 </table>
 <br><br>
 
-<a name="2.1.4 Memory mapping"></a>
-<h3>2.1.4 Memory mapping</h3>
+<a name="2.4 Memory mapping"></a>
+<h2>2.4 Memory mapping</h2>
 
 As discussed earlier, the openMSP430 memory mapping is fully configurable.<br>The
 basic system configuration section allows to adjust program and data
@@ -531,10 +522,19 @@ The following schematic should hopefully illustrate this:<br>
 <br><br>
 <img src="usercontent,img,1306066277" alt="Memory mapping" title="Memory mapping" width="80%">
 <br>
+<br><br>
+
+<a name="2.5 Interrupt mapping"></a>
+<h2>2.5 Interrupt mapping</h2>
+
+The number of supported interrupts is configurable with the IRQ_xx macros.
+The interrupt vectors are then mapped as following:
+<br><br>
+<img src="http://opencores.org/usercontent,img,1387146236" alt="Interrupt mapping" title="Interrupt mapping" width="70%">
 
 <br><br>
-<a name="2.1.5 Pinout"></a>
-<h3>2.1.5 Pinout</h3>
+<a name="2.6 Pinout"></a>
+<h2>2.6 Pinout</h2>
 
 The full pinout of the openMSP430 core is provided in the following table:
 <br><br>
@@ -841,7 +841,7 @@ Set to 0 if unused.<br>
 	<tr>
 		  <td> irq                                                              </td>
 		  <td> Input                                                            </td>
-		  <td> 14                                                               </td>
+		  <td> `IRQ_NR-2<b><sup><font color="#ff0000">1</font></sup></b>        </td>
 		  <td style="vertical-align: top; text-align: center;">mclk<br>
       </td>
 <td> Maskable interrupts (one-hot signal)                             </td>
@@ -859,7 +859,7 @@ Set to 0 if unused.<br>
 	<tr>
 	     <td> irq_acc                                                          </td>
 	     <td> Output                                                           </td>
-	     <td> 14                                                               </td>
+	     <td> `IRQ_NR-2<b><sup><font color="#ff0000">1</font></sup></b>        </td>
 	     <td style="vertical-align: top; text-align: center;">mclk<br>
       </td>
 <td> Interrupt request accepted (one-hot signal)                      </td>
@@ -971,7 +971,7 @@ or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
 
 </tbody></table> 
 <br>
-<b><sup><font color="#ff0000">1</font></sup></b>: This parameter is declared in the "openMSP430_defines.v" file and defines the RAM/ROM size.<br>
+<b><sup><font color="#ff0000">1</font></sup></b>: This parameter is declared in the "openMSP430_defines.v" file and defines the RAM/ROM size or the number of interrupts vectors (16, 32 or 64).<br>
 <b><sup><font color="#ff0000">2</font></sup></b>: These two optional
 ports can be connected whenever the program memory is a RAM. This will
 allow the user to load a program through the serial debug interface and
@@ -981,8 +981,8 @@ to use software breakpoints.<br>
 <br>
 <span style="text-decoration: underline; font-weight: bold;">Note:</span> in the FPGA configuration, the <span style="font-style: italic;">ASIC ONLY</span> signals must be left unconnected (for the outputs) and tied low (for the inputs).<br>
 
-<a name="2.1.6 Instruction Cycles and Lengths"></a>
-<h3>2.1.6 Instruction Cycles and Lengths</h3>
+<a name="2.7 Instruction Cycles and Lengths"></a>
+<h2>2.7 Instruction Cycles and Lengths</h2>
 
 Please note that a detailed description of the instruction and addressing modes can be found in the <b><a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a></b> (Chapter 3).<br><br>
 The number of CPU clock cycles required for an instruction depends on
@@ -1066,17 +1066,17 @@ All jump instructions require one code word, and take two CPU cycles to execute,
 	<tr>                                             <td align="center"> &amp;EDE  </td> <td align="center"> 6 </td> <td align="center"> 3 </td> </tr>
 </tbody></table>
 
-<a name="2.1.7 Serial Debug Interface"></a>
-<h3>2.1.7 Serial Debug Interface</h3>
+<a name="2.8 Serial Debug Interface"></a>
+<h2>2.8 Serial Debug Interface</h2>
 
 All the details about the Serial Debug Interface are located <a href="http://opencores.org/project,openmsp430,serial%20debug%20interface">here</a>.<br>
 <br>
 
-<a name="2.1.8 Benchmark results"></a>
-<h3>2.1.8 Benchmark results</h3>
+<a name="2.9 Benchmark results"></a>
+<h2>2.9 Benchmark results</h2>
 
-<a name="2.1.8.1 Dhrystone"></a>
-<h4>2.1.8.1 Dhrystone (DMIPS/MHz)</h4>
+<a name="2.9.1 Dhrystone"></a>
+<h3>2.9.1 Dhrystone (DMIPS/MHz)</h3>
 Dhrystone is known for being susceptible to compiler optimizations (among other issues).<br>However,
 as it is still quite a popular metric, some results are provided here
 (ranging from 0.30 to 0.45 DMIPS/MHz depending on the compiler version
@@ -1128,8 +1128,8 @@ Note that the used C-code is available in the repository <a href="http://opencor
   </tbody>
 </table>
 
-<a name="2.1.8.2 CoreMark"></a>
-<h4>2.1.8.2 CoreMark (CoreMark/MHz)</h4>
+<a name="2.9.2 CoreMark"></a>
+<h3>2.9.2 CoreMark (CoreMark/MHz)</h3>
 CoreMark tries to address most of Dhrystone's pitfall by preventing the
 compiler to optimize some code away and using "real-life" algorithm.<br>
 Note that the used C-code is available in the repository <a href="http://opencores.org/websvn,listing?repname=openmsp430&amp;path=%2Fopenmsp430%2Ftrunk%2Fcore%2Fsim%2Frtl_sim%2Fsrc-c%2Fcoremark_v1.0%2F#path_openmsp430_trunk_core_sim_rtl_sim_src-c_coremark_v1.0_">here</a>.<br>
@@ -1164,499 +1164,5 @@ Note that the used C-code is available in the repository <a href="http://opencor
     </tr>
   </tbody>
 </table>
-<br>
-
-<a name="2.2_System_Peripherals"></a>
-<h2>2.2 System Peripherals</h2>
-In addition to the CPU core itself, several peripherals are also
-provided and can be easily connected to the core during integration.
-The followings are directly integrated within the core because of their
-tight links with the CPU.<br>
-It is to be noted that <span style="font-weight: bold;">ALL</span> system peripherals support both ASIC and FPGA versions.<br>
-<a name="2.2.1 Basic Clock Module"></a>
-<h3>2.2.1 Basic Clock Module: FPGA<br>
-</h3>In order to make an FPGA
-implementation as simple as possible (ideally, a non-professional designer should be
-able to do it), clock gates are not used in this design configuration and neither are
-clock muxes.
-<br>
-With these constrains, the Basic Clock Module is implemented as following:
-<br><br>
-<img src="usercontent,img,1319831724" alt="Clock structure diagram" title="Clock structure diagram" width="80%">
-<br>
-<b>Note</b>: CPUOFF doesn't switch MCLK off and will instead bring the
-CPU state machines in an IDLE state while MCLK will still be running.
-<br><br>
-
-In order to '<i>clock</i>' a register with ACLK or SMCLK, the following structure needs to be implemented:
-<br><br>
-<img src="usercontent,img,1246434793" alt="Clock implementation example" title="Clock implementation example">
-<br><br>For example, the following Verilog code would implement a counter clocked with SMCLK:
-<br>
-<table border="0" cellpadding="0" cellspacing="4">
-<tbody><tr>
-<td width="35"><br>
-</td>
-<td bgcolor="#d0d0d0" width="3"><br>
-</td>
-<td width="15"><br>
-</td>
-<td>
-	<code>
-		      reg  [7:0] test_cnt;
-		<br>
-		<br>always @ (posedge mclk or posedge puc_rst)
-		<br>  if (puc_rst)       test_cnt &lt;=  8'h00;
-		<br>  else if (smclk_en) test_cnt &lt;=  test_cnt + 8'h01;
-	</code>
-</td>
-</tr>
-</tbody></table>
-<br><br>
-<b>Register Description</b>
-<ul>
-	<li>DCOCTL: Not implemented</li>
-	<li>BCSCTL1:
-	<ul>
-      <li>BCSCTL1[7:6]: Unused</li>
-      <li>BCSCTL1[5:4]: DIVAx</li>
-      <li>BCSCTL1[4:0]: Unused</li>
-	</ul>
-	</li>	
-	<li>BCSCTL2:
-	<ul>
-      <li>BCSCTL2[7:4]: Unused</li>
-      <li>BCSCTL2[3]&nbsp;&nbsp;&nbsp;: SELS</li>
-      <li>BCSCTL2[2:1]: DIVSx</li>
-      <li>BCSCTL2[0]&nbsp;&nbsp;&nbsp;: Unused</li>
-	</ul></li>
-</ul><a name="2.2.2_Basic_Clock_Module_ASIC"></a>
-<h3>2.2.2 Basic Clock Module: ASIC<br>
-</h3>
-When targeting an ASIC, up to all clock management
-options available in the <a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a> (Chapter 4) can be included:<br><br>
-
-<img src="usercontent,img,1319832480" alt="Clock structure diagram" title="Clock structure diagram" width="80%"><br>
-Additional info can be found in the <a href="http://opencores.org/project,openmsp430,asic%20implementation">ASIC implementation</a>
-section.<br>
-<br>
-<a name="2.2.3_SFR"></a>
-<h3>2.2.3 SFR</h3>Following the <a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a>, this peripheral implements flags and interrupt enable bits for the Watchdog Timer and NMI:<br>
-<br>
-<table border="1">
-
-
-<tbody><tr align="center">
-<td rowspan="2"><b><small>Register Name</small></b></td>
-<td rowspan="2"><b><small>Address</small></b></td>
-      <td colspan="8" rowspan="1" style="vertical-align: top;"><small style="font-weight: bold;">Bit Fields</small><br>
-      </td>
-
-</tr>
-<tr align="center">
-
-
-
-
-
-
-      <td style="vertical-align: top;"><small>7<br>
-      </small></td>
-      <td style="vertical-align: top;"><small>6<br>
-      </small></td>
-      <td style="vertical-align: top;"><small>5<br>
-      </small></td>
-      <td style="vertical-align: top;"><small>4<br>
-      </small></td>
-      <td style="vertical-align: top;"><small>3<br>
-      </small></td>
-      <td style="vertical-align: top;"><small>2<br>
-      </small></td>
-      <td style="vertical-align: top;"><small>1<br>
-      </small></td>
-      <td style="vertical-align: top;"><small>0<br>
-      </small></td>
-
-
-</tr>
-<tr align="center">
-<td>IE1<br>
-</td>
-<td><small>0x0000</small></td>
-
-
-
-      <td colspan="3" rowspan="1" style="vertical-align: top; text-align: center;"><small>&nbsp;Reserved <br>
-      </small></td>
-      
-      
-      <td style="vertical-align: top;">NMIIE <b><sup><font color="#ff0000">1</font></sup></b></td>
-      <td colspan="3" rowspan="1" style="vertical-align: top;"><small>&nbsp; Reserved&nbsp;</small>
-      </td>
-      
-      
-      <td style="vertical-align: top;">WDTIE <b><sup><font color="#ff0000">2</font></sup></b></td>
-
-</tr>
-<tr align="center">
-<td>IFG1<br>
-</td>
-<td><small>0x0002</small></td>
-
-      <td colspan="3" rowspan="1" style="vertical-align: top;"><small>Reserved</small><br>
-
-      </td>
-      
-      
-      <td style="vertical-align: top;">NMIIFG <b><sup><font color="#ff0000">1</font></sup></b></td>
-      <td colspan="3" rowspan="1" style="vertical-align: top;"><small>Reserved</small></td>
-      
-      
-      <td style="vertical-align: top;">WDTIFG <b><sup><font color="#ff0000">2</font></sup></b></td>
-
-
-</tr>
-</tbody>
-</table>
-<br>
-<b><sup><font color="#ff0000">1</font></sup></b>: These fields are not available if the NMI is excluded (see <i>openMSP430_defines.v</i> )<br>
-<b><sup><font color="#ff0000">2</font></sup></b>: These fields are not available if the Watchdog is excluded (see <i>openMSP430_defines.v</i> )<br>
-<br>
-In addition, three 16-bit read-only registers have been added in order
-to let the software know with which version of the openMSP430 it is
-running:<br>
-<br>
-<table border="1">
-
-<tbody><tr align="center">
-<td rowspan="2"><b><small>Register Name</small></b></td>
-<td rowspan="2"><b><small>Address</small></b></td>
-<td colspan="16"><b><small>Bit Field</small></b></td>
-</tr>
-<tr align="center">
-<td><small>15</small></td><td><small>14</small></td>
-<td><small>13</small></td><td><small>12</small></td>
-<td><small>11</small></td><td><small>10</small></td>
-<td><small> 9</small></td><td><small> 8</small></td>
-<td><small> 7</small></td><td><small> 6</small></td>
-<td><small> 5</small></td><td><small> 4</small></td>
-<td><small> 3</small></td><td><small> 2</small></td>
-<td><small> 1</small></td><td><small> 0</small></td>
-</tr>
-<tr align="center">
-<td><small>CPU_ID_LO</small></td>
-<td><small>0x0004</small></td>
-<td colspan="7"><font size="-5">PER_SPACE</font></td>
-<td colspan="5"><font size="-5">USER_VERSION</font></td>
-<td colspan="1"><font size="-5">ASIC</font></td>
-<td colspan="3"><font size="-5">CPU_VERSION</font></td>
-</tr>
-<tr align="center">
-<td><small>CPU_ID_HI</small></td>
-<td><small>0x0006</small></td>
-<td colspan="6"><font size="-5">PMEM_SIZE</font></td>
-<td colspan="9"><font size="-5">DMEM_SIZE</font></td>
-<td colspan="1"><font size="-5">MPY</font></td>
-</tr><tr>
-      <td style="vertical-align: top; text-align: center;"><small>CPU_NR</small></td>
-      <td style="vertical-align: top; text-align: center;"><small>0x0008</small></td>
-      <td colspan="8" rowspan="1" style="vertical-align: top; text-align: center;"><font size="-5">CPU_TOTAL_NR</font></td>
-      <td colspan="8" rowspan="1" style="vertical-align: top; text-align: center;"><font size="-5">CPU_INST_NR</font></td>
-    </tr>
-
-</tbody>
-</table>
-<br>
-<table border="0">
-
-<tbody><tr>
-   <td>&nbsp;</td><td valign="top"><li><b>CPU_VERSION</b></li></td>
-   <td>: Current CPU version<br>
-</td>
-</tr>
-<tr>
-   <td>&nbsp;</td><td valign="top"><li><b>ASIC</b></li></td>
-   <td>: Defines if the ASIC specific features are enabled in the current openMSP430 implementation.</td>
-</tr>
-<tr>
-   <td>&nbsp;</td><td valign="top"><li><b>USER_VERSION</b></li></td>
-   <td>: Reflects the value defined in the <b style="font-style: italic;">openMSP430_defines.v</b> file.</td>
-</tr>
-<tr>
-   <td>&nbsp;</td><td valign="top"><li><b>PER_SPACE</b></li></td>
-   <td>: Peripheral address space for the current implementation (byte size = PER_SPACE*512)</td>
-</tr>
-<tr>
-   <td>&nbsp;</td><td valign="top"><li><b>MPY</b></li></td>
-   <td>: This bit is set if the hardware multiplier is included in the current implementation</td>
-</tr>
-<tr>
-   <td>&nbsp;</td><td valign="top"><li><b>DMEM_SIZE</b></li></td>
-   <td>: Data memory size for the current implementation (byte size = DMEM_SIZE*128)</td>
-</tr>
-<tr>
-   <td>&nbsp;</td><td valign="top"><li><b>PMEM_SIZE</b></li></td>
-   <td>: Progam memory size for the current implementation (byte size = PMEM_SIZE*1024)</td>
-</tr>
-<tr>
-   <td>&nbsp;</td><td valign="top"><li><b>CPU_INST_NR</b></li></td>
-   <td>: Current oMSP instance number (for multicore systems)</td>
-</tr>
-<tr>
-   <td>&nbsp;</td><td valign="top"><li><b>CPU_TOTAL_NR</b></li></td>
-   <td>: Total number of oMSP instances-1 (for multicore systems)</td>
-</tr>
-</tbody>
-</table>
-<br>
-<span style="font-weight: bold; text-decoration: underline;">Note:</span> attentive readers will have noted that <span style="font-style: italic;">CPU_ID_LO</span>, <span style="font-style: italic;">CPU_ID_HI</span> and <span style="font-style: italic;">CPU_NR</span> are identical to the Serial Debug Interface register counterparts.<br>
-<a name="2.2.2 Watchdog Timer"></a>
-<h3>2.2.4 Watchdog Timer</h3>
-
-
-
-
-100% of the features advertised in the <a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a> (Chapter 10) have been implemented.<br>
-
-<br>
-
-The following parameter in the <i>openMSP430_defines.v</i> file controls if the watchdog timer should be included or not:<br>
-<br>
-<table border="0" cellpadding="0" cellspacing="4">
-
-<tbody><tr>
-<td width="35"><br>
-</td>
-<td bgcolor="#d0d0d0" width="3"><br>
-</td>
-<td width="15"><br>
-</td>
-<td>
-	<code>//-------------------------------------------------------<br>
-// Include/Exclude Watchdog timer<br>
-//-------------------------------------------------------<br>
-// When excluded, the following functionality will be<br>
-// lost:<br>
-//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Watchog (both interval and watchdog modes)<br>
-//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - NMI interrupt edge selection<br>
-//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - Possibility to generate a software PUC reset<br>
-//-------------------------------------------------------<br>
-`define WATCHDOG</code></td></tr></tbody>
-</table>
-<br>
-<a name="2.2.5 16x16 Hardware Multiplier"></a>
-<h3>2.2.5 16x16 Hardware Multiplier</h3>
-
-100% of the features advertised in the <a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a> (Chapter 7) have been implemented.
-<br><br>
-The following parameter in the <i>openMSP430_defines.v</i> file controls if the hardware multiplier should be included or not:<br><br>
-<table border="0" cellpadding="0" cellspacing="4">
-<tbody><tr>
-<td width="35"><br>
-</td>
-<td bgcolor="#d0d0d0" width="3"><br>
-</td>
-<td width="15"><br>
-</td>
-<td>
-	<code>
-            // Include/Exclude Hardware Multiplier
-		<br>`define MULTIPLIER
-	</code>
-</td>
-</tr>
-</tbody></table>
-<a name="2.3_Peripherals"></a>
-<h2>2.3 External Peripherals</h2>
-The external peripherals labeld with the "FPGA ONLY" tag do not contain
-any clock gate nor clock muxes and are clocked with MCLK only. This
-mean that they don't support any of the low power modes and therefore are most likely not suited for an ASIC implementation.<br>
-<br>
-<a name="2.2.3 Digital I/O"></a>
-<h3>2.3.1 Digital I/O (FPGA ONLY)<br>
-</h3>
-
-
-100% of the features advertised in the <a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a> (Chapter 9) have been implemented.
-<br>
-<br>
-
-The following Verilog parameters will enable or disable the corresponding ports in order to save area (i.e. FPGA utilization):
-<br>
-<br>
-
-<table border="0" cellpadding="0" cellspacing="4">
-
-<tbody><tr>
-<td width="35"><br>
-</td>
-<td bgcolor="#d0d0d0" width="3"><br>
-</td>
-<td width="15"><br>
-</td>
-<td>
-	<code>
-		      parameter           P1_EN = 1'b1;   // Enable Port 1
-		<br>parameter           P2_EN = 1'b1;   // Enable Port 2
-		<br>parameter           P3_EN = 1'b0;   // Enable Port 3
-		<br>parameter           P4_EN = 1'b0;   // Enable Port 4
-		<br>parameter           P5_EN = 1'b0;   // Enable Port 5
-		<br>parameter           P6_EN = 1'b0;   // Enable Port 6
-	</code>
-</td>
-</tr>
-</tbody>
-</table>
-
-<br>
-
-They can be updated as following during the module instantiation (here port 1, 2 and 3 are enabled):
-<br>
-<br>
-
-<table border="0" cellpadding="0" cellspacing="4">
-
-<tbody><tr>
-<td width="35"><br>
-</td>
-<td bgcolor="#d0d0d0" width="3"><br>
-</td>
-<td width="15"><br>
-</td>
-<td>
-	<code>
-		      gpio #(.P1_EN(1),
-		<br>       .P2_EN(1),
-		<br>       .P3_EN(1),
-		<br>       .P4_EN(0),
-		<br>       .P5_EN(0),
-		<br>       .P6_EN(0)) gpio_0 (
-	</code>
-</td>
-</tr>
-</tbody>
-</table>
-
-<br>
-
-The full pinout of the GPIO module is provided in the following table:
-<br>
-<br>
-
-<table border="1">
-
-	<tbody><tr> <td align="center"><b>Port Name</b></td> <td align="center"><b>Direction</b></td> <td align="center"><b>Width</b>    </td> <td align="center"><b>Description</b></td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Clocks &amp; Resets</i></b>  </td></tr>
-	<tr> <td> mclk           </td> <td>  Input         </td> <td>       1        </td> <td> Main system clock                           </td> </tr>
-	<tr> <td> puc_rst        </td> <td>  Input         </td> <td>       1        </td> <td> Main system reset                           </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Interrupts</i></b>  </td></tr>
-	<tr> <td> irq_port1      </td> <td>  Output        </td> <td>       1        </td> <td> Port 1 interrupt                            </td> </tr>
-	<tr> <td> irq_port2      </td> <td>  Output        </td> <td>       1        </td> <td> Port 2 interrupt                            </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>External Peripherals interface</i></b>  </td></tr>
-	<tr> <td> per_addr       </td> <td>  Input         </td> <td>       8        </td> <td> Peripheral address                          </td> </tr>
-	<tr> <td> per_din        </td> <td>  Input         </td> <td>      16        </td> <td> Peripheral data input                       </td> </tr>
-	<tr> <td> per_dout       </td> <td>  Output        </td> <td>      16        </td> <td> Peripheral data output                      </td> </tr>
-	<tr> <td> per_en         </td> <td>  Input         </td> <td>       1        </td> <td> Peripheral enable (high active)             </td> </tr>
-	<tr> <td> per_wen        </td> <td>  Input         </td> <td>       2        </td> <td> Peripheral write enable (high active)       </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Port 1</i></b>  </td></tr>
-	<tr> <td> p1_din         </td> <td>  Input         </td> <td>       8        </td> <td> Port 1 data input                           </td> </tr>
-	<tr> <td> p1_dout        </td> <td>  Output        </td> <td>       8        </td> <td> Port 1 data output                          </td> </tr>
-	<tr> <td> p1_dout_en     </td> <td>  Output        </td> <td>       8        </td> <td> Port 1 data output enable                   </td> </tr>
-	<tr> <td> p1_sel         </td> <td>  Output        </td> <td>       8        </td> <td> Port 1 function select                      </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Port 2</i></b>  </td></tr>
-	<tr> <td> p2_din         </td> <td>  Input         </td> <td>       8        </td> <td> Port 2 data input                           </td> </tr>
-	<tr> <td> p2_dout        </td> <td>  Output        </td> <td>       8        </td> <td> Port 2 data output                          </td> </tr>
-	<tr> <td> p2_dout_en     </td> <td>  Output        </td> <td>       8        </td> <td> Port 2 data output enable                   </td> </tr>
-	<tr> <td> p2_sel         </td> <td>  Output        </td> <td>       8        </td> <td> Port 2 function select                      </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Port 3</i></b>  </td></tr>
-	<tr> <td> p3_din         </td> <td>  Input         </td> <td>       8        </td> <td> Port 3 data input                           </td> </tr>
-	<tr> <td> p3_dout        </td> <td>  Output        </td> <td>       8        </td> <td> Port 3 data output                          </td> </tr>
-	<tr> <td> p3_dout_en     </td> <td>  Output        </td> <td>       8        </td> <td> Port 3 data output enable                   </td> </tr>
-	<tr> <td> p3_sel         </td> <td>  Output        </td> <td>       8        </td> <td> Port 3 function select                      </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Port 4</i></b>  </td></tr>
-	<tr> <td> p4_din         </td> <td>  Input         </td> <td>       8        </td> <td> Port 4 data input                           </td> </tr>
-	<tr> <td> p4_dout        </td> <td>  Output        </td> <td>       8        </td> <td> Port 4 data output                          </td> </tr>
-	<tr> <td> p4_dout_en     </td> <td>  Output        </td> <td>       8        </td> <td> Port 4 data output enable                   </td> </tr>
-	<tr> <td> p4_sel         </td> <td>  Output        </td> <td>       8        </td> <td> Port 4 function select                      </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Port 5</i></b>  </td></tr>
-	<tr> <td> p5_din         </td> <td>  Input         </td> <td>       8        </td> <td> Port 5 data input                           </td> </tr>
-	<tr> <td> p5_dout        </td> <td>  Output        </td> <td>       8        </td> <td> Port 5 data output                          </td> </tr>
-	<tr> <td> p5_dout_en     </td> <td>  Output        </td> <td>       8        </td> <td> Port 5 data output enable                   </td> </tr>
-	<tr> <td> p5_sel         </td> <td>  Output        </td> <td>       8        </td> <td> Port 5 function select                      </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Port 6</i></b>  </td></tr>
-	<tr> <td> p6_din         </td> <td>  Input         </td> <td>       8        </td> <td> Port 6 data input                           </td> </tr>
-	<tr> <td> p6_dout        </td> <td>  Output        </td> <td>       8        </td> <td> Port 6 data output                          </td> </tr>
-	<tr> <td> p6_dout_en     </td> <td>  Output        </td> <td>       8        </td> <td> Port 6 data output enable                   </td> </tr>
-	<tr> <td> p6_sel         </td> <td>  Output        </td> <td>       8        </td> <td> Port 6 function select                      </td> </tr>
-      </tbody>
-</table>
- 
-
-<a name="2.2.4 Timer A"></a>
-<h3>2.3.2 Timer A (FPGA ONLY)</h3>
-
-
-
-100% of the features advertised in the <a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a> (Chapter 11) have been implemented.
-<br>
-<br>
-
-The full pinout of the Timer A module is provided in the following table:
-<br>
-<br>
-
-<table border="1">
-
-	<tbody><tr> <td align="center"><b>Port Name</b></td> <td align="center"><b>Direction</b></td> <td align="center"><b>Width</b>    </td> <td align="center"><b>Description</b></td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Clocks, Resets &amp; Debug</i></b>  </td></tr>
-	<tr> <td> mclk           </td> <td>  Input         </td> <td>       1        </td> <td> Main system clock                          </td> </tr>
-	<tr> <td> aclk_en        </td> <td>  Input         </td> <td>       1        </td> <td> ACLK enable (from CPU)                     </td> </tr>
-	<tr> <td> smclk_en       </td> <td>  Input         </td> <td>       1        </td> <td> SMCLK enable (from CPU)                    </td> </tr>
-	<tr> <td> inclk          </td> <td>  Input         </td> <td>       1        </td> <td> INCLK external timer clock (SLOW)          </td> </tr>
-	<tr> <td> taclk          </td> <td>  Input         </td> <td>       1        </td> <td> TACLK external timer clock (SLOW)          </td> </tr>
-	<tr> <td> puc_rst        </td> <td>  Input         </td> <td>       1        </td> <td> Main system reset                          </td> </tr>
-	<tr> <td> dbg_freeze     </td> <td>  Input         </td> <td>       1        </td> <td> Freeze Timer A counter                     </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Interrupts</i></b>  </td></tr>
-	<tr> <td> irq_ta0        </td> <td>  Output        </td> <td>       1        </td> <td> Timer A interrupt: TACCR0                  </td> </tr>
-	<tr> <td> irq_ta1        </td> <td>  Output        </td> <td>       1        </td> <td> Timer A interrupt: TAIV, TACCR1, TACCR2    </td> </tr>
-	<tr> <td> irq_ta0_acc    </td> <td>  Input         </td> <td>       1        </td> <td> Interrupt request TACCR0 accepted          </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>External Peripherals interface</i></b>  </td></tr>
-	<tr> <td> per_addr       </td> <td>  Input         </td> <td>       8        </td> <td> Peripheral address                         </td> </tr>
-	<tr> <td> per_din        </td> <td>  Input         </td> <td>      16        </td> <td> Peripheral data input                      </td> </tr>
-	<tr> <td> per_dout       </td> <td>  Output        </td> <td>      16        </td> <td> Peripheral data output                     </td> </tr>
-	<tr> <td> per_en         </td> <td>  Input         </td> <td>       1        </td> <td> Peripheral enable (high active)            </td> </tr>
-	<tr> <td> per_wen        </td> <td>  Input         </td> <td>       2        </td> <td> Peripheral write enable (high active)      </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Capture/Compare Unit 0</i></b>  </td></tr>
-	<tr> <td> ta_cci0a       </td> <td>  Input         </td> <td>       1        </td> <td> Timer A capture 0 input A                  </td> </tr>
-	<tr> <td> ta_cci0b       </td> <td>  Input         </td> <td>       1        </td> <td> Timer A capture 0 input B                  </td> </tr>
-	<tr> <td> ta_out0        </td> <td>  Output        </td> <td>       1        </td> <td> Timer A output 0                           </td> </tr>
-	<tr> <td> ta_out0_en     </td> <td>  Output        </td> <td>       1        </td> <td> Timer A output 0 enable                    </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Capture/Compare Unit 1</i></b>  </td></tr>
-	<tr> <td> ta_cci1a       </td> <td>  Input         </td> <td>       1        </td> <td> Timer A capture 1 input A                  </td> </tr>
-	<tr> <td> ta_cci1b       </td> <td>  Input         </td> <td>       1        </td> <td> Timer A capture 1 input B                  </td> </tr>
-	<tr> <td> ta_out1        </td> <td>  Output        </td> <td>       1        </td> <td> Timer A output 1                           </td> </tr>
-	<tr> <td> ta_out1_en     </td> <td>  Output        </td> <td>       1        </td> <td> Timer A output 1 enable                    </td> </tr>
-	<tr> <td colspan="4" align="center"> <b><i>Capture/Compare Unit 2</i></b>  </td></tr>
-	<tr> <td> ta_cci2a       </td> <td>  Input         </td> <td>       1        </td> <td> Timer A capture 2 input A                  </td> </tr>
-	<tr> <td> ta_cci2b       </td> <td>  Input         </td> <td>       1        </td> <td> Timer A capture 2 input B                  </td> </tr>
-	<tr> <td> ta_out2        </td> <td>  Output        </td> <td>       1        </td> <td> Timer A output 2                           </td> </tr>
-	<tr> <td> ta_out2_en     </td> <td>  Output        </td> <td>       1        </td> <td> Timer A output 2 enable                    </td> </tr>
-</tbody>
-</table>
- 
-<br>
-
-<b>Note</b>: for the same reason as with the Basic Clock Module FPGA version, the
-two additional clock inputs (TACLK and INCLK) are internally
-synchronized with the MCLK domain.
-As a consequence, TACLK and INCLK should be at least 2 times slowlier
-than MCLK, and if these clock are used toghether with the Timer A
-output unit, some jitter might be observed on the generated output.
-If this jitter is critical for the application, ACLK and INCLK should
-idealy be derivated from DCO_CLK.
-<br>
-<br>
-<br>
-
 <br><br>
 </body></html>

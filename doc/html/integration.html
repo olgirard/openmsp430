@@ -285,7 +285,7 @@ or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
 	<tr>
 		  <td> <a href="#7.%20Interrupts">irq</a>                                </td>
 		  <td style="text-align: center;"> Input                                                            </td>
-		  <td style="text-align: center;"> 14                                                               </td>
+		  <td style="text-align: center;"> <small>`IRQ_NR-2</small><sup style="font-weight: bold; color: red;">1</sup></td>
 		  <td style="vertical-align: top; text-align: center;">mclk</td>
 <td> Maskable interrupts (one-hot signal)                             </td>
    </tr>
@@ -301,7 +301,7 @@ or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
 	<tr>
 	     <td> <a href="#7.%20Interrupts">irq_acc</a>                            </td>
 	     <td style="text-align: center;"> Output                                                           </td>
-	     <td style="text-align: center;"> 14                                                               </td>
+	     <td style="text-align: center;"> <small>`IRQ_NR-2</small><sup style="font-weight: bold; color: red;">1</sup></td>
 	     <td style="vertical-align: top; text-align: center;">mclk</td>
 <td> Interrupt request accepted (one-hot signal)                      </td>
 	</tr>
@@ -403,7 +403,7 @@ or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
 
 </tbody></table> 
 <br>
-<span class="Apple-style-span" style="color: rgb(0, 0, 0); font-family: 'Times New Roman'; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><b><sup><font color="#ff0000">1</font></sup></b>: This parameter is declared in the "openMSP430_defines.v" file and defines the RAM/ROM size.<br><b><sup><font color="#ff0000">2</font></sup></b>:
+<span class="Apple-style-span" style="color: rgb(0, 0, 0); font-family: 'Times New Roman'; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><b><sup><font color="#ff0000">1</font></sup></b>: This parameter is declared in the "openMSP430_defines.v" file and defines the RAM/ROM size or the number of interrupts vectors (16, 32 or 64).<br><b><sup><font color="#ff0000">2</font></sup></b>:
 These two optional ports can be connected whenever the program memory
 is a RAM. This will allow the user to load a program through the serial
 debug interface and to use software breakpoints.<br><b><sup><font color="#ff0000">3</font></sup></b>: When disabled, the debug interface is hold into reset (and clock gated in ASIC mode). As a consequence, the<span class="Apple-converted-space">&nbsp;</span><b><i>dbg_en</i></b><span class="Apple-converted-space">&nbsp;</span>port can be used to reset the debug interface without disrupting the CPU execution.<br><b><sup><font color="#ff0000">4</font></sup></b>: Clock domain is selectable through configuration in the "openMSP430_defines.v" file (see Advanced System Configuration).</span><sup></sup><br>
