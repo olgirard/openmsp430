@@ -97,7 +97,7 @@ function [4:0] bcd_add;
 
    reg   [4:0] Z_;
    begin
-      Z_ = {1'b0,X}+{1'b0,Y}+{4'b0,C_};
+      Z_ = {1'b0,X}+{1'b0,Y}+{4'b0000,C_};
       if (Z_<5'd10) bcd_add = Z_;
       else          bcd_add = Z_+5'd6;
    end

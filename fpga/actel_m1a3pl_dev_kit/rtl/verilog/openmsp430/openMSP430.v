@@ -36,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
+// $Rev: 175 $
 // $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $LastChangedDate: 2013-01-30 22:21:42 +0100 (Wed, 30 Jan 2013) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -114,7 +114,7 @@ output [`DMEM_MSB:0] dmem_addr;         // Data Memory address
 output               dmem_cen;          // Data Memory chip enable (low active)
 output        [15:0] dmem_din;          // Data Memory data input
 output         [1:0] dmem_wen;          // Data Memory write enable (low active)
-output        [13:0] irq_acc;           // Interrupt request accepted (one-hot signal)
+output [`IRQ_NR-3:0] irq_acc;           // Interrupt request accepted (one-hot signal)
 output               lfxt_enable;       // ASIC ONLY: Low frequency oscillator enable
 output               lfxt_wkup;         // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
 output               mclk;              // Main system clock
@@ -142,7 +142,7 @@ input                dbg_i2c_sda_in;    // Debug interface: I2C SDA IN
 input                dbg_uart_rxd;      // Debug interface: UART RXD (asynchronous)
 input                dco_clk;           // Fast oscillator (fast clock)
 input         [15:0] dmem_dout;         // Data Memory data output
-input  	      [13:0] irq;               // Maskable interrupts
+input  [`IRQ_NR-3:0] irq;               // Maskable interrupts (14, 30 or 62)
 input                lfxt_clk;          // Low frequency oscillator (typ 32kHz)
 input  	             nmi;               // Non-maskable interrupt (asynchronous and non-glitchy)
 input         [15:0] per_dout;          // Peripheral data output
@@ -261,7 +261,7 @@ omsp_clock_module clock_module_0 (
     .puc_rst      (puc_rst),       // Main system reset
     .smclk        (smclk),         // SMCLK
     .smclk_en     (smclk_en),      // SMCLK enable
-	     
+             
 // INPUTs
     .cpu_en       (cpu_en),        // Enable CPU code execution (asynchronous)
     .cpuoff       (cpuoff),        // Turns off the CPU
@@ -317,7 +317,7 @@ omsp_frontend frontend_0 (
     .nmi_acc      (nmi_acc),       // Non-Maskable interrupt request accepted
     .pc           (pc),            // Program counter
     .pc_nxt       (pc_nxt),        // Next PC value (for CALL & IRQ)
-			     
+                             
 // INPUTs
     .cpu_en_s     (cpu_en_s),      // Enable CPU code execution (synchronous)
     .cpuoff       (cpuoff),        // Turns off the CPU
@@ -411,7 +411,7 @@ omsp_mem_backbone mem_backbone_0 (
     .pmem_cen     (pmem_cen),      // Program Memory chip enable (low active)
     .pmem_din     (pmem_din),      // Program Memory data input (optional)
     .pmem_wen     (pmem_wen),      // Program Memory write enable (low active) (optional)
-			     
+                             
 // INPUTs
     .dbg_halt_st  (dbg_halt_st),   // Halt/Run status from CPU
     .dbg_mem_addr (dbg_mem_addr),  // Debug address for rd/wr access
@@ -446,7 +446,7 @@ omsp_sfr sfr_0 (
     .wdtie        (wdtie),         // Watchdog-timer interrupt enable
     .wdtifg_sw_clr(wdtifg_sw_clr), // Watchdog-timer interrupt flag software clear
     .wdtifg_sw_set(wdtifg_sw_set), // Watchdog-timer interrupt flag software set
-			     
+                             
 // INPUTs
     .cpu_nr_inst  (cpu_nr_inst),   // Current oMSP instance number
     .cpu_nr_total (cpu_nr_total),  // Total number of oMSP instances-1
@@ -471,32 +471,32 @@ omsp_sfr sfr_0 (
 omsp_watchdog watchdog_0 (
 
 // OUTPUTs
-    .per_dout       (per_dout_wdog), // Peripheral data output
-    .wdt_irq        (wdt_irq),       // Watchdog-timer interrupt
-    .wdt_reset      (wdt_reset),     // Watchdog-timer reset
-    .wdt_wkup       (wdt_wkup),      // Watchdog Wakeup
-    .wdtifg         (wdtifg),        // Watchdog-timer interrupt flag
-    .wdtnmies       (wdtnmies),      // Watchdog-timer NMI edge selection
-			     
+    .per_dout       (per_dout_wdog),      // Peripheral data output
+    .wdt_irq        (wdt_irq),            // Watchdog-timer interrupt
+    .wdt_reset      (wdt_reset),          // Watchdog-timer reset
+    .wdt_wkup       (wdt_wkup),           // Watchdog Wakeup
+    .wdtifg         (wdtifg),             // Watchdog-timer interrupt flag
+    .wdtnmies       (wdtnmies),           // Watchdog-timer NMI edge selection
+                             
 // INPUTs
-    .aclk           (aclk),          // ACLK
-    .aclk_en        (aclk_en),       // ACLK enable
-    .dbg_freeze     (dbg_freeze),    // Freeze Watchdog counter
-    .mclk           (mclk),          // Main system clock
-    .per_addr       (per_addr),      // Peripheral address
-    .per_din        (per_din),       // Peripheral data input
-    .per_en         (per_en),        // Peripheral enable (high active)
-    .per_we         (per_we),        // Peripheral write enable (high active)
-    .por            (por),           // Power-on reset
-    .puc_rst        (puc_rst),       // Main system reset
-    .scan_enable    (scan_enable),   // Scan enable (active during scan shifting)
-    .scan_mode      (scan_mode),     // Scan mode
-    .smclk          (smclk),         // SMCLK
-    .smclk_en       (smclk_en),      // SMCLK enable
-    .wdtie          (wdtie),         // Watchdog-timer interrupt enable
-    .wdtifg_irq_clr (irq_acc[10]),   // Clear Watchdog-timer interrupt flag
-    .wdtifg_sw_clr  (wdtifg_sw_clr), // Watchdog-timer interrupt flag software clear
-    .wdtifg_sw_set  (wdtifg_sw_set)  // Watchdog-timer interrupt flag software set
+    .aclk           (aclk),               // ACLK
+    .aclk_en        (aclk_en),            // ACLK enable
+    .dbg_freeze     (dbg_freeze),         // Freeze Watchdog counter
+    .mclk           (mclk),               // Main system clock
+    .per_addr       (per_addr),           // Peripheral address
+    .per_din        (per_din),            // Peripheral data input
+    .per_en         (per_en),             // Peripheral enable (high active)
+    .per_we         (per_we),             // Peripheral write enable (high active)
+    .por            (por),                // Power-on reset
+    .puc_rst        (puc_rst),            // Main system reset
+    .scan_enable    (scan_enable),        // Scan enable (active during scan shifting)
+    .scan_mode      (scan_mode),          // Scan mode
+    .smclk          (smclk),              // SMCLK
+    .smclk_en       (smclk_en),           // SMCLK enable
+    .wdtie          (wdtie),              // Watchdog-timer interrupt enable
+    .wdtifg_irq_clr (irq_acc[`IRQ_NR-6]), // Clear Watchdog-timer interrupt flag
+    .wdtifg_sw_clr  (wdtifg_sw_clr),      // Watchdog-timer interrupt flag software clear
+    .wdtifg_sw_set  (wdtifg_sw_set)       // Watchdog-timer interrupt flag software set
 );
 `else
 assign per_dout_wdog = 16'h0000;
@@ -516,7 +516,7 @@ omsp_multiplier multiplier_0 (
 
 // OUTPUTs
     .per_dout     (per_dout_mpy),  // Peripheral data output
-			     
+                             
 // INPUTs
     .mclk         (mclk),          // Main system clock
     .per_addr     (per_addr),      // Peripheral address
@@ -559,7 +559,7 @@ omsp_dbg dbg_0 (
     .dbg_mem_wr        (dbg_mem_wr),        // Debug unit memory write
     .dbg_reg_wr        (dbg_reg_wr),        // Debug unit CPU register write
     .dbg_uart_txd      (dbg_uart_txd),      // Debug interface: UART TXD
-			     
+                             
 // INPUTs
     .cpu_en_s          (cpu_en_s),          // Enable CPU code execution (synchronous)
     .cpu_id            (cpu_id),            // CPU ID

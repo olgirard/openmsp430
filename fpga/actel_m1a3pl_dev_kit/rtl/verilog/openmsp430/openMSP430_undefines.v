@@ -166,6 +166,17 @@
 `undef NMI
 `endif
 
+// Number of available IRQs
+`ifdef IRQ_16
+`undef IRQ_16
+`endif
+`ifdef IRQ_32
+`undef IRQ_32
+`endif
+`ifdef IRQ_64
+`undef IRQ_64
+`endif
+
 // Input synchronizers
 `ifdef SYNC_NMI
 `undef SYNC_NMI
@@ -380,6 +391,14 @@
 `endif
 `ifdef PER_MSB
 `undef PER_MSB
+`endif
+
+// Number of available IRQs
+`ifdef IRQ_NR
+`undef IRQ_NR
+`endif
+`ifdef IRQ_NR_GE_32
+`undef IRQ_NR_GE_32
 `endif
 
 // Instructions type
