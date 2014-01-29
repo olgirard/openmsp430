@@ -99,7 +99,7 @@ parameter [DEC_WD-1:0] CTRL        =  'h0,
 
    
 // Register one-hot decoder utilities
-parameter              DEC_SZ      =  2**DEC_WD;
+parameter              DEC_SZ      =  (1 << DEC_WD);
 parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder
@@ -231,7 +231,7 @@ wire [7:0] baud_hi_nxt = BAUD_HI[0] ? per_din[15:8]      : per_din[7:0];
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)         baud_hi <=  8'h00;
-  else if (baud_lo_wr) baud_hi <=  baud_hi_nxt;
+  else if (baud_hi_wr) baud_hi <=  baud_hi_nxt;
 
 
 wire [15:0] baudrate = {baud_hi, baud_lo};
@@ -296,10 +296,11 @@ wire uclk_en = ctrl_smclk_sel ? smclk_en : 1'b1;
 wire     uart_rxd_sync_n;
 
 omsp_sync_cell sync_cell_uart_rxd (
-    .data_out (uart_rxd_sync_n),
-    .clk      (mclk),
-    .data_in  (~uart_rxd),
-    .rst      (puc_rst)
+    .data_out  (uart_rxd_sync_n),
+    .data_meta (),
+    .data_in   (~uart_rxd),
+    .clk       (mclk),
+    .rst       (puc_rst)
 );
 wire uart_rxd_sync = ~uart_rxd_sync_n;
    

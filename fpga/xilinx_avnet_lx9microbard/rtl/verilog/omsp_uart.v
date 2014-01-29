@@ -231,7 +231,7 @@ wire [7:0] baud_hi_nxt = BAUD_HI[0] ? per_din[15:8]      : per_din[7:0];
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)         baud_hi <=  8'h00;
-  else if (baud_lo_wr) baud_hi <=  baud_hi_nxt;
+  else if (baud_hi_wr) baud_hi <=  baud_hi_nxt;
 
 
 wire [15:0] baudrate = {baud_hi, baud_lo};
@@ -297,6 +297,7 @@ wire     uart_rxd_sync_n;
 
 omsp_sync_cell sync_cell_uart_rxd (
     .data_out  (uart_rxd_sync_n),
+    .data_meta (),
     .data_in   (~uart_rxd),
     .clk       (mclk),
     .rst       (puc_rst)
