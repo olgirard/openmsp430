@@ -76,6 +76,7 @@ global server
 global verbose
 global shell
 global breakSelect
+global mspgcc_compat_mode
 
 # Initialize to default values
 set omsp_nr                1
@@ -101,6 +102,7 @@ set breakSelect            0
 
 set shell                  0
 set verbose                0
+set mspgcc_compat_mode     0
 
 ###############################################################################
 #                                                                             #
@@ -117,6 +119,7 @@ proc help {} {
     puts "                                  \[-port     <server port>\]"
     puts "                                  \[-shell]"
     puts "                                  \[-verbose\]"
+    puts "                                  \[-mspgcc_compat_mode\]"
     puts "                                  \[-help\]"
     puts ""
     puts "Examples: openmsp430-gdbproxy.tcl -device /dev/ttyUSB0 -adaptor uart_generic -speed  115200  -port 2000"
@@ -127,16 +130,17 @@ proc help {} {
 # Parse arguments
 for {set i 0} {$i < $argc} {incr i} {
     switch -exact -- [lindex $argv $i] {
-        -device   {set omsp_conf(device)    [lindex $argv [expr $i+1]]; incr i}
-        -adaptor  {set omsp_conf(interface) [lindex $argv [expr $i+1]]; incr i}
-        -speed    {set omsp_conf(baudrate)  [lindex $argv [expr $i+1]]; incr i}
-        -i2c_addr {set omsp_conf(0,cpuaddr) [lindex $argv [expr $i+1]]; incr i}
-        -port     {set server(0,port)       [lindex $argv [expr $i+1]]; incr i}
-        -shell    {set shell   1}
-        -verbose  {set verbose 1}
-        -h        {help; exit 0}
-        -help     {help; exit 0}
-        default   {}
+        -device             {set omsp_conf(device)    [lindex $argv [expr $i+1]]; incr i}
+        -adaptor            {set omsp_conf(interface) [lindex $argv [expr $i+1]]; incr i}
+        -speed              {set omsp_conf(baudrate)  [lindex $argv [expr $i+1]]; incr i}
+        -i2c_addr           {set omsp_conf(0,cpuaddr) [lindex $argv [expr $i+1]]; incr i}
+        -port               {set server(0,port)       [lindex $argv [expr $i+1]]; incr i}
+        -shell              {set shell   1}
+        -verbose            {set verbose 1}
+        -mspgcc_compat_mode {set mspgcc_compat_mode 1}
+        -h                  {help; exit 0}
+        -help               {help; exit 0}
+        default             {}
     }
 }
 
@@ -221,7 +225,7 @@ if {$shell} {
 
     # Connect to device
     if {![GetDevice 0]} {
-        puts "ERROR: Could not open $omsp_conf(device)
+        puts "ERROR: Could not open $omsp_conf(device)"
         puts "INFO:  Available serial ports are:"
         foreach port [utils::uart_port_list] {
             puts "INFO:                               -  $port"
@@ -440,7 +444,7 @@ pack   .connect.cfg.if -side top    -padx 10 -pady {10 0} -fill x -expand true
 frame  .connect.cfg.ad -bd 2 -relief ridge
 pack   .connect.cfg.ad -side top    -padx 10 -pady 10 -fill both -expand true
 frame  .connect.start
-pack   .connect.start  -side right  -padx 10 -pady 0 -fill x -expand true
+pack   .connect.start  -side right  -padx 10 -pady 10 -fill both -expand true
 
 frame  .connect.cfg.if.config1
 pack   .connect.cfg.if.config1 -side left   -padx 0 -pady 0 -fill x -expand true
@@ -562,8 +566,12 @@ pack        .connect.cfg.ad.i2c_nr.f.hard.l -side left -padx {5 10} -pady {3 0}
 updateConfiguration
 
 # Connect to CPU & start proxy server
-button .connect.start.but -text "Connect to CPU(s)\n and \nStart Proxy Server(s)" -command {startServerGUI}
-pack   .connect.start.but -side right -padx 30
+frame       .connect.start.f
+pack        .connect.start.f   -side top -padx 10 -pady 0 -fill x -expand true
+button      .connect.start.f.b -text "Connect to CPU(s)\n and \nStart Proxy Server(s)" -command {startServerGUI}
+pack        .connect.start.f.b -side top -padx 30
+checkbutton .connect.start.comp_mode -text "MSPGCC Compatibility Mode" -variable mspgcc_compat_mode
+pack        .connect.start.comp_mode -side bottom -padx 10
 
 
 # CPU Info

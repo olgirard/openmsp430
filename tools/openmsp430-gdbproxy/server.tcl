@@ -126,6 +126,7 @@ proc startServerGUI { } {
 	putsLog "       !!!! Please consider the following options:                            !!!!"
 	putsLog "       !!!!                                                                   !!!!"
 	putsLog "       !!!!      - make sure \"$omsp_conf(device)\" is the right device."
+	putsLog "       !!!!      - check permissions of the \"$omsp_conf(device)\" device (run as root if necessary)."
 	putsLog "       !!!!      - check the physical connection to the board.                !!!!"
 	putsLog "       !!!!      - adjust the serial connection baudrate.                     !!!!"
 	putsLog "       !!!!      - for UART, don't forget to reset the serial debug interface !!!!"
@@ -203,6 +204,7 @@ proc startServerGUI { } {
     .connect.cfg.if.config2.adapter.p2       configure -state disabled
     .connect.cfg.if.config1.serial_port.p1   configure -state disabled
     .connect.cfg.if.config2.serial_port.p2   configure -state disabled
+    .connect.start.comp_mode                 configure -state disabled
     .connect.cfg.ad.server_port.p0           configure -state disabled
     .connect.cfg.ad.server_port.p1           configure -state disabled
     .connect.cfg.ad.server_port.p2           configure -state disabled

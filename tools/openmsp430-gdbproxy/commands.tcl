@@ -420,6 +420,8 @@ proc rsp_s {CpuNr sock cmd} {
 #-----------------------------------------------------------------------------#
 proc rsp_stop_reply {CpuNr sock cmd {opt_val "0"}} {
 
+    global mspgcc_compat_mode
+
     # Wait until halted
     while {![IsHalted $CpuNr]} {
 
@@ -444,16 +446,20 @@ proc rsp_stop_reply {CpuNr sock cmd {opt_val "0"}} {
     set r4 [ReadReg $CpuNr 4]
     regexp {0x(..)(..)} $r4 match r4_hi r4_lo
 
-        # In case of a single step command, make sure that the PC
-        # value changes. If not, return an error otherwise GDB will
-        # end-up in an infinite loop.
-        if {$cmd == "s"} {
-                if {$opt_val == $pc} {
-                        return "E05"
-                }
-        }
-        #return "S05"
-        return "T0500:$pc_lo$pc_hi;04:$r4_lo$r4_hi;"
+    # In case of a single step command, make sure that the PC
+    # value changes. If not, return an error otherwise GDB will
+    # end-up in an infinite loop.
+    if {$cmd == "s"} {
+	if {$opt_val == $pc} {
+	    return "E05"
+	}
+    }
+
+    if {$mspgcc_compat_mode} {
+	return "T0500:$pc_lo$pc_hi;04:$r4_lo$r4_hi;"               ;# 16bit word Response for older MSPGCC versions
+    } else {
+	return "T0500:$pc_lo${pc_hi}0000;04:$r4_lo${r4_hi}0000;"   ;# 32bit word Response starting with TI/RedHat GCC port
+    }
 }
 
 
