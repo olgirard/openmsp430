@@ -1,3 +1,8 @@
+2014-10-07 [r198]  
+
+	* Update GDB-Proxy to support new GCC/GDB compiler version from
+	  RedHat/TI
+
 2012-12-27 [r172]  
 
 	* GDB-Proxy now supports multi-core systems as well as hardware and
