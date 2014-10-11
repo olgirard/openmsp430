@@ -31,9 +31,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev$
-// $LastChangedBy$
-// $LastChangedDate$
+// $Rev: 103 $
+// $LastChangedBy: olivier.girard $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 `include "timescale.v"
 `ifdef OMSP_NO_INCLUDE
@@ -67,6 +67,15 @@ wire        [15:0] per_din;
 wire        [15:0] per_dout;
 wire         [1:0] per_we;
 wire               per_en;
+
+// Master memory interface
+wire        [15:0] mstr_mem_dout;
+wire               mstr_ready;
+reg         [15:0] mstr_mem_addr;
+reg         [15:0] mstr_mem_din;
+reg                mstr_mem_en;
+reg          [1:0] mstr_mem_we;
+
 
 // Digital I/O
 wire               irq_port1;
@@ -273,6 +282,10 @@ initial
      irq                     = {`IRQ_NR-2{1'b0}};
      nmi                     = 1'b0;
      wkup                    = 14'h0000;
+     mstr_mem_addr           = 16'h0000;
+     mstr_mem_din            = 16'h0000;
+     mstr_mem_en             = 1'b0;
+     mstr_mem_we             = 2'b00;
      cpu_en                  = 1'b1;
      dbg_en                  = 1'b0;
      dbg_uart_rxd_sel        = 1'b0;
@@ -369,6 +382,8 @@ openMSP430 dut (
     .lfxt_enable       (lfxt_enable),       // ASIC ONLY: Low frequency oscillator enable
     .lfxt_wkup         (lfxt_wkup),         // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
     .mclk              (mclk),              // Main system clock
+    .mstr_mem_dout     (mstr_mem_dout),     // Master access Memory data output
+    .mstr_ready        (mstr_ready),        // Master access is complete
     .per_addr          (per_addr),          // Peripheral address
     .per_din           (per_din),           // Peripheral data input
     .per_we            (per_we),            // Peripheral write enable (high active)
@@ -393,6 +408,10 @@ openMSP430 dut (
     .dmem_dout         (dmem_dout),         // Data Memory data output
     .irq               (irq_in),            // Maskable interrupts
     .lfxt_clk          (lfxt_clk),          // Low frequency oscillator (typ 32kHz)
+    .mstr_mem_addr     (mstr_mem_addr),     // Master access Memory address
+    .mstr_mem_din      (mstr_mem_din),      // Master access Memory data input
+    .mstr_mem_en       (mstr_mem_en),       // Master access Memory enable (high active)
+    .mstr_mem_we       (mstr_mem_we),       // Master access Memory write enable (high active)
     .nmi               (nmi),               // Non-maskable interrupt (asynchronous)
     .per_dout          (per_dout),          // Peripheral data output
     .pmem_dout         (pmem_dout),         // Program Memory data output

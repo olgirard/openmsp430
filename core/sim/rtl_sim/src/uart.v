@@ -21,55 +21,57 @@
 /* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA        */
 /*                                                                           */
 /*===========================================================================*/
-/*                               CLOCK MODULE                                */
+/*                  Simple full duplex UART (8N1 protocol)                   */
 /*---------------------------------------------------------------------------*/
-/* Sandbox test                                                              */
+/* Test the UART peripheral.                                                 */
 /*                                                                           */
 /* Author(s):                                                                */
 /*             - Olivier Girard,    olgirard@gmail.com                       */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
-/* $Rev: 19 $                                                                */
+/* $Rev: 85 $                                                                */
 /* $LastChangedBy: olivier.girard $                                          */
-/* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
+/* $LastChangedDate: 2011-01-28 22:05:37 +0100 (Fri, 28 Jan 2011) $          */
 /*===========================================================================*/
-
-
-task mstr_write;
-   input  [15:0] addr;
-   input  [15:0] data;
-   
-   begin      
-      mstr_mem_en   = 1'b1;
-      mstr_mem_we   = 2'b00;
-      mstr_mem_addr = addr;
-      mstr_mem_din  = data;
-      @(posedge mclk);
-      while(~mstr_ready) @(posedge mclk);
-      mstr_mem_en   = 1'b0;
-      mstr_mem_we   = 2'b00;
-      mstr_mem_addr = 16'h0000;
-      mstr_mem_din  = 16'h0000;
-   end
-endtask
-
+    
 
 initial
    begin
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
-      
       repeat(5) @(posedge mclk);
- 
       stimulus_done = 0;
 
-      repeat(50) @(posedge mclk);
-           
-      mstr_write(16'hF800, 16'h1234);
-      mstr_write(16'hF804, 16'h5678);
+      uart_baudrate(2000000);
+      
+      // WATCHDOG TEST INTERVAL MODE /64 - SMCLK == MCLK/2
+      //--------------------------------------------------------
+      @(r15 === 16'h0001);
 
-      repeat(50) @(posedge mclk);
+      uart_tx(8'ha5);
+      repeat(100) @(negedge mclk);
+      uart_tx(8'h34);
+      repeat(100) @(negedge mclk);
+      uart_tx(8'h56);
+      uart_tx(8'h78);
+ 
 
+      @(negedge mclk);
+//      mclk_counter = 0;
+      repeat(200) @(negedge mclk);
+
+//      if (mclk_counter !== 1024) tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK =====");
+//      if (r5_counter   !== 8)    tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK =====");
+
+      
+      // WATCHDOG TEST INTERVAL MODE /64 - ACLK == LFXTCLK/1
+      //--------------------------------------------------------
+
+      repeat(10000) @(negedge mclk);
+
+
+      
       stimulus_done = 1;
    end
+
