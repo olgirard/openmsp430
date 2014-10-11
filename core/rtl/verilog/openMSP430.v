@@ -36,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev$
-// $LastChangedBy$
-// $LastChangedDate$
+// $Rev: 103 $
+// $LastChangedBy: olivier.girard $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -63,6 +63,8 @@ module  openMSP430 (
     lfxt_enable,                        // ASIC ONLY: Low frequency oscillator enable
     lfxt_wkup,                          // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
     mclk,                               // Main system clock
+    mstr_mem_dout,                      // Master access Memory data output
+    mstr_ready,                         // Master access is complete
     per_addr,                           // Peripheral address
     per_din,                            // Peripheral data input
     per_we,                             // Peripheral write enable (high active)
@@ -87,6 +89,10 @@ module  openMSP430 (
     dmem_dout,                          // Data Memory data output
     irq,                                // Maskable interrupts
     lfxt_clk,                           // Low frequency oscillator (typ 32kHz)
+    mstr_mem_addr,                      // Master access Memory address
+    mstr_mem_din,                       // Master access Memory data input
+    mstr_mem_en,                        // Master access Memory enable (high active)
+    mstr_mem_we,                        // Master access Memory write enable (high active)
     nmi,                                // Non-maskable interrupt (asynchronous)
     per_dout,                           // Peripheral data output
     pmem_dout,                          // Program Memory data output
@@ -118,6 +124,8 @@ output [`IRQ_NR-3:0] irq_acc;           // Interrupt request accepted (one-hot s
 output               lfxt_enable;       // ASIC ONLY: Low frequency oscillator enable
 output               lfxt_wkup;         // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
 output               mclk;              // Main system clock
+output        [15:0] mstr_mem_dout;     // Master access Memory data output
+output               mstr_ready;        // Master access is complete
 output        [13:0] per_addr;          // Peripheral address
 output        [15:0] per_din;           // Peripheral data input
 output         [1:0] per_we;            // Peripheral write enable (high active)
@@ -144,7 +152,11 @@ input                dco_clk;           // Fast oscillator (fast clock)
 input         [15:0] dmem_dout;         // Data Memory data output
 input  [`IRQ_NR-3:0] irq;               // Maskable interrupts (14, 30 or 62)
 input                lfxt_clk;          // Low frequency oscillator (typ 32kHz)
-input  	             nmi;               // Non-maskable interrupt (asynchronous and non-glitchy)
+input         [15:0] mstr_mem_addr;     // Master access Memory address
+input         [15:0] mstr_mem_din;      // Master access Memory data input
+input                mstr_mem_en;       // Master access Memory enable (high active)
+input          [1:0] mstr_mem_we;       // Master access Memory write enable (high active)
+input                nmi;               // Non-maskable interrupt (asynchronous and non-glitchy)
 input         [15:0] per_dout;          // Peripheral data output
 input         [15:0] pmem_dout;         // Program Memory data output
 input                reset_n;           // Reset Pin (active low, asynchronous and non-glitchy)
@@ -218,7 +230,6 @@ wire                wdtifg_sw_set;
 wire                dbg_clk;
 wire                dbg_rst;
 wire                dbg_en_s;
-wire                dbg_halt_st;
 wire                dbg_halt_cmd;
 wire                dbg_mem_en;
 wire                dbg_reg_wr;
@@ -228,6 +239,9 @@ wire         [15:0] dbg_mem_dout;
 wire         [15:0] dbg_mem_din;
 wire         [15:0] dbg_reg_din;
 wire          [1:0] dbg_mem_wr;
+
+wire                cpu_halt_st;
+wire                cpu_halt_cmd;
 wire                puc_pnd_set;
 
 wire         [15:0] per_dout_or;
@@ -292,7 +306,7 @@ omsp_clock_module clock_module_0 (
 omsp_frontend frontend_0 (
 
 // OUTPUTs
-    .dbg_halt_st  (dbg_halt_st),   // Halt/Run status from CPU
+    .cpu_halt_st  (cpu_halt_st),   // Halt/Run status from CPU
     .decode_noirq (decode_noirq),  // Frontend decode instruction
     .e_state      (e_state),       // Execution state
     .exec_done    (exec_done),     // Execution completed
@@ -320,8 +334,8 @@ omsp_frontend frontend_0 (
 
 // INPUTs
     .cpu_en_s     (cpu_en_s),      // Enable CPU code execution (synchronous)
+    .cpu_halt_cmd (cpu_halt_cmd),  // Halt CPU command
     .cpuoff       (cpuoff),        // Turns off the CPU
-    .dbg_halt_cmd (dbg_halt_cmd),  // Halt CPU command
     .dbg_reg_sel  (dbg_mem_addr[3:0]), // Debug selected register for rd/wr access
     .fe_pmem_wait (fe_pmem_wait),  // Frontend wait for Instruction fetch
     .gie          (gie),           // General interrupt enable
@@ -361,7 +375,7 @@ omsp_execution_unit execution_unit_0 (
     .scg1         (scg1),          // System clock generator 1. Turns off the SMCLK
 
 // INPUTs
-    .dbg_halt_st  (dbg_halt_st),   // Halt/Run status from CPU
+    .dbg_halt_st  (cpu_halt_st),   // Halt/Run status from CPU
     .dbg_mem_dout (dbg_mem_dout),  // Debug unit data output
     .dbg_reg_wr   (dbg_reg_wr),    // Debug unit CPU register write
     .e_state      (e_state),       // Execution state
@@ -395,6 +409,7 @@ omsp_execution_unit execution_unit_0 (
 omsp_mem_backbone mem_backbone_0 (
 
 // OUTPUTs
+    .cpu_halt_cmd (cpu_halt_cmd),  // Halt CPU command
     .dbg_mem_din  (dbg_mem_din),   // Debug unit Memory data input
     .dmem_addr    (dmem_addr),     // Data Memory address
     .dmem_cen     (dmem_cen),      // Data Memory chip enable (low active)
@@ -403,6 +418,8 @@ omsp_mem_backbone mem_backbone_0 (
     .eu_mdb_in    (eu_mdb_in),     // Execution Unit Memory data bus input
     .fe_mdb_in    (fe_mdb_in),     // Frontend Memory data bus input
     .fe_pmem_wait (fe_pmem_wait),  // Frontend wait for Instruction fetch
+    .mstr_mem_dout(mstr_mem_dout), // Master access Memory data output
+    .mstr_ready   (mstr_ready),    // Master access is complete
     .per_addr     (per_addr),      // Peripheral address
     .per_din      (per_din),       // Peripheral data input
     .per_we       (per_we),        // Peripheral write enable (high active)
@@ -413,7 +430,8 @@ omsp_mem_backbone mem_backbone_0 (
     .pmem_wen     (pmem_wen),      // Program Memory write enable (low active) (optional)
 
 // INPUTs
-    .dbg_halt_st  (dbg_halt_st),   // Halt/Run status from CPU
+    .cpu_halt_st  (cpu_halt_st),   // Halt/Run status from CPU
+    .dbg_halt_cmd (dbg_halt_cmd),  // Debug interface Halt CPU command
     .dbg_mem_addr (dbg_mem_addr),  // Debug address for rd/wr access
     .dbg_mem_dout (dbg_mem_dout),  // Debug unit data output
     .dbg_mem_en   (dbg_mem_en),    // Debug unit memory enable
@@ -426,6 +444,10 @@ omsp_mem_backbone mem_backbone_0 (
     .fe_mab       (fe_mab[15:1]),  // Frontend Memory address bus
     .fe_mb_en     (fe_mb_en),      // Frontend Memory bus enable
     .mclk         (mclk),          // Main system clock
+    .mstr_mem_addr(mstr_mem_addr), // Master access Memory address
+    .mstr_mem_din (mstr_mem_din),  // Master access Memory data input
+    .mstr_mem_en  (mstr_mem_en),   // Master access Memory enable (high active)
+    .mstr_mem_we  (mstr_mem_we),   // Master access Memory write enable (high active)
     .per_dout     (per_dout_or),   // Peripheral data output
     .pmem_dout    (pmem_dout),     // Program Memory data output
     .puc_rst      (puc_rst),       // Main system reset
@@ -567,7 +589,7 @@ omsp_dbg dbg_0 (
     .cpu_nr_total      (cpu_nr_total),      // Total number of oMSP instances-1
     .dbg_clk           (dbg_clk),           // Debug unit clock
     .dbg_en_s          (dbg_en_s),          // Debug interface enable (synchronous)
-    .dbg_halt_st       (dbg_halt_st),       // Halt/Run status from CPU
+    .dbg_halt_st       (cpu_halt_st),       // Halt/Run status from CPU
     .dbg_i2c_addr      (dbg_i2c_addr),      // Debug interface: I2C Address
     .dbg_i2c_broadcast (dbg_i2c_broadcast), // Debug interface: I2C Broadcast Address (for multicore systems)
     .dbg_i2c_scl       (dbg_i2c_scl),       // Debug interface: I2C SCL

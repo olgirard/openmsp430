@@ -1,0 +1,131 @@
+/*===========================================================================*/
+/* Copyright (C) 2001 Authors                                                */
+/*                                                                           */
+/* This source file may be used and distributed without restriction provided */
+/* that this copyright statement is not removed from the file and that any   */
+/* derivative work contains the original copyright notice and the associated */
+/* disclaimer.                                                               */
+/*                                                                           */
+/* This source file is free software; you can redistribute it and/or modify  */
+/* it under the terms of the GNU Lesser General Public License as published  */
+/* by the Free Software Foundation; either version 2.1 of the License, or    */
+/* (at your option) any later version.                                       */
+/*                                                                           */
+/* This source is distributed in the hope that it will be useful, but WITHOUT*/
+/* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or     */
+/* FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public       */
+/* License for more details.                                                 */
+/*                                                                           */
+/* You should have received a copy of the GNU Lesser General Public License  */
+/* along with this source; if not, write to the Free Software Foundation,    */
+/* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA        */
+/*                                                                           */
+/*===========================================================================*/
+/*                  Simple full duplex UART (8N1 protocol)                   */
+/*---------------------------------------------------------------------------*/
+/* Test the UART peripheral.                                                 */
+/*                                                                           */
+/* Author(s):                                                                */
+/*             - Olivier Girard,    olgirard@gmail.com                       */
+/*                                                                           */
+/*---------------------------------------------------------------------------*/
+/* $Rev: 19 $                                                                */
+/* $LastChangedBy: olivier.girard $                                          */
+/* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
+/*===========================================================================*/
+
+.include "pmem_defs.asm"
+
+.global main
+
+.set   UART_CTL,  0x0080
+.set   UART_STAT, 0x0081
+.set   UART_BAUD, 0x0082
+.set   UART_TXD,  0x0084
+.set   UART_RXD,  0x0085
+
+
+WAIT_FUNC:
+	dec r14
+	jnz WAIT_FUNC
+	ret
+	
+main:
+
+        /* -------   WATCHDOG TEST INTERVAL MODE /64 - SMCLK /2      ------ */
+
+	mov   #DMEM_250, r1	  ;# Initialize stack & Enable interrupts
+	eint
+	bis.b   #0x01,   &IE1
+
+ 	mov.b   #0x02, &BCSCTL2	  ;# SMCLK = MCLK/2
+	mov   #0x0001, r15
+
+ 	mov   #0x0009, &UART_BAUD ;# BAUD=(mclk_freq/baudrate)-1
+ 	mov.b   #0x01, &UART_CTL
+
+# 	mov   #0x0004, &UART_BAUD ;# BAUD=(mclk_freq/baudrate)-1
+# 	mov.b   #0x03, &UART_CTL
+
+	mov   #0x0070, r14
+        call  #WAIT_FUNC
+	
+	mov   #0x0002, r15
+
+	mov.b #0x7f, &UART_TXD
+	mov.b #0x3e, &UART_TXD
+
+	mov   #0x0070, r14
+        call  #WAIT_FUNC
+	
+	mov.b #0x67, &UART_TXD
+	mov.b #0x89, &UART_TXD
+
+	mov   #0x0003, r15
+	
+	mov   #0x0170, r14
+        call  #WAIT_FUNC
+
+	mov.b #0xaa, &UART_TXD
+
+	mov   #0x0070, r14
+        call  #WAIT_FUNC
+
+	mov   #0x0004, r15
+	
+        /* ----------------------         END OF TEST        --------------- */
+end_of_test:
+	nop
+	br #0xffff
+
+
+        /* ----------------------      INTERRUPT ROUTINES    --------------- */
+
+UART_RX_VECTOR:
+	xor  #0x0001, r5   	; # Toggle r5[0] for testbench stimulus check
+	reti
+
+UART_TX_VECTOR:
+	xor  #0x0001, r5   	; # Toggle r5[0] for testbench stimulus check
+	reti
+
+
+        /* ----------------------         INTERRUPT VECTORS  --------------- */
+
+.section .vectors, "a"
+.word end_of_test     ; Interrupt  0 (lowest priority)    <unused>
+.word end_of_test     ; Interrupt  1                      <unused>
+.word end_of_test     ; Interrupt  2                      <unused>
+.word end_of_test     ; Interrupt  3                      <unused>
+.word end_of_test     ; Interrupt  4                      <unused>
+.word end_of_test     ; Interrupt  5                      <unused>
+.word UART_TX_VECTOR  ; Interrupt  6                      UART transmit interrupt
+.word UART_RX_VECTOR  ; Interrupt  7                      UART receive interrupt
+.word end_of_test     ; Interrupt  8                      <unused>
+.word end_of_test     ; Interrupt  9                      <unused>
+.word end_of_test     ; Interrupt 10                      Watchdog timer
+.word end_of_test     ; Interrupt 11                      <unused>
+.word end_of_test     ; Interrupt 12                      <unused>
+.word end_of_test     ; Interrupt 13                      <unused>
+.word end_of_test     ; Interrupt 14                      NMI
+.word main            ; Interrupt 15 (highest priority)   RESET
