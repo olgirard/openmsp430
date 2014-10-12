@@ -76,7 +76,6 @@ reg         [15:0] mstr_mem_din;
 reg                mstr_mem_en;
 reg          [1:0] mstr_mem_we;
 
-
 // Digital I/O
 wire               irq_port1;
 wire               irq_port2;
@@ -512,7 +511,6 @@ omsp_timerA timerA_0 (
     .ta_cci2b     (ta_cci2b),          // Timer A compare 2 input B
     .taclk        (taclk)              // TACLK external timer clock (SLOW)
 );
-
 
 //
 // Peripheral templates
