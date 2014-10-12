@@ -101,13 +101,6 @@ reg          [7:0] p6_din;
 wire        [15:0] per_dout_temp_8b;
 wire        [15:0] per_dout_temp_16b;
 
-// Simple full duplex UART
-wire        [15:0] per_dout_uart;
-wire               irq_uart_rx;
-wire               irq_uart_tx;
-wire               uart_txd;
-reg                uart_rxd;
-
 // Timer A
 wire               irq_ta0;
 wire               irq_ta1;
@@ -213,9 +206,6 @@ reg                stimulus_done;
 `include "dbg_uart_tasks.v"
 `include "dbg_i2c_tasks.v"
 
-// Simple uart tasks
-//`include "uart_tasks.v"
-
 // Verilog stimulus
 `include "stimulus.v"
 
@@ -305,7 +295,6 @@ initial
      ta_cci1b                = 1'b0;
      ta_cci2a                = 1'b0;
      ta_cci2b                = 1'b0;
-     uart_rxd                = 1'b1;
      scan_enable             = 1'b0;
      scan_mode               = 1'b0;
   end
@@ -498,34 +487,6 @@ omsp_timerA timerA_0 (
     .taclk        (taclk)              // TACLK external timer clock (SLOW)
 );
    
-//
-// Simple full duplex UART (8N1 protocol)
-//----------------------------------------
-`ifdef READY_FOR_PRIMETIME
-omsp_uart #(.BASE_ADDR(15'h0080)) uart_0 (
-
-// OUTPUTs
-    .irq_uart_rx  (irq_uart_rx),   // UART receive interrupt
-    .irq_uart_tx  (irq_uart_tx),   // UART transmit interrupt
-    .per_dout     (per_dout_uart), // Peripheral data output
-    .uart_txd     (uart_txd),      // UART Data Transmit (TXD)
-
-// INPUTs
-    .mclk         (mclk),          // Main system clock
-    .per_addr     (per_addr),      // Peripheral address
-    .per_din      (per_din),       // Peripheral data input
-    .per_en       (per_en),        // Peripheral enable (high active)
-    .per_we       (per_we),        // Peripheral write enable (high active)
-    .puc_rst      (puc_rst),       // Main system reset
-    .smclk_en     (smclk_en),      // SMCLK enable (from CPU)
-    .uart_rxd     (uart_rxd)       // UART Data Receive (RXD)
-);
-`else
-    assign irq_uart_rx   =  1'b0;
-    assign irq_uart_tx   =  1'b0;
-    assign per_dout_uart = 16'h0000;
-    assign uart_txd      =  1'b0;
-`endif
 
 //
 // Peripheral templates
@@ -569,7 +530,6 @@ template_periph_16b #(.BASE_ADDR((15'd`PER_SIZE-15'h0070) & 15'h7ff8)) template_
 
 assign per_dout = per_dout_dio       |
                   per_dout_timerA    |
-                  per_dout_uart      |
                   per_dout_temp_8b   |
                   per_dout_temp_16b;
 
@@ -584,8 +544,8 @@ assign irq_in  = irq  | {1'b0,                 // Vector 13  (0xFFFA)
                          1'b0,                 // Vector 10  (0xFFF4) - Watchdog -
                          irq_ta0,              // Vector  9  (0xFFF2)
                          irq_ta1,              // Vector  8  (0xFFF0)
-                         irq_uart_rx,          // Vector  7  (0xFFEE)
-                         irq_uart_tx,          // Vector  6  (0xFFEC)
+                         1'b0,                 // Vector  7  (0xFFEE)
+                         1'b0,                 // Vector  6  (0xFFEC)
                          1'b0,                 // Vector  5  (0xFFEA)
                          1'b0,                 // Vector  4  (0xFFE8)
                          irq_port2,            // Vector  3  (0xFFE6)
