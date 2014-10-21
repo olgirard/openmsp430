@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_dbg_hwbrk.v
-// 
+//
 // *Module Description:
 //                       Hardware Breakpoint / Watchpoint module
 //
@@ -51,7 +51,7 @@ module  omsp_dbg_hwbrk (
     brk_halt,                // Hardware breakpoint command
     brk_pnd,                 // Hardware break/watch-point pending
     brk_dout,                // Hardware break/watch-point register data input
-			     
+
 // INPUTs
     brk_reg_rd,              // Hardware break/watch-point register read select
     brk_reg_wr,              // Hardware break/watch-point register write select
@@ -96,13 +96,13 @@ wire      addr1_rd_set;
 wire      addr0_wr_set;
 wire      addr0_rd_set;
 
-   
+
 parameter BRK_CTL   = 0,
           BRK_STAT  = 1,
           BRK_ADDR0 = 2,
           BRK_ADDR1 = 3;
 
-   
+
 //=============================================================================
 // 2)  CONFIGURATION REGISTERS
 //=============================================================================
@@ -131,14 +131,14 @@ parameter BRK_CTL   = 0,
 reg   [4:0] brk_ctl;
 
 wire        brk_ctl_wr = brk_reg_wr[BRK_CTL];
-   
+
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)         brk_ctl <=  5'h00;
   else if (brk_ctl_wr) brk_ctl <=  {`HWBRK_RANGE & dbg_din[4], dbg_din[3:0]};
 
 wire  [7:0] brk_ctl_full = {3'b000, brk_ctl};
 
-   
+
 // BRK_STAT Register
 //-----------------------------------------------------------------------------
 //     7    6       5         4         3         2         1         0
@@ -167,23 +167,23 @@ wire        brk_pnd       = |brk_stat;
 reg  [15:0] brk_addr0;
 
 wire        brk_addr0_wr = brk_reg_wr[BRK_ADDR0];
-   
+
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)           brk_addr0 <=  16'h0000;
   else if (brk_addr0_wr) brk_addr0 <=  dbg_din;
 
-   
+
 // BRK_ADDR1/DATA0 Register
 //-----------------------------------------------------------------------------
 reg  [15:0] brk_addr1;
 
 wire        brk_addr1_wr = brk_reg_wr[BRK_ADDR1];
-   
+
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)           brk_addr1 <=  16'h0000;
   else if (brk_addr1_wr) brk_addr1 <=  dbg_din;
 
-   
+
 //============================================================================
 // 3) DATA OUTPUT GENERATION
 //============================================================================
@@ -198,7 +198,7 @@ wire [15:0] brk_dout = brk_ctl_rd   |
                        brk_addr0_rd |
                        brk_addr1_rd;
 
-   
+
 //============================================================================
 // 4) BREAKPOINT / WATCHPOINT GENERATION
 //============================================================================
@@ -207,10 +207,10 @@ wire [15:0] brk_dout = brk_ctl_rd   |
 //---------------------------
 // Note: here the comparison logic is instanciated several times in order
 //       to improve the timings, at the cost of a bit more area.
-   
+
 wire        equ_d_addr0 = eu_mb_en & (eu_mab==brk_addr0) & ~brk_ctl[`BRK_RANGE];
 wire        equ_d_addr1 = eu_mb_en & (eu_mab==brk_addr1) & ~brk_ctl[`BRK_RANGE];
-wire        equ_d_range = eu_mb_en & ((eu_mab>=brk_addr0) & (eu_mab<=brk_addr1)) & 
+wire        equ_d_range = eu_mb_en & ((eu_mab>=brk_addr0) & (eu_mab<=brk_addr1)) &
                           brk_ctl[`BRK_RANGE] & `HWBRK_RANGE;
 
 
@@ -237,7 +237,7 @@ wire d_range_wr =  equ_d_range & ~brk_ctl[`BRK_I_EN] &  |eu_mb_wr;
 wire d_addr0_rd =  equ_d_addr0 & ~brk_ctl[`BRK_I_EN] & ~|eu_mb_wr;
 wire d_addr1_rd =  equ_d_addr1 & ~brk_ctl[`BRK_I_EN] & ~|eu_mb_wr;
 wire d_range_rd =  equ_d_range & ~brk_ctl[`BRK_I_EN] & ~|eu_mb_wr;
-   
+
 // Set flags
 assign addr0_rd_set = brk_ctl[`BRK_MODE_RD] & (d_addr0_rd  | i_addr0_rd);
 assign addr0_wr_set = brk_ctl[`BRK_MODE_WR] &  d_addr0_wr;
@@ -246,11 +246,11 @@ assign addr1_wr_set = brk_ctl[`BRK_MODE_WR] &  d_addr1_wr;
 assign range_rd_set = brk_ctl[`BRK_MODE_RD] & (d_range_rd  | i_range_rd);
 assign range_wr_set = brk_ctl[`BRK_MODE_WR] &  d_range_wr;
 
-   
+
 // Break CPU
 assign brk_halt     = brk_ctl[`BRK_EN] & |brk_stat_set;
-   
-     
+
+
 endmodule // omsp_dbg_hwbrk
 
 `ifdef OMSP_NO_INCLUDE

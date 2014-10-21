@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: template_periph_16b.v
-// 
+//
 // *Module Description:
 //                       16 bit peripheral template.
 //
@@ -126,7 +126,7 @@ wire [DEC_SZ-1:0] reg_rd    = reg_dec & {DEC_SZ{reg_read}};
 //============================================================================
 
 // CNTRL1 Register
-//-----------------   
+//-----------------
 reg  [15:0] cntrl1;
 
 wire        cntrl1_wr = reg_wr[CNTRL1];
@@ -135,9 +135,9 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        cntrl1 <=  16'h0000;
   else if (cntrl1_wr) cntrl1 <=  per_din;
 
-   
+
 // CNTRL2 Register
-//-----------------   
+//-----------------
 reg  [15:0] cntrl2;
 
 wire        cntrl2_wr = reg_wr[CNTRL2];
@@ -146,9 +146,9 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        cntrl2 <=  16'h0000;
   else if (cntrl2_wr) cntrl2 <=  per_din;
 
-   
+
 // CNTRL3 Register
-//-----------------   
+//-----------------
 reg  [15:0] cntrl3;
 
 wire        cntrl3_wr = reg_wr[CNTRL3];
@@ -157,9 +157,9 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        cntrl3 <=  16'h0000;
   else if (cntrl3_wr) cntrl3 <=  per_din;
 
-   
+
 // CNTRL4 Register
-//-----------------   
+//-----------------
 reg  [15:0] cntrl4;
 
 wire        cntrl4_wr = reg_wr[CNTRL4];

@@ -26,9 +26,9 @@
 // THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: openMSP430_undefines.v
-// 
+//
 // *Module Description:
 //                      openMSP430 Verilog `undef file
 //

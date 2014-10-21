@@ -26,9 +26,9 @@
 // THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: omsp_timerA_undefines.v
-// 
+//
 // *Module Description:
 //                      omsp_timerA Verilog `undef file
 //

@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_scan_mux.v
-// 
+//
 // *Module Description:
 //                       Generic mux for scan mode
 //
@@ -71,5 +71,3 @@ assign  data_out  =  scan_mode ? data_in_scan : data_in_func;
 
 
 endmodule // omsp_scan_mux
-
-

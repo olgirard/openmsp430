@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_gpio.v
-// 
+//
 // *Module Description:
 //                       Digital I/O interface
 //
@@ -215,7 +215,7 @@ parameter [DEC_SZ-1:0] P1IN_D      =  (BASE_REG << P1IN),     // Port 1
                        P6IN_D      =  (BASE_REG << P6IN),     // Port 6
                        P6OUT_D     =  (BASE_REG << P6OUT),
                        P6DIR_D     =  (BASE_REG << P6DIR),
-                       P6SEL_D     =  (BASE_REG << P6SEL); 
+                       P6SEL_D     =  (BASE_REG << P6SEL);
 
 
 //============================================================================
@@ -268,7 +268,7 @@ wire              reg_read     = ~|per_we   & reg_sel;
 // Read/Write vectors
 wire [DEC_SZ-1:0] reg_hi_wr    = reg_dec & {DEC_SZ{reg_hi_write}};
 wire [DEC_SZ-1:0] reg_lo_wr    = reg_dec & {DEC_SZ{reg_lo_write}};
-wire [DEC_SZ-1:0] reg_rd       = reg_dec & {DEC_SZ{reg_read}}; 
+wire [DEC_SZ-1:0] reg_rd       = reg_dec & {DEC_SZ{reg_read}};
 
 //============================================================================
 // 3) REGISTERS
@@ -315,7 +315,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign p1_dout_en = p1dir;
 
-   
+
 // P1IFG Register
 //----------------
 reg  [7:0] p1ifg;
@@ -323,7 +323,7 @@ reg  [7:0] p1ifg;
 wire       p1ifg_wr  = P1IFG[0] ? reg_hi_wr[P1IFG] : reg_lo_wr[P1IFG];
 wire [7:0] p1ifg_nxt = P1IFG[0] ? per_din[15:8]    : per_din[7:0];
 wire [7:0] p1ifg_set;
-       
+
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        p1ifg <=  8'h00;
   else if (p1ifg_wr)  p1ifg <=  (p1ifg_nxt | p1ifg_set) & P1_EN_MSK;
@@ -340,7 +340,7 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        p1ies <=  8'h00;
   else if (p1ies_wr)  p1ies <=  p1ies_nxt & P1_EN_MSK;
 
-   
+
 // P1IE Register
 //----------------
 reg  [7:0] p1ie;
@@ -366,7 +366,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign p1_sel = p1sel;
 
-   
+
 // P2IN Register
 //---------------
 wire [7:0] p2in;
@@ -408,7 +408,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign p2_dout_en = p2dir;
 
-   
+
 // P2IFG Register
 //----------------
 reg  [7:0] p2ifg;
@@ -422,7 +422,7 @@ always @ (posedge mclk or posedge puc_rst)
   else if (p2ifg_wr)  p2ifg <=  (p2ifg_nxt | p2ifg_set) & P2_EN_MSK;
   else                p2ifg <=  (p2ifg     | p2ifg_set) & P2_EN_MSK;
 
-   
+
 // P2IES Register
 //----------------
 reg  [7:0] p2ies;
@@ -434,7 +434,7 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        p2ies <=  8'h00;
   else if (p2ies_wr)  p2ies <=  p2ies_nxt & P2_EN_MSK;
 
-   
+
 // P2IE Register
 //----------------
 reg  [7:0] p2ie;
@@ -446,7 +446,7 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)       p2ie <=  8'h00;
   else if (p2ie_wr)  p2ie <=  p2ie_nxt & P2_EN_MSK;
 
-   
+
 // P2SEL Register
 //----------------
 reg  [7:0] p2sel;
@@ -460,7 +460,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign p2_sel = p2sel;
 
-   
+
 // P3IN Register
 //---------------
 wire  [7:0] p3in;
@@ -516,7 +516,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign p3_sel = p3sel;
 
-   
+
 // P4IN Register
 //---------------
 wire  [7:0] p4in;
@@ -572,7 +572,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign p4_sel = p4sel;
 
-   
+
 // P5IN Register
 //---------------
 wire  [7:0] p5in;
@@ -614,7 +614,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign p5_dout_en = p5dir;
 
-   
+
 // P5SEL Register
 //----------------
 reg  [7:0] p5sel;
@@ -628,7 +628,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign p5_sel = p5sel;
 
-   
+
 // P6IN Register
 //---------------
 wire  [7:0] p6in;
@@ -670,7 +670,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign p6_dout_en = p6dir;
 
-   
+
 // P6SEL Register
 //----------------
 reg  [7:0] p6sel;
@@ -684,7 +684,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign p6_sel = p6sel;
 
-   
+
 
 //============================================================================
 // 4) INTERRUPT GENERATION
@@ -697,7 +697,7 @@ assign p6_sel = p6sel;
 reg    [7:0] p1in_dly;
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)  p1in_dly <=  8'h00;
-  else          p1in_dly <=  p1in & P1_EN_MSK;    
+  else          p1in_dly <=  p1in & P1_EN_MSK;
 
 // Edge detection
 wire   [7:0] p1in_re   =   p1in & ~p1in_dly;
@@ -724,7 +724,7 @@ assign       irq_port1 = |(p1ie & p1ifg) & P1_EN[0];
 reg    [7:0] p2in_dly;
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)  p2in_dly <=  8'h00;
-  else          p2in_dly <=  p2in & P2_EN_MSK;    
+  else          p2in_dly <=  p2in & P2_EN_MSK;
 
 // Edge detection
 wire   [7:0] p2in_re   =   p2in & ~p2in_dly;

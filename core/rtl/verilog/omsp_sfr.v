@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_sfr.v
-// 
+//
 // *Module Description:
 //                       Processor Special function register
 //                       Non-Maskable Interrupt generation
@@ -171,8 +171,8 @@ wire [7:0] ie1_nxt = IE1[0] ? per_din[15:8]  : per_din[7:0];
 reg        nmie;
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)      nmie  <=  1'b0;
-  else if (nmi_acc) nmie  <=  1'b0; 
-  else if (ie1_wr)  nmie  <=  ie1_nxt[4];    
+  else if (nmi_acc) nmie  <=  1'b0;
+  else if (ie1_wr)  nmie  <=  ie1_nxt[4];
 `else
 wire       nmie  =  1'b0;
 `endif
@@ -181,9 +181,9 @@ wire       nmie  =  1'b0;
 reg        wdtie;
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)      wdtie <=  1'b0;
-  else if (ie1_wr)  wdtie <=  ie1_nxt[0];    
+  else if (ie1_wr)  wdtie <=  ie1_nxt[0];
 `else
-wire       wdtie =  1'b0;    
+wire       wdtie =  1'b0;
 `endif
 
 assign  ie1 = {3'b000, nmie, 3'b000, wdtie};
@@ -305,7 +305,7 @@ wire nmi_pol = nmi ^ wdtnmies;
    always @(posedge mclk or posedge puc_rst)
      if (puc_rst) nmi_capture_rst <= 1'b1;
      else         nmi_capture_rst <= ifg1_wr & ~ifg1_nxt[4];
- 
+
    // NMI event capture
    wire   nmi_capture;
    omsp_wakeup_cell wakeup_cell_nmi (

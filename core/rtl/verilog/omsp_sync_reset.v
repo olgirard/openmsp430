@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_sync_reset.v
-// 
+//
 // *Module Description:
 //                       Generic reset synchronizer for the openMSP430
 //
@@ -75,4 +75,3 @@ assign       rst_s      =   data_sync[1];
 
 
 endmodule // omsp_sync_reset
-

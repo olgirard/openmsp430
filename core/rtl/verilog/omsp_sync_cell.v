@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_sync_cell.v
-// 
+//
 // *Module Description:
 //                       Generic synchronizer for the openMSP430
 //
@@ -77,4 +77,3 @@ assign     data_out   =   data_sync[1];
 
 
 endmodule // omsp_sync_cell
-

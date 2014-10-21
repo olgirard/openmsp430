@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_frontend.v
-// 
+//
 // *Module Description:
 //                       openMSP430 Instruction fetch and decode unit
 //
@@ -186,7 +186,7 @@ function  [5:0] get_irq_num;
         if (&get_irq_num & irq_all[ii]) get_irq_num = ii[5:0];
    end
 endfunction
-   
+
 
 //=============================================================================
 // 2)  PARAMETER DEFINITIONS
@@ -238,10 +238,10 @@ wire [2:0] inst_type_nxt;
 wire       is_const;
 reg [15:0] sconst_nxt;
 reg  [3:0] e_state_nxt;
-           
+
 // CPU on/off through an external interface (debug or mstr) or cpu_en port
 wire   cpu_halt_req = cpu_halt_cmd | ~cpu_en_s;
-   
+
 // States Transitions
 always @(i_state    or inst_sz  or inst_sz_nxt  or pc_sw_wr or exec_done or
          irq_detect or cpuoff   or cpu_halt_req or e_state)
@@ -256,7 +256,7 @@ always @(i_state    or inst_sz  or inst_sz_nxt  or pc_sw_wr or exec_done or
                                   pc_sw_wr                    ? I_DEC       :
                              ~exec_done & ~(e_state==E_IDLE)  ? I_DEC       :        // Wait in decode state
                                   (inst_sz_nxt!=2'b00)        ? I_EXT1      : I_DEC; // until execution is completed
-      I_EXT1     : i_state_nxt =  pc_sw_wr                    ? I_DEC       : 
+      I_EXT1     : i_state_nxt =  pc_sw_wr                    ? I_DEC       :
                                   (inst_sz!=2'b01)            ? I_EXT2      : I_DEC;
       I_EXT2     : i_state_nxt =  I_DEC;
     // pragma coverage off
@@ -353,7 +353,7 @@ wire mclk_enable = inst_irq_rst ? cpu_en_s :        //      - the RESET interrup
                    (i_state==I_IDLE) &              //        and execution state machines are all two
                    (e_state==E_IDLE));              //        not idle.
 
-   
+
 // Wakeup condition from maskable interrupts
 wire mirq_wkup;
 omsp_and_gate and_mirq_wkup (.y(mirq_wkup), .a(wkup | wdt_wkup), .b(gie));
@@ -406,7 +406,7 @@ reg pmem_busy;
 always @(posedge mclk or posedge puc_rst)
   if (puc_rst)  pmem_busy <= 1'b0;
   else          pmem_busy <= fe_pmem_wait;
-   
+
 // Memory interface
 wire [15:0] mab      = pc_nxt;
 wire        mb_en    = fetch | pc_sw_wr | (i_state==I_IRQ_FETCH) | pmem_busy | (cpu_halt_st & ~cpu_halt_req);
@@ -510,7 +510,7 @@ reg  [2:0] inst_type;
 assign     inst_type_nxt = {(ir[15:14]!=2'b00),
                             (ir[15:13]==3'b001),
                             (ir[15:13]==3'b000)} & {3{~irq_detect}};
-   
+
 always @(posedge mclk_decode or posedge puc_rst)
   if (puc_rst)      inst_type <= 3'b000;
 `ifdef CLOCK_GATING
@@ -863,7 +863,7 @@ always @(e_state       or dst_acalc     or dst_rd   or inst_sext_rdy or
 
       E_SRC_AD : e_state_nxt =  inst_sext_rdy     ? E_SRC_RD : E_SRC_AD;
 
-      E_SRC_RD : e_state_nxt =  dst_acalc         ? E_DST_AD : 
+      E_SRC_RD : e_state_nxt =  dst_acalc         ? E_DST_AD :
                                  dst_rd           ? E_DST_RD : E_EXEC;
 
       E_DST_AD : e_state_nxt =  (inst_dext_rdy |
@@ -933,7 +933,7 @@ wire        alu_add       = inst_to_nxt[`ADD]  | inst_to_nxt[`ADDC]       |
                             inst_to_nxt[`CMP]  | inst_type_nxt[`INST_JMP] |
                             inst_so_nxt[`RETI];
 
- 
+
 wire        alu_and       = inst_to_nxt[`AND]  | inst_to_nxt[`BIC]  |
                             inst_to_nxt[`BIT];
 
