@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_clock_gate.v
-// 
+//
 // *Module Description:
 //                       Generic clock gate cell for the openMSP430
 //
@@ -66,7 +66,7 @@ input          scan_enable;    // Scan enable (active during scan shifting)
 //=============================================================================
 // CLOCK GATE: LATCH + AND
 //=============================================================================
-   
+
 // Enable clock gate during scan shift
 // (the gate itself is checked with the scan capture cycle)
 wire    enable_in =   (enable | scan_enable);
@@ -82,5 +82,3 @@ assign  gclk      =  (clk & enable_latch);
 
 
 endmodule // omsp_clock_gate
-
-

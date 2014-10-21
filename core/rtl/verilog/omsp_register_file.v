@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_register_file.v
-// 
+//
 // *Module Description:
 //                       openMSP430 Register files
 //
@@ -236,9 +236,9 @@ wire        mclk_r2 = mclk;
    wire [15:0] scg0_mask   = 16'h0000; //                       - the SCG0 is not supported
    wire [15:0] scg1_mask   = 16'h0080; //                       - the SCG1 mode is emulated
 `endif
-   
+
    wire [15:0] r2_mask     = cpuoff_mask | oscoff_mask | scg0_mask | scg1_mask | 16'h010f;
- 
+
 always @(posedge mclk_r2 or posedge puc_rst)
   if (puc_rst)         r2 <= 16'h0000;
   else if (reg_sr_clr) r2 <= 16'h0000;
@@ -575,38 +575,38 @@ always @(posedge mclk_r15 or posedge puc_rst)
 // 5)  READ MUX
 //=============================================================================
 
-assign reg_src  = (r0      & {16{inst_src_in[0]}})   | 
-                  (r1      & {16{inst_src_in[1]}})   | 
-                  (r2      & {16{inst_src_in[2]}})   | 
-                  (r3      & {16{inst_src_in[3]}})   | 
-                  (r4      & {16{inst_src_in[4]}})   | 
-                  (r5      & {16{inst_src_in[5]}})   | 
-                  (r6      & {16{inst_src_in[6]}})   | 
-                  (r7      & {16{inst_src_in[7]}})   | 
-                  (r8      & {16{inst_src_in[8]}})   | 
-                  (r9      & {16{inst_src_in[9]}})   | 
-                  (r10     & {16{inst_src_in[10]}})  | 
-                  (r11     & {16{inst_src_in[11]}})  | 
-                  (r12     & {16{inst_src_in[12]}})  | 
-                  (r13     & {16{inst_src_in[13]}})  | 
-                  (r14     & {16{inst_src_in[14]}})  | 
+assign reg_src  = (r0      & {16{inst_src_in[0]}})   |
+                  (r1      & {16{inst_src_in[1]}})   |
+                  (r2      & {16{inst_src_in[2]}})   |
+                  (r3      & {16{inst_src_in[3]}})   |
+                  (r4      & {16{inst_src_in[4]}})   |
+                  (r5      & {16{inst_src_in[5]}})   |
+                  (r6      & {16{inst_src_in[6]}})   |
+                  (r7      & {16{inst_src_in[7]}})   |
+                  (r8      & {16{inst_src_in[8]}})   |
+                  (r9      & {16{inst_src_in[9]}})   |
+                  (r10     & {16{inst_src_in[10]}})  |
+                  (r11     & {16{inst_src_in[11]}})  |
+                  (r12     & {16{inst_src_in[12]}})  |
+                  (r13     & {16{inst_src_in[13]}})  |
+                  (r14     & {16{inst_src_in[14]}})  |
                   (r15     & {16{inst_src_in[15]}});
 
-assign reg_dest = (r0      & {16{inst_dest[0]}})  | 
-                  (r1      & {16{inst_dest[1]}})  | 
-                  (r2      & {16{inst_dest[2]}})  | 
-                  (r3      & {16{inst_dest[3]}})  | 
-                  (r4      & {16{inst_dest[4]}})  | 
-                  (r5      & {16{inst_dest[5]}})  | 
-                  (r6      & {16{inst_dest[6]}})  | 
-                  (r7      & {16{inst_dest[7]}})  | 
-                  (r8      & {16{inst_dest[8]}})  | 
-                  (r9      & {16{inst_dest[9]}})  | 
-                  (r10     & {16{inst_dest[10]}}) | 
-                  (r11     & {16{inst_dest[11]}}) | 
-                  (r12     & {16{inst_dest[12]}}) | 
-                  (r13     & {16{inst_dest[13]}}) | 
-                  (r14     & {16{inst_dest[14]}}) | 
+assign reg_dest = (r0      & {16{inst_dest[0]}})  |
+                  (r1      & {16{inst_dest[1]}})  |
+                  (r2      & {16{inst_dest[2]}})  |
+                  (r3      & {16{inst_dest[3]}})  |
+                  (r4      & {16{inst_dest[4]}})  |
+                  (r5      & {16{inst_dest[5]}})  |
+                  (r6      & {16{inst_dest[6]}})  |
+                  (r7      & {16{inst_dest[7]}})  |
+                  (r8      & {16{inst_dest[8]}})  |
+                  (r9      & {16{inst_dest[9]}})  |
+                  (r10     & {16{inst_dest[10]}}) |
+                  (r11     & {16{inst_dest[11]}}) |
+                  (r12     & {16{inst_dest[12]}}) |
+                  (r13     & {16{inst_dest[13]}}) |
+                  (r14     & {16{inst_dest[14]}}) |
                   (r15     & {16{inst_dest[15]}});
 
 

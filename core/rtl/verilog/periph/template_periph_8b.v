@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: template_periph_8b.v
-// 
+//
 // *Module Description:
 //                       8 bit peripheral template.
 //
@@ -85,16 +85,16 @@ parameter [DEC_WD-1:0] CNTRL1      =  'h0,
                        CNTRL3      =  'h2,
                        CNTRL4      =  'h3;
 
-   
+
 // Register one-hot decoder utilities
 parameter              DEC_SZ      =  (1 << DEC_WD);
 parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder
 parameter [DEC_SZ-1:0] CNTRL1_D  = (BASE_REG << CNTRL1),
-                       CNTRL2_D  = (BASE_REG << CNTRL2), 
-                       CNTRL3_D  = (BASE_REG << CNTRL3), 
-                       CNTRL4_D  = (BASE_REG << CNTRL4); 
+                       CNTRL2_D  = (BASE_REG << CNTRL2),
+                       CNTRL3_D  = (BASE_REG << CNTRL3),
+                       CNTRL4_D  = (BASE_REG << CNTRL4);
 
 
 //============================================================================
@@ -139,7 +139,7 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        cntrl1 <=  8'h00;
   else if (cntrl1_wr) cntrl1 <=  cntrl1_nxt;
 
-   
+
 // CNTRL2 Register
 //-----------------
 reg  [7:0] cntrl2;
@@ -151,7 +151,7 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        cntrl2 <=  8'h00;
   else if (cntrl2_wr) cntrl2 <=  cntrl2_nxt;
 
-   
+
 // CNTRL3 Register
 //-----------------
 reg  [7:0] cntrl3;
@@ -163,7 +163,7 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)        cntrl3 <=  8'h00;
   else if (cntrl3_wr) cntrl3 <=  cntrl3_nxt;
 
-   
+
 // CNTRL4 Register
 //-----------------
 reg  [7:0] cntrl4;
@@ -192,5 +192,5 @@ wire [15:0] per_dout  =  cntrl1_rd  |
                          cntrl3_rd  |
                          cntrl4_rd;
 
-   
+
 endmodule // template_periph_8b

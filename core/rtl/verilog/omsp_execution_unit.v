@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_execution_unit.v
-// 
+//
 // *Module Description:
 //                       openMSP430 Execution unit
 //
@@ -166,7 +166,7 @@ wire reg_sr_wr    =  (e_state==`E_DST_RD) & inst_so[`RETI];
 
 wire reg_sr_clr   =  (e_state==`E_IRQ_2);
 
-wire reg_pc_call  = ((e_state==`E_EXEC)   & inst_so[`CALL]) | 
+wire reg_pc_call  = ((e_state==`E_EXEC)   & inst_so[`CALL]) |
                     ((e_state==`E_DST_WR) & inst_so[`RETI]);
 
 wire reg_incr     =  (exec_done          & inst_as[`INDIR_I]) |

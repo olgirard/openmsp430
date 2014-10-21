@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_watchdog.v
-// 
+//
 // *Module Description:
 //                       Watchdog Timer
 //
@@ -157,7 +157,7 @@ wire [DEC_SZ-1:0] reg_rd    = reg_dec & {DEC_SZ{reg_read}};
 // WDTCTL Register
 //-----------------
 // WDTNMI is not implemented and therefore masked
-   
+
 reg  [7:0] wdtctl;
 
 wire       wdtctl_wr = reg_wr[WDTCTL];
@@ -187,7 +187,7 @@ parameter [7:0] WDTSSEL_MASK  = 8'h04;
 `endif
 
 parameter [7:0] WDTCTL_MASK   = (8'b1001_0011 | WDTSSEL_MASK | WDTNMIES_MASK);
-   
+
 always @ (posedge mclk_wdtctl or posedge puc_rst)
   if (puc_rst)        wdtctl <=  8'h00;
 `ifdef CLOCK_GATING
@@ -254,7 +254,7 @@ omsp_clock_mux clock_mux_watchdog (
 
 // Reset synchronizer for the watchdog local clock domain
 //--------------------------------------------------------
-   
+
 wire wdt_rst_noscan;
 wire wdt_rst;
 
@@ -272,7 +272,7 @@ omsp_scan_mux scan_mux_wdt_rst (
     .data_in_func (wdt_rst_noscan),
     .data_out     (wdt_rst)
 );
-   
+
 
 // Watchog counter clear (synchronization)
 //-----------------------------------------
@@ -497,7 +497,7 @@ always @ (posedge mclk or posedge puc_rst)
   else if (wdtcnt_clr)   wdtcnt <= 16'h0000;
   else if (wdtcnt_incr)  wdtcnt <= wdtcnt_nxt;
 
-   
+
 // Interval selection mux
 //--------------------------
 reg        wdtqn;

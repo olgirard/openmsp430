@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_clock_module.v
-// 
+//
 // *Module Description:
 //                       Basic clock module implementation.
 //
@@ -65,7 +65,7 @@ module  omsp_clock_module (
     puc_rst,                      // Main system reset
     smclk,                        // SMCLK
     smclk_en,                     // SMCLK enable
-	     
+
 // INPUTs
     cpu_en,                       // Enable CPU code execution (asynchronous)
     cpuoff,                       // Turns off the CPU
@@ -341,7 +341,7 @@ wire cpu_en_wkup;
 				    .data_out     (dco_wkup_set_scan)
 			           );
 
-   // Scan MUX to increase coverage 
+   // Scan MUX to increase coverage
    wire dco_wkup_clear;
    omsp_scan_mux scan_mux_dco_wkup_clear (
 			  	          .scan_mode    (scan_mode),
@@ -429,7 +429,7 @@ wire cpu_en_wkup;
 				     .data_out     (lfxt_wkup_set_scan)
 			            );
 
-   // Scan MUX to increase coverage 
+   // Scan MUX to increase coverage
    wire lfxt_wkup_clear;
    omsp_scan_mux scan_mux_lfxt_wkup_clear (
 			  	           .scan_mode    (scan_mode),
@@ -470,17 +470,17 @@ omsp_sync_cell sync_cell_lfxt_clk (
 );
 
 reg  lfxt_clk_dly;
-   
+
 always @ (posedge mclk or posedge por)
   if (por) lfxt_clk_dly <=  1'b0;
-  else     lfxt_clk_dly <=  lfxt_clk_s;    
+  else     lfxt_clk_dly <=  lfxt_clk_s;
 
 wire   lfxt_clk_en = (lfxt_clk_s & ~lfxt_clk_dly) & ~(oscoff & ~bcsctl2[`SELS]);
 assign lfxt_enable = 1'b1;
 assign lfxt_wkup   = 1'b0;
-`endif     
+`endif
 
-   
+
 //=============================================================================
 // 6)  CLOCK GENERATION
 //=============================================================================
@@ -560,7 +560,7 @@ omsp_clock_mux clock_mux_mclk (
 assign nodiv_mclk   =  dco_clk;
 `endif
 assign nodiv_mclk_n = ~nodiv_mclk;
-   
+
 
 // Wakeup synchronizer
 //----------------------------
@@ -588,7 +588,7 @@ wire mclk_active = mclk_enable | mclk_wkup_s | (dbg_en_s & cpu_en_s);
 `else
 wire mclk_active = 1'b1;
 `endif
-   
+
 `ifdef MCLK_DIVIDER
 reg [2:0] mclk_div;
 always @ (posedge nodiv_mclk or posedge puc_rst)
@@ -682,7 +682,7 @@ omsp_clock_gate clock_gate_mclk (
    wire       nodiv_aclk   = dco_clk;
    wire [1:0] divax_ss     = bcsctl1[`DIVAx];
    wire       oscoff_s     = oscoff;
-  `endif   
+  `endif
 
    // Divider
    reg [2:0] aclk_div;
@@ -710,7 +710,7 @@ omsp_clock_gate clock_gate_mclk (
     assign  aclk    = dco_clk;
     `endif
   `endif
-   
+
 
     assign  aclk_en = 1'b1;
 
@@ -735,7 +735,7 @@ omsp_clock_gate clock_gate_mclk (
 
   assign  aclk   = mclk;
 `endif
-   
+
 //-----------------------------------------------------------
 // 6.4) SMCLK GENERATION
 //-----------------------------------------------------------
@@ -765,7 +765,7 @@ assign nodiv_smclk = dco_clk;
     //------------------------------------------------------
     // When the SMCLK MUX is enabled, the reset and DIVSx
     // and SCG1 signals must be synchronized, otherwise not.
-   
+
      // Local Reset synchronizer
      wire puc_sm_noscan_n;
      wire puc_sm_rst;
@@ -813,15 +813,15 @@ assign nodiv_smclk = dco_clk;
 	    divsx_ss <=  divsx_s;
 	 end
     `endif
-   
+
    `else
-   
+
       wire       puc_sm_rst   = puc_rst;
       wire [1:0] divsx_ss     = bcsctl2[`DIVSx];
       wire       scg1_s       = scg1;
   `endif
-   
-   
+
+
 
    // Clock Divider
    //----------------------------
@@ -843,7 +843,7 @@ assign nodiv_smclk = dco_clk;
     wire smclk_div_en = cpu_en_sm_s;
    `endif
  `endif
-   
+
 
    // Generate sub-system clock
    //----------------------------
@@ -857,7 +857,7 @@ assign nodiv_smclk = dco_clk;
  `else
    assign  smclk    = nodiv_smclk;
  `endif
-   
+
    assign  smclk_en = 1'b1;
 
 
@@ -873,7 +873,7 @@ wire      smclk_en_nxt = smclk_in & ((bcsctl2[`DIVSx]==2'b00) ?  1'b1           
                                      (bcsctl2[`DIVSx]==2'b01) ?  smclk_div[0]   :
                                      (bcsctl2[`DIVSx]==2'b10) ? &smclk_div[1:0] :
                                                                 &smclk_div[2:0]);
-   
+
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)  smclk_en <=  1'b0;
   else          smclk_en <=  smclk_en_nxt & cpu_en_s;
@@ -944,7 +944,7 @@ wire  smclk  = mclk;
 // Note: releasing the DBG_RST before PUC is particularly important in order
 //       to allow the sdi interface to halt the cpu immediately after a PUC.
 //
-   
+
 // Generate synchronized POR to MCLK domain
 //------------------------------------------
 

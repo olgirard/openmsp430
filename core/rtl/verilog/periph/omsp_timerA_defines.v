@@ -26,9 +26,9 @@
 // THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: omsp_timerA_defines.v
-// 
+//
 // *Module Description:
 //                      omsp_timerA Configuration file
 //
