@@ -3,3 +3,4 @@ pmem_defs.*
 simv
 stimulus.v
 *.vcd
+log
