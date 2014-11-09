@@ -68,14 +68,14 @@ wire        [15:0] per_dout;
 wire         [1:0] per_we;
 wire               per_en;
 
-// Master memory interface
-wire        [15:0] mstr_mem_dout;
-wire               mstr_ready;
-reg         [15:1] mstr_mem_addr;
-reg         [15:0] mstr_mem_din;
-reg                mstr_mem_en;
-reg                mstr_mem_priority;
-reg          [1:0] mstr_mem_we;
+// Direct Memory Access interface
+wire        [15:0] dma_dout;
+wire               dma_ready;
+reg         [15:1] dma_addr;
+reg         [15:0] dma_din;
+reg                dma_en;
+reg                dma_priority;
+reg          [1:0] dma_we;
 
 // Digital I/O
 wire               irq_port1;
@@ -201,6 +201,7 @@ wire    [8*32-1:0] inst_short;
 
 // Testbench variables
 integer            tb_idx;
+integer            seed;
 integer            error;
 reg                stimulus_done;
 
@@ -216,8 +217,8 @@ reg                stimulus_done;
 `include "dbg_uart_tasks.v"
 `include "dbg_i2c_tasks.v"
 
-// Master memory interface tasks
-//`include "mstr_mem_tasks.v"
+// Direct Memory Access interface tasks
+`include "dma_tasks.v"
 
 // Verilog stimulus
 `include "stimulus.v"
@@ -277,16 +278,17 @@ initial
 
 initial
   begin
+     seed                    = 0;
      error                   = 0;
      stimulus_done           = 1;
      irq                     = {`IRQ_NR-2{1'b0}};
      nmi                     = 1'b0;
      wkup                    = 14'h0000;
-     mstr_mem_addr           = 15'h0000;
-     mstr_mem_din            = 16'h0000;
-     mstr_mem_en             = 1'b0;
-     mstr_mem_priority       = 1'b0;
-     mstr_mem_we             = 2'b00;
+     dma_addr                = 15'h0000;
+     dma_din                 = 16'h0000;
+     dma_en                  = 1'b0;
+     dma_priority            = 1'b0;
+     dma_we                  = 2'b00;
      cpu_en                  = 1'b1;
      dbg_en                  = 1'b0;
      dbg_uart_rxd_sel        = 1'b0;
@@ -382,8 +384,8 @@ openMSP430 dut (
     .lfxt_enable       (lfxt_enable),          // ASIC ONLY: Low frequency oscillator enable
     .lfxt_wkup         (lfxt_wkup),            // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
     .mclk              (mclk),                 // Main system clock
-    .mstr_mem_dout     (mstr_mem_dout),        // Master access Memory data output
-    .mstr_ready        (mstr_ready),           // Master access is complete
+    .dma_dout          (dma_dout),             // Direct Memory Access data output
+    .dma_ready         (dma_ready),            // Direct Memory Access is complete
     .per_addr          (per_addr),             // Peripheral address
     .per_din           (per_din),              // Peripheral data input
     .per_en            (per_en),               // Peripheral enable (high active)
@@ -408,11 +410,11 @@ openMSP430 dut (
     .dmem_dout         (dmem_dout),            // Data Memory data output
     .irq               (irq_in),               // Maskable interrupts
     .lfxt_clk          (lfxt_clk),             // Low frequency oscillator (typ 32kHz)
-    .mstr_mem_addr     (mstr_mem_addr),        // Master access Memory address
-    .mstr_mem_din      (mstr_mem_din),         // Master access Memory data input
-    .mstr_mem_en       (mstr_mem_en),          // Master access Memory enable (high active)
-    .mstr_mem_priority (mstr_mem_priority),    // Master access Memory priority (0:low / 1:high)
-    .mstr_mem_we       (mstr_mem_we),          // Master access Memory write byte enable (high active)
+    .dma_addr          (dma_addr),             // Direct Memory Access address
+    .dma_din           (dma_din),              // Direct Memory Access data input
+    .dma_en            (dma_en),               // Direct Memory Access enable (high active)
+    .dma_priority      (dma_priority),         // Direct Memory Access priority (0:low / 1:high)
+    .dma_we            (dma_we),               // Direct Memory Access write byte enable (high active)
     .nmi               (nmi),                  // Non-maskable interrupt (asynchronous)
     .per_dout          (per_dout),             // Peripheral data output
     .pmem_dout         (pmem_dout),            // Program Memory data output
@@ -517,10 +519,6 @@ omsp_timerA timerA_0 (
     .ta_cci2b          (ta_cci2b),             // Timer A compare 2 input B
     .taclk             (taclk)                 // TACLK external timer clock (SLOW)
 );
-<<<<<<< HEAD
-=======
-
->>>>>>> Update master memory interface to support low and high priority memory access
 
 //
 // Peripheral templates
@@ -718,7 +716,12 @@ initial // Normal end of test
      wait(inst_pc=='hffff);
 
      $display(" ===============================================");
-     if (error!=0)
+     if ((dma_rd_error!=0) || (dma_wr_error!=0))
+       begin
+          $display("|               SIMULATION FAILED               |");
+          $display("|           (some DMA transfer failed)          |");
+       end
+     else if (error!=0)
        begin
           $display("|               SIMULATION FAILED               |");
           $display("|     (some verilog stimulus checks failed)     |");
@@ -733,6 +736,10 @@ initial // Normal end of test
           $display("|               SIMULATION PASSED               |");
        end
      $display(" ===============================================");
+     $display("");
+     $display("DMA REPORT: Total Accesses: %-d Total RD: %-d Total WR: %-d", dma_cnt_rd+dma_cnt_wr,     dma_cnt_rd,   dma_cnt_wr);
+     $display("            Total Errors:   %-d Error RD: %-d Error WR: %-d", dma_rd_error+dma_wr_error, dma_rd_error, dma_wr_error);
+     $display("");
      $finish;
   end
 

@@ -57,8 +57,8 @@ module  omsp_mem_backbone (
     eu_mdb_in,                          // Execution Unit Memory data bus input
     fe_mdb_in,                          // Frontend Memory data bus input
     fe_pmem_wait,                       // Frontend wait for Instruction fetch
-    mstr_mem_dout,                      // Master access Memory data output
-    mstr_ready,                         // Master access is complete
+    dma_dout,                           // Direct Memory Access data output
+    dma_ready,                          // Direct Memory Access is complete
     per_addr,                           // Peripheral address
     per_din,                            // Peripheral data input
     per_we,                             // Peripheral write enable (high active)
@@ -83,11 +83,11 @@ module  omsp_mem_backbone (
     fe_mab,                             // Frontend Memory address bus
     fe_mb_en,                           // Frontend Memory bus enable
     mclk,                               // Main system clock
-    mstr_mem_addr,                      // Master access Memory address
-    mstr_mem_din,                       // Master access Memory data input
-    mstr_mem_en,                        // Master access Memory enable (high active)
-    mstr_mem_priority,                  // Master access Memory priority (0:low / 1:high)
-    mstr_mem_we,                        // Master access Memory write byte enable (high active)
+    dma_addr,                           // Direct Memory Access address
+    dma_din,                            // Direct Memory Access data input
+    dma_en,                             // Direct Memory Access enable (high active)
+    dma_priority,                       // Direct Memory Access priority (0:low / 1:high)
+    dma_we,                             // Direct Memory Access write byte enable (high active)
     per_dout,                           // Peripheral data output
     pmem_dout,                          // Program Memory data output
     puc_rst,                            // Main system reset
@@ -105,8 +105,8 @@ output         [1:0] dmem_wen;          // Data Memory write enable (low active)
 output        [15:0] eu_mdb_in;         // Execution Unit Memory data bus input
 output        [15:0] fe_mdb_in;         // Frontend Memory data bus input
 output               fe_pmem_wait;      // Frontend wait for Instruction fetch
-output        [15:0] mstr_mem_dout;     // Master access Memory data output
-output               mstr_ready;        // Master access is complete
+output        [15:0] dma_dout;          // Direct Memory Access data output
+output               dma_ready;         // Direct Memory Access is complete
 output        [13:0] per_addr;          // Peripheral address
 output        [15:0] per_din;           // Peripheral data input
 output         [1:0] per_we;            // Peripheral write enable (high active)
@@ -132,11 +132,11 @@ input         [15:0] eu_mdb_out;        // Execution Unit Memory data bus output
 input         [14:0] fe_mab;            // Frontend Memory address bus
 input                fe_mb_en;          // Frontend Memory bus enable
 input                mclk;              // Main system clock
-input         [15:1] mstr_mem_addr;     // Master access Memory address
-input         [15:0] mstr_mem_din;      // Master access Memory data input
-input                mstr_mem_en;       // Master access Memory enable (high active)
-input		     mstr_mem_priority; // Master access Memory priority (0:low / 1:high)
-input          [1:0] mstr_mem_we;       // Master access Memory write byte enable (high active)
+input         [15:1] dma_addr;          // Direct Memory Access address
+input         [15:0] dma_din;           // Direct Memory Access data input
+input                dma_en;            // Direct Memory Access enable (high active)
+input                dma_priority;      // Direct Memory Access priority (0:low / 1:high)
+input          [1:0] dma_we;            // Direct Memory Access write byte enable (high active)
 input         [15:0] per_dout;          // Peripheral data output
 input         [15:0] pmem_dout;         // Program Memory data output
 input                puc_rst;           // Main system reset
@@ -156,22 +156,29 @@ wire                 ext_per_en;
 // Arbiter between MSTR and Debug interface
 //------------------------------------------
 
-// External interface read data
-assign      dbg_mem_din   = ext_mem_din;
-assign      mstr_mem_dout = ext_mem_din;
-
 // Debug-interface always stops the CPU
 // Master interface stops the CPU in priority mode
-assign      cpu_halt_cmd  =  dbg_halt_cmd | (mstr_mem_en & mstr_mem_priority);
+assign      cpu_halt_cmd   =  dbg_halt_cmd | (dma_en & dma_priority);
 
 // Master interface access is ready when the memory access occures
-assign      mstr_ready    = ~dbg_halt_cmd & (ext_dmem_en | ext_pmem_en | ext_per_en);
+assign      dma_ready = ~dbg_halt_cmd & (ext_dmem_en | ext_pmem_en | ext_per_en);
+
+// Use delayed version of 'dma_ready' to mask the 'dma_dout' data output
+// when not accessed and reduce toggle rate (thus power consumption)
+reg         dma_ready_dly;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)  dma_ready_dly <=  1'b0;
+  else          dma_ready_dly <=  dma_ready;
 
 // Mux between debug and master interface
-wire        ext_mem_en    =  dbg_mem_en | mstr_mem_en;
-wire  [1:0] ext_mem_wr    =  dbg_mem_en ? dbg_mem_wr    :  mstr_mem_we;
-wire [15:1] ext_mem_addr  =  dbg_mem_en ? dbg_mem_addr  :  mstr_mem_addr;
-wire [15:0] ext_mem_dout  =  dbg_mem_en ? dbg_mem_dout  :  mstr_mem_din;
+wire        ext_mem_en    =  dbg_mem_en | dma_en;
+wire  [1:0] ext_mem_wr    =  dbg_mem_en ? dbg_mem_wr    :  dma_we;
+wire [15:1] ext_mem_addr  =  dbg_mem_en ? dbg_mem_addr  :  dma_addr;
+wire [15:0] ext_mem_dout  =  dbg_mem_en ? dbg_mem_dout  :  dma_din;
+
+// External interface read data
+assign      dbg_mem_din   = ext_mem_din;
+assign      dma_dout = ext_mem_din & {16{dma_ready_dly}};
 
 
 //------------------------------------------

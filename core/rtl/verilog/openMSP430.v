@@ -63,8 +63,8 @@ module  openMSP430 (
     lfxt_enable,                             // ASIC ONLY: Low frequency oscillator enable
     lfxt_wkup,                               // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
     mclk,                                    // Main system clock
-    mstr_mem_dout,                           // Master access Memory data output
-    mstr_ready,                              // Master access is complete
+    dma_dout,                                // Direct Memory Access data output
+    dma_ready,                               // Direct Memory Access is complete
     per_addr,                                // Peripheral address
     per_din,                                 // Peripheral data input
     per_en,                                  // Peripheral enable (high active)
@@ -89,11 +89,11 @@ module  openMSP430 (
     dmem_dout,                               // Data Memory data output
     irq,                                     // Maskable interrupts
     lfxt_clk,                                // Low frequency oscillator (typ 32kHz)
-    mstr_mem_addr,                           // Master access Memory address
-    mstr_mem_din,                            // Master access Memory data input
-    mstr_mem_en,                             // Master access Memory enable (high active)
-    mstr_mem_priority,                       // Master access Memory priority (0:low / 1:high)
-    mstr_mem_we,                             // Master access Memory write byte enable (high active)
+    dma_addr,                                // Direct Memory Access address
+    dma_din,                                 // Direct Memory Access data input
+    dma_en,                                  // Direct Memory Access enable (high active)
+    dma_priority,                            // Direct Memory Access priority (0:low / 1:high)
+    dma_we,                                  // Direct Memory Access write byte enable (high active)
     nmi,                                     // Non-maskable interrupt (asynchronous)
     per_dout,                                // Peripheral data output
     pmem_dout,                               // Program Memory data output
@@ -110,61 +110,61 @@ parameter            TOTAL_NR = 8'h00;       // Total number of oMSP instances-1
 
 // OUTPUTs
 //============
-output		     aclk;		     // ASIC ONLY: ACLK
-output		     aclk_en;		     // FPGA ONLY: ACLK enable
-output		     dbg_freeze;	     // Freeze peripherals
-output		     dbg_i2c_sda_out;	     // Debug interface: I2C SDA OUT
-output		     dbg_uart_txd;	     // Debug interface: UART TXD
-output		     dco_enable;	     // ASIC ONLY: Fast oscillator enable
-output		     dco_wkup;		     // ASIC ONLY: Fast oscillator wake-up (asynchronous)
-output [`DMEM_MSB:0] dmem_addr;		     // Data Memory address
-output		     dmem_cen;		     // Data Memory chip enable (low active)
-output	      [15:0] dmem_din;		     // Data Memory data input
-output	       [1:0] dmem_wen;		     // Data Memory write byte enable (low active)
-output [`IRQ_NR-3:0] irq_acc;		     // Interrupt request accepted (one-hot signal)
-output		     lfxt_enable;	     // ASIC ONLY: Low frequency oscillator enable
-output		     lfxt_wkup;		     // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
-output		     mclk;		     // Main system clock
-output	      [15:0] mstr_mem_dout;	     // Master access Memory data output
-output		     mstr_ready;	     // Master access is complete
-output	      [13:0] per_addr;		     // Peripheral address
-output	      [15:0] per_din;		     // Peripheral data input
-output		     per_en;		     // Peripheral enable (high active)
-output	       [1:0] per_we;		     // Peripheral write byte enable (high active)
-output [`PMEM_MSB:0] pmem_addr;		     // Program Memory address
-output		     pmem_cen;		     // Program Memory chip enable (low active)
-output	      [15:0] pmem_din;		     // Program Memory data input (optional)
-output	       [1:0] pmem_wen;		     // Program Memory write enable (low active) (optional)
-output		     puc_rst;		     // Main system reset
-output		     smclk;		     // ASIC ONLY: SMCLK
-output		     smclk_en;		     // FPGA ONLY: SMCLK enable
+output               aclk;                   // ASIC ONLY: ACLK
+output               aclk_en;                // FPGA ONLY: ACLK enable
+output               dbg_freeze;             // Freeze peripherals
+output               dbg_i2c_sda_out;        // Debug interface: I2C SDA OUT
+output               dbg_uart_txd;           // Debug interface: UART TXD
+output               dco_enable;             // ASIC ONLY: Fast oscillator enable
+output               dco_wkup;               // ASIC ONLY: Fast oscillator wake-up (asynchronous)
+output [`DMEM_MSB:0] dmem_addr;              // Data Memory address
+output               dmem_cen;               // Data Memory chip enable (low active)
+output        [15:0] dmem_din;               // Data Memory data input
+output         [1:0] dmem_wen;               // Data Memory write byte enable (low active)
+output [`IRQ_NR-3:0] irq_acc;                // Interrupt request accepted (one-hot signal)
+output               lfxt_enable;            // ASIC ONLY: Low frequency oscillator enable
+output               lfxt_wkup;              // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
+output               mclk;                   // Main system clock
+output        [15:0] dma_dout;               // Direct Memory Access data output
+output               dma_ready;              // Direct Memory Access is complete
+output        [13:0] per_addr;               // Peripheral address
+output        [15:0] per_din;                // Peripheral data input
+output               per_en;                 // Peripheral enable (high active)
+output         [1:0] per_we;                 // Peripheral write byte enable (high active)
+output [`PMEM_MSB:0] pmem_addr;              // Program Memory address
+output               pmem_cen;               // Program Memory chip enable (low active)
+output        [15:0] pmem_din;               // Program Memory data input (optional)
+output         [1:0] pmem_wen;               // Program Memory write enable (low active) (optional)
+output               puc_rst;                // Main system reset
+output               smclk;                  // ASIC ONLY: SMCLK
+output               smclk_en;               // FPGA ONLY: SMCLK enable
 
 
 // INPUTs
 //============
-input		     cpu_en;		     // Enable CPU code execution (asynchronous and non-glitchy)
-input		     dbg_en;		     // Debug interface enable (asynchronous and non-glitchy)
-input	       [6:0] dbg_i2c_addr;	     // Debug interface: I2C Address
-input	       [6:0] dbg_i2c_broadcast;	     // Debug interface: I2C Broadcast Address (for multicore systems)
-input		     dbg_i2c_scl;	     // Debug interface: I2C SCL
-input		     dbg_i2c_sda_in;	     // Debug interface: I2C SDA IN
-input		     dbg_uart_rxd;	     // Debug interface: UART RXD (asynchronous)
-input		     dco_clk;		     // Fast oscillator (fast clock)
-input	      [15:0] dmem_dout;		     // Data Memory data output
-input  [`IRQ_NR-3:0] irq;		     // Maskable interrupts (14, 30 or 62)
-input		     lfxt_clk;		     // Low frequency oscillator (typ 32kHz)
-input	      [15:1] mstr_mem_addr;	     // Master access Memory address
-input	      [15:0] mstr_mem_din;	     // Master access Memory data input
-input		     mstr_mem_en;	     // Master access Memory enable (high active)
-input		     mstr_mem_priority;	     // Master access Memory priority (0:low / 1:high)
-input	       [1:0] mstr_mem_we;	     // Master access Memory write byte enable (high active)
-input		     nmi;		     // Non-maskable interrupt (asynchronous and non-glitchy)
-input	      [15:0] per_dout;		     // Peripheral data output
-input	      [15:0] pmem_dout;		     // Program Memory data output
-input		     reset_n;		     // Reset Pin (active low, asynchronous and non-glitchy)
-input		     scan_enable;	     // ASIC ONLY: Scan enable (active during scan shifting)
-input		     scan_mode;		     // ASIC ONLY: Scan mode
-input		     wkup;		     // ASIC ONLY: System Wake-up (asynchronous and non-glitchy)
+input                cpu_en;                 // Enable CPU code execution (asynchronous and non-glitchy)
+input                dbg_en;                 // Debug interface enable (asynchronous and non-glitchy)
+input          [6:0] dbg_i2c_addr;           // Debug interface: I2C Address
+input          [6:0] dbg_i2c_broadcast;      // Debug interface: I2C Broadcast Address (for multicore systems)
+input                dbg_i2c_scl;            // Debug interface: I2C SCL
+input                dbg_i2c_sda_in;         // Debug interface: I2C SDA IN
+input                dbg_uart_rxd;           // Debug interface: UART RXD (asynchronous)
+input                dco_clk;                // Fast oscillator (fast clock)
+input         [15:0] dmem_dout;              // Data Memory data output
+input  [`IRQ_NR-3:0] irq;                    // Maskable interrupts (14, 30 or 62)
+input                lfxt_clk;               // Low frequency oscillator (typ 32kHz)
+input         [15:1] dma_addr;               // Direct Memory Access address
+input         [15:0] dma_din;                // Direct Memory Access data input
+input                dma_en;                 // Direct Memory Access enable (high active)
+input                dma_priority;           // Direct Memory Access priority (0:low / 1:high)
+input          [1:0] dma_we;                 // Direct Memory Access write byte enable (high active)
+input                nmi;                    // Non-maskable interrupt (asynchronous and non-glitchy)
+input         [15:0] per_dout;               // Peripheral data output
+input         [15:0] pmem_dout;              // Program Memory data output
+input                reset_n;                // Reset Pin (active low, asynchronous and non-glitchy)
+input                scan_enable;            // ASIC ONLY: Scan enable (active during scan shifting)
+input                scan_mode;              // ASIC ONLY: Scan mode
+input                wkup;                   // ASIC ONLY: System Wake-up (asynchronous and non-glitchy)
 
 
 
@@ -501,8 +501,8 @@ omsp_mem_backbone mem_backbone_0 (
     .eu_mdb_in         (eu_mdb_in),          // Execution Unit Memory data bus input
     .fe_mdb_in         (fe_mdb_in),          // Frontend Memory data bus input
     .fe_pmem_wait      (fe_pmem_wait),       // Frontend wait for Instruction fetch
-    .mstr_mem_dout     (mstr_mem_dout),      // Master access Memory data output
-    .mstr_ready        (mstr_ready),         // Master access is complete
+    .dma_dout          (dma_dout),           // Direct Memory Access data output
+    .dma_ready         (dma_ready),          // Direct Memory Access is complete
     .per_addr          (per_addr),           // Peripheral address
     .per_din           (per_din),            // Peripheral data input
     .per_we            (per_we),             // Peripheral write enable (high active)
@@ -527,11 +527,11 @@ omsp_mem_backbone mem_backbone_0 (
     .fe_mab            (fe_mab[15:1]),       // Frontend Memory address bus
     .fe_mb_en          (fe_mb_en),           // Frontend Memory bus enable
     .mclk              (mclk),               // Main system clock
-    .mstr_mem_addr     (mstr_mem_addr),      // Master access Memory address
-    .mstr_mem_din      (mstr_mem_din),       // Master access Memory data input
-    .mstr_mem_en       (mstr_mem_en),        // Master access Memory enable (high active)
-    .mstr_mem_priority (mstr_mem_priority),  // Master access Memory priority (0:low / 1:high)
-    .mstr_mem_we       (mstr_mem_we),        // Master access Memory write byte enable (high active)
+    .dma_addr          (dma_addr),           // Direct Memory Access address
+    .dma_din           (dma_din),            // Direct Memory Access data input
+    .dma_en            (dma_en),             // Direct Memory Access enable (high active)
+    .dma_priority      (dma_priority),       // Direct Memory Access priority (0:low / 1:high)
+    .dma_we            (dma_we),             // Direct Memory Access write byte enable (high active)
     .per_dout          (per_dout_or),        // Peripheral data output
     .pmem_dout         (pmem_dout),          // Program Memory data output
     .puc_rst           (puc_rst),            // Main system reset
@@ -625,12 +625,12 @@ omsp_multiplier multiplier_0 (
 
 // INPUTs
     .mclk              (mclk),               // Main system clock
-    .per_addr	       (per_addr),	     // Peripheral address
-    .per_din	       (per_din),	     // Peripheral data input
-    .per_en	       (per_en),	     // Peripheral enable (high active)
-    .per_we	       (per_we),	     // Peripheral write enable (high active)
-    .puc_rst	       (puc_rst),	     // Main system reset
-    .scan_enable       (scan_enable)	     // Scan enable (active during scan shifting)
+    .per_addr          (per_addr),           // Peripheral address
+    .per_din           (per_din),            // Peripheral data input
+    .per_en            (per_en),             // Peripheral enable (high active)
+    .per_we            (per_we),             // Peripheral write enable (high active)
+    .puc_rst           (puc_rst),            // Main system reset
+    .scan_enable       (scan_enable)         // Scan enable (active during scan shifting)
 );
 `else
 assign per_dout_mpy = 16'h0000;
