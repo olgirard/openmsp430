@@ -44,8 +44,6 @@ initial
 
       // Initialize memory
       //--------------------------------------------------------
-      @(mem200==16'h0000);
-
       @(mem200==16'h0001);
       if (mem200 !== 16'h0001) tb_error("====== Initialize memory error: @0x200 =====");
       if (mem202 !== 16'h1020) tb_error("====== Initialize memory error: @0x202 =====");
@@ -923,7 +921,6 @@ initial
 
 
 
-      
+
       stimulus_done = 1;
    end
-
