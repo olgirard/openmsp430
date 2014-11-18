@@ -72,6 +72,7 @@ module  omsp_clock_module (
     dbg_cpu_reset,                // Reset CPU from debug interface
     dbg_en,                       // Debug interface enable (asynchronous)
     dco_clk,                      // Fast oscillator (fast clock)
+    dma_en,                       // Direct Memory Access enable (high active)
     lfxt_clk,                     // Low frequency oscillator (typ 32kHz)
     mclk_enable,                  // Main System Clock enable
     mclk_wkup,                    // Main System Clock wake-up (asynchronous)
@@ -115,6 +116,7 @@ input               cpuoff;       // Turns off the CPU
 input               dbg_cpu_reset;// Reset CPU from debug interface
 input               dbg_en;       // Debug interface enable (asynchronous)
 input               dco_clk;      // Fast oscillator (fast clock)
+input               dma_en;       // Direct Memory Access enable (high active)
 input               lfxt_clk;     // Low frequency oscillator (typ 32kHz)
 input               mclk_enable;  // Main System Clock enable
 input               mclk_wkup;    // Main System Clock wake-up (asynchronous)
@@ -584,7 +586,7 @@ omsp_sync_cell sync_cell_mclk_wkup (
 // comes from the same clock domain.
 
 `ifdef CPUOFF_EN
-wire mclk_active = mclk_enable | mclk_wkup_s | (dbg_en_s & cpu_en_s);
+wire mclk_active = mclk_enable | mclk_wkup_s | ((dbg_en_s | dma_en) & cpu_en_s);
 `else
 wire mclk_active = 1'b1;
 `endif

@@ -90,7 +90,7 @@
 //`define DMEM_SIZE_2p5_KB
 //`define DMEM_SIZE_2_KB
 //`define DMEM_SIZE_1_KB
-//`define DMEM_SIZE_512_B
+`define DMEM_SIZE_512_B
 //`define DMEM_SIZE_256_B
 //`define DMEM_SIZE_128_B
 
@@ -144,9 +144,9 @@
 // Indicates the number of interrupt vectors supported
 // (16, 32 or 64).
 //-------------------------------------------------------
-`define IRQ_16
+//`define IRQ_16
 //`define IRQ_32
-//`define IRQ_64
+`define IRQ_64
 
 
 //-------------------------------------------------------
@@ -252,10 +252,10 @@
 // (i.e. Flash/OTP/ROM/...) or when you are interested
 // in data breakpoints.
 //-------------------------------------------------------
-//`define  DBG_HWBRK_0
-//`define  DBG_HWBRK_1
-//`define  DBG_HWBRK_2
-//`define  DBG_HWBRK_3
+`define  DBG_HWBRK_0
+`define  DBG_HWBRK_1
+`define  DBG_HWBRK_2
+`define  DBG_HWBRK_3
 
 
 //-------------------------------------------------------
@@ -266,7 +266,7 @@
 // access lays within an address range.
 // Note that this feature is not supported by GDB.
 //-------------------------------------------------------
-//`define DBG_HWBRK_RANGE
+`define DBG_HWBRK_RANGE
 
 
 //-------------------------------------------------------
@@ -304,7 +304,7 @@
 // WARNING: if you target an FPGA, leave this define
 //          commented.
 //-------------------------------------------------------
-//`define ASIC
+`define ASIC
 
 
 //============================================================================
