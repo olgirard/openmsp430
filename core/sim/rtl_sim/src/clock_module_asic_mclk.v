@@ -50,7 +50,7 @@ always @ (negedge lfxt_clk)
   lfxt_clk_counter <=  lfxt_clk_counter+1;
 
 reg [15:0] reg_val;
-   
+
 initial
    begin
       $display(" ===============================================");
@@ -62,7 +62,7 @@ initial
       force tb_openMSP430.dut.wdt_reset = 1'b0;
 
 `ifdef ASIC_CLOCKING
-     
+
       //--------------------------------------------------------
       // MCLK GENERATION - LFXT_CLK INPUT
       //--------------------------------------------------------
@@ -102,7 +102,7 @@ initial
       if (dco_clk_counter  !==  15) tb_error("====== CLOCK GENERATOR 1: MCLK - LFXT_CLK INPUT (DIV /2) - TEST 5 =====");
     `endif
   `endif
-      
+
 	                        // ------- Divider /4 ----------
       @(r15 === 16'h0003);
       repeat(2) @(posedge mclk);
@@ -124,7 +124,7 @@ initial
       if (dco_clk_counter  !==  15) tb_error("====== CLOCK GENERATOR 1: MCLK - LFXT_CLK INPUT (DIV /4) - TEST 5 =====");
     `endif
   `endif
-      
+
 	                        // ------- Divider /8 ----------
       @(r15 === 16'h0004);
       repeat(2) @(posedge mclk);
@@ -147,7 +147,7 @@ initial
     `endif
   `endif
 
-      
+
       //--------------------------------------------------------
       // SMCLK GENERATION - DCO_CLK INPUT
       //--------------------------------------------------------
@@ -175,7 +175,7 @@ initial
   `else
       if (dco_clk_counter !==  15) tb_error("====== CLOCK GENERATOR 2: MCLK - DCO_CLK INPUT (DIV /2) - TEST 3 =====");
   `endif
-      
+
 	                        // ------- Divider /4 ----------
       @(r15 === 16'h1003);
       repeat(2) @(posedge mclk);
@@ -189,7 +189,7 @@ initial
   `else
       if (dco_clk_counter !==  15) tb_error("====== CLOCK GENERATOR 2: MCLK - DCO_CLK INPUT (DIV /4) - TEST 3 =====");
   `endif
-      
+
 	                        // ------- Divider /8 ----------
       @(r15 === 16'h1004);
       repeat(2) @(posedge mclk);
@@ -244,7 +244,7 @@ initial
       if (dco_clk_counter  !==  15) tb_error("====== CLOCK GENERATOR 3: MCLK - LFXT_CLK INPUT (DIV /2) - TEST 5 =====");
     `endif
   `endif
-      
+
 	                        // ------- Divider /4 ----------
       @(r15 === 16'h2003);
       repeat(2) @(posedge mclk);
@@ -266,7 +266,7 @@ initial
       if (dco_clk_counter  !==  15) tb_error("====== CLOCK GENERATOR 3: MCLK - LFXT_CLK INPUT (DIV /4) - TEST 5 =====");
     `endif
   `endif
-      
+
 	                        // ------- Divider /8 ----------
       @(r15 === 16'h2004);
       repeat(2) @(posedge mclk);
@@ -289,7 +289,7 @@ initial
     `endif
   `endif
 
-      
+
       //--------------------------------------------------------
       // SMCLK GENERATION - DCO_CLK INPUT
       //--------------------------------------------------------
@@ -317,7 +317,7 @@ initial
   `else
       if (dco_clk_counter !==  15) tb_error("====== CLOCK GENERATOR 4: MCLK - DCO_CLK INPUT (DIV /2) - TEST 3 =====");
   `endif
-      
+
 	                        // ------- Divider /4 ----------
       @(r15 === 16'h3003);
       repeat(2) @(posedge mclk);
@@ -331,7 +331,7 @@ initial
   `else
       if (dco_clk_counter !==  15) tb_error("====== CLOCK GENERATOR 4: MCLK - DCO_CLK INPUT (DIV /4) - TEST 3 =====");
   `endif
-      
+
 	                        // ------- Divider /8 ----------
       @(r15 === 16'h3004);
       repeat(2) @(posedge mclk);
@@ -348,13 +348,8 @@ initial
 
 
 `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test is not supported in FPGA mode)   |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|   (this test is not supported in FPGA mode)   |");
 `endif
 
       stimulus_done = 1;
    end
-

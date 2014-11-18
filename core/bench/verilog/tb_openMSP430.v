@@ -201,7 +201,7 @@ wire    [8*32-1:0] inst_short;
 
 // Testbench variables
 integer            tb_idx;
-integer            seed;
+integer            tmp_seed;
 integer            error;
 reg                stimulus_done;
 
@@ -278,7 +278,8 @@ initial
 
 initial
   begin
-     seed                    = 0;
+     tmp_seed                = `SEED;
+     tmp_seed                = $urandom(tmp_seed);
      error                   = 0;
      stimulus_done           = 1;
      irq                     = {`IRQ_NR-2{1'b0}};
@@ -706,6 +707,8 @@ initial // Timeout
        $display("|               SIMULATION FAILED               |");
        $display("|              (simulation Timeout)             |");
        $display(" ===============================================");
+       $display("");
+       tb_extra_report;
        $finish;
    `endif
   end
@@ -737,9 +740,7 @@ initial // Normal end of test
        end
      $display(" ===============================================");
      $display("");
-     $display("DMA REPORT: Total Accesses: %-d Total RD: %-d Total WR: %-d", dma_cnt_rd+dma_cnt_wr,     dma_cnt_rd,   dma_cnt_wr);
-     $display("            Total Errors:   %-d Error RD: %-d Error WR: %-d", dma_rd_error+dma_wr_error, dma_rd_error, dma_wr_error);
-     $display("");
+     tb_extra_report;
      $finish;
   end
 
@@ -756,5 +757,34 @@ initial // Normal end of test
       end
    endtask
 
+   task tb_extra_report;
+      begin
+         if ((`PMEM_SIZE>=4092) && (`DMEM_SIZE>=512))
+           begin
+              $display("DMA REPORT: Total Accesses: %-d Total RD: %-d Total WR: %-d", dma_cnt_rd+dma_cnt_wr,     dma_cnt_rd,   dma_cnt_wr);
+              $display("            Total Errors:   %-d Error RD: %-d Error WR: %-d", dma_rd_error+dma_wr_error, dma_rd_error, dma_wr_error);
+           end
+         else
+           begin
+              $display("Note: DMA if verification disabled (PMEM must be 4kB or bigger, DMEM must be 512B or bigger)");
+           end
+         $display("");
+         $display("SIMULATION SEED: %-d", `SEED);
+         $display("");
+      end
+   endtask
+
+   task tb_skip_finish;
+      input [65*8:0] skip_string;
+      begin
+         $display(" ===============================================");
+         $display("|               SIMULATION SKIPPED              |");
+         $display("%-s", skip_string);
+         $display(" ===============================================");
+         $display("");
+         tb_extra_report;
+         $finish;
+      end
+   endtask
 
 endmodule

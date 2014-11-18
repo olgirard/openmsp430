@@ -47,7 +47,7 @@
    always @ (negedge dbg_clk)
      dbg_clk_counter <=  dbg_clk_counter+1;
 
-   
+
 initial
    begin
       $display(" ===============================================");
@@ -76,8 +76,8 @@ initial
       if (dbg_clk_counter !== 0)    tb_error("====== DBG_CLK is not stopped (test 1) =====");
       if (dbg_rst          == 1'b0) tb_error("====== DBG_RST signal is not active (test 3) =====");
       test_var = r14;
-      
-      
+
+
       // Make sure that enabling the debug interface after the POR
       // don't stop the cpu
       // Also make sure that the debug interface clock is running
@@ -85,7 +85,7 @@ initial
       //--------------------------------------------------------
       dbg_en  = 1;
       test_nr = 2;
-     
+
       @(negedge dco_clk) dbg_clk_counter = 0;
 
       repeat(300) @(posedge dco_clk);
@@ -93,7 +93,7 @@ initial
       if (dbg_clk_counter  == 0)    tb_error("====== DBG_CLK is not running (test 5) =====");
       if (dbg_rst         !== 1'b0) tb_error("====== DBG_RST signal is active (test 6) =====");
 
-      
+
       // Make sure that disabling the CPU with debug enabled
       // will stop the CPU
       // Also make sure that the debug interface clock is stopped
@@ -102,7 +102,7 @@ initial
       cpu_en  = 0;
       dbg_en  = 1;
       test_nr = 3;
-     
+
       #(6*50);
       test_var = r14;
       dbg_clk_counter = 0;
@@ -114,19 +114,19 @@ initial
 
       cpu_en  = 1;
       repeat(6) @(negedge dco_clk);
-     
+
 
       // Create POR with debug enable and observe the
       // behavior depending on the DBG_RST_BRK_EN define
       //--------------------------------------------------------
       dbg_en  = 1;
       test_nr = 4;
-      
+
       @(posedge dco_clk); // Generate POR
       reset_n = 1'b0;
       @(posedge dco_clk);
       reset_n = 1'b1;
-     
+
       repeat(300) @(posedge dco_clk);
   `ifdef DBG_RST_BRK_EN
       if (r14 !== 16'h0000)       tb_error("====== CPU is not stopped with the debug interface enabled and DBG_RST_BRK_EN=1 - test 3 =====");
@@ -142,7 +142,7 @@ initial
   `ifdef DBG_RST_BRK_EN
       if (dbg_uart_buf !== 16'h0030) tb_error("====== CPU_CTL wrong reset value -  test 4 =====");
   `else
-      if (dbg_uart_buf !== 16'h0010) tb_error("====== CPU_CTL wrong reset value -  test 4 =====");     
+      if (dbg_uart_buf !== 16'h0010) tb_error("====== CPU_CTL wrong reset value -  test 4 =====");
   `endif
 
 
@@ -161,10 +161,10 @@ initial
       dbg_uart_rd(MEM_DATA);
       if (dbg_uart_buf !== 16'haa55)  tb_error("====== MEM_DATA write access failed - test 6 =====");
 
-      
+
       test_var = r14;  // Backup the current register value
 
-      
+
       @(posedge dco_clk); // Resets the debug interface
       dbg_en = 1'b0;
       repeat(2) @(posedge dco_clk);
@@ -172,8 +172,8 @@ initial
 
       // Make sure that the register was not reseted
       if (r14 < test_var) tb_error("====== CPU was reseted with DBG_EN -  test 7 =====");
-      repeat(2) @(posedge dco_clk);   
-      
+      repeat(2) @(posedge dco_clk);
+
       // Send uart synchronization frame
       dbg_uart_tx(DBG_SYNC);
 
@@ -182,7 +182,7 @@ initial
   `ifdef DBG_RST_BRK_EN
       if (dbg_uart_buf !== 16'h0030) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");
   `else
-      if (dbg_uart_buf !== 16'h0010) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");     
+      if (dbg_uart_buf !== 16'h0010) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");
   `endif
       dbg_uart_rd(MEM_DATA);
       if (dbg_uart_buf !== 16'h0000) tb_error("====== MEM_DATA read access failed - test 9 =====");
@@ -213,7 +213,7 @@ initial
       // Make sure that the register was reseted
       if (r14 !== 16'h0000) tb_error("====== CPU was not reseted with RESET_N -  test 12 =====");
       repeat(2) @(posedge dco_clk);
-     
+
       // Send uart synchronization frame
       dbg_uart_tx(DBG_SYNC);
 
@@ -224,12 +224,12 @@ initial
   `ifdef DBG_RST_BRK_EN
       if (dbg_uart_buf !== 16'h0030) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");
   `else
-      if (dbg_uart_buf !== 16'h0010) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");     
+      if (dbg_uart_buf !== 16'h0010) tb_error("====== CPU_CTL wrong reset value -  test 8 =====");
   `endif
       dbg_uart_rd(MEM_DATA);
       if (dbg_uart_buf !== 16'h0000) tb_error("====== MEM_DATA read access failed - test 9 =====");
 
-      
+
       // Let the CPU run
       dbg_uart_wr(CPU_CTL,  16'h0002);
 
@@ -239,31 +239,16 @@ initial
       irq[`IRQ_NR-15] = 1'b1;
       @(r13);
       irq[`IRQ_NR-15] = 1'b0;
-      
+
       stimulus_done = 1;
 
   `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test is not supported in FPGA mode)   |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|   (this test is not supported in FPGA mode)   |");
   `endif
 `else
-
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|   (serial debug interface UART not included)  |");
-       $display(" ===============================================");
-       $finish;
+      tb_skip_finish("|   (serial debug interface UART not included)  |");
 `endif
 `else
-
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (serial debug interface not included)    |");
-       $display(" ===============================================");
-       $finish;
+      tb_skip_finish("|      (serial debug interface not included)    |");
 `endif
    end
-

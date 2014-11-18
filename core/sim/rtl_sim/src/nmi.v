@@ -207,11 +207,7 @@ initial
 
 
 `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|         (the NMI support is not included)     |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|         (the NMI support is not included)     |");
 `endif
 
       stimulus_done = 1;

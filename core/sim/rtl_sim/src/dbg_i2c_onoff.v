@@ -48,11 +48,7 @@ initial
 `ifdef DBG_EN
 `ifdef DBG_I2C
   `ifdef ASIC_CLOCKING
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test is not supported in ASIC mode)   |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|   (this test is not supported in ASIC mode)   |");
   `else
       test_nr = 0;
       #1 dbg_en = 0;
@@ -200,18 +196,9 @@ initial
   `endif
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|   (serial debug interface I2C not included)   |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|   (serial debug interface I2C not included)   |");
 `endif
 `else
-
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (serial debug interface not included)    |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|      (serial debug interface not included)    |");
 `endif
    end

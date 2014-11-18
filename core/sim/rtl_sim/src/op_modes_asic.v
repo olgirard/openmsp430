@@ -66,7 +66,7 @@ always @(posedge mclk or posedge puc_rst)
 
 always @(wkup2_sync)
   irq[`IRQ_NR-14] = wkup2_sync[1]; // IRQ-2
-   
+
 // Wakeup synchronizer to generate IRQ
 reg [1:0] wkup3_sync;
 always @(posedge mclk or posedge puc_rst)
@@ -75,7 +75,7 @@ always @(posedge mclk or posedge puc_rst)
 
 always @(wkup3_sync)
   irq[`IRQ_NR-13] = wkup3_sync[1]; // IRQ-3
-   
+
 
 initial
    begin
@@ -146,7 +146,7 @@ initial
 `endif
       smclk_cnt = 0;
 
-      
+
       @(r15==16'h1006);                //---------- PORT1 IRQ TRIAL (STAYING IN POWER MODE) -------------//
       wkup[2] = 1'b1;
       @(posedge irq_acc[`IRQ_NR-14]); // IRQ_ACC-2
@@ -177,7 +177,7 @@ initial
       if (smclk_cnt !== 50)  tb_error("====== SCG1 TEST 8: SMCLK IS NOT RUNNING =====");
       smclk_cnt = 0;
 
-      
+
       // OSCOFF  (<=> R2[5]): turn off LFXT1CLK
       //--------------------------------------------------------
 
@@ -242,7 +242,7 @@ initial
 `endif
       aclk_cnt = 0;
 
-      
+
       @(r15==16'h2006);                //---------- PORT1 IRQ TRIAL (STAYING IN POWER MODE) -------------//
       wkup[2] = 1'b1;
       @(posedge irq_acc[`IRQ_NR-14]); // IRQ_ACC-2
@@ -281,7 +281,7 @@ initial
   `endif
       aclk_cnt = 0;
 
-      
+
       // CPUOFF  (<=> R2[4]): turn off CPU
       //--------------------------------------------------------
 
@@ -307,7 +307,7 @@ initial
       mclk_cnt = 0;
       @(r13==16'haaaa);
       wkup[2] = 1'b0;
-      
+
       @(r1==(`PER_SIZE+16'h0050));
       repeat (10) @(negedge dco_clk);
       mclk_cnt  = 0;
@@ -369,7 +369,7 @@ initial
       dco_clk_cnt = 0;
       @(r13==16'haaaa);
       wkup[2] = 1'b0;
-      
+
       #(10*50);
       dco_clk_cnt  = 0;
       #(80*50);
@@ -404,13 +404,8 @@ initial
 
 
 `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test is not supported in FPGA mode)   |");
-      $display(" ===============================================");
-      $finish;
-`endif    
+      tb_skip_finish("|   (this test is not supported in FPGA mode)   |");
+`endif
 
       stimulus_done = 1;
    end
-

@@ -265,17 +265,9 @@ initial
       stimulus_done = 1;
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|   (serial debug interface UART not included)  |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|   (serial debug interface UART not included)  |");
 `endif
 `else
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (serial debug interface not included)    |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|      (serial debug interface not included)    |");
 `endif
    end

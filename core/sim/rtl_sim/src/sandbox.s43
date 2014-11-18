@@ -40,10 +40,11 @@
 .global main
 
 WAIT_FUNC:
-	dec r14
+	;dec r14
+	dec &DMEM_204
 	jnz WAIT_FUNC
 	ret
-	
+
 main:
  	mov  #0x0250, r1 	; # Initialize stack pointer
 	mov  #0x0000, &0x0200
@@ -59,11 +60,12 @@ main:
 	mov    &0x170,  r7
 	nop
 	nop
-	mov    #0x0200, r14
+	;mov    #0x0200, r14
+	mov    #0x0100, &DMEM_204
         call   #WAIT_FUNC
 
 
-		
+
         /* ----------------------         END OF TEST        --------------- */
 end_of_test:
 	nop

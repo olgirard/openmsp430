@@ -56,22 +56,22 @@ initial
       // Enable metastablity emulation for the SCL and SDA master path
       dbg_scl_master_meta     = 1'b1;
       dbg_sda_master_out_meta = 1'b1;
-  
+
       //--------------------------------------------------------
       // TRY VARIOUS SERIAL DEBUG INTERFACE TRANSFER
       // WITH DIFFERENT BAUD-RATES
       //--------------------------------------------------------
-  
+
       for ( ii=0; ii < 200; ii=ii+1)
 	begin
 	   #1 reset_n = 0;
 	   repeat(1) @(posedge mclk);
  	   #1 reset_n = 1;
 	   repeat(10) @(posedge mclk);
-    
+
 	   I2C_PERIOD = 600 + 1*ii;
 	   $display("Synchronisation test for DBG_I2C_PERIOD = %5d ns  /  ii = %-d", I2C_PERIOD, ii);
-	   
+
 
 	   // READ CPU_ID
 	   dbg_i2c_rd(CPU_ID_LO);
@@ -122,7 +122,7 @@ initial
       //--------------------------------------------------------
       // END OF TEST
       //--------------------------------------------------------
-  
+
       #1 reset_n = 0;
       repeat(1) @(posedge mclk);
       #1 reset_n = 1;
@@ -130,7 +130,7 @@ initial
 
       I2C_PERIOD = 600;
       $display("Synchronisation test for DBG_I2C_PERIOD = %5d ns  /  ii = %-d", I2C_PERIOD, ii);
-      
+
       // Let the CPU run
       dbg_i2c_wr(CPU_CTL,  16'h0002);
 
@@ -142,25 +142,16 @@ initial
       @(negedge mclk);
       wkup[0]         = 1'b0;
       irq[`IRQ_NR-16] = 1'b0;
-      
+
       repeat(10) @(posedge mclk);
 
       stimulus_done = 1;
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|   (serial debug interface I2C not included)   |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|   (serial debug interface I2C not included)   |");
 `endif
 `else
-
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (serial debug interface not included)    |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|      (serial debug interface not included)    |");
 `endif
    end
 
@@ -171,6 +162,8 @@ initial
 	 $display("|               SIMULATION FAILED               |");
 	 $display("|     (some verilog stimulus checks failed)     |");
 	 $display(" ===============================================");
+         $display("");
+         tb_extra_report;
 	 $finish;
       end
    endtask

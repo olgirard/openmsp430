@@ -48,7 +48,7 @@ reg  [8:0] dmem_size;
 reg  [5:0] pmem_size;
 reg [31:0] dbg_id;
 integer    step;
-   
+
 initial
    begin
       $display(" ===============================================");
@@ -60,13 +60,13 @@ initial
       #1 dbg_en = 1;
       repeat(30) @(posedge mclk);
       stimulus_done = 0;
-      
+
 
    `ifdef DBG_RST_BRK_EN
       dbg_i2c_wr(CPU_CTL,  16'h0002);  // RUN
    `endif
 
-      
+
       // TEST CPU REGISTERS
       //--------------------------------------------------------
       step = 1;
@@ -101,7 +101,7 @@ initial
       dbg_i2c_wr(CPU_ID_LO  ,  16'h0000);
       dbg_i2c_rd(CPU_ID_LO);
       if (dbg_i2c_buf !== dbg_id[15:0])  tb_error("====== CPU_ID_LO uncorrect =====");
-     
+
       dbg_i2c_wr(CPU_ID_HI  ,  16'hffff);
       dbg_i2c_rd(CPU_ID_HI);
       if (dbg_i2c_buf !== dbg_id[31:16]) tb_error("====== CPU_ID_HI uncorrect =====");
@@ -123,7 +123,7 @@ initial
       dbg_i2c_rd(CPU_CTL);
       if (dbg_i2c_buf !== 16'h0000)      tb_error("====== CPU_CTL uncorrect =====");
 
-      
+
       // TEST MEMORY CONTROL REGISTERS
       //--------------------------------------------------------
       step = 2;
@@ -276,7 +276,7 @@ initial
       dbg_i2c_rd(BRK2_ADDR1);
       if (dbg_i2c_buf !== 16'h0000)      tb_error("====== BRK2_ADDR1 uncorrect =====");
 `endif
-      
+
       // TEST HARDWARE BREAKPOINT 3 REGISTERS
       //--------------------------------------------------------
 `ifdef DBG_HWBRK_3
@@ -323,7 +323,7 @@ initial
 
       dbg_i2c_wr(MEM_ADDR, (`PER_SIZE+16'h0000)); // select @0x0200
       dbg_i2c_wr(MEM_CNT,  16'h0004);             // 5 consecutive access
- 
+
       dbg_i2c_wr(MEM_CTL,  16'h0003); // Start burst to 16 bit memory write
       dbg_i2c_burst_start(0);
       dbg_i2c_tx16(16'h1234, 0);      // write 1st data
@@ -345,7 +345,7 @@ initial
       step = 8;
       dbg_i2c_wr(MEM_ADDR, (`PER_SIZE+16'h0000)); // select @0x0200
       dbg_i2c_wr(MEM_CNT,  16'h0004);             // 5 consecutive access
-      
+
       dbg_i2c_wr(MEM_CTL,  16'h0001); // Start burst to 16 bit registers read
       dbg_i2c_burst_start(1);
       dbg_i2c_rx16(0);                // read 1st data
@@ -366,7 +366,7 @@ initial
 
       dbg_i2c_wr(MEM_ADDR, 16'h0005); // select R5
       dbg_i2c_wr(MEM_CNT,  16'h0004); // 5 consecutive access
- 
+
       dbg_i2c_wr(MEM_CTL,  16'h0007); // Start burst to 16 bit cpu register write
       dbg_i2c_burst_start(0);
       dbg_i2c_tx16(16'hcba9, 0);      // write 1st data
@@ -384,11 +384,11 @@ initial
       dbg_i2c_tx16(16'h4567, 1);      // write 5th data
       repeat(12) @(posedge mclk);
       if (r9 !== 16'h4567)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) WR ERROR: 5th DATA =====");
-      
+
       step = 10;
       dbg_i2c_wr(MEM_ADDR, 16'h0005); // select @0x0200
       dbg_i2c_wr(MEM_CNT,  16'h0004); // 5 consecutive access
-      
+
       dbg_i2c_wr(MEM_CTL,  16'h0005); // Start burst to 16 bit cpu registers read
       dbg_i2c_burst_start(1);
       dbg_i2c_rx16(0);                // read 1st data
@@ -409,7 +409,7 @@ initial
 
       dbg_i2c_wr(MEM_ADDR, (`PER_SIZE+16'h0000)); // select @0x0210
       dbg_i2c_wr(MEM_CNT,  16'h0004); // 5 consecutive access
- 
+
       dbg_i2c_wr(MEM_CTL,  16'h000b); // Start burst to 8 bit memory write
       dbg_i2c_burst_start(0);
       dbg_i2c_tx8(8'h91, 0);          // write 1st data
@@ -427,11 +427,11 @@ initial
       dbg_i2c_tx8(8'h55, 1);          // write 5th data
       repeat(12) @(posedge mclk);
       if (mem204 !== 16'h9a55)           tb_error("====== 8B WRITE BURSTS (MEMORY) WR ERROR: 5th DATA =====");
-      
+
       step = 12;
       dbg_i2c_wr(MEM_ADDR, (`PER_SIZE+16'h0000)); // select @0x0200
       dbg_i2c_wr(MEM_CNT,  16'h0004); // 5 consecutive access
-      
+
       dbg_i2c_wr(MEM_CTL,  16'h0009); // Start burst to 8 bit registers read
       dbg_i2c_burst_start(1);
       dbg_i2c_rx8(0);                 // read 1st data
@@ -447,25 +447,15 @@ initial
       if (dbg_i2c_buf !== 16'h0055)      tb_error("====== 8B WRITE BURSTS (MEMORY) RD ERROR: 5th DATA =====");
 
 
-      dbg_i2c_wr(CPU_CTL    ,  16'h0002); 
+      dbg_i2c_wr(CPU_CTL    ,  16'h0002);
       repeat(10) @(posedge mclk);
 
       stimulus_done = 1;
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|   (serial debug interface I2C not included)   |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|   (serial debug interface I2C not included)   |");
 `endif
 `else
-
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (serial debug interface not included)    |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|   (serial debug interface I2C not included)   |");
 `endif
    end
-

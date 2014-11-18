@@ -60,7 +60,7 @@ initial
       dbg_i2c_wr(CPU_CTL,  16'h0001);  // HALT
       repeat(150) @(posedge mclk);
       r13_bkup = r13;
-	
+
       // Generate a GPIO interrupt
       p1_din[0] = 1'b1;
       repeat(150) @(posedge mclk);
@@ -71,28 +71,18 @@ initial
 
       // Make sure the interrupt was serviced
       if (r14 !== 16'haaaa) tb_error("====== Interrupt was not properly serviced =====");
-      
+
       // Make sure the program resumed execution when coming back from IRQ
       if (r13 === r13_bkup) tb_error("====== Program didn't properly resumed execution =====");
 
 
-      p1_din[1] = 1'b1;     
+      p1_din[1] = 1'b1;
       stimulus_done = 1;
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|   (serial debug interface I2C not included)   |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|   (serial debug interface I2C not included)   |");
 `endif
 `else
-
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (serial debug interface not included)    |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|      (serial debug interface not included)    |");
 `endif
    end
-

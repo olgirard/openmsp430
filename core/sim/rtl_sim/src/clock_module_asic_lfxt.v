@@ -46,7 +46,7 @@ always @ (negedge lfxt_clk)
   lfxt_clk_counter <=  lfxt_clk_counter+1;
 
 reg [15:0] reg_val;
-   
+
 initial
    begin
       $display(" ===============================================");
@@ -58,7 +58,7 @@ initial
 `ifdef ASIC_CLOCKING
   `ifdef OSCOFF_EN
      `ifdef MCLK_MUX
-    
+
       //--------------------------------------------------------
       // First make sure CPU runs with LFXT_CLK
       //--------------------------------------------------------
@@ -112,27 +112,14 @@ initial
 
 
      `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test requires the MCLK clock mux)     |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|   (this test requires the MCLK clock mux)     |");
      `endif
   `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test requires the OSCOFF option)      |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|   (this test requires the OSCOFF option)      |");
   `endif
 `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test is not supported in FPGA mode)   |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|   (this test is not supported in FPGA mode)   |");
 `endif
 
       stimulus_done = 1;
    end
-

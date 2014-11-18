@@ -34,7 +34,7 @@
 /* $LastChangedBy$                                          */
 /* $LastChangedDate$          */
 /*===========================================================================*/
-    
+
 `define LONG_TIMEOUT
 
 initial
@@ -108,13 +108,13 @@ initial
     `endif
   `endif
 `endif
-  
+
 `ifdef ASIC_CLOCKING
   `ifdef WATCHDOG_MUX
   `else
     `ifdef WATCHDOG_NOMUX_ACLK
       // From there, force the watchdog clock to DCO_CLK to speedup simulation
-      force lfxt_clk = dco_clk; 
+      force lfxt_clk = dco_clk;
     `endif
   `endif
 `endif
@@ -128,10 +128,10 @@ initial
 `else
       if (mem200 !== 16'h000A) tb_error("====== WATCHDOG MODE /64: @0x200 != 0x000A =====");
 `endif
-    
+
       $display("Watchdog mode /64 mode test completed...");
 
-      
+
       // WATCHDOG TEST:  INTERVAL MODE /512
       //--------------------------------------------------------
 
@@ -144,7 +144,7 @@ initial
 
       $display("Watchdog mode /512 mode test completed...");
 
-      
+
       // WATCHDOG TEST:  INTERVAL MODE /8192
       //--------------------------------------------------------
 
@@ -157,7 +157,7 @@ initial
 
       $display("Watchdog mode /8192 mode test completed...");
 
-      
+
       // WATCHDOG TEST:  INTERVAL MODE /32768
       //--------------------------------------------------------
 
@@ -171,13 +171,8 @@ initial
       $display("Watchdog mode /32768 mode test completed...");
 
 `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|         (the Watchdog is not included)        |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|         (the Watchdog is not included)        |");
 `endif
 
       stimulus_done = 1;
    end
-

@@ -34,7 +34,7 @@
 /* $LastChangedBy$                                          */
 /* $LastChangedDate$          */
 /*===========================================================================*/
-    
+
 `define LONG_TIMEOUT
 
 initial
@@ -114,7 +114,7 @@ initial
       if (r9 !== 16'h0000) tb_error("====== WATCHDOG RD/WR ACCESS: IFG1   != 0x00 =====");
 `endif
 
-      
+
       // WATCHDOG TEST:  INTERVAL MODE /64
       //--------------------------------------------------------
 
@@ -138,19 +138,19 @@ initial
 `else
       if (r7 !== 16'h000D) tb_error("====== WATCHDOG INTERVAL MODE /64: R7 != 0x000D (CONFIG 1) =====");
 `endif
-    
+
       @(r15==16'h2001);
       if (r5 !== 16'h0002) tb_error("====== WATCHDOG INTERVAL MODE /64 NO IRQ: R5 != 0x0002 =====");
       if (r6 !== 16'h0001) tb_error("====== WATCHDOG INTERVAL MODE /64 NO IRQ: R6 != 0x0001 =====");
       if (r7 !== 16'h0000) tb_error("====== WATCHDOG INTERVAL MODE /64 NO IRQ: R7 != 0x0000 =====");
       if (r8 !== 16'h0000) tb_error("====== WATCHDOG INTERVAL MODE /64 NO IRQ: R8 != 0x0000 =====");
-      
+
 `ifdef ASIC_CLOCKING
   `ifdef WATCHDOG_MUX
   `else
     `ifdef WATCHDOG_NOMUX_ACLK
       // From there, force the watchdog clock to DCO_CLK to speedup simulation
-      force lfxt_clk = dco_clk; 
+      force lfxt_clk = dco_clk;
     `endif
   `endif
 `endif
@@ -167,8 +167,8 @@ initial
       if (r8 !== 16'h0001) tb_error("====== WATCHDOG INTERVAL MODE /64 NO IRQ CNT CLEAR: R8 != 0x0001 =====");
 
       $display("Interval mode /64 mode test completed...");
-      
-      
+
+
       // WATCHDOG TEST:  INTERVAL MODE /512
       //--------------------------------------------------------
 
@@ -183,7 +183,7 @@ initial
 
       $display("Interval mode /512 mode test completed...");
 
-      
+
       // WATCHDOG TEST:  INTERVAL MODE /8192
       //--------------------------------------------------------
 
@@ -198,7 +198,7 @@ initial
 
       $display("Interval mode /8192 mode test completed...");
 
-      
+
       // WATCHDOG TEST:  INTERVAL MODE /32768
       //--------------------------------------------------------
 
@@ -214,13 +214,8 @@ initial
       $display("Interval mode /32768 mode test completed...");
 
 `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|         (the Watchdog is not included)        |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|         (the Watchdog is not included)        |");
 `endif
 
       stimulus_done = 1;
    end
-

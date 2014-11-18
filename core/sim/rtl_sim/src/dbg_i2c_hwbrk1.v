@@ -36,7 +36,7 @@
 /*===========================================================================*/
 
 `define LONG_TIMEOUT
-   
+
 initial
    begin
       $display(" ===============================================");
@@ -53,7 +53,7 @@ initial
       dbg_i2c_wr(CPU_CTL,  16'h0002);  // RUN
    `endif
 
-      
+
       // HARDWARE BREAKPOINTS: INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES
       //----------------------------------------------------------------------
 
@@ -75,7 +75,7 @@ initial
 
       // CHECK
       if (mem200 === 16'h0000)  tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES: test 1 =====");
-      
+
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
       dbg_i2c_wr(BRK1_ADDR0, ('h10000-`PMEM_SIZE+'h04));
       dbg_i2c_wr(BRK1_ADDR1, ('h10000-`PMEM_SIZE+'h18));
@@ -93,7 +93,7 @@ initial
       dbg_i2c_wr(BRK1_STAT, 16'h0001);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES: test 6 =====");
-     
+
       // RE-RUN
       dbg_i2c_wr(BRK1_ADDR0, 16'h0000);
       dbg_i2c_wr(CPU_CTL,    16'h0002);
@@ -116,7 +116,7 @@ initial
       //----------------------------------------------------------------------
       if (`HWBRK_RANGE)
 	begin
-     
+
       // RESET, BREAK & CLEAR STATUS
       dbg_i2c_wr(CPU_CTL,    16'h0060);
       dbg_i2c_wr(CPU_CTL,    16'h0020);
@@ -141,8 +141,8 @@ initial
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE: test 5 =====");
 	end
-      
-     
+
+
       // HARDWARE BREAKPOINTS: DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ
       //----------------------------------------------------------------------------
 
@@ -152,7 +152,7 @@ initial
       dbg_i2c_wr(BRK1_STAT,  16'h00ff);
       dbg_i2c_wr(CPU_STAT,   16'h00ff);
 
-      
+
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
       dbg_i2c_wr(BRK1_ADDR0, (`PER_SIZE+16'h0004));
       dbg_i2c_wr(BRK1_ADDR1, (`PER_SIZE+16'h0008));
@@ -170,7 +170,7 @@ initial
       dbg_i2c_wr(BRK1_STAT, 16'h0001);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ: test 5 =====");
-     
+
       // RE-RUN
       dbg_i2c_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -200,8 +200,8 @@ initial
       dbg_i2c_wr(BRK1_STAT, 16'h0001);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ: test 15 =====");
-     
-     
+
+
       // HARDWARE BREAKPOINTS: DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - WRITE
       //-----------------------------------------------------------------------------
 
@@ -211,7 +211,7 @@ initial
       dbg_i2c_wr(BRK1_STAT,  16'h00ff);
       dbg_i2c_wr(CPU_STAT,   16'h00ff);
 
-      
+
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
       dbg_i2c_wr(BRK1_ADDR0, (`PER_SIZE+16'h0004));
       dbg_i2c_wr(BRK1_ADDR1, (`PER_SIZE+16'h0008));
@@ -229,7 +229,7 @@ initial
       dbg_i2c_wr(BRK1_STAT, 16'h0002);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - WRITE: test 5 =====");
-     
+
       // RE-RUN
       dbg_i2c_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -290,7 +290,7 @@ initial
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - WRITE: test 25 =====");
 
-      
+
       // HARDWARE BREAKPOINTS: DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ/WRITE
       //----------------------------------------------------------------------------------
 
@@ -300,7 +300,7 @@ initial
       dbg_i2c_wr(BRK1_STAT,  16'h00ff);
       dbg_i2c_wr(CPU_STAT,   16'h00ff);
 
-      
+
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
       dbg_i2c_wr(BRK1_ADDR0, (`PER_SIZE+16'h0004));
       dbg_i2c_wr(BRK1_ADDR1, (`PER_SIZE+16'h0008));
@@ -318,7 +318,7 @@ initial
       dbg_i2c_wr(BRK1_STAT, 16'h0002);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ/WRITE: test 5 =====");
-     
+
       // RE-RUN
       dbg_i2c_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -378,7 +378,7 @@ initial
       dbg_i2c_wr(BRK1_STAT, 16'h0001);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== DATA FLOW (EXECUTION-UNIT) - SINGLE ADDRESSES - READ/WRITE: test 25 =====");
-     
+
       // RE-RUN
       dbg_i2c_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -394,7 +394,7 @@ initial
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - SINGLE ADDRESSES - READ/WRITE: test 30 =====");
 
-      
+
       // HARDWARE BREAKPOINTS: DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - READ
       //----------------------------------------------------------------------------
       if (`HWBRK_RANGE)
@@ -406,7 +406,7 @@ initial
       dbg_i2c_wr(BRK1_STAT,  16'h00ff);
       dbg_i2c_wr(CPU_STAT,   16'h00ff);
 
-      
+
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
       dbg_i2c_wr(BRK1_ADDR0, (`PER_SIZE+16'h0001));
       dbg_i2c_wr(BRK1_ADDR1, (`PER_SIZE+16'h0005));
@@ -424,7 +424,7 @@ initial
       dbg_i2c_wr(BRK1_STAT, 16'h0010);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - READ: test 5 =====");
-     
+
       // RE-RUN
       dbg_i2c_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -440,8 +440,8 @@ initial
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - READ: test 10 =====");
 	end
-      
-      
+
+
       // HARDWARE BREAKPOINTS: DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - WRITE
       //-----------------------------------------------------------------------------
       if (`HWBRK_RANGE)
@@ -453,7 +453,7 @@ initial
       dbg_i2c_wr(BRK1_STAT,  16'h00ff);
       dbg_i2c_wr(CPU_STAT,   16'h00ff);
 
-      
+
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
       dbg_i2c_wr(BRK1_ADDR0, (`PER_SIZE+16'h0001));
       dbg_i2c_wr(BRK1_ADDR1, (`PER_SIZE+16'h0005));
@@ -471,7 +471,7 @@ initial
       dbg_i2c_wr(BRK1_STAT, 16'h0020);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - WRITE: test 5 =====");
-     
+
       // RE-RUN
       dbg_i2c_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -532,7 +532,7 @@ initial
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== INSTRUCTION FLOW (FRONTEND) - ADDRESS RANGE - WRITE: test 25 =====");
 	end
- 
+
       // HARDWARE BREAKPOINTS: DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - READ/WRITE
       //----------------------------------------------------------------------------------
       if (`HWBRK_RANGE)
@@ -544,7 +544,7 @@ initial
       dbg_i2c_wr(BRK1_STAT,  16'h00ff);
       dbg_i2c_wr(CPU_STAT,   16'h00ff);
 
-      
+
       // CONFIGURE BREAKPOINT (ENABLED) & RUN
       dbg_i2c_wr(BRK1_ADDR0, (`PER_SIZE+16'h0001));
       dbg_i2c_wr(BRK1_ADDR1, (`PER_SIZE+16'h0005));
@@ -562,7 +562,7 @@ initial
       dbg_i2c_wr(BRK1_STAT, 16'h0020);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - READ/WRITE: test 5 =====");
-     
+
       // RE-RUN
       dbg_i2c_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -622,7 +622,7 @@ initial
       dbg_i2c_wr(BRK1_STAT, 16'h0010);
       dbg_i2c_rd(CPU_STAT);
       if (dbg_i2c_buf !== 16'h0001) tb_error("====== DATA FLOW (EXECUTION-UNIT) - ADDRESS RANGE - READ/WRITE: test 25 =====");
-     
+
       // RE-RUN
       dbg_i2c_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
@@ -645,31 +645,16 @@ initial
       dbg_i2c_wr(CPU_CTL,    16'h0002);
       repeat(100) @(posedge mclk);
 
-     
+
       stimulus_done = 1;
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|   (hardware breakpoint unit 1 not included)   |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|   (hardware breakpoint unit 1 not included)   |");
 `endif
 `else
-
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|   (serial debug interface I2C not included)   |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|   (serial debug interface I2C not included)   |");
 `endif
 `else
-
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (serial debug interface not included)    |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|      (serial debug interface not included)    |");
 `endif
    end
-
