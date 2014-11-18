@@ -35,39 +35,65 @@
 #------------------------------------------------------------------------------
 
 ###############################################################################
+#                            Parse arguments                                  #
+###############################################################################
+testname=""
+seed=""
+dma_verif="DMA_VERIF"
+while [[ $# > 0 ]]; do
+    key="$1"
+    shift
+    case $key in
+	-seed)
+	    seed="$1"
+	    shift
+	    ;;
+	-no_dma)
+	    dma_verif="NO_DMA_VERIF"
+	    ;;
+	*)
+            testname="$key"
+	    ;;
+    esac
+done
+
+###############################################################################
 #                            Parameter Check                                  #
 ###############################################################################
-EXPECTED_ARGS=1
-if [ $# -ne $EXPECTED_ARGS ]; then
-  echo "ERROR    : wrong number of arguments"
-  echo "USAGE    : msp430sim <test name>"
-  echo "Example  : msp430sim c-jump_jge"
+if [ "$testname" == "" ]; then
+  echo "ERROR	 : missing argument"
+  echo "USAGE	 : msp430sim <test name> [-seed <seed_nr>] [-no_dma]"
+  echo "Example	 : msp430sim c-jump_jge"
   echo ""
   echo "In order to switch the verilog simulator, the OMSP_SIMULATOR environment"
   echo "variable can be set to the following values:"
   echo ""
-  echo "                  - iverilog  : Icarus Verilog  (default)"
-  echo "                  - cver      : CVer"
-  echo "                  - verilog   : Verilog-XL"
-  echo "                  - ncverilog : NC-Verilog"
-  echo "                  - vcs       : VCS"
-  echo "                  - vsim      : Modelsim"
-  echo "                  - isim      : Xilinx simulator"
+  echo "		  - iverilog  : Icarus Verilog	(default)"
+  echo "		  - cver      : CVer"
+  echo "		  - verilog   : Verilog-XL"
+  echo "		  - ncverilog : NC-Verilog"
+  echo "		  - vcs	      : VCS"
+  echo "		  - vsim      : Modelsim"
+  echo "		  - isim      : Xilinx simulator"
   echo ""
   exit 1
 fi
 
+# Generate random seed if not specified
+if [ "$seed" == "" ]; then
+    seed=`od -A n -t d -N 4 /dev/urandom`
+fi
 
 ###############################################################################
 #                     Check if the required files exist                       #
 ###############################################################################
-asmfile=../src/$1.s43;
-verfile=../src/$1.v;
+asmfile=../src/$testname.s43;
+verfile=../src/$testname.v;
 incfile=../../../rtl/verilog/openMSP430_defines.v;
 linkfile=../bin/template.x;
 headfile=../bin/template_defs.asm;
 submitfile=../src/submit.f;
-if [ $OMSP_SIMULATOR == "isim" ]; then
+if [ "$OMSP_SIMULATOR" == "isim" ]; then
     submitfile=../src/submit.prj;
 fi
 
@@ -109,8 +135,11 @@ rm -rf stimulus.v
 #                              Run simulation                                 #
 ###############################################################################
 echo " ======================================================="
-echo "| Start simulation:             $1"
+echo "| Start simulation:             $testname"
 echo " ======================================================="
+echo ""
+echo " Seed: $seed"
+echo ""
 
 # Create links
 if [ `uname -o` = "Cygwin" ]
@@ -130,8 +159,8 @@ sed -i 's/`else/#else/g'           ./pmem.h
 sed -i 's/`endif/#endif/g'         ./pmem.h
 sed -i 's/`define/#define/g'       ./pmem.h
 sed -i 's/`include/\/\/#include/g' ./pmem.h
-sed -i 's/`//g'              ./pmem.h
-sed -i "s/'//g"              ./pmem.h
+sed -i 's/`//g'                    ./pmem.h
+sed -i "s/'//g"                    ./pmem.h
 
 # Use MSPGCC preprocessor to extract the Program, Data
 # and Peripheral memory sizes
@@ -154,4 +183,4 @@ echo "Convert IHEX file to Verilog MEMH format..."
 
 # Start verilog simulation
 echo "Start Verilog simulation..."
-../bin/rtlsim.sh    stimulus.v pmem.mem $submitfile
+../bin/rtlsim.sh    stimulus.v pmem.mem $submitfile $seed $dma_verif

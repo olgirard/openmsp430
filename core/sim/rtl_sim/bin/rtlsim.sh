@@ -22,9 +22,9 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #------------------------------------------------------------------------------
-# 
+#
 # File Name: rtlsim.sh
-# 
+#
 # Author(s):
 #             - Olivier Girard,    olgirard@gmail.com
 #             - Mihai M.,	   mmihai@delajii.net
@@ -38,11 +38,11 @@
 ###############################################################################
 #                            Parameter Check                                  #
 ###############################################################################
-EXPECTED_ARGS=3
+EXPECTED_ARGS=5
 if [ $# -ne $EXPECTED_ARGS ]; then
   echo "ERROR    : wrong number of arguments"
-  echo "USAGE    : rtlsim.sh <verilog stimulus file> <memory file> <submit file>"
-  echo "Example  : rtlsim.sh ./stimulus.v            pmem.mem      ../src/submit.f"
+  echo "USAGE    : rtlsim.sh <verilog stimulus file> <memory file> <submit file>   <seed> <dma_verif>"
+  echo "Example  : rtlsim.sh ./stimulus.v            pmem.mem      ../src/submit.f  123   NO_DMA_VERIF"
   echo "OMSP_SIMULATOR env keeps simulator name iverilog/cver/verilog/ncverilog/vsim/vcs"
   exit 1
 fi
@@ -73,33 +73,33 @@ fi
 if [ "${OMSP_SIMULATOR:-iverilog}" = iverilog ]; then
 
     rm -rf simv
-    
+
     NODUMP=${OMSP_NODUMP-0}
     if [ $NODUMP -eq 1 ]
       then
-        iverilog -o simv -c $3 -D NODUMP
+        iverilog -o simv -c $3 -D SEED=$4 -D $5 -D NODUMP
       else
-        iverilog -o simv -c $3
+        iverilog -o simv -c $3 -D SEED=$4 -D $5
     fi
-    
-if [ `uname -o` = "Cygwin" ]
-then
-	vvp.exe ./simv
-else
-    ./simv
-fi
+
+    if [ `uname -o` = "Cygwin" ]
+    then
+     	vvp.exe ./simv
+    else
+        ./simv
+    fi
 
 else
 
     NODUMP=${OMSP_NODUMP-0}
     if [ $NODUMP -eq 1 ] ; then
-       vargs="+define+NODUMP"
+       vargs="+define+SEED=$4 +define+$5 +define+NODUMP"
     else
-       vargs=""
+       vargs="+define+SEED=$4 +define+$5"
     fi
 
-   case $OMSP_SIMULATOR in 
-    cver* ) 
+   case $OMSP_SIMULATOR in
+    cver* )
        vargs="$vargs +define+VXL +define+CVER" ;;
     verilog* )
        vargs="$vargs +define+VXL" ;;
@@ -123,7 +123,7 @@ else
        ./isim.exe -tclbatch isim.tcl
        exit
    esac
-   
+
    echo "Running: $OMSP_SIMULATOR -f $3 $vargs"
    exec $OMSP_SIMULATOR -f $3 $vargs
 fi
