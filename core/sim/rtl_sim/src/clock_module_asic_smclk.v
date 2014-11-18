@@ -50,7 +50,7 @@ always @ (negedge lfxt_clk)
   lfxt_clk_counter <=  lfxt_clk_counter+1;
 
 reg [15:0] reg_val;
-   
+
 initial
    begin
       $display(" ===============================================");
@@ -60,7 +60,7 @@ initial
       stimulus_done = 0;
 
 `ifdef ASIC_CLOCKING
-     
+
       //--------------------------------------------------------
       // SMCLK GENERATION - LFXT_CLK INPUT
       //--------------------------------------------------------
@@ -102,7 +102,7 @@ initial
     `endif
   `endif
       $display("====== CLOCK GENERATOR 1: SMCLK - LFXT_CLK INPUT (DIV /2) - DONE =====");
-      
+
 	                        // ------- Divider /4 ----------
       @(r15 === 16'h0003);
       repeat(2) @(posedge smclk);
@@ -125,7 +125,7 @@ initial
     `endif
   `endif
       $display("====== CLOCK GENERATOR 1: SMCLK - LFXT_CLK INPUT (DIV /4) - DONE =====");
-      
+
 	                        // ------- Divider /8 ----------
       @(r15 === 16'h0004);
       repeat(2) @(posedge smclk);
@@ -149,7 +149,7 @@ initial
   `endif
       $display("====== CLOCK GENERATOR 1: SMCLK - LFXT_CLK INPUT (DIV /8) - DONE =====");
 
-      
+
       //--------------------------------------------------------
       // SSMCLK GENERATION - DCO_CLK INPUT
       //--------------------------------------------------------
@@ -179,7 +179,7 @@ initial
       if (dco_clk_counter !==  15) tb_error("====== CLOCK GENERATOR 2: SMCLK - DCO_CLK INPUT (DIV /2) - TEST 3 =====");
   `endif
       $display("====== CLOCK GENERATOR 2: SMCLK - DCO_CLK INPUT (DIV /2) - DONE =====");
-      
+
 	                        // ------- Divider /4 ----------
       @(r15 === 16'h1003);
       repeat(2) @(posedge smclk);
@@ -194,7 +194,7 @@ initial
       if (dco_clk_counter !==  15) tb_error("====== CLOCK GENERATOR 2: SMCLK - DCO_CLK INPUT (DIV /4) - TEST 3 =====");
   `endif
       $display("====== CLOCK GENERATOR 2: SMCLK - DCO_CLK INPUT (DIV /4) - DONE =====");
-      
+
 	                        // ------- Divider /8 ----------
       @(r15 === 16'h1004);
       repeat(2) @(posedge smclk);
@@ -252,7 +252,7 @@ initial
     `endif
   `endif
       $display("====== CLOCK GENERATOR 3: SMCLK - LFXT_CLK INPUT (DIV /2) - DONE =====");
-      
+
 	                        // ------- Divider /4 ----------
       @(r15 === 16'h2003);
       repeat(2) @(posedge smclk);
@@ -275,7 +275,7 @@ initial
     `endif
   `endif
       $display("====== CLOCK GENERATOR 3: SMCLK - LFXT_CLK INPUT (DIV /4) - DONE =====");
-      
+
 	                        // ------- Divider /8 ----------
       @(r15 === 16'h2004);
       repeat(2) @(posedge smclk);
@@ -299,7 +299,7 @@ initial
   `endif
       $display("====== CLOCK GENERATOR 3: SMCLK - LFXT_CLK INPUT (DIV /8) - DONE =====");
 
-      
+
       //--------------------------------------------------------
       // SSMCLK GENERATION - DCO_CLK INPUT
       //--------------------------------------------------------
@@ -329,7 +329,7 @@ initial
       if (dco_clk_counter !==  15) tb_error("====== CLOCK GENERATOR 4: SMCLK - DCO_CLK INPUT (DIV /2) - TEST 3 =====");
   `endif
       $display("====== CLOCK GENERATOR 4: SMCLK - DCO_CLK INPUT (DIV /2) - DONE =====");
-      
+
 	                        // ------- Divider /4 ----------
       @(r15 === 16'h3003);
       repeat(2) @(posedge smclk);
@@ -344,7 +344,7 @@ initial
       if (dco_clk_counter !==  15) tb_error("====== CLOCK GENERATOR 4: SMCLK - DCO_CLK INPUT (DIV /4) - TEST 3 =====");
   `endif
       $display("====== CLOCK GENERATOR 4: SMCLK - DCO_CLK INPUT (DIV /4) - DONE =====");
-      
+
 	                        // ------- Divider /8 ----------
       @(r15 === 16'h3004);
       repeat(2) @(posedge smclk);
@@ -362,13 +362,8 @@ initial
 
 
 `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test is not supported in FPGA mode)   |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|   (this test is not supported in FPGA mode)   |");
 `endif
 
       stimulus_done = 1;
    end
-

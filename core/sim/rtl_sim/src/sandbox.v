@@ -34,40 +34,45 @@
 /* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
 
+`define LONG_TIMEOUT
 
-task mstr_write;
-   input  [15:0] addr;
-   input  [15:0] data;
-   
-   begin      
-      mstr_mem_en   = 1'b1;
-      mstr_mem_we   = 2'b00;
-      mstr_mem_addr = addr;
-      mstr_mem_din  = data;
-      @(posedge mclk);
-      while(~mstr_ready) @(posedge mclk);
-      mstr_mem_en   = 1'b0;
-      mstr_mem_we   = 2'b00;
-      mstr_mem_addr = 16'h0000;
-      mstr_mem_din  = 16'h0000;
-   end
-endtask
-
+integer wait_wr;
+integer wait_rd;
 
 initial
    begin
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
-      
+
       repeat(5) @(posedge mclk);
- 
+
       stimulus_done = 0;
 
+      wait_wr       = 0;
+      wait_rd       = 0;
+
       repeat(50) @(posedge mclk);
-           
-      mstr_write(16'hF800, 16'h1234);
-      mstr_write(16'hF804, 16'h5678);
+if (0)
+  begin
+      dma_write_16b(16'hF900, 16'h1234);
+      repeat(wait_wr) @(posedge mclk);
+      dma_write_16b(16'hF902, 16'h5678);
+      repeat(wait_wr) @(posedge mclk);
+      dma_write_16b(16'hF904, 16'h9ABC);
+      repeat(wait_wr) @(posedge mclk);
+      dma_write_16b(16'hF906, 16'hDEF0);
+
+      repeat(10) @(posedge mclk);
+
+      dma_read_16b(16'hF900, 16'h1234);
+      repeat(wait_rd) @(posedge mclk);
+      dma_read_16b(16'hF902, 16'h5678);
+      repeat(wait_rd) @(posedge mclk);
+      dma_read_16b(16'hF904, 16'h9ABC);
+      repeat(wait_rd) @(posedge mclk);
+      dma_read_16b(16'hF906, 16'hDEF0);
+  end
 
       repeat(50) @(posedge mclk);
 

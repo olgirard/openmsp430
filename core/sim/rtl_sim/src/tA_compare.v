@@ -49,11 +49,7 @@ initial
       stimulus_done = 0;
 
 `ifdef ASIC_CLOCKING
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test is not supported in ASIC mode)   |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|   (this test is not supported in ASIC mode)   |");
 `else
 
       // TIMER A TEST:  UP MODE
@@ -80,7 +76,7 @@ initial
       @(posedge irq_ta1);
       if (my_counter !== 32'h2) tb_error("====== TIMER_A COMPARE 0: UP MODE =====");
 
-      
+
       @(mem200 === 16'h0002);  // Check Comparator 1
       @(posedge ta_out1);
       @(negedge mclk);
@@ -100,7 +96,7 @@ initial
       @(posedge ta_out0);
       if (my_counter !== 32'h20) tb_error("====== TIMER_A COMPARE 1: UP MODE =====");
 
-      
+
       @(mem200 === 16'h0003);  // Check Comparator 2
       @(posedge ta_out2);
       @(negedge mclk);
@@ -119,11 +115,11 @@ initial
       my_counter = 0;
       @(posedge ta_out0);
       if (my_counter !== 32'h12) tb_error("====== TIMER_A COMPARE 2: UP MODE =====");
-      
+
 
       // TIMER A TEST:  CONTINUOUS MODE
       //--------------------------------------------------------
-      
+
       @(mem200 === 16'h0001);
       @(posedge irq_ta1);
       @(negedge mclk);
@@ -147,7 +143,7 @@ initial
       repeat(10) @(negedge mclk);
       if (mem206 !== 16'h0004) tb_error("====== TIMER_A COMPARE 2: CONTINUOUS MODE - TEST 1 =====");
 
-      
+
       @(mem200 === 16'h0002);
       @(posedge irq_ta1);
       @(negedge mclk);
@@ -171,8 +167,8 @@ initial
       repeat(10) @(negedge mclk);
       if (mem206 !== 16'h0004) tb_error("====== TIMER_A COMPARE 2: CONTINUOUS MODE - TEST 2 =====");
 
-      
-      
+
+
       // TIMER A TEST:  UP-DOWN MODE
       //--------------------------------------------------------
 
@@ -194,7 +190,7 @@ initial
       @(negedge ta_out0);
       if (my_counter !== 32'h360) tb_error("====== TIMER_A COMPARE 0: CONTINUOUS MODE - TEST 2 =====");
 
-      
+
       @(mem200 === 16'h0002);
       @(posedge irq_ta1);
       @(negedge mclk);
@@ -257,4 +253,3 @@ initial
 
       stimulus_done = 1;
    end
-

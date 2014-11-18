@@ -34,7 +34,7 @@
 /* $LastChangedBy: olivier.girard $                                          */
 /* $LastChangedDate: 2009-08-04 23:44:12 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
-    
+
 `define NO_TIMEOUT
 
 integer     i;
@@ -49,7 +49,7 @@ initial
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
       i = 0;
-     
+
 
       for ( i=0; i < 'h10000; i=i+1)
 	begin
@@ -86,11 +86,6 @@ initial
       stimulus_done = 1;
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (hardware multiplier not included)       |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|      (hardware multiplier not included)       |");
 `endif
    end
-

@@ -335,11 +335,6 @@ initial
       stimulus_done = 1;
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|    (RTL configured to support 16 IRQs only)   |");
-       $display(" ===============================================");
-       $finish;
+      tb_skip_finish("|    (RTL configured to support 16 IRQs only)   |");
 `endif
    end
-

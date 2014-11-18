@@ -39,7 +39,7 @@
    integer my_test;
    integer test_var;
 
-   
+
 initial
    begin
       $display(" ===============================================");
@@ -71,7 +71,7 @@ initial
       test_var = inst_number;
       repeat(50) @(posedge mclk);
       if (test_var !== inst_number)       tb_error("====== STOP, FREEZE, ISTEP, RUN: HALT function =====");
-    
+
       dbg_uart_rd(CPU_STAT);            // READ STATUS
       if (dbg_uart_buf !== 16'h0001)      tb_error("====== STOP, FREEZE, ISTEP, RUN: HALT status - test 1 =====");
 
@@ -80,7 +80,7 @@ initial
       repeat(10) @(posedge mclk);
       if (dbg_freeze !== 1'b1)            tb_error("====== STOP, FREEZE, ISTEP, RUN: FREEZE value - test 2 =====");
 
-      
+
       test_var = r14;
       dbg_uart_wr(CPU_CTL,  16'h0004); // ISTEP
       dbg_uart_wr(CPU_CTL,  16'h0004); // ISTEP
@@ -95,7 +95,7 @@ initial
       repeat(12) @(posedge mclk);
       if (test_var !== (r14+3))           tb_error("====== STOP, FREEZE, ISTEP, RUN: ISTEP test 3 =====");
 
-      
+
       test_var = inst_number;
       dbg_uart_wr(CPU_CTL,  16'h0002); // RUN
       repeat(50) @(posedge mclk);
@@ -106,9 +106,9 @@ initial
 
       dbg_uart_rd(CPU_STAT);           // READ STATUS
       if (dbg_uart_buf !== 16'h0000)      tb_error("====== STOP/RUN, ISTEP: HALT status - test 2 =====");
-     
 
-      
+
+
       // RESET / BREAK ON RESET
       //--------------------------------------------------------
 
@@ -150,7 +150,7 @@ initial
       dbg_uart_rd(CPU_STAT);            // READ STATUS
       if (dbg_uart_buf !== 16'h0000)      tb_error("====== RESET / BREAK ON RESET: BREAK ON RESET error- test 8 =====");
 
-      
+
       // SOFTWARE BREAKPOINT
       //--------------------------------------------------------
 
@@ -177,7 +177,7 @@ initial
       dbg_uart_wr(CPU_CTL,  16'h000A);
       repeat(20) @(posedge mclk);
       if (r15     !== 16'h0002)           tb_error("====== SOFTWARE BREAKPOINT: test 4 =====");
- 
+
       dbg_uart_rd(CPU_STAT);            // READ STATUS
       if (dbg_uart_buf !== 16'h0009)      tb_error("====== SOFTWARE BREAKPOINT: test 5 =====");
       if (r0           !== ('h10000-`PMEM_SIZE+'h16))      tb_error("====== SOFTWARE BREAKPOINT: test 6 =====");
@@ -185,7 +185,7 @@ initial
       dbg_uart_rd(CPU_STAT);            // READ STATUS
       if (dbg_uart_buf !== 16'h0001)      tb_error("====== SOFTWARE BREAKPOINT: test 7 =====");
 
-      
+
       // Replace software breakpoint with a mov #4, r15 (opcode=0x422f)
       dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h16));
       dbg_uart_wr(MEM_DATA, 16'h422f);
@@ -195,29 +195,19 @@ initial
       dbg_uart_wr(MEM_ADDR, 16'hff00);
       dbg_uart_wr(MEM_DATA, 16'h5678);
       dbg_uart_wr(MEM_CTL,  16'h0003);
-     
+
       // RUN
       dbg_uart_wr(CPU_CTL,  16'h000A);
       repeat(20) @(posedge mclk);
       if (r15     !== 16'h0004)           tb_error("====== SOFTWARE BREAKPOINT: test 8 =====");
- 
+
 
       stimulus_done = 1;
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|   (serial debug interface UART not included)  |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|   (serial debug interface UART not included)  |");
 `endif
 `else
-
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (serial debug interface not included)    |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|      (serial debug interface not included)    |");
 `endif
    end
-

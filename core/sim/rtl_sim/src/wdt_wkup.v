@@ -34,7 +34,7 @@
 /* $LastChangedBy: olivier.girard $                                          */
 /* $LastChangedDate: 2009-08-04 23:47:15 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
-    
+
 `define LONG_TIMEOUT
 
 integer dco_clk_cnt;
@@ -87,7 +87,7 @@ always @(posedge dut.wdt_irq)
 
 integer ii;
 integer jj;
-   
+
 initial
    begin
       $display(" ===============================================");
@@ -97,10 +97,10 @@ initial
       stimulus_done = 0;
       ii = 0;
       jj = 0;
-      
+
 `ifdef WATCHDOG
 
-      
+
       // WATCHDOG TEST:  INTERVAL MODE /64
       //--------------------------------------------------------
 
@@ -198,13 +198,8 @@ initial
 
 
 `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|         (the Watchdog is not included)        |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|         (the Watchdog is not included)        |");
 `endif
 
       stimulus_done = 1;
    end
-

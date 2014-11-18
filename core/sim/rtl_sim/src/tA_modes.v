@@ -51,13 +51,9 @@ initial
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
       test_step     = 0;
-      
+
 `ifdef ASIC_CLOCKING
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test is not supported in ASIC mode)   |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|   (this test is not supported in ASIC mode)   |");
 `else
 
       // TIMER A TEST:  RD/WR ACCESS
@@ -101,7 +97,7 @@ initial
       if (mem242 !== 16'h0000) tb_error("====== TIMER_A RD/WR REGISTERS: TAIV    ERROR =====");
       if (mem244 !== 16'h0000) tb_error("====== TIMER_A RD/WR REGISTERS: TAIV    ERROR =====");
       test_step = 1;
-      
+
       // TIMER A TEST:  INPUT DIVIDER
       //--------------------------------------------------------
 
@@ -140,7 +136,7 @@ initial
       @(r15===16'h2000);
       test_step = 6;
 
-      
+
       // TIMER A TEST:  UP MODE
       //--------------------------------------------------------
 
@@ -159,7 +155,7 @@ initial
       @(posedge irq_ta1)
         if (my_counter !== 32'h3E) tb_error("====== TIMER_A UP MODE: TIMING 2 - TAIFG interrupt =====");
       test_step = 8;
-   
+
       @(mem200 === 16'h0003);  // Check timing 1 - TACCR0 interrupt
       @(posedge irq_ta0)
       @(negedge mclk)
@@ -175,13 +171,13 @@ initial
       @(posedge irq_ta0)
         if (my_counter !== 32'h3E) tb_error("====== TIMER_A UP MODE: TIMING 2 - TACCR0 interrupt =====");
       test_step = 9;
-    
+
       @(r15===16'h3000);
       if (mem202 !== 16'h0004) tb_error("====== TIMER_A UP MODE: TAIFG LATENCY ERROR =====");
       if (mem204 !== 16'h0003) tb_error("====== TIMER_A UP MODE: TACCR0 LATENCY ERROR =====");
       test_step = 10;
 
-  
+
       // TIMER A TEST:  CONTINUOUS MODE
       //--------------------------------------------------------
 
@@ -192,7 +188,7 @@ initial
         if (my_counter !== 32'h1C) tb_error("====== TIMER_A CONTINUOUS MODE: TIMING 1 - TAIFG interrupt =====");
       test_step = 11;
 
-      
+
       // TIMER A TEST:  UP-DOWN MODE
       //--------------------------------------------------------
 
@@ -227,4 +223,3 @@ initial
 
       stimulus_done = 1;
    end
-

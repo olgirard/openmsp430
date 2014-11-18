@@ -63,7 +63,7 @@ always @ (inclk_cnt)
   if (inclk_cnt==4) inclk = 1'b1;
   else              inclk = 1'b0;
 
-   
+
 initial
    begin
       $display(" ===============================================");
@@ -74,11 +74,7 @@ initial
 
 
 `ifdef ASIC_CLOCKING
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test is not supported in ASIC mode)   |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|   (this test is not supported in ASIC mode)   |");
 `else
 
       // TIMER A TEST:  INPUT MUX - TACLK
@@ -91,7 +87,7 @@ initial
       repeat(300) @(posedge mclk);
       if (tar !== 16'h0032) tb_error("====== TIMER A TEST:  INPUT MUX - TACLK =====");
 
-      
+
       // TIMER A TEST:  INPUT MUX - ACLK
       //--------------------------------------------------------
       @(r15 === 16'h1000);
@@ -102,7 +98,7 @@ initial
       repeat(300) @(posedge mclk);
       if (tar !== 16'h0005) tb_error("====== TIMER A TEST:  INPUT MUX - ACLK =====");
 
-      
+
       // TIMER A TEST:  INPUT MUX - SMCLK
       //--------------------------------------------------------
       @(r15 === 16'h2000);
@@ -113,7 +109,7 @@ initial
       repeat(300) @(posedge mclk);
       if (tar !== 16'h0013) tb_error("====== TIMER A TEST:  INPUT MUX - SMCLK =====");
 
-      
+
       // TIMER A TEST:  INPUT MUX - INCLK
       //--------------------------------------------------------
       @(r15 === 16'h3000);
@@ -124,8 +120,7 @@ initial
       repeat(300) @(posedge mclk);
       if (tar !== 16'h001E) tb_error("====== TIMER A TEST:  INPUT MUX - INCLK =====");
 
-`endif    
+`endif
 
       stimulus_done = 1;
    end
-

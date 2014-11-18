@@ -183,8 +183,9 @@ integer    dma_rand_wait;
 reg        dma_rand_rdwr;
 integer	   dma_rand_data;
 integer	   dma_rand_addr;
-integer    dma_pmem_ref_idx;
+integer    dma_mem_ref_idx;
 reg [15:0] dma_pmem_reference[0:255];
+reg [15:0] dma_dmem_reference[0:255];
 reg	   dma_verif_on;
 reg	   dma_verif_verbose;
 integer    dma_cnt_wr;
@@ -193,23 +194,30 @@ integer    dma_cnt_rd;
 initial
   begin
      // Initialize
+   `ifdef NO_DMA_VERIF
+     dma_verif_on      = 0;
+   `else
      dma_verif_on      = 1;
+   `endif
      dma_verif_verbose = 0;
      dma_cnt_wr        = 0;
      dma_cnt_rd        = 0;
      dma_wr_error      = 0;
      dma_rd_error      = 0;
      #1;
-     dma_rand_wait     = $urandom(seed);
-     for (dma_pmem_ref_idx=0; dma_pmem_ref_idx < 256; dma_pmem_ref_idx=dma_pmem_ref_idx+1)
-       dma_pmem_reference[dma_pmem_ref_idx] = 16'h0000;
+     dma_rand_wait     = $urandom;
+     for (dma_mem_ref_idx=0; dma_mem_ref_idx < 256; dma_mem_ref_idx=dma_mem_ref_idx+1)
+       begin
+	  dma_pmem_reference[dma_mem_ref_idx] = 16'h0000;
+	  dma_dmem_reference[dma_mem_ref_idx] = 16'h0000;
+       end
 
      // Wait for reset release
      repeat(1) @(posedge dco_clk);
      @(negedge puc_rst);
 
      // Perform random read/write 16b memory accesses
-     if (dma_verif_on)
+     if (dma_verif_on && (`PMEM_SIZE>=4092) && (`DMEM_SIZE>=512))
        begin
 	  forever
 	    begin
@@ -221,7 +229,7 @@ initial
 	       // Randomize read/write accesses
 	       // (1/3 proba of getting a read access)
 	       dma_rand_rdwr = ($urandom_range(2,0)==0);
-	       dma_rand_addr = $urandom(seed) & 'hFE;
+	       dma_rand_addr = $urandom & 'hFE;
 	       if (dma_rand_rdwr)
 		 begin
 		    if (dma_verif_verbose)
@@ -231,7 +239,7 @@ initial
 		 end
 	       else
 		 begin
-		    dma_rand_data = $urandom(seed);
+		    dma_rand_data = $urandom;
 		    if (dma_verif_verbose)
 		      $display("WRITE DMA interface -- address: 0x%h -- data: 0x%h", 16'hFE00+dma_rand_addr, dma_rand_data[15:0]);
 		    dma_cnt_wr = dma_cnt_wr+1;

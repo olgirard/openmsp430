@@ -54,22 +54,22 @@ initial
 
       // Enable metastablity emulation for the RXD path
       dbg_uart_rxd_meta = 1'b1;
-  
+
       //--------------------------------------------------------
       // TRY VARIOUS SERIAL DEBUG INTERFACE TRANSFER
       // WITH DIFFERENT BAUD-RATES
       //--------------------------------------------------------
-  
+
       for ( ii=0; ii < 500; ii=ii+1)
 	begin
 	   #1 reset_n = 0;
 	   repeat(1) @(posedge mclk);
  	   #1 reset_n = 1;
 	   repeat(10) @(posedge mclk);
-    
+
 	   UART_PERIOD = 650 + 1*ii;
 	   $display("Synchronisation test for DBG_UART_PERIOD = %5d ns  /  ii = %-d", UART_PERIOD, ii);
-	   
+
 	   // SEND UART SYNCHRONIZATION FRAME
 	   dbg_uart_sync;
 
@@ -187,7 +187,7 @@ initial
       //--------------------------------------------------------
       // TRY LONGEST POSSIBLE SYNCHRONIZATION FRAME
       //--------------------------------------------------------
-  
+
       #1 reset_n = 0;
       repeat(1) @(posedge mclk);
       #1 reset_n = 1;
@@ -209,7 +209,7 @@ initial
       //--------------------------------------------------------
       // END OF TEST
       //--------------------------------------------------------
-  
+
       #1 reset_n = 0;
       repeat(1) @(posedge mclk);
       #1 reset_n = 1;
@@ -217,10 +217,10 @@ initial
 
       UART_PERIOD = 550;
       $display("Synchronisation test for DBG_UART_PERIOD = %5d ns  /  ii = %-d", UART_PERIOD, ii);
-      
+
       // SEND UART SYNCHRONIZATION FRAME
       dbg_uart_sync;
-           
+
       // Let the CPU run
       dbg_uart_wr(CPU_CTL,  16'h0002);
 
@@ -232,25 +232,16 @@ initial
       @(negedge mclk);
       wkup[0]            = 1'b0;
       irq[`IRQ_NR-16]    = 1'b0;
-      
+
       repeat(10) @(posedge mclk);
 
       stimulus_done = 1;
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|   (serial debug interface UART not included)  |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|   (serial debug interface UART not included)  |");
 `endif
 `else
-
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (serial debug interface not included)    |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|      (serial debug interface not included)    |");
 `endif
    end
 
@@ -261,6 +252,8 @@ initial
 	 $display("|               SIMULATION FAILED               |");
 	 $display("|     (some verilog stimulus checks failed)     |");
 	 $display(" ===============================================");
+         $display("");
+         tb_extra_report;
 	 $finish;
       end
    endtask

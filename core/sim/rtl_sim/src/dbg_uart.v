@@ -47,7 +47,7 @@ reg        mpy_info;
 reg  [8:0] dmem_size;
 reg  [5:0] pmem_size;
 reg [31:0] dbg_id;
-   
+
 initial
    begin
       $display(" ===============================================");
@@ -99,7 +99,7 @@ initial
       dbg_uart_wr(CPU_ID_LO  ,  16'h0000);
       dbg_uart_rd(CPU_ID_LO);
       if (dbg_uart_buf !== dbg_id[15:0])  tb_error("====== CPU_ID_LO uncorrect =====");
-     
+
       dbg_uart_wr(CPU_ID_HI  ,  16'hffff);
       dbg_uart_rd(CPU_ID_HI);
       if (dbg_uart_buf !== dbg_id[31:16]) tb_error("====== CPU_ID_HI uncorrect =====");
@@ -121,7 +121,7 @@ initial
       dbg_uart_rd(CPU_CTL);
       if (dbg_uart_buf !== 16'h0000)      tb_error("====== CPU_CTL uncorrect =====");
 
-      
+
       // TEST MEMORY CONTROL REGISTERS
       //--------------------------------------------------------
 
@@ -270,7 +270,7 @@ initial
       dbg_uart_rd(BRK2_ADDR1);
       if (dbg_uart_buf !== 16'h0000)      tb_error("====== BRK2_ADDR1 uncorrect =====");
 `endif
-      
+
       // TEST HARDWARE BREAKPOINT 3 REGISTERS
       //--------------------------------------------------------
 `ifdef DBG_HWBRK_3
@@ -315,7 +315,7 @@ initial
 
       dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0000)); // select @0x0200
       dbg_uart_wr(MEM_CNT,  16'h0004);             // 5 consecutive access
- 
+
       dbg_uart_wr(MEM_CTL,  16'h0003); // Start burst to 16 bit memory write
       dbg_uart_tx16(16'h1234);         // write 1st data
       repeat(12) @(posedge mclk);
@@ -332,10 +332,10 @@ initial
       dbg_uart_tx16(16'h0fed);         // write 5th data
       repeat(12) @(posedge mclk);
       if (mem208 !== 16'h0fed)      tb_error("====== 16B WRITE BURSTS (MEMORY) WR ERROR: 5th DATA =====");
-      
+
       dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0000)); // select @0x0200
       dbg_uart_wr(MEM_CNT,  16'h0004);             // 5 consecutive access
-      
+
       dbg_uart_wr(MEM_CTL,  16'h0001); // Start burst to 16 bit registers read
       dbg_uart_rx16;                   // read 1st data
       if (dbg_uart_buf !== 16'h1234)      tb_error("====== 16B WRITE BURSTS (MEMORY) RD ERROR: 1st DATA =====");
@@ -354,7 +354,7 @@ initial
 
       dbg_uart_wr(MEM_ADDR, 16'h0005); // select R5
       dbg_uart_wr(MEM_CNT,  16'h0004); // 5 consecutive access
- 
+
       dbg_uart_wr(MEM_CTL,  16'h0007); // Start burst to 16 bit cpu register write
       dbg_uart_tx16(16'hcba9);         // write 1st data
       repeat(12) @(posedge mclk);
@@ -371,10 +371,10 @@ initial
       dbg_uart_tx16(16'h4567);         // write 5th data
       repeat(12) @(posedge mclk);
       if (r9 !== 16'h4567)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) WR ERROR: 5th DATA =====");
-      
+
       dbg_uart_wr(MEM_ADDR, 16'h0005); // select @0x0200
       dbg_uart_wr(MEM_CNT,  16'h0004); // 5 consecutive access
-      
+
       dbg_uart_wr(MEM_CTL,  16'h0005); // Start burst to 16 bit cpu registers read
       dbg_uart_rx16;                   // read 1st data
       if (dbg_uart_buf !== 16'hcba9)      tb_error("====== 16B WRITE BURSTS (CPU REGISTERS) RD ERROR: 1st DATA =====");
@@ -393,7 +393,7 @@ initial
 
       dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0000)); // select @0x0210
       dbg_uart_wr(MEM_CNT,  16'h0004); // 5 consecutive access
- 
+
       dbg_uart_wr(MEM_CTL,  16'h000b); // Start burst to 8 bit memory write
       dbg_uart_tx(8'h91);         // write 1st data
       repeat(12) @(posedge mclk);
@@ -410,10 +410,10 @@ initial
       dbg_uart_tx(8'h55);         // write 5th data
       repeat(12) @(posedge mclk);
       if (mem204 !== 16'h9a55)      tb_error("====== 8B WRITE BURSTS (MEMORY) WR ERROR: 5th DATA =====");
-      
+
       dbg_uart_wr(MEM_ADDR, (`PER_SIZE+16'h0000)); // select @0x0200
       dbg_uart_wr(MEM_CNT,  16'h0004); // 5 consecutive access
-      
+
       dbg_uart_wr(MEM_CTL,  16'h0009); // Start burst to 8 bit registers read
       dbg_uart_rx8;                   // read 1st data
       if (dbg_uart_buf !== 16'h0091)      tb_error("====== 8B WRITE BURSTS (MEMORY) RD ERROR: 1st DATA =====");
@@ -429,26 +429,16 @@ initial
 
 
 
-      
-      dbg_uart_wr(CPU_CTL    ,  16'h0002); 
+
+      dbg_uart_wr(CPU_CTL    ,  16'h0002);
       repeat(10) @(posedge mclk);
 
       stimulus_done = 1;
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|   (serial debug interface UART not included)  |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|   (serial debug interface UART not included)  |");
 `endif
 `else
-
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (serial debug interface not included)    |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|      (serial debug interface not included)    |");
 `endif
    end
-

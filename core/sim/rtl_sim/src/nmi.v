@@ -71,7 +71,7 @@ initial
       @(negedge irq_acc[`IRQ_NR-16])
       wkup[0]            = 1'b0;
       irq[`IRQ_NR-16]    = 1'b0;
-      
+
       @(r15==16'h1002);
       nmi       = 1'b0;
 
@@ -81,7 +81,7 @@ initial
       if (r12   !==16'h0000)  tb_error("====== NMI disabled: flag was not cleared    =====");
       if (r11   !==16'h0000)  tb_error("====== NMI disabled: flag is set             =====");
 
- 
+
       // Test NMI rising edge
       //--------------------------
       @(r15==16'h2000);
@@ -127,7 +127,7 @@ initial
       //--------------------------
       @(r15==16'h3000);
       $display(" Test NMI falling edge");
-      
+
       @(r15==16'h3001);
 
       #(2000);
@@ -175,7 +175,7 @@ initial
       //-----------------------------------
       @(r15==16'h4000);
       $display(" Test NMI nested from Maskable-IRQ");
-      
+
       @(r15==16'h4001);
       #(2000);
       inst_cnt = 0;
@@ -196,13 +196,8 @@ initial
 
 
 `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|         (the NMI support is not included)     |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|         (the NMI support is not included)     |");
 `endif
 
       stimulus_done = 1;
    end
-

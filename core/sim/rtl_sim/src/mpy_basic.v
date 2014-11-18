@@ -37,7 +37,7 @@
 /* $LastChangedBy: olivier.girard $                                          */
 /* $LastChangedDate: 2009-08-04 23:44:12 +0200 (Tue, 04 Aug 2009) $          */
 /*===========================================================================*/
-    
+
 
 initial
    begin
@@ -149,7 +149,7 @@ initial
 
       $display("Signed Multiplication test completed (MPYS mode)");
 
-      
+
       // UNSIGNED MULTIPLY ACCUMULATE
       //--------------------------------------------------------
 
@@ -284,7 +284,7 @@ initial
       if (r14 !== 16'h0FED) tb_error("====== 16-BIT RD/WR ACCESS OPERANDS: OP2      (4) =====");
 
       $display("16-BIT RD/WR Access operands test completed");
-     
+
 
       // 8-BIT RD/WR ACCESS OPERANDS
       //--------------------------------------------------------
@@ -324,11 +324,6 @@ initial
       stimulus_done = 1;
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (hardware multiplier not included)       |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|      (hardware multiplier not included)       |");
 `endif
    end
-

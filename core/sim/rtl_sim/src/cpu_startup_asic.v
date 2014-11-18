@@ -60,7 +60,7 @@ always @(inst_number)
   inst_cnt = inst_cnt+1;
 
 integer test_nr;
-   
+
 initial
    begin
       $display(" ===============================================");
@@ -434,7 +434,7 @@ initial
       reset_n = 0;
       #(100*50);
 
-     
+
       //  ####  CPU_EN=1  ####  DBG_EN=1  ####  RESET_N=1  ####  SEQUENCE 1: RESET_N -> CPU_EN -> DBG_EN
       test_nr = 8;
 
@@ -471,7 +471,7 @@ initial
       reset_n = 0;
       #(100*50);
 
-     
+
       //  ####  CPU_EN=1  ####  DBG_EN=1  ####  RESET_N=1  ####  SEQUENCE 2: RESET_N -> DBG_EN -> CPU_EN
       test_nr = 9;
 
@@ -651,16 +651,11 @@ initial
       #(100*50);
 
 
-      
+
 
 `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test is not supported in FPGA mode)   |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|   (this test is not supported in FPGA mode)   |");
 `endif
 
       stimulus_done = 1;
    end
-

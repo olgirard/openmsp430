@@ -73,7 +73,7 @@ always @(posedge mclk or posedge puc_rst)
 
 always @(wkup2_sync)
   irq[2] = wkup2_sync[1];
-   
+
 // Wakeup synchronizer to generate IRQ
 reg [1:0] wkup3_sync;
 always @(posedge mclk or posedge puc_rst)
@@ -82,7 +82,7 @@ always @(posedge mclk or posedge puc_rst)
 
 always @(wkup3_sync)
   irq[3] = wkup3_sync[1];
-   
+
 
 initial
    begin
@@ -100,7 +100,7 @@ initial
 
 
 `ifdef ASIC_CLOCKING
-      
+
       // ACTIVE
       //--------------------------------------------------------
 
@@ -176,7 +176,7 @@ initial
       if (inst_cnt    <  60)   tb_error("====== LPM0 TEST 10: CPU IS NOT EXECUTING DURING IRQ   =====");
       @(r13==16'haaaa);
       wkup[2] = 1'b0;
-      
+
        #(10*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -220,7 +220,7 @@ initial
       if (inst_cnt    <  60)   tb_error("====== LPM0 TEST 20: CPU IS NOT EXECUTING DURING IRQ   =====");
       @(r13==16'hbbbb);
       wkup[3] = 1'b0;
-      
+
        #(10*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -243,7 +243,7 @@ initial
       aclk_cnt     = 0;
       inst_cnt     = 0;
 
-      
+
       // LPM1 ( CPUOFF + SCG0 )
       //--------------------------------------------------------
 
@@ -295,7 +295,7 @@ initial
       if (inst_cnt    <  60)   tb_error("====== LPM1 TEST 10: CPU IS NOT EXECUTING DURING IRQ   =====");
       @(r13==16'haaaa);
       wkup[2] = 1'b0;
-      
+
        #(15*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -339,7 +339,7 @@ initial
       if (inst_cnt    <  60)   tb_error("====== LPM1 TEST 20: CPU IS NOT EXECUTING DURING IRQ   =====");
       @(r13==16'hbbbb);
       wkup[3] = 1'b0;
-      
+
        #(10*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -367,7 +367,7 @@ initial
       //--------------------------------------------------------
 
       @(r15==16'h4001);
-      
+
       #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -415,7 +415,7 @@ initial
       if (inst_cnt    <  60)   tb_error("====== LPM2 TEST 10: CPU IS NOT EXECUTING DURING IRQ   =====");
       @(r13==16'haaaa);
       wkup[2] = 1'b0;
-      
+
        #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -463,7 +463,7 @@ initial
       if (inst_cnt    <  60)   tb_error("====== LPM2 TEST 20: CPU IS NOT EXECUTING DURING IRQ   =====");
       @(r13==16'hbbbb);
       wkup[3] = 1'b0;
-      
+
        #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -491,7 +491,7 @@ initial
       //--------------------------------------------------------
 
       @(r15==16'h5001);
-      
+
       #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -539,7 +539,7 @@ initial
       if (inst_cnt    <  60)   tb_error("====== LPM3 TEST 10: CPU IS NOT EXECUTING DURING IRQ   =====");
       @(r13==16'haaaa);
       wkup[2] = 1'b0;
-      
+
        #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -587,7 +587,7 @@ initial
       if (inst_cnt    <  60)   tb_error("====== LPM3 TEST 20: CPU IS NOT EXECUTING DURING IRQ   =====");
       @(r13==16'hbbbb);
       wkup[3] = 1'b0;
-      
+
       #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -614,7 +614,7 @@ initial
       // LPM4 ( CPUOFF + SCG0 + SCG1 + OSCOFF)
       //--------------------------------------------------------
 
-      @(r15==16'h6001);      
+      @(r15==16'h6001);
 
       #(100*70);
       dco_clk_cnt  = 0;
@@ -671,7 +671,7 @@ initial
       if (inst_cnt    <  60)   tb_error("====== LPM4 TEST 10: CPU IS NOT EXECUTING DURING IRQ   =====");
       @(r13==16'haaaa);
       wkup[2] = 1'b0;
-      
+
       #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -727,7 +727,7 @@ initial
       if (inst_cnt    <  60)   tb_error("====== LPM4 TEST 20: CPU IS NOT EXECUTING DURING IRQ   =====");
       @(r13==16'hbbbb);
       wkup[3] = 1'b0;
-      
+
       #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -753,13 +753,8 @@ initial
 
 
 `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test is not supported in FPGA mode)   |");
-      $display(" ===============================================");
-      $finish;
-`endif    
+      tb_skip_finish("|   (this test is not supported in FPGA mode)   |");
+`endif
 
       stimulus_done = 1;
    end
-

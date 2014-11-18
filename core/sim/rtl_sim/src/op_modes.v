@@ -58,11 +58,7 @@ initial
       stimulus_done = 0;
 
 `ifdef ASIC_CLOCKING
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|   (this test is not supported in ASIC mode)   |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|   (this test is not supported in ASIC mode)   |");
 `else
 
       // SCG1   (<=> R2[7]): turn off SMCLK
@@ -90,13 +86,13 @@ initial
       smclk_cnt = 0;
       repeat (84) @(posedge mclk);
       if (smclk_cnt !== 16'h0000) tb_error("====== SCG1 TEST 4: SMCLK IS NOT STOPPED =====");
-   
+
       @(r15==16'h1005);
       smclk_cnt = 0;
       repeat (80) @(posedge mclk);
       if (smclk_cnt !== 16'h000a) tb_error("====== SCG1 TEST 5: SMCLK IS NOT RUNNING =====");
 
-      
+
       // OSCOFF  (<=> R2[5]): turn off LFXT1CLK
       //--------------------------------------------------------
 
@@ -145,7 +141,7 @@ initial
       if (aclk_cnt  !== 16'h0003) tb_error("====== OSCOFF TEST 6: ACLK  IS NOT RUNNING =====");
       if (smclk_cnt !== 16'h0068) tb_error("====== OSCOFF TEST 6: SMCLK IS NOT RUNNING ON MCLK =====");
 
-      
+
       // CPUOFF  (<=> R2[4]): turn off CPU
       //--------------------------------------------------------
 
@@ -169,7 +165,7 @@ initial
       inst_cnt  = 0;
       repeat (80) @(negedge mclk);
       if (inst_cnt <= 16'h0025) tb_error("====== CPUOFF TEST 3: CPU IS NOT RUNNING DURING IRQ (PORT 1) =====");
-      
+
       @(r1==(`PER_SIZE+16'h0050));
       repeat (3) @(negedge mclk);
       inst_cnt  = 0;
@@ -191,8 +187,7 @@ initial
       repeat (80) @(negedge mclk);
       if (inst_cnt  <= 16'h0030) tb_error("====== CPUOFF TEST 6: CPU IS NOT RUNNING =====");
 
-`endif    
+`endif
 
       stimulus_done = 1;
    end
-

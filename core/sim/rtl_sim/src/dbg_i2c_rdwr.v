@@ -117,7 +117,7 @@ initial
 	   if (ii!=7)
 	     dbg_i2c_wr(ii[7:0] ,  16'hffff);
 	end
-      
+
       // Read value back
       for ( ii=0; ii < 64; ii=ii+1)
 	begin
@@ -177,26 +177,16 @@ initial
 	   endcase
 	end
 
-      
-      dbg_i2c_wr(CPU_CTL    ,  16'h0002); 
+
+      dbg_i2c_wr(CPU_CTL    ,  16'h0002);
       repeat(10) @(posedge mclk);
 
       stimulus_done = 1;
 `else
 
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|   (serial debug interface I2C not included)  |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|   (serial debug interface I2C not included)  |");
 `endif
 `else
-
-       $display(" ===============================================");
-       $display("|               SIMULATION SKIPPED              |");
-       $display("|      (serial debug interface not included)    |");
-       $display(" ===============================================");
-       $finish;
+       tb_skip_finish("|      (serial debug interface not included)   |");
 `endif
    end
-

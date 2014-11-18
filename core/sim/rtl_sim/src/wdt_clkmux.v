@@ -34,7 +34,7 @@
 /* $LastChangedBy$                                          */
 /* $LastChangedDate$          */
 /*===========================================================================*/
-    
+
 `define LONG_TIMEOUT
 
 integer mclk_counter;
@@ -91,7 +91,7 @@ initial
       if (r5_counter   !== 8)           tb_error("====== WATCHDOG TEST INTERVAL MODE /64 - SMCLK - TEST 8 =====");
    `endif
 
-   
+
       // WATCHDOG TEST INTERVAL MODE /64 - ACLK == LFXTCLK/1
       //--------------------------------------------------------
 
@@ -121,13 +121,8 @@ initial
    `endif
 
 `else
-      $display(" ===============================================");
-      $display("|               SIMULATION SKIPPED              |");
-      $display("|         (the Watchdog is not included)        |");
-      $display(" ===============================================");
-      $finish;
+      tb_skip_finish("|         (the Watchdog is not included)        |");
 `endif
 
       stimulus_done = 1;
    end
-
