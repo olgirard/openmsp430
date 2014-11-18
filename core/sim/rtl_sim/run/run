@@ -17,8 +17,7 @@ export OMSP_SIMULATOR
 
 rm -rf cov_work
 
-#../bin/msp430sim dbg_i2c
+../bin/msp430sim dbg_i2c
 #../bin/msp430sim dbg_uart
-../bin/msp430sim sandbox
-#../bin/msp430sim sing-op_reti
-
+#../bin/msp430sim sandbox
+#../bin/msp430sim wdt_wkup
