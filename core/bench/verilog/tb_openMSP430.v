@@ -759,14 +759,12 @@ initial // Normal end of test
 
    task tb_extra_report;
       begin
-         if ((`PMEM_SIZE>=4092) && (`DMEM_SIZE>=512))
+         $display("DMA REPORT: Total Accesses: %-d Total RD: %-d Total WR: %-d", dma_cnt_rd+dma_cnt_wr,     dma_cnt_rd,   dma_cnt_wr);
+         $display("            Total Errors:   %-d Error RD: %-d Error WR: %-d", dma_rd_error+dma_wr_error, dma_rd_error, dma_wr_error);
+         if (!((`PMEM_SIZE>=4092) && (`DMEM_SIZE>=1024)))
            begin
-              $display("DMA REPORT: Total Accesses: %-d Total RD: %-d Total WR: %-d", dma_cnt_rd+dma_cnt_wr,     dma_cnt_rd,   dma_cnt_wr);
-              $display("            Total Errors:   %-d Error RD: %-d Error WR: %-d", dma_rd_error+dma_wr_error, dma_rd_error, dma_wr_error);
-           end
-         else
-           begin
-              $display("Note: DMA if verification disabled (PMEM must be 4kB or bigger, DMEM must be 512B or bigger)");
+	      $display("");
+              $display("Note: DMA if verification disabled (PMEM must be 4kB or bigger, DMEM must be 1kB or bigger)");
            end
          $display("");
          $display("SIMULATION SEED: %-d", `SEED);
