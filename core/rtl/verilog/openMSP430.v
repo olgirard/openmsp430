@@ -284,6 +284,7 @@ omsp_clock_module clock_module_0 (
     .dbg_cpu_reset     (dbg_cpu_reset),      // Reset CPU from debug interface
     .dbg_en            (dbg_en),             // Debug interface enable (asynchronous)
     .dco_clk           (dco_clk),            // Fast oscillator (fast clock)
+    .dma_en            (dma_en),             // Direct Memory Access enable (high active)
     .lfxt_clk          (lfxt_clk),           // Low frequency oscillator (typ 32kHz)
     .mclk_enable       (mclk_enable),        // Main System Clock enable
     .mclk_wkup         (mclk_wkup),          // Main System Clock wake-up (asynchronous)
