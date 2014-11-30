@@ -77,10 +77,10 @@ main:
 
 	mov     #0x1122, &DMEM_214
 	mov     #0xabcd, r7
-	add.b        r7, Rn_EDEL+PMEM_LENGTH   ;# Write 0x22+0xcd=0xef to memory @0x0214
+	add.b        r7, Rn_EDEL   ;# Write 0x22+0xcd=0xef to memory @0x0214
 	mov     #0x99aa, &DMEM_216
 	mov     #0xef12, r7
-	add.b        r7, Rn_EDEH+PMEM_LENGTH   ;# Write 0x99+0x12=0xab to memory @0x0217
+	add.b        r7, Rn_EDEH   ;# Write 0x99+0x12=0xab to memory @0x0217
 
 	mov     #0x7788, &DMEM_218
 	mov     #0x1f2e, r8
@@ -142,13 +142,13 @@ main:
 	mov     #0xd12e, &DMEM_21E
 
 	mov   #DMEM_200, r8
-	add.b       @r8, aRn_EDE_218+PMEM_LENGTH ;# Write 0xaa+0xee=0x98 to memory @0x218
+	add.b       @r8, aRn_EDE_218 ;# Write 0xaa+0xee=0x98 to memory @0x218
 	mov   #DMEM_202, r8
-	add.b       @r8, aRn_EDE_21B+PMEM_LENGTH ;# Write 0xcc+0x22=0xee to memory @0x21B
+	add.b	    @r8, aRn_EDE_21B ;# Write 0xcc+0x22=0xee to memory @0x21B
 	mov   #DMEM_205, r8
-	add.b       @r8, aRn_EDE_21C+PMEM_LENGTH ;# Write 0xdd+0xe2=0xbf to memory @0x21C
+	add.b	    @r8, aRn_EDE_21C ;# Write 0xdd+0xe2=0xbf to memory @0x21C
 	mov   #DMEM_207, r8
-	add.b       @r8, aRn_EDE_21F+PMEM_LENGTH ;# Write 0xff+0xd1=0xd0 to memory @0x21F
+	add.b	    @r8, aRn_EDE_21F ;# Write 0xff+0xd1=0xd0 to memory @0x21F
 
 	mov     #0x2233, &DMEM_200
 	mov     #0x4455, &DMEM_202
@@ -205,11 +205,11 @@ main:
 
 	mov   #DMEM_200, r9
 	add.b      @r9+, 16(r8)      ;# Write 0x22+0xbb=0xdd to memory @0x210
-	mov.b      @r9+, r10    
+	mov.b      @r9+, r10
 	add.b      @r9+, 19(r8)      ;# Write 0x44+0x55=0x99 to memory @0x213
-	mov        @r9+, r10    
+	mov        @r9+, r10
 	add.b      @r9+, 20(r8)      ;# Write 0x55+0x6b=0xc0 to memory @0x214
-	mov.b      @r9+, r10    
+	mov.b      @r9+, r10
 	add.b      @r9+, 23(r8)      ;# Write 0x77+0xa5=0x1c to memory @0x217
 
 	mov     #0x99aa, &DMEM_200
@@ -222,13 +222,13 @@ main:
 	mov     #0xe1f2, &DMEM_21E
 
 	mov   #DMEM_200, r10
-	add.b     @r10+, aRni_EDE_218+PMEM_LENGTH ;# Write 0xaa+0x22=0xcc to memory @0x218
-	mov.b     @r10+, r11
-	add.b     @r10+, aRni_EDE_21B+PMEM_LENGTH ;# Write 0xcc+0xee=0xba to memory @0x21B
-	mov       @r10+, r11
-	add.b     @r10+, aRni_EDE_21C+PMEM_LENGTH ;# Write 0xdd+0x2f=0x0c to memory @0x21C
-	mov.b     @r10+, r11
-	add.b     @r10+, aRni_EDE_21F+PMEM_LENGTH ;# Write 0xff+0xe1=0xe0 to memory @0x21F
+	add.b     @r10+, aRni_EDE_218 ;# Write 0xaa+0x22=0xcc to memory @0x218
+	mov.b	  @r10+, r11
+	add.b	  @r10+, aRni_EDE_21B ;# Write 0xcc+0xee=0xba to memory @0x21B
+	mov	  @r10+, r11
+	add.b	  @r10+, aRni_EDE_21C ;# Write 0xdd+0x2f=0x0c to memory @0x21C
+	mov.b	  @r10+, r11
+	add.b	  @r10+, aRni_EDE_21F ;# Write 0xff+0xe1=0xe0 to memory @0x21F
 
 	mov     #0x2233, &DMEM_200
 	mov     #0x4455, &DMEM_202
@@ -281,10 +281,10 @@ main:
 	mov     #0xeecc, &DMEM_21A
 	mov     #0x1e2c, &DMEM_21C
 	mov     #0xe1c2, &DMEM_21E
-	add.b   #0x99aa, N_EDE_218+PMEM_LENGTH  ;# Write 0xaa+0x22=0xcc to memory @0x218
-	add.b   #0xbbcc, N_EDE_21B+PMEM_LENGTH  ;# Write 0xcc+0xee=0xba to memory @0x21B
-	add.b   #0xddee, N_EDE_21C+PMEM_LENGTH  ;# Write 0xee+0x2c=0x1a to memory @0x21C
-	add.b   #0xff11, N_EDE_21F+PMEM_LENGTH  ;# Write 0x11+0xe1=0xf2 to memory @0x21F
+	add.b   #0x99aa, N_EDE_218  ;# Write 0xaa+0x22=0xcc to memory @0x218
+	add.b	#0xbbcc, N_EDE_21B  ;# Write 0xcc+0xee=0xba to memory @0x21B
+	add.b	#0xddee, N_EDE_21C  ;# Write 0xee+0x2c=0x1a to memory @0x21C
+	add.b	#0xff11, N_EDE_21F  ;# Write 0x11+0xe1=0xf2 to memory @0x21F
 
 	mov     #0xaa88, &DMEM_220
 	mov     #0x22ee, &DMEM_222
@@ -345,10 +345,10 @@ main:
 	mov     #0x73c4, &DMEM_21E
 
 	mov   #DMEM_200, r8
-	add.b     2(r8), xRn_EDE_218+PMEM_LENGTH ;# Write 0xaa+0x44=0xee to memory @0x218
-	add.b     4(r8), xRn_EDE_21B+PMEM_LENGTH ;# Write 0xcc+0x77=0x43 to memory @0x21B
-	add.b     7(r8), xRn_EDE_21C+PMEM_LENGTH ;# Write 0xdd+0x4c=0x29 to memory @0x21C
-	add.b     9(r8), xRn_EDE_21F+PMEM_LENGTH ;# Write 0xff+0x73=0x72 to memory @0x21F
+	add.b     2(r8), xRn_EDE_218 ;# Write 0xaa+0x44=0xee to memory @0x218
+	add.b	  4(r8), xRn_EDE_21B ;# Write 0xcc+0x77=0x43 to memory @0x21B
+	add.b	  7(r8), xRn_EDE_21C ;# Write 0xdd+0x4c=0x29 to memory @0x21C
+	add.b	  9(r8), xRn_EDE_21F ;# Write 0xff+0x73=0x72 to memory @0x21F
 
 	mov     #0x2233, &DMEM_202
 	mov     #0x4455, &DMEM_204
@@ -389,10 +389,10 @@ main:
 
 	mov       #0x2233, &DMEM_210
 	mov       #0xcb43, r5
-	add.b EDE_EDE_210+PMEM_LENGTH, r5         ;# Write 0x33+0x43=0x76 to r5
+	add.b EDE_EDE_210, r5         ;# Write 0x33+0x43=0x76 to r5
 	mov       #0x4455, &DMEM_212
 	mov       #0x32a5, r6
-	add.b EDE_EDE_213+PMEM_LENGTH, r6         ;# Write 0x44+0xa5=0xe9 to r6
+	add.b EDE_EDE_213, r6         ;# Write 0x44+0xa5=0xe9 to r6
 
 	mov       #0x1122, &DMEM_202
 	mov       #0x3344, &DMEM_204
@@ -404,10 +404,10 @@ main:
 	mov       #0xa6b5, &DMEM_214
 	mov       #0x6a5b, &DMEM_216
 
-	add.b EDE_EDE_202+PMEM_LENGTH, 16(r7)      ;# Write 0x22+0xbb=0xdd to memory @0x210
-	add.b EDE_EDE_204+PMEM_LENGTH, 19(r7)      ;# Write 0x44+0x66=0xaa to memory @0x213
-	add.b EDE_EDE_207+PMEM_LENGTH, 20(r7)      ;# Write 0x55+0xb5=0x0a to memory @0x214
-	add.b EDE_EDE_209+PMEM_LENGTH, 23(r7)      ;# Write 0x77+0x6a=0xe1 to memory @0x217
+	add.b EDE_EDE_202, 16(r7)      ;# Write 0x22+0xbb=0xdd to memory @0x210
+	add.b EDE_EDE_204, 19(r7)      ;# Write 0x44+0x66=0xaa to memory @0x213
+	add.b EDE_EDE_207, 20(r7)      ;# Write 0x55+0xb5=0x0a to memory @0x214
+	add.b EDE_EDE_209, 23(r7)      ;# Write 0x77+0x6a=0xe1 to memory @0x217
 
 	mov       #0x99aa, &DMEM_202
 	mov       #0xbbcc, &DMEM_204
@@ -418,10 +418,10 @@ main:
 	mov       #0x1e2f, &DMEM_21C
 	mov       #0xe1f2, &DMEM_21E
 
-	add.b EDE_EDE_202+PMEM_LENGTH, EDE_EDE_218+PMEM_LENGTH ;# Write 0xaa+0x22=0xcc to memory @0x218
-	add.b EDE_EDE_204+PMEM_LENGTH, EDE_EDE_21B+PMEM_LENGTH ;# Write 0xcc+0xee=0xba to memory @0x21B
-	add.b EDE_EDE_207+PMEM_LENGTH, EDE_EDE_21C+PMEM_LENGTH ;# Write 0xdd+0x2f=0x0c to memory @0x21C
-	add.b EDE_EDE_209+PMEM_LENGTH, EDE_EDE_21F+PMEM_LENGTH ;# Write 0xff+0xe1=0xe0 to memory @0x21F
+	add.b EDE_EDE_202, EDE_EDE_218 ;# Write 0xaa+0x22=0xcc to memory @0x218
+	add.b EDE_EDE_204, EDE_EDE_21B ;# Write 0xcc+0xee=0xba to memory @0x21B
+	add.b EDE_EDE_207, EDE_EDE_21C ;# Write 0xdd+0x2f=0x0c to memory @0x21C
+	add.b EDE_EDE_209, EDE_EDE_21F ;# Write 0xff+0xe1=0xe0 to memory @0x21F
 
 	mov       #0x2233, &DMEM_202
 	mov       #0x4455, &DMEM_204
@@ -433,10 +433,10 @@ main:
 	mov       #0x2c3d, &DMEM_224
 	mov       #0xc2d3, &DMEM_226
 
-	add.b EDE_EDE_202+PMEM_LENGTH, &EDE_TONY_220 ;# Write 0x33+0x07=0x3a to memory @0x220
-	add.b EDE_EDE_204+PMEM_LENGTH, &EDE_TONY_223 ;# Write 0x55+0xcc=0x21 to memory @0x223
-	add.b EDE_EDE_207+PMEM_LENGTH, &EDE_TONY_224 ;# Write 0x66+0x3d=0xa3 to memory @0x224
-	add.b EDE_EDE_209+PMEM_LENGTH, &EDE_TONY_227 ;# Write 0x88+0xc2=0x4a to memory @0x227
+	add.b EDE_EDE_202, &EDE_TONY_220 ;# Write 0x33+0x07=0x3a to memory @0x220
+	add.b EDE_EDE_204, &EDE_TONY_223 ;# Write 0x55+0xcc=0x21 to memory @0x223
+	add.b EDE_EDE_207, &EDE_TONY_224 ;# Write 0x66+0x3d=0xa3 to memory @0x224
+	add.b EDE_EDE_209, &EDE_TONY_227 ;# Write 0x88+0xc2=0x4a to memory @0x227
 
 	mov       #0x7000, r15
 
@@ -484,10 +484,10 @@ main:
 	mov       #0x1627, &DMEM_21C
 	mov       #0x6172, &DMEM_21E
 
-	add.b   &DMEM_202, aEDE_EDE_218+PMEM_LENGTH ;# Write 0xaa+0x22=0xcc to memory @0x218
-	add.b   &DMEM_204, aEDE_EDE_21B+PMEM_LENGTH ;# Write 0xcc+0x66=0x32 to memory @0x21B
-	add.b   &DMEM_207, aEDE_EDE_21C+PMEM_LENGTH ;# Write 0xdd+0x27=0x04 to memory @0x21C
-	add.b   &DMEM_209, aEDE_EDE_21F+PMEM_LENGTH ;# Write 0xff+0x61=0x60 to memory @0x21F
+	add.b   &DMEM_202, aEDE_EDE_218 ;# Write 0xaa+0x22=0xcc to memory @0x218
+	add.b	&DMEM_204, aEDE_EDE_21B ;# Write 0xcc+0x66=0x32 to memory @0x21B
+	add.b	&DMEM_207, aEDE_EDE_21C ;# Write 0xdd+0x27=0x04 to memory @0x21C
+	add.b	&DMEM_209, aEDE_EDE_21F ;# Write 0xff+0x61=0x60 to memory @0x21F
 
 	mov       #0x2233, &DMEM_202
 	mov       #0x4455, &DMEM_204
@@ -589,18 +589,18 @@ main:
 	mov      #0xee55, &DMEM_244
 	mov      #0x3355, &DMEM_246
 
-	add.b    #0x0000, CONSTL_EDE0+PMEM_LENGTH     ;# Move +0 to memory @0x230
-	add.b    #0x0001, CONSTL_EDE1+PMEM_LENGTH     ;# Move +1 to memory @0x232
-	add.b    #0x0002, CONSTL_EDE2+PMEM_LENGTH     ;# Move +2 to memory @0x234
-	add.b    #0x0004, CONSTL_EDE4+PMEM_LENGTH     ;# Move +4 to memory @0x236
-	add.b    #0x0008, CONSTL_EDE8+PMEM_LENGTH     ;# Move +8 to memory @0x238
-	add.b    #0xffff, CONSTL_EDEm1+PMEM_LENGTH    ;# Move -1 to memory @0x23A
-	add.b    #0x0000, CONSTH_EDE0+PMEM_LENGTH     ;# Move +0 to memory @0x23D
-	add.b    #0x0001, CONSTH_EDE1+PMEM_LENGTH     ;# Move +1 to memory @0x23F
-	add.b    #0x0002, CONSTH_EDE2+PMEM_LENGTH     ;# Move +2 to memory @0x241
-	add.b    #0x0004, CONSTH_EDE4+PMEM_LENGTH     ;# Move +4 to memory @0x243
-	add.b    #0x0008, CONSTH_EDE8+PMEM_LENGTH     ;# Move +8 to memory @0x245
-	add.b    #0xffff, CONSTH_EDEm1+PMEM_LENGTH    ;# Move -1 to memory @0x247
+	add.b    #0x0000, CONSTL_EDE0	  ;# Move +0 to memory @0x230
+	add.b	 #0x0001, CONSTL_EDE1	  ;# Move +1 to memory @0x232
+	add.b	 #0x0002, CONSTL_EDE2	  ;# Move +2 to memory @0x234
+	add.b	 #0x0004, CONSTL_EDE4	  ;# Move +4 to memory @0x236
+	add.b	 #0x0008, CONSTL_EDE8	  ;# Move +8 to memory @0x238
+	add.b    #0xffff, CONSTL_EDEm1    ;# Move -1 to memory @0x23A
+	add.b    #0x0000, CONSTH_EDE0	  ;# Move +0 to memory @0x23D
+	add.b	 #0x0001, CONSTH_EDE1	  ;# Move +1 to memory @0x23F
+	add.b	 #0x0002, CONSTH_EDE2	  ;# Move +2 to memory @0x241
+	add.b	 #0x0004, CONSTH_EDE4	  ;# Move +4 to memory @0x243
+	add.b	 #0x0008, CONSTH_EDE8	  ;# Move +8 to memory @0x245
+	add.b    #0xffff, CONSTH_EDEm1    ;# Move -1 to memory @0x247
 
 
 	#

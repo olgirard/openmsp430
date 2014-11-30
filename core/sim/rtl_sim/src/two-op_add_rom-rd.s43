@@ -36,7 +36,7 @@
 /*===========================================================================*/
 
 .include "pmem_defs.asm"
-	
+
 .global main
 
 main:
@@ -44,7 +44,7 @@ main:
 .set   aRn_EDE,  DMEM_212
 .set   aRn_TONY, DMEM_214
 
-	
+
 	mov   #data_aRn_0x1111, r4
 	mov            #0x6666, r5
 	add                @r4, r5         ;# Add @r4+r5 (0x1111+0x6666=0x7777)
@@ -64,7 +64,7 @@ test_aRn_PC:
 
         mov            #0x8e1c, &DMEM_212
 	mov   #data_aRn_0x5f12, r7
-	add                @r7, aRn_EDE+PMEM_LENGTH    ;# Write 0x5f12+0x8e1c=0xed2e to memory @0x0212
+	add                @r7, aRn_EDE    ;# Write 0x5f12+0x8e1c=0xed2e to memory @0x0212
 
         mov            #0x1541, &DMEM_214
 	mov   #data_aRn_0x3112, r8
@@ -103,13 +103,13 @@ test_aRni_PC2:
         mov             #0x5432, &DMEM_210
 	mov           #DMEM_200, r8
 	mov   #data_aRni_0x1234, r10
-	add               @r10+, 16(r8)    ;# Write 0x1234+0x5432=0x6666 to memory @0x0210
-	add               @r10+, 16(r8)    ;# Write 0x2345+0x6666=0x89AB to memory @0x0210
+	add               @r10+, 16(r8)     ;# Write 0x1234+0x5432=0x6666 to memory @0x0210
+	add               @r10+, 16(r8)     ;# Write 0x2345+0x6666=0x89AB to memory @0x0210
 
         mov             #0x8e1c, &DMEM_212
 	mov   #data_aRni_0x5f12, r8
-	add                @r8+, aRni_EDE+PMEM_LENGTH   ;# Write 0x5f12+0x8e1c=0xed2e to memory @0x0212
-	add                @r8+, aRni_EDE+PMEM_LENGTH   ;# Write 0x6345+0xed2e=0x5073 to memory @0x0212
+	add                @r8+, aRni_EDE   ;# Write 0x5f12+0x8e1c=0xed2e to memory @0x0212
+	add		   @r8+, aRni_EDE   ;# Write 0x6345+0xed2e=0x5073 to memory @0x0212
 
         mov             #0x1541, &DMEM_214
 	mov   #data_aRni_0x3112, r9
@@ -144,7 +144,7 @@ test_xRn_PC:
 
 	mov            #0x2143, &DMEM_220
 	mov   #data_xRn_0x7238, r7
-	add              4(r7), xRn_EDE+PMEM_LENGTH    ;# Write 0x7238+0x2143=0x937b to memory @0x220
+	add              4(r7), xRn_EDE    ;# Write 0x7238+0x2143=0x937b to memory @0x220
 
 	mov            #0x1432, &DMEM_208
 	mov   #data_xRn_0x98b2, r4
@@ -177,7 +177,7 @@ test_EDE_PC:
 
 	mov              #0x058a, &DMEM_216
 	mov              #0x1234, &DMEM_208
-	add      data_EDE_0xb3a9, EDE_EDE+PMEM_LENGTH     ;# Write 0xb3a9+0x058a=0xb933 to memory @0x216
+	add      data_EDE_0xb3a9, EDE_EDE     ;# Write 0xb3a9+0x058a=0xb933 to memory @0x216
 
 	mov              #0xA738, &DMEM_212
 	mov              #0x1234, &DMEM_20A
@@ -210,7 +210,7 @@ test_aEDE_PC:
 
 	mov                #0x6e2f, &DMEM_218
 	mov                #0x1234, &DMEM_208
-	add      &data_aEDE_0x5c1f, aEDE_EDE+PMEM_LENGTH    ;# Write 0x5c1f+0x6e2f=0xca4e to memory @0x218
+	add      &data_aEDE_0x5c1f, aEDE_EDE    ;# Write 0x5c1f+0x6e2f=0xca4e to memory @0x218
 
 	mov                #0x51ca, &DMEM_202
 	mov                #0x1234, &DMEM_20A
@@ -219,7 +219,7 @@ test_aEDE_PC:
 	mov                #0x5000, r15
 
 
-	
+
 end_of_test:
 	nop
 	br #0xffff
@@ -296,7 +296,7 @@ data_xRn_0x98b2:
 	.word 0x0000
 	.word 0x0000
 	.word 0x98b2
-	
+
 data_EDE_0xc3d6:
 	.word 0xc3d6
 data_EDE_0x000a:
@@ -320,7 +320,7 @@ data_aEDE_0xc16e:
 	.word 0xc16e
 
 
-	
+
         /* ----------------------         INTERRUPT VECTORS  --------------- */
 
 .section .vectors, "a"

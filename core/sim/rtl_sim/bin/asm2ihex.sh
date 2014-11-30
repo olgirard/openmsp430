@@ -22,9 +22,9 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #------------------------------------------------------------------------------
-# 
+#
 # File Name: asm2ihex.sh
-# 
+#
 # Author(s):
 #             - Olivier Girard,    olgirard@gmail.com
 #
@@ -89,7 +89,13 @@ sed -i "s/PMEM_SIZE/$PMEM_SIZE/g"    pmem_defs.asm
 ###############################################################################
 #                  Compile, link & generate IHEX file                         #
 ###############################################################################
-msp430-as      -alsm         $2     -o $1.o     > $1.l43
-msp430-objdump -xdsStr       $1.o              >> $1.l43
-msp430-ld      -T ./pmem.x   $1.o   -o $1.elf
-msp430-objcopy -O ihex       $1.elf    $1.ihex
+echo ""
+echo "\$ msp430-elf-as      -alsm $2 -o $1.o > $1.l43"
+msp430-elf-as      -alsm         $2     -o $1.o     > $1.l43
+echo "\$ msp430-elf-objdump -xdsStr $1.o >> $1.l43"
+msp430-elf-objdump -xdsStr       $1.o              >> $1.l43
+echo "\$ msp430-elf-ld      -T ./pmem.x $1.o -o $1.elf"
+msp430-elf-ld      -T ./pmem.x   $1.o   -o $1.elf
+echo "\$ msp430-elf-objcopy -O ihex $1.elf $1.ihex"
+msp430-elf-objcopy -O ihex       $1.elf    $1.ihex
+echo ""

@@ -39,7 +39,7 @@
 /*===========================================================================*/
 
 `define LONG_TIMEOUT
-   
+
 initial
    begin
       $display(" ===============================================");
@@ -57,7 +57,7 @@ initial
    `ifdef DBG_RST_BRK_EN
       dbg_uart_wr(CPU_CTL,  16'h0002);  // RUN
    `endif
-    
+
       // RD/WR ACCESS: CPU REGISTERS (16b)
       //--------------------------------------------------------
 
@@ -83,7 +83,7 @@ initial
       repeat(20) @(posedge mclk);
       if (r6 !== 16'hcb54)  tb_error("====== CPU REGISTERS (16b): Write R6 =====");
 
-      
+
       // RD/WR ACCESS: RAM (16b)
       //--------------------------------------------------------
 
@@ -135,16 +135,16 @@ initial
       repeat(20) @(posedge mclk);
       if (mem210 !== 16'hc4b3)  tb_error("====== RAM (8b): Write @0x211 =====");
 
-      
+
       // RD/WR ACCESS: ROM (16b)
       //--------------------------------------------------------
 
       // READ ROM
-      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h2e));  // select memory address
+      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h30));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0001);  // read memory
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h5ab7)  tb_error("====== ROM (16b): Read @0xf82e =====");
-      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h30));  // select memory address
+      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h32));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0001);  // read memory
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h6bc8)  tb_error("====== ROM (16b): Read @0xf830 =====");
@@ -166,11 +166,11 @@ initial
       //--------------------------------------------------------
 
       // READ ROM
-      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h2e));  // select memory address
+      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h30));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0009);  // read memory
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h00b7)  tb_error("====== ROM (8b): Read @0xf82e =====");
-      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h2f));  // select memory address
+      dbg_uart_wr(MEM_ADDR, ('h10000-`PMEM_SIZE+'h31));  // select memory address
       dbg_uart_wr(MEM_CTL,  16'h0009);  // read memory
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h005a)  tb_error("====== ROM (8b): Read @0xf82f =====");
@@ -187,10 +187,10 @@ initial
       repeat(20) @(posedge mclk);
       if (irq_vect_00 !== 16'h2514)  tb_error("====== ROM (8b): Write @0xffe1 =====");
 
-      
+
       // RD/WR ACCESS: PERIPHERALS (16b)
       //--------------------------------------------------------
-      
+
       // WRITE PERIPHERAL
       dbg_uart_wr(MEM_ADDR, 16'h0170);                        // select memory address
       dbg_uart_wr(MEM_DATA, 16'h9dc7);                        // write data
@@ -261,7 +261,7 @@ initial
       dbg_uart_rd(MEM_DATA);            // read data
       if (dbg_uart_buf !== 16'h00fa)  tb_error("====== Peripheral (8b): Read @0x0023 =====");
 
-     
+
       stimulus_done = 1;
 `else
 
@@ -279,4 +279,3 @@ initial
        $finish;
 `endif
    end
-

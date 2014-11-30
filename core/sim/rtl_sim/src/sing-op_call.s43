@@ -115,7 +115,7 @@ main:
 	mov     #0x0000, r5
 	mov  #TEST_ROUTINE_EDE, &DMEM_21E
 	mov     #0x5555, &DMEM_300
-	call    EDE_21E+PMEM_LENGTH            ;# CALL TEST_ROUTINE_EDE
+	call    EDE_21E            ;# CALL TEST_ROUTINE_EDE
 
 	mov     #0x7000, r15
 
@@ -133,7 +133,7 @@ main:
 
 
         /* -------------- TEST INSTRUCTION WITH SR AS ARGUMENT ------------------- */
- 
+
 
         # Addressing mode: SR
         #------------------------
@@ -141,7 +141,7 @@ main:
         mov #0x0000, r5
 	nop
         #call    r1                 ;# NOT VALID BECAUSE IT JUMPS IN THE DATA MEMORY
-	nop			    ;# WHICH IS NOT EXECUTABLE 
+	nop			    ;# WHICH IS NOT EXECUTABLE
 
         mov     #0x9000, r15
 
@@ -195,7 +195,7 @@ main:
 
         # Addressing mode: x(SR)
         #------------------------
-			
+
 	mov  #DMEM_252, r1        ;# Initialize stack pointer
 	push #TEST_ROUTINE_RN
 	push #TEST_ROUTINE_aRN
@@ -216,11 +216,11 @@ main:
         mov #0x0000, r5
 	call  10(r1)            ;# CALL #TEST_ROUTINE_aRNi (r5 = 0x9abc)
 	nop
-	
+
 	mov     #0xc000, r15
 
 
-	
+
         /* ----------------------         END OF TEST        --------------- */
 end_of_test:
 	nop

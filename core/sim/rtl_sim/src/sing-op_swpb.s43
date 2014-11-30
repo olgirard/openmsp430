@@ -128,13 +128,13 @@ main:
 	mov     #0x0102, r2        ;# Test 1
 	mov     #0x7524, &DMEM_218
 	mov     #0xaaaa, &DMEM_21A
-	swpb    EDE_218+PMEM_LENGTH            ;# SWPB (mem0c=0x7524  => {mem0c=0x2475)
+	swpb    EDE_218            ;# SWPB (mem0c=0x7524  => {mem0c=0x2475)
 	mov          r2, r5
 
 	mov     #0x0005, r2        ;# Test 2
 	mov     #0x1cb6, &DMEM_21A
 	mov     #0xaaaa, &DMEM_21C
-	swpb    EDE_21A+PMEM_LENGTH            ;# SWPB (mem0d=0x1cb6  => {mem0d=0xb61c)
+	swpb    EDE_21A            ;# SWPB (mem0d=0x1cb6  => {mem0d=0xb61c)
 	mov          r2, r7
 
 	mov     #0x5000, r15

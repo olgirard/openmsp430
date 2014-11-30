@@ -50,7 +50,7 @@ clear_mem_loop:
 	clr    0(r5)
 	incd     r5
 	dec      r4
-	jnz     clear_mem_loop 
+	jnz     clear_mem_loop
 
 
 	mov   #DMEM_252, r1        ;# Initialize stack pointer
@@ -127,11 +127,11 @@ clear_mem_loop:
 	mov   #DMEM_200, r4
 	mov     #0x8765, &DMEM_21E
 	mov     #0x5555, &DMEM_300
-	push    EDE_21E+PMEM_LENGTH            ;# PUSH (0x8765  =>  @=0x0240)
+	push    EDE_21E            ;# PUSH (0x8765  =>  @=0x0240)
 
 	mov     #0x4321, &DMEM_220
 	mov     #0x5555, &DMEM_300
-	push    EDE_220+PMEM_LENGTH            ;# PUSH (0x4321  =>  @=0x023E)
+	push    EDE_220            ;# PUSH (0x4321  =>  @=0x023E)
 
 	mov     #0x6000, r15
 
@@ -242,11 +242,11 @@ clear_mem_loop:
 	mov   #DMEM_200, r4
 	mov     #0xd10e, &DMEM_21E
 	mov     #0x5555, &DMEM_300
-	push.b  EDE_B_21E+PMEM_LENGTH          ;# PUSH (0x0e  =>  @=0x0240)
+	push.b  EDE_B_21E          ;# PUSH (0x0e  =>  @=0x0240)
 
 	mov     #0xfed0, &DMEM_220
 	mov     #0x5555, &DMEM_300
-	push.b  EDE_B_221+PMEM_LENGTH          ;# PUSH (0xfe  =>  @=0x023E)
+	push.b  EDE_B_221          ;# PUSH (0xfe  =>  @=0x023E)
 
 	mov     #0xD000, r15
 
@@ -260,7 +260,7 @@ clear_mem_loop:
 	mov     #0x1bc2, &DMEM_222
 	mov     #0x5555, &DMEM_300
 	push.b &aEDE_B_222         ;# PUSH (0xc2  =>  @=0x023C)
-	
+
 	mov     #0x3ba4, &DMEM_224
 	mov     #0x5555, &DMEM_300
 	push.b &aEDE_B_225         ;# PUSH (0x3b  =>  @=0x023A)
@@ -280,7 +280,7 @@ clear_mem_loop:
 	mov     #0xF000, r15
 
         /* -------------- TEST INSTRUCTION WITH SR AS ARGUMENT ------------------- */
- 
+
         # Addressing mode: SR
         #------------------------
 
@@ -320,16 +320,16 @@ clear_mem_loop:
 
         # Addressing mode: x(SR)
         #------------------------
-			
+
 	nop
 	push    12(r1)              ;# PUSH (r1=0x022C+12  =>  @=0x022C)
 	push    12(r1)              ;# PUSH (r1=0x022A+12  =>  @=0x022A)
 	nop
-	
+
 	mov     #0xF400, r15
 
         /* -------------- TEST POP INSTRUCTION WITH SR AS ARGUMENT ------------------- */
- 
+
         # Addressing mode: x(SR)
         #------------------------
 
@@ -350,7 +350,7 @@ clear_mem_loop:
 
         mov     #0xF600, r15
 
-			
+
         /* ----------------------         END OF TEST        --------------- */
 end_of_test:
 	nop

@@ -180,25 +180,25 @@ main:
 	mov     #0x0000, r2        ;# Test 1
 	mov     #0x3332, &DMEM_218
 	mov     #0xaaaa, &DMEM_21A
-	rrc     EDE_218+PMEM_LENGTH            ;# RRC ({C=0, mem0c=0x3332}  => {mem0c=0x1999, C=0})
+	rrc     EDE_218            ;# RRC ({C=0, mem0c=0x3332}  => {mem0c=0x1999, C=0})
 	mov          r2, r5
 
 	mov     #0x0000, r2        ;# Test 2
 	mov     #0x3333, &DMEM_21A
 	mov     #0xaaaa, &DMEM_21C
-	rrc     EDE_21A+PMEM_LENGTH            ;# RRC ({C=0, mem0d=0x3333}  => {mem0d=0x1999, C=1})
+	rrc     EDE_21A            ;# RRC ({C=0, mem0d=0x3333}  => {mem0d=0x1999, C=1})
 	mov          r2, r7
 
 	mov     #0x0001, r2        ;# Test 3
 	mov     #0x3332, &DMEM_21C
 	mov     #0xaaaa, &DMEM_21E
-	rrc     EDE_21C+PMEM_LENGTH            ;# RRC ({C=1, mem0e=0x3332}  => {mem0e=0x9999, C=0})
+	rrc     EDE_21C            ;# RRC ({C=1, mem0e=0x3332}  => {mem0e=0x9999, C=0})
 	mov          r2, r9
 
 	mov     #0x0001, r2        ;# Test 4
 	mov     #0x3333, &DMEM_21E
 	mov     #0xaaaa, &DMEM_220
-	rrc     EDE_21E+PMEM_LENGTH            ;# RRC ({C=1, mem0f=0x3333}  => {mem0f=0x9999, C=1})
+	rrc     EDE_21E            ;# RRC ({C=1, mem0f=0x3333}  => {mem0f=0x9999, C=1})
 	mov          r2, r11
 
 	mov     #0x5000, r15
@@ -245,7 +245,7 @@ clear_mem_loop:
 	clr    0(r5)
 	incd     r5
 	dec      r4
-	jnz     clear_mem_loop 
+	jnz     clear_mem_loop
 
 	mov     #0x7000, r15
 
@@ -489,25 +489,25 @@ clear_mem_loop:
 	mov     #0x0000, r2        ;# Test 1
 	mov     #0x2532, &DMEM_230
 	mov     #0xaaaa, &DMEM_232
-	rrc.b   EDE_230+PMEM_LENGTH            ;# RRC ({C=0, mem18=0x2532}  => {mem18=0x2519, C=0})
+	rrc.b   EDE_230            ;# RRC ({C=0, mem18=0x2532}  => {mem18=0x2519, C=0})
 	mov          r2, r5
 
 	mov     #0x0000, r2        ;# Test 2
 	mov     #0x2533, &DMEM_232
 	mov     #0xaaaa, &DMEM_234
-	rrc.b   EDE_232+PMEM_LENGTH            ;# RRC ({C=0, mem19=0x2533}  => {mem19=0x2519, C=1})
+	rrc.b   EDE_232            ;# RRC ({C=0, mem19=0x2533}  => {mem19=0x2519, C=1})
 	mov          r2, r7
 
 	mov     #0x0001, r2        ;# Test 3
 	mov     #0x2532, &DMEM_234
 	mov     #0xaaaa, &DMEM_236
-	rrc.b   EDE_234+PMEM_LENGTH            ;# RRC ({C=1, mem1a=0x2532}  => {mem1a=0x2599, C=0})
+	rrc.b   EDE_234            ;# RRC ({C=1, mem1a=0x2532}  => {mem1a=0x2599, C=0})
 	mov          r2, r9
 
 	mov     #0x0001, r2        ;# Test 4
 	mov     #0x2533, &DMEM_236
 	mov     #0xaaaa, &DMEM_238
-	rrc.b   EDE_236+PMEM_LENGTH            ;# RRC ({C=1, mem1b=0x2533}  => {mem1b=0x2599, C=1})
+	rrc.b   EDE_236            ;# RRC ({C=1, mem1b=0x2533}  => {mem1b=0x2599, C=1})
 	mov          r2, r11
 
 	mov     #0xC000, r15
@@ -522,25 +522,25 @@ clear_mem_loop:
 	mov     #0x0000, r2        ;# Test 1
 	mov     #0x3225, &DMEM_238
 	mov     #0xaaaa, &DMEM_23A
-	rrc.b   EDE_239+PMEM_LENGTH            ;# RRC ({C=0, mem1c=0x3225}  => {mem1c=0x1925, C=0})
+	rrc.b   EDE_239            ;# RRC ({C=0, mem1c=0x3225}  => {mem1c=0x1925, C=0})
 	mov          r2, r5
 
 	mov     #0x0000, r2        ;# Test 2
 	mov     #0x3325, &DMEM_23A
 	mov     #0xaaaa, &DMEM_23C
-	rrc.b   EDE_23B+PMEM_LENGTH            ;# RRC ({C=0, mem1d=0x3325}  => {mem1d=0x1925, C=1})
+	rrc.b   EDE_23B            ;# RRC ({C=0, mem1d=0x3325}  => {mem1d=0x1925, C=1})
 	mov          r2, r7
 
 	mov     #0x0001, r2        ;# Test 3
 	mov     #0x3225, &DMEM_23C
 	mov     #0xaaaa, &DMEM_23E
-	rrc.b   EDE_23D+PMEM_LENGTH            ;# RRC ({C=1, mem1e=0x3225}  => {mem1e=0x9925, C=0})
+	rrc.b   EDE_23D            ;# RRC ({C=1, mem1e=0x3225}  => {mem1e=0x9925, C=0})
 	mov          r2, r9
 
 	mov     #0x0001, r2        ;# Test 4
 	mov     #0x3325, &DMEM_23E
 	mov     #0xaaaa, &DMEM_240
-	rrc.b   EDE_23F+PMEM_LENGTH            ;# RRC ({C=1, mem1f=0x3325}  => {mem1f=0x9925, C=1})
+	rrc.b   EDE_23F            ;# RRC ({C=1, mem1f=0x3325}  => {mem1f=0x9925, C=1})
 	mov          r2, r11
 
 	mov     #0xC001, r15
