@@ -72,7 +72,7 @@ always @(posedge mclk or posedge puc_rst)
   else         wkup2_sync <= {wkup2_sync[0], wkup[2]};
 
 always @(wkup2_sync)
-  irq[2] = wkup2_sync[1];
+  irq[`IRQ_NR-14] = wkup2_sync[1]; // IRQ-2
    
 // Wakeup synchronizer to generate IRQ
 reg [1:0] wkup3_sync;
@@ -81,7 +81,7 @@ always @(posedge mclk or posedge puc_rst)
   else         wkup3_sync <= {wkup3_sync[0], wkup[3]};
 
 always @(wkup3_sync)
-  irq[3] = wkup3_sync[1];
+  irq[`IRQ_NR-13] = wkup3_sync[1]; // IRQ-3
    
 
 initial
@@ -96,10 +96,10 @@ initial
       // Enable debug interface
       dbg_en  = 1;
 
-      irq[2]  = 0;
+      irq[`IRQ_NR-14]  = 0;
       wkup[2] = 0;
 
-      irq[3]  = 0;
+      irq[`IRQ_NR-13]  = 0;
       wkup[3] = 0;
 
       //$display("dco_clk_cnt: %d / mclk_cnt: %d / smclk_cnt: %d / aclk_cnt: %d / inst_cnt: %d ", dco_clk_cnt, mclk_cnt, smclk_cnt, aclk_cnt, inst_cnt);
@@ -154,7 +154,7 @@ initial
 
       @(posedge dco_clk);                //---------- PORT1 IRQ TRIAL (STAYING IN POWER MODE) -------------//
       wkup[2] = 1'b1;
-      @(posedge irq_acc[2]);
+      @(posedge irq_acc[`IRQ_NR-14]); // IRQ_ACC-2
       #(10*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -190,7 +190,7 @@ initial
 
                                          //---------- PORT2 IRQ TRIAL (EXITING POWER MODE) -------------//
       wkup[3] = 1'b1;
-      @(posedge irq_acc[3]);
+      @(posedge irq_acc[`IRQ_NR-13]); // IRQ_ACC-3
       #(10*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -253,7 +253,7 @@ initial
 
       #(1*50);                           //---------- PORT1 IRQ TRIAL (STAYING IN POWER MODE) -------------//
       wkup[2] = 1'b1;
-      @(posedge irq_acc[2]);
+      @(posedge irq_acc[`IRQ_NR-14]); // IRQ_ACC-2
       #(10*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -289,7 +289,7 @@ initial
 
                                          //---------- PORT2 IRQ TRIAL (EXITING POWER MODE) -------------//
       wkup[3] = 1'b1;
-      @(posedge irq_acc[3]);
+      @(posedge irq_acc[`IRQ_NR-13]); // IRQ_ACC-3
       #(10*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -353,7 +353,7 @@ initial
 
       #(1*50);                           //---------- PORT1 IRQ TRIAL (STAYING IN POWER MODE) -------------//
       wkup[2] = 1'b1;
-      @(posedge irq_acc[2]);
+      @(posedge irq_acc[`IRQ_NR-14]); // IRQ_ACC-2
       #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -393,7 +393,7 @@ initial
 
                                          //---------- PORT2 IRQ TRIAL (EXITING POWER MODE) -------------//
       wkup[3] = 1'b1;
-      @(posedge irq_acc[3]);
+      @(posedge irq_acc[`IRQ_NR-13]); // IRQ_ACC-3
       #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -457,7 +457,7 @@ initial
 
       #(1*50);                           //---------- PORT1 IRQ TRIAL (STAYING IN POWER MODE) -------------//
       wkup[2] = 1'b1;
-      @(posedge irq_acc[2]);
+      @(posedge irq_acc[`IRQ_NR-14]); // IRQ_ACC-2
       #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -497,7 +497,7 @@ initial
 
                                          //---------- PORT2 IRQ TRIAL (EXITING POWER MODE) -------------//
       wkup[3] = 1'b1;
-      @(posedge irq_acc[3]);
+      @(posedge irq_acc[`IRQ_NR-13]); // IRQ_ACC-3
       #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -569,7 +569,7 @@ initial
 
       #(1*50);                           //---------- PORT1 IRQ TRIAL (STAYING IN POWER MODE) -------------//
       wkup[2] = 1'b1;
-      @(posedge irq_acc[2]);
+      @(posedge irq_acc[`IRQ_NR-14]); // IRQ_ACC-2
       #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;
@@ -617,7 +617,7 @@ initial
 
                                          //---------- PORT2 IRQ TRIAL (EXITING POWER MODE) -------------//
       wkup[3] = 1'b1;
-      @(posedge irq_acc[3]);
+      @(posedge irq_acc[`IRQ_NR-13]); // IRQ_ACC-3
       #(100*50);
       dco_clk_cnt  = 0;
       mclk_cnt     = 0;

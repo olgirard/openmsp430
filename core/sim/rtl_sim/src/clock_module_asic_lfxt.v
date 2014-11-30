@@ -92,13 +92,13 @@ initial
       // Generate IRQ and make sure CPU re-runs with LFXT_CLK
       //--------------------------------------------------------
 
-      wkup[0]   = 1'b1;
+      wkup[0]          = 1'b1;
       @(negedge mclk);
-      irq[0]    = 1'b1;
-      @(negedge irq_acc[0])
+      irq[`IRQ_NR-16]  = 1'b1;
+      @(negedge irq_acc[`IRQ_NR-16])
       @(negedge mclk);
-      wkup[0]   = 1'b0;
-      irq[0]    = 1'b0;
+      wkup[0]          = 1'b0;
+      irq[`IRQ_NR-16]    = 1'b0;
 
       @(r15 === 16'h0003);
       #10;
