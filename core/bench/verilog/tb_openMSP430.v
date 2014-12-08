@@ -21,9 +21,9 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: tb_openMSP430.v
-// 
+//
 // *Module Description:
 //                      openMSP430 testbench
 //
@@ -119,7 +119,7 @@ wire               ta_out1;
 wire               ta_out1_en;
 wire               ta_out2;
 wire               ta_out2_en;
-   
+
 // Clock / Reset & Interrupts
 reg                dco_clk;
 wire               dco_enable;
@@ -143,7 +143,7 @@ wire [`IRQ_NR-3:0] irq_in;
 reg                cpu_en;
 reg         [13:0] wkup;
 wire        [13:0] wkup_in;
-   
+
 // Scan (ASIC version only)
 reg                scan_enable;
 reg                scan_mode;
@@ -189,8 +189,9 @@ wire    [8*32-1:0] inst_full;
 wire        [31:0] inst_number;
 wire        [15:0] inst_pc;
 wire    [8*32-1:0] inst_short;
-   
+
 // Testbench variables
+integer            tb_idx;
 integer            error;
 reg                stimulus_done;
 
@@ -209,14 +210,20 @@ reg                stimulus_done;
 // Verilog stimulus
 `include "stimulus.v"
 
-   
+
 //
-// Initialize ROM
+// Initialize Memory
 //------------------------------
 initial
   begin
+     // Initialize data memory
+     for (tb_idx=0; tb_idx < `DMEM_SIZE/2; tb_idx=tb_idx+1)
+       dmem_0.mem[tb_idx] = 16'h0000;
+
+     // Initialize program memory
      #10 $readmemh("./pmem.mem", pmem_0.mem);
   end
+
 
 //
 // Generate Clock & Reset
@@ -299,7 +306,7 @@ initial
      scan_mode               = 1'b0;
   end
 
-   
+
 //
 // Program Memory
 //----------------------------------
@@ -433,7 +440,7 @@ omsp_gpio #(.P1_EN(1),
     .p6_dout_en   (p6_dout_en),        // Port 6 data output enable
     .p6_sel       (p6_sel),            // Port 6 function select
     .per_dout     (per_dout_dio),      // Peripheral data output
-                             
+
 // INPUTs
     .mclk         (mclk),              // Main system clock
     .p1_din       (p1_din),            // Port 1 data input
@@ -486,7 +493,7 @@ omsp_timerA timerA_0 (
     .ta_cci2b     (ta_cci2b),          // Timer A compare 2 input B
     .taclk        (taclk)              // TACLK external timer clock (SLOW)
 );
-   
+
 
 //
 // Peripheral templates
@@ -575,8 +582,8 @@ assign wkup_in = wkup | {1'b0,                 // Vector 13  (0xFFFA)
 
 // I2C Bus
 //.........................
-pullup dbg_scl_inst (dbg_scl); 
-pullup dbg_sda_inst (dbg_sda); 
+pullup dbg_scl_inst (dbg_scl);
+pullup dbg_sda_inst (dbg_sda);
 
 // I2C Slave (openMSP430)
 //.........................
@@ -586,7 +593,7 @@ io_cell scl_slave_inst (
   .data_out_en (1'b0),                // Output enable
   .data_out    (1'b0)                 // Output
 );
-                                                           
+
 io_cell sda_slave_inst (
   .pad         (dbg_sda),             // I/O pad
   .data_in     (dbg_sda_slave_in),    // Input
@@ -602,7 +609,7 @@ io_cell scl_master_inst (
   .data_out_en (!dbg_scl_master),     // Output enable
   .data_out    (1'b0)                 // Output
 );
-                                                                   
+
 io_cell sda_master_inst (
   .pad         (dbg_sda),             // I/O pad
   .data_in     (dbg_sda_master_in),   // Input
@@ -663,10 +670,10 @@ initial // Timeout
    `else
      `ifdef VERY_LONG_TIMEOUT
        #500000000;
-     `else     
+     `else
      `ifdef LONG_TIMEOUT
        #5000000;
-     `else     
+     `else
        #500000;
      `endif
      `endif
@@ -682,7 +689,7 @@ initial // Normal end of test
   begin
      @(negedge stimulus_done);
      wait(inst_pc=='hffff);
-     
+
      $display(" ===============================================");
      if (error!=0)
        begin
@@ -694,7 +701,7 @@ initial // Normal end of test
           $display("|               SIMULATION FAILED               |");
           $display("|     (the verilog stimulus didn't complete)    |");
        end
-     else 
+     else
        begin
           $display("|               SIMULATION PASSED               |");
        end

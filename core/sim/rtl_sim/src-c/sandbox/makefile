@@ -1,12 +1,11 @@
 # makfile configuration
 NAME            = sandbox
-OBJECTS         = main.o
+OBJECTS         = main.o copydata.o
 
-#CFLAGS          = -O2 -Wall -g                                          # Old flags
-CFLAGS          = -O2 -Wall -g -mcpu=430 -mivcnt=16 -mmpy=none           # Uniarch flags
+CFLAGS          =  -O2 -Wall -g -mcpu=msp430 -mhwmult=none
 
 #switch the compiler (for the internal make rules)
-CC              = msp430-gcc
+CC              = msp430-elf-gcc
 
 
 .PHONY: all FORCE clean download download-jtag download-bsl dist
@@ -21,19 +20,13 @@ download: download-uart
 
 #additional rules for files
 ${NAME}.elf: ${OBJECTS}
-	${CC} -T linker.x -o $@ ${OBJECTS}
+	${CC} -mcpu=msp430 -T linker.x -o $@ ${OBJECTS}
 
 ${NAME}.a43: ${NAME}.elf
-	msp430-objcopy -O ihex $^ $@
+	msp430-elf-objcopy -O ihex $^ $@
 
 ${NAME}.lst: ${NAME}.elf
-	msp430-objdump -dSt $^ >$@
-
-download-jtag: all
-	msp430-jtag -e ${NAME}.elf
-
-download-bsl: all
-	msp430-bsl -e ${NAME}.elf
+	msp430-elf-objdump -dSt $^ >$@
 
 download-uart: all
 	openmsp430-loader.tcl -device /dev/ttyUSB0 -baudrate 115200 ${NAME}.elf
@@ -50,4 +43,4 @@ FORCE:
 
 #project dependencies
 main.o: main.c
-
+copydata.o: copydata.c
