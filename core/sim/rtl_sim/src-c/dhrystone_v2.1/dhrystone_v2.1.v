@@ -41,7 +41,7 @@ time dhry_start_time, dhry_end_time;
 real dhry_per_sec,    dhry_mips,     dhry_mips_per_mhz;
 
 integer Number_Of_Runs;
-  
+
 initial
    begin
       $display(" ===============================================");
@@ -54,16 +54,16 @@ initial
       // Check CPU configuration
       //---------------------------------------
 
-      if ((`PMEM_SIZE !== 24576) || (`DMEM_SIZE !== 16384))
+      if ((`PMEM_SIZE !== 41984) || (`DMEM_SIZE !== 16384))
         begin
            $display(" ===============================================");
            $display("|               SIMULATION ERROR                |");
            $display("|                                               |");
            $display("|  Core must be configured for:                 |");
-           $display("|               - 24kB program memory           |");
+           $display("|               - 41kB program memory           |");
            $display("|               - 16kB data memory              |");
            $display(" ===============================================");
-           $finish;        
+           $finish;
         end
 
       //---------------------------------------
@@ -97,13 +97,13 @@ initial
       dhry_start_time = $time;
       $timeformat(-3, 3, " ms", 10);
       $display("\nINFO-VERILOG: Dhrystone loop started at %t ", dhry_start_time);
- 
+
       // Detect end of run
       @(negedge p3_dout[0]);
       dhry_end_time = $time;
       $timeformat(-3, 3, " ms", 10);
       $display("INFO-VERILOG: Dhrystone loop ended   at %t ",   dhry_end_time);
- 
+
       // Compute results
       $timeformat(-9, 3, " ns", 10);
       dhry_per_sec      = (Number_Of_Runs*1000000000)/(dhry_end_time - dhry_start_time);
@@ -119,7 +119,7 @@ initial
       // Wait for the end of C-code execution
       //---------------------------------------
       @(posedge p4_dout[0]);
- 
+
       stimulus_done = 1;
 
       $display(" ===============================================");

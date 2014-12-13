@@ -26,9 +26,9 @@
 // THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: openMSP430_defines.v
-// 
+//
 // *Module Description:
 //                      openMSP430 Configuration file
 //
@@ -65,14 +65,14 @@
 //`define PMEM_SIZE_54_KB
 //`define PMEM_SIZE_51_KB
 //`define PMEM_SIZE_48_KB
-//`define PMEM_SIZE_41_KB
+`define PMEM_SIZE_41_KB
 //`define PMEM_SIZE_32_KB
 //`define PMEM_SIZE_24_KB
 //`define PMEM_SIZE_16_KB
 //`define PMEM_SIZE_12_KB
 //`define PMEM_SIZE_8_KB
 //`define PMEM_SIZE_4_KB
-`define PMEM_SIZE_2_KB
+//`define PMEM_SIZE_2_KB
 //`define PMEM_SIZE_1_KB
 
 
@@ -82,7 +82,7 @@
 //`define DMEM_SIZE_CUSTOM
 //`define DMEM_SIZE_32_KB
 //`define DMEM_SIZE_24_KB
-//`define DMEM_SIZE_16_KB
+`define DMEM_SIZE_16_KB
 //`define DMEM_SIZE_10_KB
 //`define DMEM_SIZE_8_KB
 //`define DMEM_SIZE_5_KB
@@ -92,7 +92,7 @@
 //`define DMEM_SIZE_1_KB
 //`define DMEM_SIZE_512_B
 //`define DMEM_SIZE_256_B
-`define DMEM_SIZE_128_B
+//`define DMEM_SIZE_128_B
 
 
 // Include/Exclude Hardware Multiplier
@@ -144,9 +144,9 @@
 // Indicates the number of interrupt vectors supported
 // (16, 32 or 64).
 //-------------------------------------------------------
-//`define IRQ_16
+`define IRQ_16
 //`define IRQ_32
-`define IRQ_64
+//`define IRQ_64
 
 
 //-------------------------------------------------------
@@ -871,7 +871,7 @@ CONFIGURATION ERROR: I2C OR UART DEBUG INTERFACE SHOULD BE ENABLED
 // the 16x16 multiplier (1 cycle) instead of the
 // default 16x8 multplier (2 cycles)
 //`define MPY_16x16
-  
+
 //======================================
 // CONFIGURATION CHECKS
 //======================================
@@ -896,7 +896,7 @@ CONFIGURATION ERROR: THE MCLK_MUX CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENAB
  `endif
  `ifdef SMCLK_MUX
 CONFIGURATION ERROR: THE SMCLK_MUX CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
- `endif   
+ `endif
  `ifdef WATCHDOG_MUX
 CONFIGURATION ERROR: THE WATCHDOG_MUX CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
  `else
@@ -906,5 +906,5 @@ CONFIGURATION ERROR: THE WATCHDOG_NOMUX_ACLK CAN ONLY BE ENABLED IF THE LFXT_DOM
  `endif
  `ifdef OSCOFF_EN
 CONFIGURATION ERROR: THE OSCOFF LOW POWER MODE CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
- `endif   
+ `endif
 `endif

@@ -1,18 +1,17 @@
 # makfile configuration
 NAME            = dhrystone_v2.1
-OBJECTS         = dhry_1.o dhry_2.o omsp_func.o
+OBJECTS         = dhry_1.o dhry_2.o omsp_func.o copydata.o
 
 # disable some warnings specific to the Dhrystone code
 WARNINGS        =  -Wall -Wno-implicit-int -Wno-implicit-function-declaration -Wno-return-type
 
-#CFLAGS         = -O2  ${WARNINGS} -g                                          # Old flags
-#CFLAGS          = -O1 ${WARNINGS} -g -mcpu=430 -mivcnt=16 -mmpy=16            # Uniarch flags     #   DMIPS=0.377632
-#CFLAGS          = -Os ${WARNINGS} -g -mcpu=430 -mivcnt=16 -mmpy=16            # Uniarch flags     #   DMIPS=0.373193
-#CFLAGS          = -O2 ${WARNINGS} -g -mcpu=430 -mivcnt=16 -mmpy=16            # Uniarch flags     #   DMIPS=0.396044
-CFLAGS          = -O3 ${WARNINGS} -g -mcpu=430 -mivcnt=16 -mmpy=16            # Uniarch flags     #   DMIPS=0.400228
+#CFLAGS		 = -O1 ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit       # DMIPS=0.377632
+#CFLAGS		 = -Os ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit       # DMIPS=0.373193
+#CFLAGS		 = -O2 ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit       # DMIPS=0.396044
+CFLAGS		= -O3 ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit       # DMIPS=0.400228
 
 #switch the compiler (for the internal make rules)
-CC              = msp430-gcc
+CC              = msp430-elf-gcc
 
 
 .PHONY: all FORCE clean download download-jtag download-bsl dist
@@ -20,26 +19,18 @@ CC              = msp430-gcc
 #all should be the first target. it's built when make is runwithout args
 all: ${NAME}.elf ${NAME}.a43 ${NAME}.lst
 
-#confgigure the next line if you want to use the serial download
+#configure the next line if you want to use the serial download
 download: download-uart
-#download: download-jtag
-#download: download-bsl
 
 #additional rules for files
 ${NAME}.elf: ${OBJECTS}
-	${CC} -T linker.x -o $@ ${OBJECTS}
+	${CC} -mcpu=msp430 -T linker.x -o $@ ${OBJECTS}
 
 ${NAME}.a43: ${NAME}.elf
-	msp430-objcopy -O ihex $^ $@
+	msp430-elf-objcopy -O ihex $^ $@
 
 ${NAME}.lst: ${NAME}.elf
-	msp430-objdump -dSt $^ >$@
-
-download-jtag: all
-	msp430-jtag -e ${NAME}.elf
-
-download-bsl: all
-	msp430-bsl -e ${NAME}.elf
+	msp430-elf-objdump -dSt $^ >$@
 
 download-uart: all
 	openmsp430-loader.tcl -device /dev/ttyUSB0 -baudrate 115200 ${NAME}.elf
@@ -58,4 +49,4 @@ FORCE:
 dhry_1.o: dhry_1.c
 dhry_2.o: dhry_2.c
 omsp_func.o: omsp_func.c
-
+copydata.o: copydata.c

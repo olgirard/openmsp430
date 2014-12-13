@@ -38,13 +38,11 @@ OUTPUT_ARCH(msp430)
 ENTRY(_start)
 
 MEMORY {
-  SFR              : ORIGIN = 0x0000, LENGTH = 0x0010 /* END=0x0010, size 16 */
-  PERIPHERAL_8BIT  : ORIGIN = 0x0010, LENGTH = 0x00F0 /* END=0x0100, size 240 */
-  PERIPHERAL_16BIT : ORIGIN = 0x0100, LENGTH = 0x0100 /* END=0x0200, size 256 */
-  RAM              : ORIGIN = 0x0200, LENGTH = 0x0080 /* END=0x027F, size 128 */
-  INFOMEM          : ORIGIN = 0x1080, LENGTH = 0x0080 /* END=0x10FF, size 128 as 1 128-byte segments */
-  INFOA            : ORIGIN = 0x1080, LENGTH = 0x0080 /* END=0x10FF, size 128 */
-  ROM (rx)         : ORIGIN = 0xFC00, LENGTH = 0x03E0 /* END=0xFFDF, size 992 */
+  SFR              : ORIGIN = 0x0000, LENGTH = 0x0010
+  PERIPHERAL_8BIT  : ORIGIN = 0x0010, LENGTH = 0x00F0
+  PERIPHERAL_16BIT : ORIGIN = 0x0100, LENGTH = 0x0100
+  RAM              : ORIGIN = 0x0200, LENGTH = 0x4000
+  ROM (rx)         : ORIGIN = 0xA000, LENGTH = 0x6000-0x20
   VECT1            : ORIGIN = 0xFFE0, LENGTH = 0x0002
   VECT2            : ORIGIN = 0xFFE2, LENGTH = 0x0002
   VECT3            : ORIGIN = 0xFFE4, LENGTH = 0x0002
@@ -206,8 +204,6 @@ SECTIONS
     PROVIDE (__stack = .);
     *(.stack)
   }
-
-  .infoA     : {} > INFOA              /* MSP430 INFO FLASH MEMORY SEGMENTS */
 
   .MP430.attributes 0 :
   {

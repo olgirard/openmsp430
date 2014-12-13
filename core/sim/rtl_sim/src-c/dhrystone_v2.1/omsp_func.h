@@ -121,4 +121,4 @@
 // FUNCTIONS
 //=============================================================================
 
-int putchar (int txdata);
+//int putchar (int txdata);
