@@ -58,7 +58,7 @@ main:
 
 
         /* ---------------------- TEST WHEN SOURCE IS Rn ------------------- */
-.set   Rn_EDE,  DMEM_212
+.set   Rn_EDE,  DMEM_212+PMEM_EDE_LENGTH
 .set   Rn_TONY, DMEM_214
 
         mov     #0x4444, r4
@@ -90,7 +90,7 @@ test_Rn_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS @Rn ------------------ */
-.set   aRn_EDE,  DMEM_212
+.set   aRn_EDE,  DMEM_212+PMEM_EDE_LENGTH
 .set   aRn_TONY, DMEM_214
 
         mov   #DMEM_200, r4
@@ -128,7 +128,7 @@ test_aRn_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS @Rn+ ----------------- */
-.set   aRni_EDE,  DMEM_212
+.set   aRni_EDE,  DMEM_212+PMEM_EDE_LENGTH
 .set   aRni_TONY, DMEM_214
 
         mov   #DMEM_200, r4
@@ -166,7 +166,7 @@ test_aRni_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS #N ------------------- */
-.set   N_EDE,  DMEM_210
+.set   N_EDE,  DMEM_210+PMEM_EDE_LENGTH
 .set   N_TONY, DMEM_206
 
         mov      #0x3210, r4
@@ -194,7 +194,7 @@ test_N_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS x(Rn) ---------------- */
-.set   xRn_EDE,  DMEM_220
+.set   xRn_EDE,  DMEM_220+PMEM_EDE_LENGTH
 .set   xRn_TONY, DMEM_208
 
         mov      #0x8347, &DMEM_210
@@ -233,14 +233,14 @@ test_xRn_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS 'EDE' ---------------- */
-.set   EDE_EDE,  DMEM_216
+.set   EDE_EDE,  DMEM_216+PMEM_EDE_LENGTH
 .set   EDE_TONY, DMEM_212
 
-.set   EDE_200,  DMEM_200
-.set   EDE_202,  DMEM_202
-.set   EDE_204,  DMEM_204
-.set   EDE_206,  DMEM_206
-.set   EDE_208,  DMEM_208
+.set   EDE_200,  DMEM_200+PMEM_EDE_LENGTH
+.set   EDE_202,  DMEM_202+PMEM_EDE_LENGTH
+.set   EDE_204,  DMEM_204+PMEM_EDE_LENGTH
+.set   EDE_206,  DMEM_206+PMEM_EDE_LENGTH
+.set   EDE_208,  DMEM_208+PMEM_EDE_LENGTH
 
         mov      #0xc3d6, &DMEM_200
         mov      #0x1234, &DMEM_204
@@ -279,7 +279,7 @@ test_EDE_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS '&EDE' --------------- */
-.set   aEDE_EDE,  DMEM_218
+.set   aEDE_EDE,  DMEM_218+PMEM_EDE_LENGTH
 .set   aEDE_TONY, DMEM_202
 
         mov      #0x23d4, &DMEM_200
@@ -318,12 +318,12 @@ test_aEDE_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS CONSTANT ------------- */
-.set   CONST_EDE0,   DMEM_220
-.set   CONST_EDE1,   DMEM_222
-.set   CONST_EDE2,   DMEM_224
-.set   CONST_EDE4,   DMEM_226
-.set   CONST_EDE8,   DMEM_228
-.set   CONST_EDEm1,  DMEM_22A
+.set   CONST_EDE0,   DMEM_220+PMEM_EDE_LENGTH
+.set   CONST_EDE1,   DMEM_222+PMEM_EDE_LENGTH
+.set   CONST_EDE2,   DMEM_224+PMEM_EDE_LENGTH
+.set   CONST_EDE4,   DMEM_226+PMEM_EDE_LENGTH
+.set   CONST_EDE8,   DMEM_228+PMEM_EDE_LENGTH
+.set   CONST_EDEm1,  DMEM_22A+PMEM_EDE_LENGTH
 
 .set   CONST_TONY0,  DMEM_230
 .set   CONST_TONY1,  DMEM_232

@@ -71,7 +71,7 @@ initial
       @(negedge irq_acc[`IRQ_NR-16])
       wkup[0]            = 1'b0;
       irq[`IRQ_NR-16]    = 1'b0;
-      
+
       @(r15==16'h1002);
       nmi       = 1'b0;
 
@@ -81,7 +81,7 @@ initial
       if (r12   !==16'h0000)  tb_error("====== NMI disabled: flag was not cleared    =====");
       if (r11   !==16'h0000)  tb_error("====== NMI disabled: flag is set             =====");
 
- 
+
       // Test NMI rising edge
       //--------------------------
       @(r15==16'h2000);
@@ -126,8 +126,18 @@ initial
       // Test NMI falling edge
       //--------------------------
       @(r15==16'h3000);
+`ifdef WATCHDOG
       $display(" Test NMI falling edge");
-      
+`else
+      $display(" Skip NMI falling edge (Watchdog is not included)");
+`endif
+//ERROR:  ====== NMI falling edge: NMI irq was taken with rising edge =====              1208250
+//ERROR:                 ====== NMI falling edge: CPU is not sleeping =====              1208250
+//ERROR:                 ====== NMI falling edge: CPU is not sleeping =====              1228250
+//ERROR:  ====== NMI falling edge: NMI irq was taken with rising edge =====              1328250
+//ERROR:                 ====== NMI falling edge: CPU is not sleeping =====              1328250
+//ERROR:                 ====== NMI falling edge: CPU is not sleeping =====              1348250
+
       @(r15==16'h3001);
 
       #(2000);
@@ -138,10 +148,14 @@ initial
       nmi      = 1'b1;
 
       #(2000);
+`ifdef WATCHDOG
       if (r6       !==16'h0000)  tb_error("====== NMI falling edge: NMI irq was taken with rising edge =====");
       if (inst_cnt !==16'h0000)  tb_error("====== NMI falling edge: CPU is not sleeping =====");
       #(2000);
       if (inst_cnt !==16'h0000)  tb_error("====== NMI falling edge: CPU is not sleeping =====");
+`else
+      #(2000);
+`endif
       #(2000);
       nmi      = 1'b0;
 
@@ -155,10 +169,14 @@ initial
       nmi      = 1'b1;
 
       #(2000);
+`ifdef WATCHDOG
       if (r6       !==16'h0001)  tb_error("====== NMI falling edge: NMI irq was taken with rising edge =====");
       if (inst_cnt !==16'h0000)  tb_error("====== NMI falling edge: CPU is not sleeping =====");
       #(2000);
       if (inst_cnt !==16'h0000)  tb_error("====== NMI falling edge: CPU is not sleeping =====");
+`else
+      #(2000);
+`endif
       #(2000);
       nmi      = 1'b0;
 
@@ -170,12 +188,11 @@ initial
       if (inst_cnt ===16'h0000)  tb_error("====== NMI falling edge: CPU is not out of LPM4 =====");
       #(2000);
 
-
       // Test NMI nested from Maskable-IRQ
       //-----------------------------------
       @(r15==16'h4000);
       $display(" Test NMI nested from Maskable-IRQ");
-      
+
       @(r15==16'h4001);
       #(2000);
       inst_cnt = 0;
@@ -205,4 +222,3 @@ initial
 
       stimulus_done = 1;
    end
-

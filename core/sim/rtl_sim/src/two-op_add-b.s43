@@ -58,8 +58,8 @@ main:
 
 
         /* ---------------------- TEST WHEN SOURCE IS Rn ------------------- */
-.set   Rn_EDEL,  DMEM_214
-.set   Rn_EDEH,  DMEM_217
+.set   Rn_EDEL,  DMEM_214+PMEM_EDE_LENGTH
+.set   Rn_EDEH,  DMEM_217+PMEM_EDE_LENGTH
 .set   Rn_TONYL, DMEM_218
 .set   Rn_TONYH, DMEM_21B
 
@@ -93,10 +93,10 @@ main:
 
 
         /* ---------------------- TEST WHEN SOURCE IS @Rn ------------------ */
-.set   aRn_EDE_218,  DMEM_218
-.set   aRn_EDE_21B,  DMEM_21B
-.set   aRn_EDE_21C,  DMEM_21C
-.set   aRn_EDE_21F,  DMEM_21F
+.set   aRn_EDE_218,  DMEM_218+PMEM_EDE_LENGTH
+.set   aRn_EDE_21B,  DMEM_21B+PMEM_EDE_LENGTH
+.set   aRn_EDE_21C,  DMEM_21C+PMEM_EDE_LENGTH
+.set   aRn_EDE_21F,  DMEM_21F+PMEM_EDE_LENGTH
 
 .set   aRn_TONY_220, DMEM_220
 .set   aRn_TONY_223, DMEM_223
@@ -173,10 +173,10 @@ main:
 
 
         /* ---------------------- TEST WHEN SOURCE IS @Rn+ ----------------- */
-.set   aRni_EDE_218,  DMEM_218
-.set   aRni_EDE_21B,  DMEM_21B
-.set   aRni_EDE_21C,  DMEM_21C
-.set   aRni_EDE_21F,  DMEM_21F
+.set   aRni_EDE_218,  DMEM_218+PMEM_EDE_LENGTH
+.set   aRni_EDE_21B,  DMEM_21B+PMEM_EDE_LENGTH
+.set   aRni_EDE_21C,  DMEM_21C+PMEM_EDE_LENGTH
+.set   aRni_EDE_21F,  DMEM_21F+PMEM_EDE_LENGTH
 
 .set   aRni_TONY_220, DMEM_220
 .set   aRni_TONY_223, DMEM_223
@@ -253,10 +253,10 @@ main:
 
 
         /* ---------------------- TEST WHEN SOURCE IS #N ------------------- */
-.set   N_EDE_218,  DMEM_218
-.set   N_EDE_21B,  DMEM_21B
-.set   N_EDE_21C,  DMEM_21C
-.set   N_EDE_21F,  DMEM_21F
+.set   N_EDE_218,  DMEM_218+PMEM_EDE_LENGTH
+.set   N_EDE_21B,  DMEM_21B+PMEM_EDE_LENGTH
+.set   N_EDE_21C,  DMEM_21C+PMEM_EDE_LENGTH
+.set   N_EDE_21F,  DMEM_21F+PMEM_EDE_LENGTH
 
 .set   N_TONY_220, DMEM_220
 .set   N_TONY_223, DMEM_223
@@ -300,10 +300,10 @@ main:
 
 
         /* ---------------------- TEST WHEN SOURCE IS x(Rn) ---------------- */
-.set   xRn_EDE_218,  DMEM_218
-.set   xRn_EDE_21B,  DMEM_21B
-.set   xRn_EDE_21C,  DMEM_21C
-.set   xRn_EDE_21F,  DMEM_21F
+.set   xRn_EDE_218,  DMEM_218+PMEM_EDE_LENGTH
+.set   xRn_EDE_21B,  DMEM_21B+PMEM_EDE_LENGTH
+.set   xRn_EDE_21C,  DMEM_21C+PMEM_EDE_LENGTH
+.set   xRn_EDE_21F,  DMEM_21F+PMEM_EDE_LENGTH
 
 .set   xRn_TONY_220, DMEM_220
 .set   xRn_TONY_223, DMEM_223
@@ -370,16 +370,16 @@ main:
 
 
         /* ---------------------- TEST WHEN SOURCE IS 'EDE' ---------------- */
-.set   EDE_EDE_202,  DMEM_202
-.set   EDE_EDE_204,  DMEM_204
-.set   EDE_EDE_207,  DMEM_207
-.set   EDE_EDE_209,  DMEM_209
-.set   EDE_EDE_210,  DMEM_210
-.set   EDE_EDE_213,  DMEM_213
-.set   EDE_EDE_218,  DMEM_218
-.set   EDE_EDE_21B,  DMEM_21B
-.set   EDE_EDE_21C,  DMEM_21C
-.set   EDE_EDE_21F,  DMEM_21F
+.set   EDE_EDE_202,  DMEM_202+PMEM_EDE_LENGTH
+.set   EDE_EDE_204,  DMEM_204+PMEM_EDE_LENGTH
+.set   EDE_EDE_207,  DMEM_207+PMEM_EDE_LENGTH
+.set   EDE_EDE_209,  DMEM_209+PMEM_EDE_LENGTH
+.set   EDE_EDE_210,  DMEM_210+PMEM_EDE_LENGTH
+.set   EDE_EDE_213,  DMEM_213+PMEM_EDE_LENGTH
+.set   EDE_EDE_218,  DMEM_218+PMEM_EDE_LENGTH
+.set   EDE_EDE_21B,  DMEM_21B+PMEM_EDE_LENGTH
+.set   EDE_EDE_21C,  DMEM_21C+PMEM_EDE_LENGTH
+.set   EDE_EDE_21F,  DMEM_21F+PMEM_EDE_LENGTH
 
 .set   EDE_TONY_220, DMEM_220
 .set   EDE_TONY_223, DMEM_223
@@ -442,10 +442,10 @@ main:
 
 
         /* ---------------------- TEST WHEN SOURCE IS '&EDE' --------------- */
-.set   aEDE_EDE_218,  DMEM_218
-.set   aEDE_EDE_21B,  DMEM_21B
-.set   aEDE_EDE_21C,  DMEM_21C
-.set   aEDE_EDE_21F,  DMEM_21F
+.set   aEDE_EDE_218,  DMEM_218+PMEM_EDE_LENGTH
+.set   aEDE_EDE_21B,  DMEM_21B+PMEM_EDE_LENGTH
+.set   aEDE_EDE_21C,  DMEM_21C+PMEM_EDE_LENGTH
+.set   aEDE_EDE_21F,  DMEM_21F+PMEM_EDE_LENGTH
 
 .set   aEDE_TONY_220, DMEM_220
 .set   aEDE_TONY_223, DMEM_223
@@ -507,18 +507,18 @@ main:
 
 
         /* ---------------------- TEST WHEN SOURCE IS CONSTANT ------------- */
-.set   CONSTL_EDE0,   DMEM_230
-.set   CONSTL_EDE1,   DMEM_232
-.set   CONSTL_EDE2,   DMEM_234
-.set   CONSTL_EDE4,   DMEM_236
-.set   CONSTL_EDE8,   DMEM_238
-.set   CONSTL_EDEm1,  DMEM_23A
-.set   CONSTH_EDE0,   DMEM_23D
-.set   CONSTH_EDE1,   DMEM_23F
-.set   CONSTH_EDE2,   DMEM_241
-.set   CONSTH_EDE4,   DMEM_243
-.set   CONSTH_EDE8,   DMEM_245
-.set   CONSTH_EDEm1,  DMEM_247
+.set   CONSTL_EDE0,   DMEM_230+PMEM_EDE_LENGTH
+.set   CONSTL_EDE1,   DMEM_232+PMEM_EDE_LENGTH
+.set   CONSTL_EDE2,   DMEM_234+PMEM_EDE_LENGTH
+.set   CONSTL_EDE4,   DMEM_236+PMEM_EDE_LENGTH
+.set   CONSTL_EDE8,   DMEM_238+PMEM_EDE_LENGTH
+.set   CONSTL_EDEm1,  DMEM_23A+PMEM_EDE_LENGTH
+.set   CONSTH_EDE0,   DMEM_23D+PMEM_EDE_LENGTH
+.set   CONSTH_EDE1,   DMEM_23F+PMEM_EDE_LENGTH
+.set   CONSTH_EDE2,   DMEM_241+PMEM_EDE_LENGTH
+.set   CONSTH_EDE4,   DMEM_243+PMEM_EDE_LENGTH
+.set   CONSTH_EDE8,   DMEM_245+PMEM_EDE_LENGTH
+.set   CONSTH_EDEm1,  DMEM_247+PMEM_EDE_LENGTH
 
 .set   CONSTL_TONY0,  DMEM_250
 .set   CONSTL_TONY1,  DMEM_252

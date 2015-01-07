@@ -121,8 +121,8 @@ clear_mem_loop:
 
         # Addressing mode: EDE
 	#------------------------
-.set   EDE_21E,  DMEM_21E
-.set   EDE_220,  DMEM_220
+.set   EDE_21E,  DMEM_21E+PMEM_EDE_LENGTH
+.set   EDE_220,  DMEM_220+PMEM_EDE_LENGTH
 
 	mov   #DMEM_200, r4
 	mov     #0x8765, &DMEM_21E
@@ -236,8 +236,8 @@ clear_mem_loop:
 
         # Addressing mode: EDE
 	#------------------------
-.set   EDE_B_21E,  DMEM_21E
-.set   EDE_B_221,  DMEM_221
+.set   EDE_B_21E,  DMEM_21E+PMEM_EDE_LENGTH
+.set   EDE_B_221,  DMEM_221+PMEM_EDE_LENGTH
 
 	mov   #DMEM_200, r4
 	mov     #0xd10e, &DMEM_21E

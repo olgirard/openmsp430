@@ -110,7 +110,7 @@ main:
 
         # Addressing mode: EDE
 	#------------------------
-.set   EDE_21E,  DMEM_21E
+.set   EDE_21E,  DMEM_21E+PMEM_EDE_LENGTH
 
 	mov     #0x0000, r5
 	mov  #TEST_ROUTINE_EDE, &DMEM_21E

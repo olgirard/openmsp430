@@ -172,10 +172,10 @@ main:
 
         # Addressing mode: EDE
 	#------------------------
-.set   EDE_218,  DMEM_218
-.set   EDE_21A,  DMEM_21A
-.set   EDE_21C,  DMEM_21C
-.set   EDE_21E,  DMEM_21E
+.set   EDE_218,  DMEM_218+PMEM_EDE_LENGTH
+.set   EDE_21A,  DMEM_21A+PMEM_EDE_LENGTH
+.set   EDE_21C,  DMEM_21C+PMEM_EDE_LENGTH
+.set   EDE_21E,  DMEM_21E+PMEM_EDE_LENGTH
 
 	mov     #0x0001, r2        ;# Test 1
 	mov     #0x7332, &DMEM_218
@@ -481,10 +481,10 @@ clear_mem_loop:
 
         # Addressing mode: EDE (Low Byte)
 	#---------------------------------
-.set   EDE_230,  DMEM_230
-.set   EDE_232,  DMEM_232
-.set   EDE_234,  DMEM_234
-.set   EDE_236,  DMEM_236
+.set   EDE_230,  DMEM_230+PMEM_EDE_LENGTH
+.set   EDE_232,  DMEM_232+PMEM_EDE_LENGTH
+.set   EDE_234,  DMEM_234+PMEM_EDE_LENGTH
+.set   EDE_236,  DMEM_236+PMEM_EDE_LENGTH
 
 	mov     #0x0001, r2        ;# Test 1
 	mov     #0x2572, &DMEM_230
@@ -514,10 +514,10 @@ clear_mem_loop:
 
         # Addressing mode: EDE (High Byte)
 	#----------------------------------
-.set   EDE_239,  DMEM_239
-.set   EDE_23B,  DMEM_23B
-.set   EDE_23D,  DMEM_23D
-.set   EDE_23F,  DMEM_23F
+.set   EDE_239,  DMEM_239+PMEM_EDE_LENGTH
+.set   EDE_23B,  DMEM_23B+PMEM_EDE_LENGTH
+.set   EDE_23D,  DMEM_23D+PMEM_EDE_LENGTH
+.set   EDE_23F,  DMEM_23F+PMEM_EDE_LENGTH
 
 	mov     #0x0001, r2        ;# Test 1
 	mov     #0x7225, &DMEM_238

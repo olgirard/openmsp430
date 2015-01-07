@@ -41,7 +41,7 @@
 
 main:
         /* ---------------------- TEST WHEN SOURCE IS @Rn ------------------ */
-.set   aRn_EDE,  DMEM_212
+.set   aRn_EDE,  DMEM_212+PMEM_EDE_LENGTH
 .set   aRn_TONY, DMEM_214
 
 
@@ -75,7 +75,7 @@ test_aRn_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS @Rn+ ----------------- */
-.set   aRni_EDE,  DMEM_212
+.set   aRni_EDE,  DMEM_212+PMEM_EDE_LENGTH
 .set   aRni_TONY, DMEM_214
 
 	mov   #data_aRni_0x2222, r4
@@ -120,7 +120,7 @@ test_aRni_PC2:
 
 
         /* ---------------------- TEST WHEN SOURCE IS x(Rn) ---------------- */
-.set   xRn_EDE,  DMEM_220
+.set   xRn_EDE,  DMEM_220+PMEM_EDE_LENGTH
 .set   xRn_TONY, DMEM_208
 
 	mov            #0x1234, r5
@@ -154,7 +154,7 @@ test_xRn_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS 'EDE' ---------------- */
-.set   EDE_EDE,  DMEM_216
+.set   EDE_EDE,  DMEM_216+PMEM_EDE_LENGTH
 .set   EDE_TONY, DMEM_212
 
 
@@ -188,7 +188,7 @@ test_EDE_PC:
 
 
         /* ---------------------- TEST WHEN SOURCE IS '&EDE' --------------- */
-.set   aEDE_EDE,  DMEM_218
+.set   aEDE_EDE,  DMEM_218+PMEM_EDE_LENGTH
 .set   aEDE_TONY, DMEM_202
 
 	mov                #0x4321, r4

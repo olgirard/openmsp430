@@ -42,14 +42,21 @@
 
 .global main
 
+        /* ----------------------         SOME VARIABLES IN ROM  --------------- */
+diverse_data:
+	.word 0x5ab7
+	.word 0x6bc8
+
+        /* ----------------------              WAIT FUNCTION     --------------- */
 WAIT_FUNC:
 	dec r14
 	jnz WAIT_FUNC
 	ret
-	
+
+        /* ----------------------                 MAIN           --------------- */
 main:
-	mov   #0x5a10, &WDTCTL  ; # Disable Watchdog 
-	
+	mov   #0x5a10, &WDTCTL  ; # Disable Watchdog
+
  	mov #DMEM_250, r1 	; # Initialize stack pointer
 
 	mov   #0x1122, &DMEM_210
@@ -63,16 +70,11 @@ main:
 
 	mov   #0x1000, r15
 
-		
+
         /* ----------------------         END OF TEST        --------------- */
 end_of_test:
 	nop
 	br #0xffff
-
-        /* ----------------------         SOME VARIABLES IN ROM  --------------- */
-diverse_data:
-	.word 0x5ab7
-	.word 0x6bc8
 
         /* ----------------------         INTERRUPT VECTORS  --------------- */
 

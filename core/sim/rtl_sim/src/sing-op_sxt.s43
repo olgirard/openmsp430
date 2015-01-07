@@ -120,10 +120,10 @@ main:
 
         # Addressing mode: EDE
 	#------------------------
-.set   EDE_218,  DMEM_218
-.set   EDE_21A,  DMEM_21A
-.set   EDE_21C,  DMEM_21C
-.set   EDE_21E,  DMEM_21E
+.set   EDE_218,  DMEM_218+PMEM_EDE_LENGTH
+.set   EDE_21A,  DMEM_21A+PMEM_EDE_LENGTH
+.set   EDE_21C,  DMEM_21C+PMEM_EDE_LENGTH
+.set   EDE_21E,  DMEM_21E+PMEM_EDE_LENGTH
 
 	mov     #0x0100, r2        ;# Test 1
 	mov     #0x7524, &DMEM_218

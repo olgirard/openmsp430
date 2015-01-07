@@ -4,6 +4,16 @@
 OMSP_NODUMP=0
 export OMSP_NODUMP
 
+# Choose GCC toolchain prefix ('msp430' for MSPGCC / 'msp430-elf' for GCC RedHat/TI)
+# Note: default to MSPGCC until GCC RedHat/TI is mature enough
+if which msp430-gcc >/dev/null; then
+    MSPGCC_PFX=msp430
+else
+    MSPGCC_PFX=msp430-elf
+fi
+#MSPGCC_PFX=msp430-elf
+export MSPGCC_PFX
+
 # Choose simulator:
 #                   - iverilog  : Icarus Verilog  (default)
 #                   - cver      : CVer
@@ -17,4 +27,4 @@ export OMSP_SIMULATOR
 
 rm -rf cov_work
 
-../bin/msp430sim sing-op_reti
+../bin/msp430sim dbg_i2c_onoff

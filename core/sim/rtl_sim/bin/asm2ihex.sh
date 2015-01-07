@@ -45,6 +45,8 @@ if [ $# -ne $EXPECTED_ARGS ]; then
   exit 1
 fi
 
+# MSPGCC version prefix
+MSPGCC_PFX=${MSPGCC_PFX:=msp430}
 
 ###############################################################################
 #               Check if definition & assembler files exist                   #
@@ -76,26 +78,33 @@ STACK_INIT=$((PER_SIZE+0x0080))
 
 cp  $3  ./pmem.x
 cp  $4  ./pmem_defs.asm
-sed -i "s/PMEM_BASE/$PMEM_BASE/g"    pmem.x
-sed -i "s/PMEM_SIZE/$PMEM_SIZE/g"    pmem.x
-sed -i "s/DMEM_SIZE/$DMEM_SIZE/g"    pmem.x
-sed -i "s/PER_SIZE/$PER_SIZE/g"      pmem.x
-sed -i "s/STACK_INIT/$STACK_INIT/g"  pmem.x
+sed -i "s/PMEM_BASE/$PMEM_BASE/g"         pmem.x
+sed -i "s/PMEM_SIZE/$PMEM_SIZE/g"         pmem.x
+sed -i "s/DMEM_SIZE/$DMEM_SIZE/g"         pmem.x
+sed -i "s/PER_SIZE/$PER_SIZE/g"           pmem.x
+sed -i "s/STACK_INIT/$STACK_INIT/g"       pmem.x
 
-sed -i "s/PER_SIZE/$PER_SIZE/g"      pmem_defs.asm
-sed -i "s/PMEM_SIZE/$PMEM_SIZE/g"    pmem_defs.asm
+sed -i "s/PMEM_SIZE/$PMEM_SIZE/g"         pmem_defs.asm
+sed -i "s/PER_SIZE_HEX/$PER_SIZE/g"       pmem_defs.asm
+if [ $MSPGCC_PFX == "msp430-elf" ]; then
+    sed -i "s/PER_SIZE/.data/g"           pmem_defs.asm
+    sed -i "s/PMEM_EDE_SIZE/0/g"          pmem_defs.asm
+else
+    sed -i "s/PER_SIZE/$PER_SIZE/g"       pmem_defs.asm
+    sed -i "s/PMEM_EDE_SIZE/$PMEM_SIZE/g" pmem_defs.asm
+fi
 
 
 ###############################################################################
 #                  Compile, link & generate IHEX file                         #
 ###############################################################################
 echo ""
-echo "\$ msp430-elf-as      -alsm $2 -o $1.o > $1.l43"
-msp430-elf-as      -alsm         $2     -o $1.o     > $1.l43
-echo "\$ msp430-elf-objdump -xdsStr $1.o >> $1.l43"
-msp430-elf-objdump -xdsStr       $1.o              >> $1.l43
-echo "\$ msp430-elf-ld      -T ./pmem.x $1.o -o $1.elf"
-msp430-elf-ld      -T ./pmem.x   $1.o   -o $1.elf
-echo "\$ msp430-elf-objcopy -O ihex $1.elf $1.ihex"
-msp430-elf-objcopy -O ihex       $1.elf    $1.ihex
+echo "\$ $MSPGCC_PFX-as      -alsm $2 -o $1.o > $1.l43"
+$MSPGCC_PFX-as      -alsm         $2     -o $1.o     > $1.l43
+echo "\$ $MSPGCC_PFX-objdump -xdsStr $1.o >> $1.l43"
+$MSPGCC_PFX-objdump -xdsStr       $1.o              >> $1.l43
+echo "\$ $MSPGCC_PFX-ld      -T ./pmem.x $1.o -o $1.elf"
+$MSPGCC_PFX-ld      -T ./pmem.x   $1.o   -o $1.elf
+echo "\$ $MSPGCC_PFX-objcopy -O ihex $1.elf $1.ihex"
+$MSPGCC_PFX-objcopy -O ihex       $1.elf    $1.ihex
 echo ""
