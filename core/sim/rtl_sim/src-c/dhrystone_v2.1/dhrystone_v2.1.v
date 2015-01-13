@@ -66,6 +66,12 @@ initial
            $finish;
         end
 
+      // Disable watchdog
+      // (only required because RedHat/TI GCC toolchain doesn't disable watchdog properly at startup)
+      `ifdef WATCHDOG
+        force dut.watchdog_0.wdtcnt   = 16'h0000;
+      `endif
+
       //---------------------------------------
       // Number of benchmark iteration
       // (Must match the C-code value)

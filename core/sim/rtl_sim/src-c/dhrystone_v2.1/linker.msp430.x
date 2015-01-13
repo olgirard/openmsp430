@@ -5,8 +5,8 @@ MEMORY {
   sfr              : ORIGIN = 0x0000, LENGTH = 0x0010
   peripheral_8bit  : ORIGIN = 0x0010, LENGTH = 0x00f0
   peripheral_16bit : ORIGIN = 0x0100, LENGTH = 0x0100
-  ram (wx)         : ORIGIN = 0x0200, LENGTH = 0x4000
-  rom (rx)         : ORIGIN = 0xA000, LENGTH = 0x6000-0x20
+  ram (wx)         : ORIGIN = 0x0200, LENGTH = 0x4000       /* 16kB */
+  rom (rx)         : ORIGIN = 0x5C00, LENGTH = 0xA400-0x20  /* 41kB */
   vectors          : ORIGIN = 0xffe0, LENGTH = 0x0020
 }
 REGION_ALIAS("REGION_TEXT", rom);

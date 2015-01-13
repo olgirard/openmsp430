@@ -33,7 +33,7 @@
  *
  *  Collection of Results:
  *              Reinhold Weicker (address see above) and
- *              
+ *
  *              Rick Richardson
  *              PC Research. Inc.
  *              94 Apple Orchard Drive
@@ -281,7 +281,7 @@
  *       && (AND-THEN)          1            1.6
  *       |  (OR)                1            1.6
  *       !  (NOT)               2            3.2
- * 
+ *
  *                           --          -----
  *                           63          100.1
  *
@@ -368,7 +368,7 @@
 #include <stdio.h>
                 /* for strcpy, strcmp */
 
-#define Null 0 
+#define Null 0
                 /* Value of a Null pointer */
 #define true  1
 #define false 0
@@ -381,7 +381,7 @@ typedef char    Str_30 [31];
 typedef int     Arr_1_Dim [25];        /* <-- changed from 50 */
 typedef int     Arr_2_Dim [25] [25];   /* <-- changed from 50 */
 
-typedef struct record 
+typedef struct record
     {
     struct record *Ptr_Comp;
     Enumeration    Discr;
@@ -417,11 +417,11 @@ Boolean Func_2( Str_30 Str_1_Par_Ref, Str_30 Str_2_Par_Ref );
 
 #ifdef printf
 #undef printf
-#endif 
+#endif
 #define printf //
 #ifdef fprintf
 #undef fprintf
-#endif 
+#endif
 #define fprintf //
  */
 
@@ -443,6 +443,8 @@ extern int fclose( FILE * stream );
 
 #elif defined( __MSP430__ )       /* MSP430 */
 
+#ifdef PFX_MSP430
 typedef int FILE;
+#endif
 
 #endif

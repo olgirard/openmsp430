@@ -2,19 +2,33 @@
 NAME            = dhrystone_v2.1
 OBJECTS         = dhry_1.o dhry_2.o omsp_func.o copydata.o
 
+# Choose GCC toolchain prefix ('msp430' for MSPGCC / 'msp430-elf' for GCC RedHat/TI)
+ifndef MSPGCC_PFX
+MSPGCC_PFX      = msp430
+endif
+
 # disable some warnings specific to the Dhrystone code
 WARNINGS        =  -Wall -Wno-implicit-int -Wno-implicit-function-declaration -Wno-return-type
 
-#CFLAGS		 = -O1 ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit       # DMIPS=0.377632
-#CFLAGS		 = -Os ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit       # DMIPS=0.373193
-#CFLAGS		 = -O2 ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit       # DMIPS=0.396044
-CFLAGS		= -O3 ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit       # DMIPS=0.400228
+# Select flags depending on selected toolchain
+ifeq ($(MSPGCC_PFX),msp430-elf)
+#CFLAGS		 = -D PFX_MSP430_ELF -O1 ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit
+#CFLAGS		 = -D PFX_MSP430_ELF -Os ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit
+#CFLAGS		 = -D PFX_MSP430_ELF -O2 ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit
+CFLAGS		 = -D PFX_MSP430_ELF -O3 ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit
+else
+#CFLAGS		 = -D PFX_MSP430     -O1 ${WARNINGS} -g -mcpu=430    -mmpy=16	    -mivcnt=16
+#CFLAGS		 = -D PFX_MSP430     -Os ${WARNINGS} -g -mcpu=430    -mmpy=16	    -mivcnt=16
+#CFLAGS		 = -D PFX_MSP430     -O2 ${WARNINGS} -g -mcpu=430    -mmpy=16	    -mivcnt=16
+CFLAGS		 = -D PFX_MSP430     -O2 ${WARNINGS} -g -mcpu=430    -mmpy=16	    -mivcnt=16
+endif
 
-#switch the compiler (for the internal make rules)
-CC              = msp430-elf-gcc
+# Toolchain executables
+CC              = ${MSPGCC_PFX}-gcc
+OBJCOPY		= ${MSPGCC_PFX}-objcopy
+OBJDUMP         = ${MSPGCC_PFX}-objdump
 
-
-.PHONY: all FORCE clean download download-jtag download-bsl dist
+.PHONY: all FORCE clean download dist
 
 #all should be the first target. it's built when make is runwithout args
 all: ${NAME}.elf ${NAME}.a43 ${NAME}.lst
@@ -24,13 +38,13 @@ download: download-uart
 
 #additional rules for files
 ${NAME}.elf: ${OBJECTS}
-	${CC} -mcpu=msp430 -T linker.x -o $@ ${OBJECTS}
+	${CC} ${CFLAGS} -T linker.${MSPGCC_PFX}.x -o $@ ${OBJECTS}
 
 ${NAME}.a43: ${NAME}.elf
-	msp430-elf-objcopy -O ihex $^ $@
+	${OBJCOPY} -O ihex $^ $@
 
 ${NAME}.lst: ${NAME}.elf
-	msp430-elf-objdump -dSt $^ >$@
+	${OBJDUMP} -dSt $^ >$@
 
 download-uart: all
 	openmsp430-loader.tcl -device /dev/ttyUSB0 -baudrate 115200 ${NAME}.elf
