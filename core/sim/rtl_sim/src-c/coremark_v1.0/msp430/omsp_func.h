@@ -122,5 +122,5 @@
 // FUNCTIONS
 //=============================================================================
 
-int putchar (int txdata);
+//int putchar (int txdata);
 unsigned long read_verilog_time ();

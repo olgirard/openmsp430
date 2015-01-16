@@ -42,7 +42,7 @@ real coremark_per_sec;
 real coremark_per_mhz;
 
 integer Number_Of_Iterations;
-  
+
 initial
    begin
       $display(" ===============================================");
@@ -55,17 +55,23 @@ initial
       // Check CPU configuration
       //---------------------------------------
 
-      if ((`PMEM_SIZE !== 24576) || (`DMEM_SIZE !== 16384))
-        begin
-           $display(" ===============================================");
-           $display("|               SIMULATION ERROR                |");
-           $display("|                                               |");
-           $display("|  Core must be configured for:                 |");
-           $display("|               - 24kB program memory           |");
-           $display("|               - 16kB data memory              |");
-           $display(" ===============================================");
-           $finish;        
-        end
+//      if ((`PMEM_SIZE !== 49152) || (`DMEM_SIZE !== 10240))
+//        begin
+//           $display(" ===============================================");
+//           $display("|               SIMULATION ERROR                |");
+//           $display("|                                               |");
+//           $display("|  Core must be configured for:                 |");
+//           $display("|               - 48kB program memory           |");
+//           $display("|               - 10kB data memory              |");
+//           $display(" ===============================================");
+//           $finish;
+//        end
+
+      // Disable watchdog
+      // (only required because RedHat/TI GCC toolchain doesn't disable watchdog properly at startup)
+      `ifdef WATCHDOG
+        force dut.watchdog_0.wdtcnt   = 16'h0000;
+      `endif
 
       //---------------------------------------
       // Number of benchmark iteration
@@ -98,13 +104,16 @@ initial
       coremark_start_time = $time;
       $timeformat(-3, 3, " ms", 10);
       $display("INFO-VERILOG: CoreMark loop started at %t ", coremark_start_time);
- 
+      $display("");
+      $display("INFO-VERILOG: Be patient... still roughly 350ms to simulate");
+      $display("");
+
       // Detect end of run
       @(negedge p2_dout[1]);
       coremark_end_time = $time;
       $timeformat(-3, 3, " ms", 10);
       $display("INFO-VERILOG: Coremark loop ended   at %t ",   coremark_end_time);
- 
+
       // Compute results
       $timeformat(-9, 3, " ns", 10);
       coremark_per_sec = coremark_end_time - coremark_start_time;
@@ -121,7 +130,7 @@ initial
       // Wait for the end of C-code execution
       //---------------------------------------
       @(posedge p2_dout[7]);
- 
+
       stimulus_done = 1;
 
       $display(" ===============================================");
@@ -136,6 +145,19 @@ initial
 always @(p2_dout[0])
   begin
      $write("%s", p1_dout);
+     $fflush();
+  end
+
+// Display some info to show simulation progress
+initial
+  begin
+     @(posedge p2_dout[1]);
+     #1000000;
+     while (p2_dout[1])
+       begin
+	  $display("INFO-VERILOG: Simulated time %t ", $time);
+	  #1000000;
+       end
   end
 
 
