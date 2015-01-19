@@ -55,17 +55,17 @@ initial
       // Check CPU configuration
       //---------------------------------------
 
-//      if ((`PMEM_SIZE !== 49152) || (`DMEM_SIZE !== 10240))
-//        begin
-//           $display(" ===============================================");
-//           $display("|               SIMULATION ERROR                |");
-//           $display("|                                               |");
-//           $display("|  Core must be configured for:                 |");
-//           $display("|               - 48kB program memory           |");
-//           $display("|               - 10kB data memory              |");
-//           $display(" ===============================================");
-//           $finish;
-//        end
+      if ((`PMEM_SIZE !== 49152) || (`DMEM_SIZE !== 10240))
+        begin
+           $display(" ===============================================");
+           $display("|               SIMULATION ERROR                |");
+           $display("|                                               |");
+           $display("|  Core must be configured for:                 |");
+           $display("|               - 48kB program memory           |");
+           $display("|               - 10kB data memory              |");
+           $display(" ===============================================");
+           $finish;
+        end
 
       // Disable watchdog
       // (only required because RedHat/TI GCC toolchain doesn't disable watchdog properly at startup)
@@ -105,7 +105,7 @@ initial
       $timeformat(-3, 3, " ms", 10);
       $display("INFO-VERILOG: CoreMark loop started at %t ", coremark_start_time);
       $display("");
-      $display("INFO-VERILOG: Be patient... still roughly 350ms to simulate");
+      $display("INFO-VERILOG: Be patient... there could be up to 80ms to simulate");
       $display("");
 
       // Detect end of run
