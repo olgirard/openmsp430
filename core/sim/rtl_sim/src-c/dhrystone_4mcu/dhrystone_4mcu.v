@@ -104,7 +104,7 @@ initial
       $timeformat(-3, 3, " ms", 10);
       $display("\nINFO-VERILOG: Dhrystone loop started at %t ", dhry_start_time);
       $display("");
-      $display("INFO-VERILOG: Be patient... there could be up to 10ms to simulate");
+      $display("INFO-VERILOG: Be patient... there could be up to 13ms to simulate");
       $display("");
 
       // Detect end of run

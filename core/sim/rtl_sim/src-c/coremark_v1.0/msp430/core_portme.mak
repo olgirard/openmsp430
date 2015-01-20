@@ -5,7 +5,7 @@ PORT_CFLAGS = -O2
 
 # Choose GCC toolchain prefix ('msp430' for MSPGCC / 'msp430-elf' for GCC RedHat/TI)
 ifndef MSPGCC_PFX
-MSPGCC_PFX      = msp430
+MSPGCC_PFX      = msp430-elf
 endif
 
 # Flag: OUTFLAG
