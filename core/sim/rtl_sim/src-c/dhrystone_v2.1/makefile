@@ -2,6 +2,9 @@
 NAME            = dhrystone_v2.1
 OBJECTS         = dhry_1.o dhry_2.o omsp_func.o copydata.o
 
+# Compiler performance option (-Os / -O2 / -O3)
+PORT_CFLAGS     = -O2
+
 # Choose GCC toolchain prefix ('msp430' for MSPGCC / 'msp430-elf' for GCC RedHat/TI)
 ifndef MSPGCC_PFX
 MSPGCC_PFX      = msp430
@@ -12,15 +15,9 @@ WARNINGS        =  -Wall -Wno-implicit-int -Wno-implicit-function-declaration -W
 
 # Select flags depending on selected toolchain
 ifeq ($(MSPGCC_PFX),msp430-elf)
-#CFLAGS		 = -D PFX_MSP430_ELF -O1 ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit
-#CFLAGS		 = -D PFX_MSP430_ELF -Os ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit
-#CFLAGS		 = -D PFX_MSP430_ELF -O2 ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit
-CFLAGS		 = -D PFX_MSP430_ELF -O3 ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit
+CFLAGS		= -D PFX_MSP430_ELF $(PORT_CFLAGS) ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit
 else
-#CFLAGS		 = -D PFX_MSP430     -O1 ${WARNINGS} -g -mcpu=430    -mmpy=16	    -mivcnt=16
-#CFLAGS		 = -D PFX_MSP430     -Os ${WARNINGS} -g -mcpu=430    -mmpy=16	    -mivcnt=16
-#CFLAGS		 = -D PFX_MSP430     -O2 ${WARNINGS} -g -mcpu=430    -mmpy=16	    -mivcnt=16
-CFLAGS		 = -D PFX_MSP430     -O2 ${WARNINGS} -g -mcpu=430    -mmpy=16	    -mivcnt=16
+CFLAGS		= -D PFX_MSP430     $(PORT_CFLAGS) ${WARNINGS} -g -mcpu=430    -mmpy=16		-mivcnt=16
 endif
 
 # Toolchain executables

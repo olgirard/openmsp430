@@ -21,7 +21,7 @@
 /* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA        */
 /*                                                                           */
 /*===========================================================================*/
-/*                                 SANDBOX                                   */
+/*                              DHRYSTONE V2.1                               */
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /* Author(s):                                                                */
@@ -103,6 +103,9 @@ initial
       dhry_start_time = $time;
       $timeformat(-3, 3, " ms", 10);
       $display("\nINFO-VERILOG: Dhrystone loop started at %t ", dhry_start_time);
+      $display("");
+      $display("INFO-VERILOG: Be patient... there could be up to 15ms to simulate");
+      $display("");
 
       // Detect end of run
       @(negedge p3_dout[0]);
@@ -140,4 +143,17 @@ initial
 always @(p2_dout[0])
   begin
      $write("%s", p1_dout);
+     $fflush();
+  end
+
+// Display some info to show simulation progress
+initial
+  begin
+     @(posedge p3_dout[0]);
+     #1000000;
+     while (p3_dout[0])
+       begin
+	  $display("INFO-VERILOG: Simulated time %t ", $time);
+	  #1000000;
+       end
   end

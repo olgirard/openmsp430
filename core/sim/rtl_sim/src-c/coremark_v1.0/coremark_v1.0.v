@@ -21,7 +21,7 @@
 /* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA        */
 /*                                                                           */
 /*===========================================================================*/
-/*                                 SANDBOX                                   */
+/*                                 COREMARK                                  */
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
 /* Author(s):                                                                */
@@ -96,7 +96,7 @@ initial
       $display("\nINFO-VERILOG: openMSP430 System clock frequency %f MHz", mclk_frequency);
 
       //---------------------------------------
-      // Measure Dhrystone run time
+      // Measure CoreMark run time
       //---------------------------------------
 
       // Detect beginning of run

@@ -15,7 +15,7 @@ if which msp430-gcc >/dev/null; then
 else
     MSPGCC_PFX=msp430-elf
 fi
-#MSPGCC_PFX=msp430-elf
+#MSPGCC_PFX=msp430
 export MSPGCC_PFX
 
 # Choose simulator:
