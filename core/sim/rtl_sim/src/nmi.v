@@ -131,12 +131,6 @@ initial
 `else
       $display(" Skip NMI falling edge (Watchdog is not included)");
 `endif
-//ERROR:  ====== NMI falling edge: NMI irq was taken with rising edge =====              1208250
-//ERROR:                 ====== NMI falling edge: CPU is not sleeping =====              1208250
-//ERROR:                 ====== NMI falling edge: CPU is not sleeping =====              1228250
-//ERROR:  ====== NMI falling edge: NMI irq was taken with rising edge =====              1328250
-//ERROR:                 ====== NMI falling edge: CPU is not sleeping =====              1328250
-//ERROR:                 ====== NMI falling edge: CPU is not sleeping =====              1348250
 
       @(r15==16'h3001);
 
