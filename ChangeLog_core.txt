@@ -1,3 +1,8 @@
+2015-01-21 [r200]  
+
+	* Major verificaiton and benchmark update to support both MSPGCC
+	  and RedHat/TI GCC toolchains.
+
 2013-12-17 [r192]  
 
 	* Number of supported IRQs is now configurable to 14 (default), 30
