@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: openMSP430.v
-// 
+//
 // *Module Description:
 //                       openMSP430 Top level file
 //
@@ -186,7 +186,7 @@ wire                mclk_wkup;
 wire         [31:0] cpu_id;
 wire          [7:0] cpu_nr_inst  = INST_NR;
 wire          [7:0] cpu_nr_total = TOTAL_NR;
-   
+
 wire         [15:0] eu_mab;
 wire         [15:0] eu_mdb_in;
 wire         [15:0] eu_mdb_out;
@@ -229,14 +229,14 @@ wire         [15:0] dbg_mem_din;
 wire         [15:0] dbg_reg_din;
 wire          [1:0] dbg_mem_wr;
 wire                puc_pnd_set;
-   
+
 wire         [15:0] per_dout_or;
 wire         [15:0] per_dout_sfr;
 wire         [15:0] per_dout_wdog;
 wire         [15:0] per_dout_mpy;
 wire         [15:0] per_dout_clk;
 
-   
+
 //=============================================================================
 // 2)  GLOBAL CLOCK & RESET MANAGEMENT
 //=============================================================================
@@ -261,7 +261,7 @@ omsp_clock_module clock_module_0 (
     .puc_rst      (puc_rst),       // Main system reset
     .smclk        (smclk),         // SMCLK
     .smclk_en     (smclk_en),      // SMCLK enable
-             
+
 // INPUTs
     .cpu_en       (cpu_en),        // Enable CPU code execution (asynchronous)
     .cpuoff       (cpuoff),        // Turns off the CPU
@@ -284,7 +284,7 @@ omsp_clock_module clock_module_0 (
     .wdt_reset    (wdt_reset)      // Watchdog-timer reset
 );
 
-   
+
 //=============================================================================
 // 3)  FRONTEND (<=> FETCH & DECODE)
 //=============================================================================
@@ -317,7 +317,7 @@ omsp_frontend frontend_0 (
     .nmi_acc      (nmi_acc),       // Non-Maskable interrupt request accepted
     .pc           (pc),            // Program counter
     .pc_nxt       (pc_nxt),        // Next PC value (for CALL & IRQ)
-                             
+
 // INPUTs
     .cpu_en_s     (cpu_en_s),      // Enable CPU code execution (synchronous)
     .cpuoff       (cpuoff),        // Turns off the CPU
@@ -349,6 +349,7 @@ omsp_execution_unit execution_unit_0 (
 // OUTPUTs
     .cpuoff       (cpuoff),        // Turns off the CPU
     .dbg_reg_din  (dbg_reg_din),   // Debug unit CPU register data input
+    .gie          (gie),           // General interrupt enable
     .mab          (eu_mab),        // Memory address bus
     .mb_en        (eu_mb_en),      // Memory bus enable
     .mb_wr        (eu_mb_wr),      // Memory bus write transfer
@@ -365,7 +366,6 @@ omsp_execution_unit execution_unit_0 (
     .dbg_reg_wr   (dbg_reg_wr),    // Debug unit CPU register write
     .e_state      (e_state),       // Execution state
     .exec_done    (exec_done),     // Execution completed
-    .gie          (gie),           // General interrupt enable
     .inst_ad      (inst_ad),       // Decoded Inst: destination addressing mode
     .inst_as      (inst_as),       // Decoded Inst: source addressing mode
     .inst_alu     (inst_alu),      // ALU control signals
@@ -411,7 +411,7 @@ omsp_mem_backbone mem_backbone_0 (
     .pmem_cen     (pmem_cen),      // Program Memory chip enable (low active)
     .pmem_din     (pmem_din),      // Program Memory data input (optional)
     .pmem_wen     (pmem_wen),      // Program Memory write enable (low active) (optional)
-                             
+
 // INPUTs
     .dbg_halt_st  (dbg_halt_st),   // Halt/Run status from CPU
     .dbg_mem_addr (dbg_mem_addr),  // Debug address for rd/wr access
@@ -446,7 +446,7 @@ omsp_sfr sfr_0 (
     .wdtie        (wdtie),         // Watchdog-timer interrupt enable
     .wdtifg_sw_clr(wdtifg_sw_clr), // Watchdog-timer interrupt flag software clear
     .wdtifg_sw_set(wdtifg_sw_set), // Watchdog-timer interrupt flag software set
-                             
+
 // INPUTs
     .cpu_nr_inst  (cpu_nr_inst),   // Current oMSP instance number
     .cpu_nr_total (cpu_nr_total),  // Total number of oMSP instances-1
@@ -477,7 +477,7 @@ omsp_watchdog watchdog_0 (
     .wdt_wkup       (wdt_wkup),           // Watchdog Wakeup
     .wdtifg         (wdtifg),             // Watchdog-timer interrupt flag
     .wdtnmies       (wdtnmies),           // Watchdog-timer NMI edge selection
-                             
+
 // INPUTs
     .aclk           (aclk),               // ACLK
     .aclk_en        (aclk_en),            // ACLK enable
@@ -516,7 +516,7 @@ omsp_multiplier multiplier_0 (
 
 // OUTPUTs
     .per_dout     (per_dout_mpy),  // Peripheral data output
-                             
+
 // INPUTs
     .mclk         (mclk),          // Main system clock
     .per_addr     (per_addr),      // Peripheral address
@@ -529,7 +529,7 @@ omsp_multiplier multiplier_0 (
 `else
 assign per_dout_mpy = 16'h0000;
 `endif
-   
+
 //=============================================================================
 // 9)  PERIPHERALS' OUTPUT BUS
 //=============================================================================
@@ -540,7 +540,7 @@ assign  per_dout_or  =  per_dout      |
                         per_dout_wdog |
                         per_dout_mpy;
 
-   
+
 //=============================================================================
 // 10)  DEBUG INTERFACE
 //=============================================================================
@@ -559,7 +559,7 @@ omsp_dbg dbg_0 (
     .dbg_mem_wr        (dbg_mem_wr),        // Debug unit memory write
     .dbg_reg_wr        (dbg_reg_wr),        // Debug unit CPU register write
     .dbg_uart_txd      (dbg_uart_txd),      // Debug interface: UART TXD
-                             
+
 // INPUTs
     .cpu_en_s          (cpu_en_s),          // Enable CPU code execution (synchronous)
     .cpu_id            (cpu_id),            // CPU ID
@@ -598,7 +598,7 @@ assign dbg_reg_wr      =  1'b0;
 assign dbg_uart_txd    =  1'b1;
 `endif
 
-   
+
 endmodule // openMSP430
 
 `ifdef OMSP_NO_INCLUDE
