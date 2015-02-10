@@ -44,7 +44,10 @@ initial
 
       // Initialize memory
       //--------------------------------------------------------
+<<<<<<< HEAD
 
+=======
+>>>>>>> f504588ee3d36830a42865f0a992b0542612aeaf
       @(mem200==16'h0001);
       if (mem200 !== 16'h0001) tb_error("====== Initialize memory error: @0x200 =====");
       if (mem202 !== 16'h0000) tb_error("====== Initialize memory error: @0x202 =====");

@@ -140,8 +140,13 @@ initial
       irq[`IRQ_NR-16] = 1'b1;
       @(negedge irq_acc[`IRQ_NR-16])
       @(negedge mclk);
+<<<<<<< HEAD
       wkup[0]         = 1'b0;
       irq[`IRQ_NR-16] = 1'b0;
+=======
+      wkup[0]   = 1'b0;
+      irq[0]    = 1'b0;
+>>>>>>> f504588ee3d36830a42865f0a992b0542612aeaf
 
       repeat(10) @(posedge mclk);
 

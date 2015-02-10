@@ -128,9 +128,12 @@ initial
       @(r15==16'h3000);
 `ifdef WATCHDOG
       $display(" Test NMI falling edge");
+<<<<<<< HEAD
 `else
       $display(" Skip NMI falling edge (Watchdog is not included)");
 `endif
+=======
+>>>>>>> f504588ee3d36830a42865f0a992b0542612aeaf
 
       @(r15==16'h3001);
 
