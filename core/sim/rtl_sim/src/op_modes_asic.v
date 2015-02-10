@@ -65,11 +65,7 @@ always @(posedge mclk or posedge puc_rst)
   else         wkup2_sync <= {wkup2_sync[0], wkup[2]};
 
 always @(wkup2_sync)
-<<<<<<< HEAD
   irq[`IRQ_NR-14] = wkup2_sync[1]; // IRQ-2
-=======
-  irq[2] = wkup2_sync[1];
->>>>>>> f504588ee3d36830a42865f0a992b0542612aeaf
 
 // Wakeup synchronizer to generate IRQ
 reg [1:0] wkup3_sync;
@@ -78,11 +74,7 @@ always @(posedge mclk or posedge puc_rst)
   else         wkup3_sync <= {wkup3_sync[0], wkup[3]};
 
 always @(wkup3_sync)
-<<<<<<< HEAD
   irq[`IRQ_NR-13] = wkup3_sync[1]; // IRQ-3
-=======
-  irq[3] = wkup3_sync[1];
->>>>>>> f504588ee3d36830a42865f0a992b0542612aeaf
 
 
 initial

@@ -229,11 +229,7 @@ initial
       // Generate IRQ to terminate the test pattern
       irq[`IRQ_NR-15] = 1'b1;
       @(r13);
-<<<<<<< HEAD
       irq[`IRQ_NR-15] = 1'b0;
-=======
-      irq[1] = 1'b0;
->>>>>>> f504588ee3d36830a42865f0a992b0542612aeaf
 
       stimulus_done = 1;
 
