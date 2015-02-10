@@ -777,7 +777,7 @@ initial // Normal end of test
       begin
          $display(" ===============================================");
          $display("|               SIMULATION SKIPPED              |");
-         $display("%s", skip_string);
+         $display("%-s", skip_string);
          $display(" ===============================================");
          $display("");
          tb_extra_report;
