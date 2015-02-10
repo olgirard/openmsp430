@@ -767,7 +767,7 @@ initial // Normal end of test
               $display("Note: DMA if verification disabled (PMEM must be 4kB or bigger, DMEM must be 1kB or bigger)");
            end
          $display("");
-         $display("SIMULATION SEED: %-d", `SEED);
+         $display("SIMULATION SEED: %d", `SEED);
          $display("");
       end
    endtask

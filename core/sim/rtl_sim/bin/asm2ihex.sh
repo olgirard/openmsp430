@@ -46,7 +46,13 @@ if [ $# -ne $EXPECTED_ARGS ]; then
 fi
 
 # MSPGCC version prefix
-MSPGCC_PFX=${MSPGCC_PFX:=msp430}
+if [ -z "$MSPGCC_PFX" ]; then
+    if which msp430-gcc >/dev/null; then
+	MSPGCC_PFX=msp430
+    else
+	MSPGCC_PFX=msp430-elf
+    fi
+fi  
 
 ###############################################################################
 #               Check if definition & assembler files exist                   #
