@@ -164,7 +164,7 @@ sed -i "s/'//g"                    ./pmem.h
 
 # Use MSPGCC preprocessor to extract the Program, Data
 # and Peripheral memory sizes
-if which msp430-elf-gcc >/dev/null; then
+if command -v msp430-elf-gcc >/dev/null; then
     msp430-elf-gcc -E -P -x c ../bin/omsp_config.sh > pmem.sh
 else
     msp430-gcc     -E -P -x c ../bin/omsp_config.sh > pmem.sh

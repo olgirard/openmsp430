@@ -106,7 +106,7 @@ else
     ncverilog* )
        rm -rf INCA_libs
        #vargs="$vargs +access+r +nclicq +ncinput+../bin/cov_ncverilog.tcl -covdut openMSP430 -covfile ../bin/cov_ncverilog.ccf -coverage all +define+TRN_FILE" ;;
-       vargs="$vargs +access+r +nclicq +define+TRN_FILE" ;;
+       vargs="$vargs +access+r +svseed=$4 +nclicq +define+TRN_FILE" ;;
     vcs* )
        rm -rf csrc simv*
        vargs="$vargs -R -debug_pp +vcs+lic+wait +v2k +define+VPD_FILE" ;;

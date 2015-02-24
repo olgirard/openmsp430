@@ -47,7 +47,7 @@ fi
 
 # MSPGCC version prefix
 if [ -z "$MSPGCC_PFX" ]; then
-    if which msp430-gcc >/dev/null; then
+    if command -v msp430-gcc >/dev/null; then
 	MSPGCC_PFX=msp430
     else
 	MSPGCC_PFX=msp430-elf

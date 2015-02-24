@@ -773,11 +773,11 @@ initial // Normal end of test
    endtask
 
    task tb_skip_finish;
-      input [65*8:0] skip_string;
+      input [65*8-1:0] skip_string;
       begin
          $display(" ===============================================");
          $display("|               SIMULATION SKIPPED              |");
-         $display("%-s", skip_string);
+         $display("%s", skip_string);
          $display(" ===============================================");
          $display("");
          tb_extra_report;
