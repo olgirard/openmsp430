@@ -1,0 +1,280 @@
+#!/bin/bash
+#------------------------------------------------------------------------------
+# Copyright (C) 2001 Authors
+#
+# This source file may be used and distributed without restriction provided
+# that this copyright statement is not removed from the file and that any
+# derivative work contains the original copyright notice and the associated
+# disclaimer.
+#
+# This source file is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published
+# by the Free Software Foundation; either version 2.1 of the License, or
+# (at your option) any later version.
+#
+# This source is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+# License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with this source; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+#
+#------------------------------------------------------------------------------
+#
+# File Name: parse_summaries
+#
+# Author(s):
+#             - Olivier Girard,    olgirard@gmail.com
+#
+#------------------------------------------------------------------------------
+# $Rev: 138 $
+# $LastChangedBy: olivier.girard $
+# $LastChangedDate: 2012-04-23 13:10:00 +0200 (Mon, 23 Apr 2012) $
+#------------------------------------------------------------------------------
+
+###############################################################################
+#                                                                             #
+#                PARSE REGRESSION RESULTS IN THE LOG DIRECTORY                #
+#                                                                             #
+###############################################################################
+
+# Formating attributes
+green=$(tput setaf 2)
+green_bold=$(tput bold)$(tput setaf 2)
+red=$(tput setaf 1)
+red_bold=$(tput bold)$(tput setaf 1)
+normal=$(tput sgr0)
+
+# Specify log directory & summary files
+LOG_DIR=./log
+if [ $# -ne 1 ]; then
+    SUM_FILES=$LOG_DIR/summary.*.log
+else
+    SUM_FILES=$1
+fi
+
+# Number of files to be processed
+nr_log_files=0
+for file in $SUM_FILES ; do
+    nr_log_files=`expr $nr_log_files + 1`
+done
+progress=0.0
+progress_idx=0
+progress_incr=$(awk -v r=$nr_log_files 'BEGIN{print 100 / (r * 2)}')
+printf "\nProcess and merge log files...   ${progress}%%"
+
+#-------------------------------------------------------------------------#
+# Get overall numbers of PASSED/SKIPPED/FAILED/ABORTED tests              #
+#-------------------------------------------------------------------------#
+
+passed_nr="0"
+skipped_nr="0"
+failed_nr="0"
+aborted_nr="0"
+
+for file in $SUM_FILES ; do
+    passed_ok=`grep   "PASSED"  $file | grep -c msp430sim`
+    skipped_ok=`grep  "SKIPPED" $file | grep -c msp430sim`
+    failed_ok=`grep   "FAILED"  $file | grep -c msp430sim`
+    aborted_ok=`grep  "ABORTED" $file | grep -c msp430sim`
+
+    passed_nr=`expr  $passed_nr  + $passed_ok`
+    skipped_nr=`expr $skipped_nr + $skipped_ok`
+    failed_nr=`expr  $failed_nr  + $failed_ok`
+    aborted_nr=`expr $aborted_nr + $aborted_ok`
+
+    progress_idx=`expr $progress_idx + 1`
+    progress=$(awk -v idx=$progress_idx -v incr=$progress_incr 'BEGIN{print incr * idx}')
+    printf "\b\b\b\b\b%3.1f%%" $progress
+done
+
+#-------------------------------------------------------------------------#
+# Get numbers of PASSED/SKIPPED/FAILED/ABORTED tests for individual tests #
+#-------------------------------------------------------------------------#
+testnames_list=""
+failed_reg_list=""
+
+for file in $SUM_FILES ; do
+
+    # Get regression index number
+    reg_index=`basename $file .log`
+    reg_index=`echo "${reg_index##*.}"`
+
+    # For each line, analyze test results
+    while read -r line ; do
+        line_arr=($line)
+
+        # Update list of test names
+        testnames_list=$testnames_list" ${line_arr[1]}"
+        
+        # Detect if the test as PASSED, SKIPPED, FAILED or ABORTED
+        passed_ok=`echo $line  | grep  -c "PASSED"`
+        skipped_ok=`echo $line | grep  -c "SKIPPED"`
+        failed_ok=`echo $line  | grep  -c "FAILED"`
+        aborted_ok=`echo $line | grep  -c "ABORTED"`
+
+        # Get number of DMA accesses (Total and Error)
+        dma_total=${line_arr[9]}
+        dma_error=${line_arr[11]}
+
+        # Update accumulated values for later reporting
+        prefix=${line_arr[1]//-/_} 
+        varname=${prefix}_passed_nr
+        if [ -z "${!varname}" ]; then
+            declare -i ${prefix}_passed_nr=$passed_ok
+            declare -i ${prefix}_skipped_nr=$skipped_ok
+            declare -i ${prefix}_failed_nr=$failed_ok
+            declare -i ${prefix}_aborted_nr=$aborted_ok
+            declare -i ${prefix}_dma_total_nr=$dma_total
+            declare -i ${prefix}_dma_error_nr=$dma_error
+            if [ $failed_ok != 0 ] || [ $aborted_ok != 0 ] || [ $dma_error != 0 ]; then
+                declare ${prefix}_failing_indexes=$reg_index
+                failed_reg_list=$failed_reg_list" $file"
+            else
+                declare ${prefix}_failing_indexes="-"
+            fi
+        else
+            varname=${prefix}_passed_nr;    declare -i $varname=`expr ${!varname} + $passed_ok`
+            varname=${prefix}_skipped_nr;   declare -i $varname=`expr ${!varname} + $skipped_ok`
+            varname=${prefix}_failed_nr;    declare -i $varname=`expr ${!varname} + $failed_ok`
+            varname=${prefix}_aborted_nr;   declare -i $varname=`expr ${!varname} + $aborted_ok`
+            varname=${prefix}_dma_total_nr; declare -i $varname=`expr ${!varname} + $dma_total`
+            varname=${prefix}_dma_error_nr; declare -i $varname=`expr ${!varname} + $dma_error`
+            if [ $failed_ok != 0 ] || [ $aborted_ok != 0 ] || [ $dma_error != 0 ]; then
+                varname=${prefix}_failing_indexes; 
+                failed_reg_list=$failed_reg_list" $file"
+                if [ "${!varname}" == "-" ]; then
+                    declare $varname=$reg_index
+                else
+                    declare $varname="${!varname} $reg_index"
+                fi
+            fi
+        fi
+
+    done < <(grep msp430sim $file)
+
+    # Display progress status
+    progress_idx=`expr $progress_idx + 1`
+    progress=$(awk -v idx=$progress_idx -v incr=$progress_incr 'BEGIN{print incr * idx}')
+    printf "\b\b\b\b\b%3.1f%%" $progress
+
+done
+echo ""
+
+# Remove duplicate elements in list of test
+testnames_list=$(echo "$testnames_list" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+
+# Remove duplicate elements in list of failed regressions
+failed_reg_list=$(echo "$failed_reg_list" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+
+#-------------------------------------------------------------------------#
+#                   Display detailed report                               #
+#-------------------------------------------------------------------------#
+echo ""
+echo "#=======================================================================================================================================================#"
+echo "#                                                                                                                                                       #"
+echo "#                                                                        DETAILED REPORT                                                                #"
+echo "#                                                                                                                                                       #"
+echo "#=======================================================================================================================================================#"
+echo "#                             ||                           RESULTS                     ||         DMA IF TRANSFER       ||                              #"
+echo "#          TEST NAME          ||-------------------------------------------------------||-------------------------------||  FAILING REGRESSION INDEXES  #"
+echo "#                             ||  Passed  |  Skipped  |  Failed  |  Aborted  |  Total  ||     Total     |     Error     ||                              #"
+echo "#=============================++==========+===========+==========+===========+=========++===============+===============++==============================#"
+echo "#                             ||          |           |          |           |         ||               |               ||                              #"
+for testname in $testnames_list ; do
+
+    # Get accumulated results
+    prefix=${testname//-/_} 
+    var_passed=${prefix}_passed_nr;
+    var_skipped=${prefix}_skipped_nr;
+    var_failed=${prefix}_failed_nr;
+    var_aborted=${prefix}_aborted_nr;
+    var_total=`expr ${!var_passed} + ${!var_skipped} + ${!var_failed} + ${!var_aborted}`
+    var_dma_total=${prefix}_dma_total_nr;
+    var_dma_error=${prefix}_dma_error_nr;
+    var_failing_indexes=${prefix}_failing_indexes;
+
+    # Add some color
+    if [ ${!var_failed} != 0 ] || [ ${!var_aborted} != 0 ] || [ ${!var_dma_error} != 0 ]; then
+	var_testname="${red} $testname ${normal}"
+	printf "#  %-37s ||" "$var_testname"
+        res_passed="${normal} ${!var_passed} ${normal}"
+        printf " %20s | %8s  |" "$res_passed" ${!var_skipped}
+        if [ ${!var_failed} != 0 ]; then
+            res_failed="${red} ${!var_failed} ${normal}"
+	    printf " %19s |" "$res_failed"
+        else
+            res_failed="${normal} ${!var_failed} ${normal}"
+	    printf " %20s |" "$res_failed"
+        fi
+        if [ ${!var_aborted} != 0 ]; then
+            res_aborted="${red} ${!var_aborted} ${normal}"
+	    printf " %20s | %6s  || %12s  |" "$res_aborted" $var_total ${!var_dma_total}
+        else
+            res_aborted="${normal} ${!var_aborted} ${normal}"
+	    printf " %21s | %6s  || %12s  |" "$res_aborted" $var_total ${!var_dma_total}
+        fi
+        if [ ${!var_dma_error} != 0 ]; then
+            res_dma_error="${red} ${!var_dma_error} ${normal}"
+	    printf "  %23s ||" "$res_dma_error"
+        else
+            res_dma_error="${normal} ${!var_dma_error} ${normal}"
+	    printf "  %24s ||" "$res_dma_error"
+        fi
+    else
+	var_testname="${normal} $testname ${normal}"
+	printf "#  %-38s ||" "$var_testname"
+        res_passed="${green} ${!var_passed} ${normal}"
+        printf " %19s | %8s  |" "$res_passed" ${!var_skipped}
+        res_failed="${normal} ${!var_failed} ${normal}"
+	printf " %20s |" "$res_failed"
+        res_aborted="${normal} ${!var_aborted} ${normal}"
+	printf " %21s | %6s  || %12s  |" "$res_aborted" $var_total ${!var_dma_total}
+        res_dma_error="${normal} ${!var_dma_error} ${normal}"
+	printf "  %24s ||" "$res_dma_error"
+    fi
+
+    printf "  %-27s #\n" "${!var_failing_indexes}"
+done
+echo "#                             ||          |           |          |           |         ||               |               ||                              #"
+echo "#=======================================================================================================================================================#"
+echo ""
+ 
+#----------------------------------------------------#
+#        Display failed regressions                  #
+#----------------------------------------------------#
+echo ""
+echo "#=======================================================================================================================================================#"
+echo "#                                                                 FAILING REGRESSIONS                                                                   #"
+echo "#=======================================================================================================================================================#"
+echo ""
+for failed_reg_file in $failed_reg_list ; do
+    echo "         >  cat  $failed_reg_file"
+done
+echo ""
+
+#----------------------------------------------------#
+# Display summary report                             #
+#----------------------------------------------------#
+echo ""
+echo "#=======================================================================================================================================================#"
+echo "#                                                                   SUMMARY REPORT                                                                      #"
+echo "#=======================================================================================================================================================#"
+echo ""
+
+# Generate final report
+echo    "         +-----------------------------------"
+echo    "         | Number of PASSED  tests :${green_bold} $passed_nr ${normal}"
+echo    "         | Number of SKIPPED tests :${green_bold} $skipped_nr ${normal}"
+echo    "         | Number of FAILED  tests :${red_bold} $failed_nr ${normal}"
+echo    "         | Number of ABORTED tests :${red_bold} $aborted_nr ${normal}"
+echo    "         |----------------------------------"
+echo -n "         | Number of tests         : "
+ls -1 $LOG_DIR/*/*.log | wc -l
+echo    "         +----------------------------------"
+echo    ""
+echo    "         Make sure passed+skipped == total"
+echo    ""
+echo    ""
