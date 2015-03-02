@@ -41,6 +41,7 @@
 ###############################################################################
 
 # Formating attributes
+yellow=$(tput setaf 3)
 green=$(tput setaf 2)
 green_bold=$(tput bold)$(tput setaf 2)
 red=$(tput setaf 1)
@@ -55,19 +56,22 @@ else
     SUM_FILES=$1
 fi
 
+
+#-------------------------------------------------------------------------#
+# Get overall numbers of PASSED/SKIPPED/FAILED/ABORTED tests              #
+#-------------------------------------------------------------------------#
+
 # Number of files to be processed
 nr_log_files=0
 for file in $SUM_FILES ; do
     nr_log_files=`expr $nr_log_files + 1`
 done
+
+# Initialize progress variables
 progress=0.0
 progress_idx=0
-progress_incr=$(awk -v r=$nr_log_files 'BEGIN{print 100 / (r * 2)}')
-printf "\nProcess and merge log files...   ${progress}%%"
-
-#-------------------------------------------------------------------------#
-# Get overall numbers of PASSED/SKIPPED/FAILED/ABORTED tests              #
-#-------------------------------------------------------------------------#
+progress_incr=$(awk -v r=$nr_log_files 'BEGIN{print 100 / r}')
+printf "\nProcess and merge log files (1/2)...     0.00%%"
 
 passed_nr="0"
 skipped_nr="0"
@@ -87,8 +91,9 @@ for file in $SUM_FILES ; do
 
     progress_idx=`expr $progress_idx + 1`
     progress=$(awk -v idx=$progress_idx -v incr=$progress_incr 'BEGIN{print incr * idx}')
-    printf "\b\b\b\b\b%3.1f%%" $progress
+    printf "\b\b\b\b\b\b\b%6.2f%%" $progress
 done
+
 
 #-------------------------------------------------------------------------#
 # Get numbers of PASSED/SKIPPED/FAILED/ABORTED tests for individual tests #
@@ -96,71 +101,90 @@ done
 testnames_list=""
 failed_reg_list=""
 
-for file in $SUM_FILES ; do
+# Put log file content into variable
+tests_list=`grep msp430sim $SUM_FILES`
+tests_nr=`cat $SUM_FILES | grep -c msp430sim`
+
+# Initialize progress variables
+progress=0.0
+progress_idx=0
+progress_incr=$(awk -v r=$tests_nr 'BEGIN{print 100 / r}')
+printf "\nProcess and merge log files (2/2)...     0.00%%"
+
+while read -r line; do
+
+    line_arr=($line)
+
+    # Update list of test names
+    testnames_list=$testnames_list" ${line_arr[1]}"
 
     # Get regression index number
-    reg_index=`basename $file .log`
+    reg_index=`basename ${line_arr[0]} .log:#`
     reg_index=`echo "${reg_index##*.}"`
+    
+    # Detect if the test as PASSED, SKIPPED, FAILED or ABORTED
+    passed_ok=0
+    skipped_ok=0
+    failed_ok=0
+    aborted_ok=0
+    if   [[ $line =~ .*PASSED.*  ]]; then
+	passed_ok=1
+    elif [[ $line =~ .*SKIPPED.* ]]; then
+	skipped_ok=1
+    elif [[ $line =~ .*FAILED.*  ]]; then
+	failed_ok=1
+    elif [[ $line =~ .*ABORTED.* ]]; then
+	aborted_ok=1
+    fi
 
-    # For each line, analyze test results
-    while read -r line ; do
-        line_arr=($line)
+    # Get number of DMA accesses (Total and Error)
+    dma_total=${line_arr[9]}
+    if [ "${line_arr[11]}" == "[31m" ]; then
+	dma_error=${line_arr[12]}
+    else
+	dma_error=${line_arr[11]}
+    fi
 
-        # Update list of test names
-        testnames_list=$testnames_list" ${line_arr[1]}"
-        
-        # Detect if the test as PASSED, SKIPPED, FAILED or ABORTED
-        passed_ok=`echo $line  | grep  -c "PASSED"`
-        skipped_ok=`echo $line | grep  -c "SKIPPED"`
-        failed_ok=`echo $line  | grep  -c "FAILED"`
-        aborted_ok=`echo $line | grep  -c "ABORTED"`
-
-        # Get number of DMA accesses (Total and Error)
-        dma_total=${line_arr[9]}
-        dma_error=${line_arr[11]}
-
-        # Update accumulated values for later reporting
-        prefix=${line_arr[1]//-/_} 
-        varname=${prefix}_passed_nr
-        if [ -z "${!varname}" ]; then
-            declare -i ${prefix}_passed_nr=$passed_ok
-            declare -i ${prefix}_skipped_nr=$skipped_ok
-            declare -i ${prefix}_failed_nr=$failed_ok
-            declare -i ${prefix}_aborted_nr=$aborted_ok
-            declare -i ${prefix}_dma_total_nr=$dma_total
-            declare -i ${prefix}_dma_error_nr=$dma_error
-            if [ $failed_ok != 0 ] || [ $aborted_ok != 0 ] || [ $dma_error != 0 ]; then
-                declare ${prefix}_failing_indexes=$reg_index
-                failed_reg_list=$failed_reg_list" $file"
-            else
-                declare ${prefix}_failing_indexes="-"
-            fi
-        else
-            varname=${prefix}_passed_nr;    declare -i $varname=`expr ${!varname} + $passed_ok`
-            varname=${prefix}_skipped_nr;   declare -i $varname=`expr ${!varname} + $skipped_ok`
-            varname=${prefix}_failed_nr;    declare -i $varname=`expr ${!varname} + $failed_ok`
-            varname=${prefix}_aborted_nr;   declare -i $varname=`expr ${!varname} + $aborted_ok`
-            varname=${prefix}_dma_total_nr; declare -i $varname=`expr ${!varname} + $dma_total`
-            varname=${prefix}_dma_error_nr; declare -i $varname=`expr ${!varname} + $dma_error`
-            if [ $failed_ok != 0 ] || [ $aborted_ok != 0 ] || [ $dma_error != 0 ]; then
-                varname=${prefix}_failing_indexes; 
-                failed_reg_list=$failed_reg_list" $file"
-                if [ "${!varname}" == "-" ]; then
-                    declare $varname=$reg_index
-                else
-                    declare $varname="${!varname} $reg_index"
-                fi
-            fi
-        fi
-
-    done < <(grep msp430sim $file)
+    # Update accumulated values for later reporting
+    prefix=${line_arr[1]//-/_} 
+    varname=${prefix}_passed_nr
+    if [ -z "${!varname}" ]; then
+	declare -i ${prefix}_passed_nr=$passed_ok
+	declare -i ${prefix}_skipped_nr=$skipped_ok
+	declare -i ${prefix}_failed_nr=$failed_ok
+	declare -i ${prefix}_aborted_nr=$aborted_ok
+	declare -i ${prefix}_dma_total_nr=$dma_total
+	declare -i ${prefix}_dma_error_nr=$dma_error
+	if [ $failed_ok != 0 ] || [ $aborted_ok != 0 ] || [ $dma_error != 0 ]; then
+	    declare ${prefix}_failing_indexes=$reg_index
+	    failed_reg_list=$failed_reg_list" $file"
+	else
+	    declare ${prefix}_failing_indexes="-"
+	fi
+    else
+	varname=${prefix}_passed_nr;	declare -i $varname=`expr ${!varname} + $passed_ok`
+	varname=${prefix}_skipped_nr;	declare -i $varname=`expr ${!varname} + $skipped_ok`
+	varname=${prefix}_failed_nr;	declare -i $varname=`expr ${!varname} + $failed_ok`
+	varname=${prefix}_aborted_nr;	declare -i $varname=`expr ${!varname} + $aborted_ok`
+	varname=${prefix}_dma_total_nr; declare -i $varname=`expr ${!varname} + $dma_total`
+	varname=${prefix}_dma_error_nr; declare -i $varname=`expr ${!varname} + $dma_error`
+	if [ $failed_ok != 0 ] || [ $aborted_ok != 0 ] || [ $dma_error != 0 ]; then
+	    varname=${prefix}_failing_indexes; 
+	    failed_reg_list=$failed_reg_list" $file"
+	    if [ "${!varname}" == "-" ]; then
+		declare $varname=$reg_index
+	    else
+		declare $varname="${!varname} $reg_index"
+	    fi
+	fi
+    fi
 
     # Display progress status
     progress_idx=`expr $progress_idx + 1`
     progress=$(awk -v idx=$progress_idx -v incr=$progress_incr 'BEGIN{print incr * idx}')
-    printf "\b\b\b\b\b%3.1f%%" $progress
+    printf "\b\b\b\b\b\b\b%6.2f%%" $progress
 
-done
+done <<< "$tests_list"
 echo ""
 
 # Remove duplicate elements in list of test
@@ -226,7 +250,11 @@ for testname in $testnames_list ; do
     else
 	var_testname="${normal} $testname ${normal}"
 	printf "#  %-38s ||" "$var_testname"
-        res_passed="${green} ${!var_passed} ${normal}"
+	if [ ${!var_passed} != 0 ]; then
+            res_passed="${green} ${!var_passed} ${normal}"
+	else
+            res_passed="${yellow} ${!var_passed} ${normal}"
+	fi
         printf " %19s | %8s  |" "$res_passed" ${!var_skipped}
         res_failed="${normal} ${!var_failed} ${normal}"
 	printf " %20s |" "$res_failed"

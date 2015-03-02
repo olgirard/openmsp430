@@ -35,8 +35,7 @@ fi
 
 # Cleanup from previous regression
 LOG_DIR=./log
-rm -rf $LOG_DIR/*.log
-rm -rf $LOG_DIR/*/*.log
+rm -rf $LOG_DIR/*
 
 # Perform the regression runs
 for (( ii=0; ii<=$LAST_REGRESSION; ii++ ))

@@ -199,7 +199,11 @@ initial
    `ifdef NO_DMA_VERIF
      dma_verif_on      = 0;
    `else
+     `ifdef DMA_IF_EN
      dma_verif_on      = 1;
+     `else
+     dma_verif_on      = 0;
+     `endif     
    `endif
      dma_verif_verbose = 0;
      dma_cnt_wr        = 0;
@@ -243,6 +247,9 @@ initial
 	       // Randomize access through PMEM or DMEM memories
 	       dma_rand_if   = $urandom_range(1,0);
 
+	       // Make sure the core is not in reset
+	       while(puc_rst) @(posedge mclk);
+	       
 	       if (dma_rand_rdwr)
 		 begin
 		    dma_cnt_rd = dma_cnt_rd+1;

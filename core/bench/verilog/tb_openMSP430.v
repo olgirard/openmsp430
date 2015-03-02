@@ -76,6 +76,7 @@ reg         [15:0] dma_din;
 reg                dma_en;
 reg                dma_priority;
 reg          [1:0] dma_we;
+reg                dma_wkup;
 
 // Digital I/O
 wire               irq_port1;
@@ -290,6 +291,7 @@ initial
      dma_en                  = 1'b0;
      dma_priority            = 1'b0;
      dma_we                  = 2'b00;
+     dma_wkup                = 1'b0;
      cpu_en                  = 1'b1;
      dbg_en                  = 1'b0;
      dbg_uart_rxd_sel        = 1'b0;
@@ -416,6 +418,7 @@ openMSP430 dut (
     .dma_en            (dma_en),               // Direct Memory Access enable (high active)
     .dma_priority      (dma_priority),         // Direct Memory Access priority (0:low / 1:high)
     .dma_we            (dma_we),               // Direct Memory Access write byte enable (high active)
+    .dma_wkup          (dma_wkup),             // ASIC ONLY: DMA Sub-System Wake-up (asynchronous and non-glitchy)
     .nmi               (nmi),                  // Non-maskable interrupt (asynchronous)
     .per_dout          (per_dout),             // Peripheral data output
     .pmem_dout         (pmem_dout),            // Program Memory data output

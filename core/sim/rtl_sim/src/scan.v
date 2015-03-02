@@ -35,7 +35,7 @@
 /* $LastChangedBy: olivier.girard $                                          */
 /* $LastChangedDate: 2011-01-28 22:05:37 +0100 (Fri, 28 Jan 2011) $          */
 /*===========================================================================*/
-    
+
 integer ii;
 
 initial
@@ -43,12 +43,18 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
+
+      // Disable automatic DMA verification
+      #10;
+      dma_verif_on = 0;
+
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
       // Disable detection of the end of test
       force inst_pc = 16'h0000;
 
+  
 
       //  SCAN MODE
       //------------------------------

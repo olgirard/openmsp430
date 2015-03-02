@@ -537,6 +537,19 @@ initial
   `ifdef ACLK_DIVIDER
       bcsctl1_mask = bcsctl1_mask | 16'h0030;
   `endif
+  `ifdef DMA_IF_EN
+    `ifdef CPUOFF_EN
+      bcsctl1_mask = bcsctl1_mask | 16'h0001;
+    `endif
+    `ifdef SCG0_EN
+      bcsctl1_mask = bcsctl1_mask | 16'h0002;
+    `endif
+    `ifdef OSCOFF_EN
+      `ifdef MCLK_MUX
+      bcsctl1_mask = bcsctl1_mask | 16'h0004;
+      `endif
+    `endif
+  `endif
 `else
       bcsctl1_mask = bcsctl1_mask | 16'h0030;
 `endif
