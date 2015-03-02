@@ -48,101 +48,109 @@
 module  omsp_frontend (
 
 // OUTPUTs
-    cpu_halt_st,                    // Halt/Run status from CPU
-    decode_noirq,                   // Frontend decode instruction
-    e_state,                        // Execution state
-    exec_done,                      // Execution completed
-    inst_ad,                        // Decoded Inst: destination addressing mode
-    inst_as,                        // Decoded Inst: source addressing mode
-    inst_alu,                       // ALU control signals
-    inst_bw,                        // Decoded Inst: byte width
-    inst_dest,                      // Decoded Inst: destination (one hot)
-    inst_dext,                      // Decoded Inst: destination extended instruction word
-    inst_irq_rst,                   // Decoded Inst: Reset interrupt
-    inst_jmp,                       // Decoded Inst: Conditional jump
-    inst_mov,                       // Decoded Inst: mov instruction
-    inst_sext,                      // Decoded Inst: source extended instruction word
-    inst_so,                        // Decoded Inst: Single-operand arithmetic
-    inst_src,                       // Decoded Inst: source (one hot)
-    inst_type,                      // Decoded Instruction type
-    irq_acc,                        // Interrupt request accepted (one-hot signal)
-    mab,                            // Frontend Memory address bus
-    mb_en,                          // Frontend Memory bus enable
-    mclk_enable,                    // Main System Clock enable
-    mclk_wkup,                      // Main System Clock wake-up (asynchronous)
-    nmi_acc,                        // Non-Maskable interrupt request accepted
-    pc,                             // Program counter
-    pc_nxt,                         // Next PC value (for CALL & IRQ)
-
-// INPUTs
-    cpu_en_s,                       // Enable CPU code execution (synchronous)
-    cpu_halt_cmd,                   // Halt CPU command
-    cpuoff,                         // Turns off the CPU
-    dbg_reg_sel,                    // Debug selected register for rd/wr access
-    fe_pmem_wait,                   // Frontend wait for Instruction fetch
-    gie,                            // General interrupt enable
-    irq,                            // Maskable interrupts
-    mclk,                           // Main system clock
-    mdb_in,                         // Frontend Memory data bus input
-    nmi_pnd,                        // Non-maskable interrupt pending
-    nmi_wkup,                       // NMI Wakeup
-    pc_sw,                          // Program counter software value
-    pc_sw_wr,                       // Program counter software write
-    puc_rst,                        // Main system reset
-    scan_enable,                    // Scan enable (active during scan shifting)
-    wdt_irq,                        // Watchdog-timer interrupt
-    wdt_wkup,                       // Watchdog Wakeup
-    wkup                            // System Wake-up (asynchronous)
+    cpu_halt_st,                       // Halt/Run status from CPU
+    decode_noirq,                      // Frontend decode instruction
+    e_state,                           // Execution state
+    exec_done,                         // Execution completed
+    inst_ad,                           // Decoded Inst: destination addressing mode
+    inst_as,                           // Decoded Inst: source addressing mode
+    inst_alu,                          // ALU control signals
+    inst_bw,                           // Decoded Inst: byte width
+    inst_dest,                         // Decoded Inst: destination (one hot)
+    inst_dext,                         // Decoded Inst: destination extended instruction word
+    inst_irq_rst,                      // Decoded Inst: Reset interrupt
+    inst_jmp,                          // Decoded Inst: Conditional jump
+    inst_mov,                          // Decoded Inst: mov instruction
+    inst_sext,                         // Decoded Inst: source extended instruction word
+    inst_so,                           // Decoded Inst: Single-operand arithmetic
+    inst_src,                          // Decoded Inst: source (one hot)
+    inst_type,                         // Decoded Instruction type
+    irq_acc,                           // Interrupt request accepted (one-hot signal)
+    mab,                               // Frontend Memory address bus
+    mb_en,                             // Frontend Memory bus enable
+    mclk_dma_enable,                   // DMA Sub-System Clock enable
+    mclk_dma_wkup,		       // DMA Sub-System Clock wake-up (asynchronous)
+    mclk_enable,                       // Main System Clock enable
+    mclk_wkup,                         // Main System Clock wake-up (asynchronous)
+    nmi_acc,                           // Non-Maskable interrupt request accepted
+    pc,                                // Program counter
+    pc_nxt,                            // Next PC value (for CALL & IRQ)
+				       
+// INPUTs			       
+    cpu_en_s,                          // Enable CPU code execution (synchronous)
+    cpu_halt_cmd,                      // Halt CPU command
+    cpuoff,                            // Turns off the CPU
+    dbg_reg_sel,                       // Debug selected register for rd/wr access
+    dma_en,                            // Direct Memory Access enable (high active)
+    dma_wkup,                          // DMA Sub-System Wake-up (asynchronous and non-glitchy)
+    fe_pmem_wait,                      // Frontend wait for Instruction fetch
+    gie,                               // General interrupt enable
+    irq,                               // Maskable interrupts
+    mclk,                              // Main system clock
+    mdb_in,                            // Frontend Memory data bus input
+    nmi_pnd,                           // Non-maskable interrupt pending
+    nmi_wkup,                          // NMI Wakeup
+    pc_sw,                             // Program counter software value
+    pc_sw_wr,                          // Program counter software write
+    puc_rst,                           // Main system reset
+    scan_enable,                       // Scan enable (active during scan shifting)
+    wdt_irq,                           // Watchdog-timer interrupt
+    wdt_wkup,                          // Watchdog Wakeup
+    wkup                               // System Wake-up (asynchronous)
 );
 
 // OUTPUTs
 //=========
-output               cpu_halt_st;   // Halt/Run status from CPU
-output               decode_noirq;  // Frontend decode instruction
-output         [3:0] e_state;       // Execution state
-output               exec_done;     // Execution completed
-output         [7:0] inst_ad;       // Decoded Inst: destination addressing mode
-output         [7:0] inst_as;       // Decoded Inst: source addressing mode
-output        [11:0] inst_alu;      // ALU control signals
-output               inst_bw;       // Decoded Inst: byte width
-output        [15:0] inst_dest;     // Decoded Inst: destination (one hot)
-output        [15:0] inst_dext;     // Decoded Inst: destination extended instruction word
-output               inst_irq_rst;  // Decoded Inst: Reset interrupt
-output         [7:0] inst_jmp;      // Decoded Inst: Conditional jump
-output               inst_mov;      // Decoded Inst: mov instruction
-output        [15:0] inst_sext;     // Decoded Inst: source extended instruction word
-output         [7:0] inst_so;       // Decoded Inst: Single-operand arithmetic
-output        [15:0] inst_src;      // Decoded Inst: source (one hot)
-output         [2:0] inst_type;     // Decoded Instruction type
-output [`IRQ_NR-3:0] irq_acc;       // Interrupt request accepted (one-hot signal)
-output        [15:0] mab;           // Frontend Memory address bus
-output               mb_en;         // Frontend Memory bus enable
-output               mclk_enable;   // Main System Clock enable
-output               mclk_wkup;     // Main System Clock wake-up (asynchronous)
-output               nmi_acc;       // Non-Maskable interrupt request accepted
-output        [15:0] pc;            // Program counter
-output        [15:0] pc_nxt;        // Next PC value (for CALL & IRQ)
+output               cpu_halt_st;      // Halt/Run status from CPU
+output               decode_noirq;     // Frontend decode instruction
+output         [3:0] e_state;          // Execution state
+output               exec_done;        // Execution completed
+output         [7:0] inst_ad;          // Decoded Inst: destination addressing mode
+output         [7:0] inst_as;          // Decoded Inst: source addressing mode
+output        [11:0] inst_alu;         // ALU control signals
+output               inst_bw;          // Decoded Inst: byte width
+output        [15:0] inst_dest;        // Decoded Inst: destination (one hot)
+output        [15:0] inst_dext;        // Decoded Inst: destination extended instruction word
+output               inst_irq_rst;     // Decoded Inst: Reset interrupt
+output         [7:0] inst_jmp;         // Decoded Inst: Conditional jump
+output               inst_mov;         // Decoded Inst: mov instruction
+output        [15:0] inst_sext;        // Decoded Inst: source extended instruction word
+output         [7:0] inst_so;          // Decoded Inst: Single-operand arithmetic
+output        [15:0] inst_src;         // Decoded Inst: source (one hot)
+output         [2:0] inst_type;        // Decoded Instruction type
+output [`IRQ_NR-3:0] irq_acc;          // Interrupt request accepted (one-hot signal)
+output        [15:0] mab;              // Frontend Memory address bus
+output               mb_en;            // Frontend Memory bus enable
+output               mclk_dma_enable;  // DMA Sub-System Clock enable
+output               mclk_dma_wkup;    // DMA Sub-System Clock wake-up (asynchronous)
+output               mclk_enable;      // Main System Clock enable
+output               mclk_wkup;        // Main System Clock wake-up (asynchronous)
+output               nmi_acc;          // Non-Maskable interrupt request accepted
+output        [15:0] pc;               // Program counter
+output        [15:0] pc_nxt;           // Next PC value (for CALL & IRQ)
 
 // INPUTs
 //=========
-input                cpu_en_s;      // Enable CPU code execution (synchronous)
-input                cpu_halt_cmd;  // Halt CPU command
-input                cpuoff;        // Turns off the CPU
-input          [3:0] dbg_reg_sel;   // Debug selected register for rd/wr access
-input                fe_pmem_wait;  // Frontend wait for Instruction fetch
-input                gie;           // General interrupt enable
-input  [`IRQ_NR-3:0] irq;           // Maskable interrupts
-input                mclk;          // Main system clock
-input         [15:0] mdb_in;        // Frontend Memory data bus input
-input                nmi_pnd;       // Non-maskable interrupt pending
-input                nmi_wkup;      // NMI Wakeup
-input         [15:0] pc_sw;         // Program counter software value
-input                pc_sw_wr;      // Program counter software write
-input                puc_rst;       // Main system reset
-input                scan_enable;   // Scan enable (active during scan shifting)
-input                wdt_irq;       // Watchdog-timer interrupt
-input                wdt_wkup;      // Watchdog Wakeup
-input                wkup;          // System Wake-up (asynchronous)
+input                cpu_en_s;         // Enable CPU code execution (synchronous)
+input                cpu_halt_cmd;     // Halt CPU command
+input                cpuoff;           // Turns off the CPU
+input          [3:0] dbg_reg_sel;      // Debug selected register for rd/wr access
+input                dma_en;           // Direct Memory Access enable (high active)
+input                dma_wkup;         // DMA Sub-System Wake-up (asynchronous and non-glitchy)
+input                fe_pmem_wait;     // Frontend wait for Instruction fetch
+input                gie;              // General interrupt enable
+input  [`IRQ_NR-3:0] irq;              // Maskable interrupts
+input                mclk;             // Main system clock
+input         [15:0] mdb_in;           // Frontend Memory data bus input
+input                nmi_pnd;          // Non-maskable interrupt pending
+input                nmi_wkup;         // NMI Wakeup
+input         [15:0] pc_sw;            // Program counter software value
+input                pc_sw_wr;         // Program counter software write
+input                puc_rst;          // Main system reset
+input                scan_enable;      // Scan enable (active during scan shifting)
+input                wdt_irq;          // Watchdog-timer interrupt
+input                wdt_wkup;         // Watchdog Wakeup
+input                wkup;             // System Wake-up (asynchronous)
 
 
 //=============================================================================
@@ -356,16 +364,26 @@ wire mclk_enable = inst_irq_rst ? cpu_en_s :        //      - the RESET interrup
 
 // Wakeup condition from maskable interrupts
 wire mirq_wkup;
-omsp_and_gate and_mirq_wkup (.y(mirq_wkup), .a(wkup | wdt_wkup), .b(gie));
+omsp_and_gate and_mirq_wkup     (.y(mirq_wkup),     .a(wkup | wdt_wkup),      .b(gie));
 
 // Combined asynchronous wakeup detection from nmi & irq (masked if the cpu is disabled)
-omsp_and_gate and_mclk_wkup (.y(mclk_wkup), .a(nmi_wkup | mirq_wkup), .b(cpu_en_s));
+omsp_and_gate and_mclk_wkup     (.y(mclk_wkup),     .a(nmi_wkup | mirq_wkup), .b(cpu_en_s));
 
+// Wakeup condition from DMA interface
+  `ifdef DMA_IF_EN
+wire mclk_dma_enable = dma_en & cpu_en_s;
+omsp_and_gate and_mclk_dma_wkup (.y(mclk_dma_wkup), .a(dma_wkup),             .b(cpu_en_s));
+  `else
+assign  mclk_dma_wkup   = 1'b0;
+assign  mclk_dma_enable = 1'b0;
+  `endif
 `else
 
 // In the CPUOFF feature is disabled, the wake-up and enable signals are always 1
-assign  mclk_wkup   = 1'b1;
-assign  mclk_enable = 1'b1;
+assign  mclk_dma_wkup   = 1'b1;
+assign  mclk_dma_enable = 1'b1;
+assign  mclk_wkup       = 1'b1;
+assign  mclk_enable     = 1'b1;
 `endif
 
 //=============================================================================

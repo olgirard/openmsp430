@@ -48,89 +48,93 @@
 module  omsp_clock_module (
 
 // OUTPUTs
-    aclk,                         // ACLK
-    aclk_en,                      // ACLK enable
-    cpu_en_s,                     // Enable CPU code execution (synchronous)
-    dbg_clk,                      // Debug unit clock
-    dbg_en_s,                     // Debug interface enable (synchronous)
-    dbg_rst,                      // Debug unit reset
-    dco_enable,                   // Fast oscillator enable
-    dco_wkup,                     // Fast oscillator wake-up (asynchronous)
-    lfxt_enable,                  // Low frequency oscillator enable
-    lfxt_wkup,                    // Low frequency oscillator wake-up (asynchronous)
-    mclk,                         // Main system clock
-    per_dout,                     // Peripheral data output
-    por,                          // Power-on reset
-    puc_pnd_set,                  // PUC pending set for the serial debug interface
-    puc_rst,                      // Main system reset
-    smclk,                        // SMCLK
-    smclk_en,                     // SMCLK enable
-
-// INPUTs
-    cpu_en,                       // Enable CPU code execution (asynchronous)
-    cpuoff,                       // Turns off the CPU
-    dbg_cpu_reset,                // Reset CPU from debug interface
-    dbg_en,                       // Debug interface enable (asynchronous)
-    dco_clk,                      // Fast oscillator (fast clock)
-    dma_en,                       // Direct Memory Access enable (high active)
-    lfxt_clk,                     // Low frequency oscillator (typ 32kHz)
-    mclk_enable,                  // Main System Clock enable
-    mclk_wkup,                    // Main System Clock wake-up (asynchronous)
-    oscoff,                       // Turns off LFXT1 clock input
-    per_addr,                     // Peripheral address
-    per_din,                      // Peripheral data input
-    per_en,                       // Peripheral enable (high active)
-    per_we,                       // Peripheral write enable (high active)
-    reset_n,                      // Reset Pin (low active, asynchronous)
-    scan_enable,                  // Scan enable (active during scan shifting)
-    scan_mode,                    // Scan mode
-    scg0,                         // System clock generator 1. Turns off the DCO
-    scg1,                         // System clock generator 1. Turns off the SMCLK
-    wdt_reset                     // Watchdog-timer reset
+    aclk,                             // ACLK
+    aclk_en,                          // ACLK enable
+    cpu_en_s,                         // Enable CPU code execution (synchronous)
+    cpu_mclk,                         // Main system CPU only clock
+    dma_mclk,                         // Main system DMA and/or CPU clock
+    dbg_clk,                          // Debug unit clock
+    dbg_en_s,                         // Debug interface enable (synchronous)
+    dbg_rst,                          // Debug unit reset
+    dco_enable,                       // Fast oscillator enable
+    dco_wkup,                         // Fast oscillator wake-up (asynchronous)
+    lfxt_enable,                      // Low frequency oscillator enable
+    lfxt_wkup,                        // Low frequency oscillator wake-up (asynchronous)
+    per_dout,                         // Peripheral data output
+    por,                              // Power-on reset
+    puc_pnd_set,                      // PUC pending set for the serial debug interface
+    puc_rst,                          // Main system reset
+    smclk,                            // SMCLK
+    smclk_en,                         // SMCLK enable
+				      
+// INPUTs			      
+    cpu_en,                           // Enable CPU code execution (asynchronous)
+    cpuoff,                           // Turns off the CPU
+    dbg_cpu_reset,                    // Reset CPU from debug interface
+    dbg_en,                           // Debug interface enable (asynchronous)
+    dco_clk,                          // Fast oscillator (fast clock)
+    lfxt_clk,                         // Low frequency oscillator (typ 32kHz)
+    mclk_dma_enable,                  // DMA Sub-System Clock enable
+    mclk_dma_wkup,		      // DMA Sub-System Clock wake-up (asynchronous)
+    mclk_enable,                      // Main System Clock enable
+    mclk_wkup,                        // Main System Clock wake-up (asynchronous)
+    oscoff,                           // Turns off LFXT1 clock input
+    per_addr,                         // Peripheral address
+    per_din,                          // Peripheral data input
+    per_en,                           // Peripheral enable (high active)
+    per_we,                           // Peripheral write enable (high active)
+    reset_n,                          // Reset Pin (low active, asynchronous)
+    scan_enable,                      // Scan enable (active during scan shifting)
+    scan_mode,                        // Scan mode
+    scg0,                             // System clock generator 1. Turns off the DCO
+    scg1,                             // System clock generator 1. Turns off the SMCLK
+    wdt_reset                         // Watchdog-timer reset
 );
 
 // OUTPUTs
 //=========
-output              aclk;         // ACLK
-output              aclk_en;      // ACLK enable
-output              cpu_en_s;     // Enable CPU code execution (synchronous)
-output              dbg_clk;      // Debug unit clock
-output              dbg_en_s;     // Debug unit enable (synchronous)
-output              dbg_rst;      // Debug unit reset
-output              dco_enable;   // Fast oscillator enable
-output              dco_wkup;     // Fast oscillator wake-up (asynchronous)
-output              lfxt_enable;  // Low frequency oscillator enable
-output              lfxt_wkup;    // Low frequency oscillator wake-up (asynchronous)
-output              mclk;         // Main system clock
-output       [15:0] per_dout;     // Peripheral data output
-output              por;          // Power-on reset
-output              puc_pnd_set;  // PUC pending set for the serial debug interface
-output              puc_rst;      // Main system reset
-output              smclk;        // SMCLK
-output              smclk_en;     // SMCLK enable
+output              aclk;             // ACLK
+output              aclk_en;          // ACLK enable
+output              cpu_en_s;         // Enable CPU code execution (synchronous)
+output              cpu_mclk;         // Main system CPU only clock
+output              dma_mclk;         // Main system DMA and/or CPU clock
+output              dbg_clk;          // Debug unit clock
+output              dbg_en_s;         // Debug unit enable (synchronous)
+output              dbg_rst;          // Debug unit reset
+output              dco_enable;       // Fast oscillator enable
+output              dco_wkup;         // Fast oscillator wake-up (asynchronous)
+output              lfxt_enable;      // Low frequency oscillator enable
+output              lfxt_wkup;        // Low frequency oscillator wake-up (asynchronous)
+output       [15:0] per_dout;         // Peripheral data output
+output              por;              // Power-on reset
+output              puc_pnd_set;      // PUC pending set for the serial debug interface
+output              puc_rst;          // Main system reset
+output              smclk;            // SMCLK
+output              smclk_en;         // SMCLK enable
 
 // INPUTs
 //=========
-input               cpu_en;       // Enable CPU code execution (asynchronous)
-input               cpuoff;       // Turns off the CPU
-input               dbg_cpu_reset;// Reset CPU from debug interface
-input               dbg_en;       // Debug interface enable (asynchronous)
-input               dco_clk;      // Fast oscillator (fast clock)
-input               dma_en;       // Direct Memory Access enable (high active)
-input               lfxt_clk;     // Low frequency oscillator (typ 32kHz)
-input               mclk_enable;  // Main System Clock enable
-input               mclk_wkup;    // Main System Clock wake-up (asynchronous)
-input               oscoff;       // Turns off LFXT1 clock input
-input        [13:0] per_addr;     // Peripheral address
-input        [15:0] per_din;      // Peripheral data input
-input               per_en;       // Peripheral enable (high active)
-input         [1:0] per_we;       // Peripheral write enable (high active)
-input               reset_n;      // Reset Pin (low active, asynchronous)
-input               scan_enable;  // Scan enable (active during scan shifting)
-input               scan_mode;    // Scan mode
-input               scg0;         // System clock generator 1. Turns off the DCO
-input               scg1;         // System clock generator 1. Turns off the SMCLK
-input               wdt_reset;    // Watchdog-timer reset
+input               cpu_en;           // Enable CPU code execution (asynchronous)
+input               cpuoff;           // Turns off the CPU
+input               dbg_cpu_reset;    // Reset CPU from debug interface
+input               dbg_en;           // Debug interface enable (asynchronous)
+input               dco_clk;          // Fast oscillator (fast clock)
+input               lfxt_clk;         // Low frequency oscillator (typ 32kHz)
+input               mclk_dma_enable;  // DMA Sub-System Clock enable
+input               mclk_dma_wkup;    // DMA Sub-System Clock wake-up (asynchronous)
+input               mclk_enable;      // Main System Clock enable
+input               mclk_wkup;        // Main System Clock wake-up (asynchronous)
+input               oscoff;           // Turns off LFXT1 clock input
+input        [13:0] per_addr;         // Peripheral address
+input        [15:0] per_din;          // Peripheral data input
+input               per_en;           // Peripheral enable (high active)
+input         [1:0] per_we;           // Peripheral write enable (high active)
+input               reset_n;          // Reset Pin (low active, asynchronous)
+input               scan_enable;      // Scan enable (active during scan shifting)
+input               scan_mode;        // Scan mode
+input               scg0;             // System clock generator 1. Turns off the DCO
+input               scg1;             // System clock generator 1. Turns off the SMCLK
+input               wdt_reset;        // Watchdog-timer reset
 
 
 //=============================================================================
@@ -198,17 +202,46 @@ wire [7:0] bcsctl1_nxt = BCSCTL1[0] ? per_din[15:8]      : per_din[7:0];
 
 `ifdef ASIC_CLOCKING
   `ifdef ACLK_DIVIDER
-wire [7:0] divax_mask = 8'h30;
+wire [7:0] divax_mask      = 8'h30;
   `else
-wire [7:0] divax_mask = 8'h00;
+wire [7:0] divax_mask      = 8'h00;
+  `endif
+  `ifdef DMA_IF_EN
+    `ifdef CPUOFF_EN
+wire [7:0] dma_cpuoff_mask = 8'h01;
+    `else
+wire [7:0] dma_cpuoff_mask = 8'h00;
+    `endif
+    `ifdef SCG0_EN
+wire [7:0] dma_scg0_mask   = 8'h02;
+    `else
+wire [7:0] dma_scg0_mask   = 8'h00;
+    `endif
+    `ifdef OSCOFF_EN
+      `ifdef MCLK_MUX
+wire [7:0] dma_oscoff_mask = 8'h04;
+      `else
+wire [7:0] dma_oscoff_mask = 8'h00;
+      `endif
+    `else
+wire [7:0] dma_oscoff_mask = 8'h00;
+    `endif
+  `else
+wire [7:0] dma_cpuoff_mask = 8'h00;
+wire [7:0] dma_scg0_mask   = 8'h00;
+wire [7:0] dma_oscoff_mask = 8'h00;
   `endif
 `else
-wire [7:0] divax_mask = 8'h30;
+wire [7:0] divax_mask      = 8'h30;
+wire [7:0] dma_cpuoff_mask = 8'h00;
+wire [7:0] dma_scg0_mask   = 8'h00;
+wire [7:0] dma_oscoff_mask = 8'h00;
 `endif
 
-always @ (posedge mclk or posedge puc_rst)
+always @ (posedge dma_mclk or posedge puc_rst)
   if (puc_rst)          bcsctl1  <=  8'h00;
-  else if (bcsctl1_wr)  bcsctl1  <=  bcsctl1_nxt & divax_mask; // Mask unused bits
+  else if (bcsctl1_wr)  bcsctl1  <=  bcsctl1_nxt & (divax_mask    | dma_cpuoff_mask |
+                                                    dma_scg0_mask | dma_oscoff_mask); // Mask unused bits
 
 
 // BCSCTL2 Register
@@ -243,7 +276,7 @@ wire [7:0] sels_mask  = 8'h08;
 wire [7:0] divsx_mask = 8'h06;
 `endif
 
-always @ (posedge mclk or posedge puc_rst)
+always @ (posedge dma_mclk or posedge puc_rst)
   if (puc_rst)          bcsctl2  <=  8'h00;
   else if (bcsctl2_wr)  bcsctl2  <=  bcsctl2_nxt & ( sels_mask  | divsx_mask |
                                                      selmx_mask | divmx_mask); // Mask unused bits
@@ -267,7 +300,57 @@ wire [15:0] per_dout =  bcsctl1_rd   |
 
 `ifdef ASIC_CLOCKING
    wire cpuoff_and_mclk_enable;
-   omsp_and_gate and_cpuoff_mclk_en (.y(cpuoff_and_mclk_enable), .a(cpuoff), .b(mclk_enable));
+   wire cpuoff_and_mclk_dma_enable;
+   wire cpuoff_and_mclk_dma_wkup;
+  `ifdef CPUOFF_EN
+   omsp_and_gate and_cpuoff_mclk_en       (.y(cpuoff_and_mclk_enable),     .a(cpuoff),               .b(mclk_enable));
+    `ifdef DMA_IF_EN
+   omsp_and_gate and_cpuoff_mclk_dma_en   (.y(cpuoff_and_mclk_dma_enable), .a(bcsctl1[`DMA_CPUOFF]), .b(mclk_dma_enable));
+   omsp_and_gate and_cpuoff_mclk_dma_wkup (.y(cpuoff_and_mclk_dma_wkup),   .a(bcsctl1[`DMA_CPUOFF]), .b(mclk_dma_wkup));
+    `else
+   assign cpuoff_and_mclk_dma_enable = 1'b0;
+   assign cpuoff_and_mclk_dma_wkup   = 1'b0;
+    `endif
+  `else
+   assign cpuoff_and_mclk_enable     = 1'b0;
+   assign cpuoff_and_mclk_dma_enable = 1'b0;
+   assign cpuoff_and_mclk_dma_wkup   = 1'b0;
+  `endif
+
+   wire scg0_and_mclk_dma_enable;
+   wire scg0_and_mclk_dma_wkup;
+  `ifdef DMA_IF_EN
+    `ifdef SCG0_EN
+   omsp_and_gate and_scg0_mclk_dma_en     (.y(scg0_and_mclk_dma_enable),   .a(bcsctl1[`DMA_SCG0]),   .b(mclk_dma_enable));
+   omsp_and_gate and_scg0_mclk_dma_wkup   (.y(scg0_and_mclk_dma_wkup),     .a(bcsctl1[`DMA_SCG0]),   .b(mclk_dma_wkup));
+    `else
+   assign scg0_and_mclk_dma_enable   = 1'b0;
+   assign scg0_and_mclk_dma_wkup     = 1'b0;
+    `endif
+  `else
+   assign scg0_and_mclk_dma_enable   = 1'b0;
+   assign scg0_and_mclk_dma_wkup     = 1'b0;
+  `endif
+
+   wire oscoff_and_mclk_dma_enable;
+   wire oscoff_and_mclk_dma_wkup;
+  `ifdef DMA_IF_EN
+    `ifdef OSCOFF_EN
+      `ifdef MCLK_MUX
+   omsp_and_gate and_oscoff_mclk_dma_en   (.y(oscoff_and_mclk_dma_enable), .a(bcsctl1[`DMA_OSCOFF]), .b(mclk_dma_enable));
+   omsp_and_gate and_oscoff_mclk_dma_wkup (.y(oscoff_and_mclk_dma_wkup),   .a(bcsctl1[`DMA_OSCOFF]), .b(mclk_dma_wkup));
+      `else
+   assign oscoff_and_mclk_dma_enable = 1'b0;
+   assign oscoff_and_mclk_dma_wkup   = 1'b0;
+      `endif
+    `else
+   assign oscoff_and_mclk_dma_enable = 1'b0;
+   assign oscoff_and_mclk_dma_wkup   = 1'b0;
+    `endif
+  `else
+   assign oscoff_and_mclk_dma_enable = 1'b0;
+   assign oscoff_and_mclk_dma_wkup   = 1'b0;
+  `endif
 `endif
 
 //-----------------------------------------------------------
@@ -298,7 +381,7 @@ wire cpu_en_wkup;
    wire dco_disable_by_scg0;
    wire dco_disable_by_cpu_en;
    wire dco_enable_nxt;
-   omsp_and_gate and_dco_dis1 (.y(cpu_enabled_with_dco),   .a(~bcsctl2[`SELMx]),     .b(cpuoff_and_mclk_enable));
+   omsp_and_gate and_dco_dis1 (.y(cpu_enabled_with_dco),   .a(~bcsctl2[`SELMx]),     .b(cpuoff_and_mclk_enable | scg0_and_mclk_dma_enable));
    omsp_and_gate and_dco_dis2 (.y(dco_not_enabled_by_dbg), .a(~dbg_en_s),            .b(~cpu_enabled_with_dco));
    omsp_and_gate and_dco_dis3 (.y(dco_disable_by_scg0),    .a(scg0),                 .b(dco_not_enabled_by_dbg));
    omsp_and_gate and_dco_dis4 (.y(dco_disable_by_cpu_en),  .a(~cpu_en_s),            .b(~mclk_enable));
@@ -329,8 +412,8 @@ wire cpu_en_wkup;
    //      - if the DCO wants to be synchronously enabled (i.e dco_enable_nxt=1)
    wire dco_mclk_wkup;
    wire dco_en_wkup;
-   omsp_and_gate and_dco_mclk_wkup (.y(dco_mclk_wkup), .a(mclk_wkup),   .b(~bcsctl2[`SELMx]));
-   omsp_and_gate and_dco_en_wkup   (.y(dco_en_wkup),   .a(~dco_enable), .b(dco_enable_nxt));
+   omsp_and_gate and_dco_mclk_wkup (.y(dco_mclk_wkup), .a(mclk_wkup | scg0_and_mclk_dma_wkup), .b(~bcsctl2[`SELMx]));
+   omsp_and_gate and_dco_en_wkup   (.y(dco_en_wkup),   .a(~dco_enable),                        .b(dco_enable_nxt));
 
    wire dco_wkup_set = dco_mclk_wkup | dco_en_wkup | cpu_en_wkup;
 
@@ -391,7 +474,7 @@ wire cpu_en_wkup;
    wire lfxt_disable_by_oscoff;
    wire lfxt_disable_by_cpu_en;
    wire lfxt_enable_nxt;
-   omsp_and_gate and_lfxt_dis1 (.y(cpu_enabled_with_lfxt),   .a(bcsctl2[`SELMx]),         .b(cpuoff_and_mclk_enable));
+   omsp_and_gate and_lfxt_dis1 (.y(cpu_enabled_with_lfxt),   .a(bcsctl2[`SELMx]),         .b(cpuoff_and_mclk_enable | oscoff_and_mclk_dma_enable));
    omsp_and_gate and_lfxt_dis2 (.y(lfxt_not_enabled_by_dbg), .a(~dbg_en_s),               .b(~cpu_enabled_with_lfxt));
    omsp_and_gate and_lfxt_dis3 (.y(lfxt_disable_by_oscoff),  .a(oscoff),                  .b(lfxt_not_enabled_by_dbg));
    omsp_and_gate and_lfxt_dis4 (.y(lfxt_disable_by_cpu_en),  .a(~cpu_en_s),               .b(~mclk_enable));
@@ -417,8 +500,8 @@ wire cpu_en_wkup;
    //      - if the LFXT wants to be synchronously enabled (i.e lfxt_enable_nxt=1)
    wire lfxt_mclk_wkup;
    wire lfxt_en_wkup;
-   omsp_and_gate and_lfxt_mclk_wkup (.y(lfxt_mclk_wkup), .a(mclk_wkup),    .b(bcsctl2[`SELMx]));
-   omsp_and_gate and_lfxt_en_wkup   (.y(lfxt_en_wkup),   .a(~lfxt_enable), .b(lfxt_enable_nxt));
+   omsp_and_gate and_lfxt_mclk_wkup (.y(lfxt_mclk_wkup), .a(mclk_wkup | oscoff_and_mclk_dma_wkup), .b(bcsctl2[`SELMx]));
+   omsp_and_gate and_lfxt_en_wkup   (.y(lfxt_en_wkup),   .a(~lfxt_enable),                         .b(lfxt_enable_nxt));
 
    wire   lfxt_wkup_set  = lfxt_mclk_wkup | lfxt_en_wkup | cpu_en_wkup;
 
@@ -467,13 +550,13 @@ wire lfxt_clk_s;
 omsp_sync_cell sync_cell_lfxt_clk (
     .data_out  (lfxt_clk_s),
     .data_in   (lfxt_clk),
-    .clk       (mclk),
+    .clk       (nodiv_mclk),
     .rst       (por)
 );
 
 reg  lfxt_clk_dly;
 
-always @ (posedge mclk or posedge por)
+always @ (posedge nodiv_mclk or posedge por)
   if (por) lfxt_clk_dly <=  1'b0;
   else     lfxt_clk_dly <=  lfxt_clk_s;
 
@@ -566,9 +649,20 @@ assign nodiv_mclk_n = ~nodiv_mclk;
 
 // Wakeup synchronizer
 //----------------------------
+wire cpuoff_and_mclk_dma_wkup_s;
 wire mclk_wkup_s;
 
 `ifdef CPUOFF_EN
+  `ifdef DMA_IF_EN
+omsp_sync_cell sync_cell_mclk_dma_wkup (
+   .data_out  (cpuoff_and_mclk_dma_wkup_s),
+   .data_in   (cpuoff_and_mclk_dma_wkup),
+   .clk       (nodiv_mclk),
+   .rst       (puc_rst)
+);
+  `else
+   assign cpuoff_and_mclk_dma_wkup_s = 1'b0;
+  `endif
 omsp_sync_cell sync_cell_mclk_wkup (
    .data_out  (mclk_wkup_s),
    .data_in   (mclk_wkup),
@@ -576,7 +670,8 @@ omsp_sync_cell sync_cell_mclk_wkup (
    .rst       (puc_rst)
 );
 `else
-   assign mclk_wkup_s = 1'b0;
+   assign cpuoff_and_mclk_dma_wkup_s = 1'b0;
+   assign mclk_wkup_s                = 1'b0;
 `endif
 
 
@@ -586,9 +681,11 @@ omsp_sync_cell sync_cell_mclk_wkup (
 // comes from the same clock domain.
 
 `ifdef CPUOFF_EN
-wire mclk_active = mclk_enable | mclk_wkup_s | ((dbg_en_s | dma_en) & cpu_en_s);
+wire mclk_active     = mclk_enable                | mclk_wkup_s                | (dbg_en_s & cpu_en_s);
+wire mclk_dma_active = cpuoff_and_mclk_dma_enable | cpuoff_and_mclk_dma_wkup_s | mclk_active;
 `else
-wire mclk_active = 1'b1;
+wire mclk_active     = 1'b1;
+wire mclk_dma_active = 1'b1;
 `endif
 
 `ifdef MCLK_DIVIDER
@@ -597,12 +694,17 @@ always @ (posedge nodiv_mclk or posedge puc_rst)
   if (puc_rst)                       mclk_div <=  3'h0;
   else if ((bcsctl2[`DIVMx]!=2'b00)) mclk_div <=  mclk_div+3'h1;
 
-  wire  mclk_div_en = mclk_active & ((bcsctl2[`DIVMx]==2'b00) ?  1'b1          :
-                                     (bcsctl2[`DIVMx]==2'b01) ?  mclk_div[0]   :
-                                     (bcsctl2[`DIVMx]==2'b10) ? &mclk_div[1:0] :
-                                                                &mclk_div[2:0]);
+  wire  mclk_div_sel    = (bcsctl2[`DIVMx]==2'b00) ?  1'b1          :
+                          (bcsctl2[`DIVMx]==2'b01) ?  mclk_div[0]   :
+                          (bcsctl2[`DIVMx]==2'b10) ? &mclk_div[1:0] :
+                                                     &mclk_div[2:0] ;
+
+  wire  mclk_div_en     = mclk_div_sel & mclk_active;
+  wire  mclk_dma_div_en = mclk_div_sel & mclk_dma_active;
+
 `else
-  wire  mclk_div_en = mclk_active;
+  wire  mclk_div_en     = mclk_active;
+  wire  mclk_dma_div_en = mclk_dma_active;
 `endif
 
 
@@ -611,13 +713,24 @@ always @ (posedge nodiv_mclk or posedge puc_rst)
 `ifdef MCLK_CGATE
 
 omsp_clock_gate clock_gate_mclk (
-    .gclk        (mclk),
+    .gclk        (cpu_mclk),
     .clk         (nodiv_mclk),
     .enable      (mclk_div_en),
     .scan_enable (scan_enable)
 );
+  `ifdef DMA_IF_EN
+omsp_clock_gate clock_gate_dma_mclk (
+    .gclk        (dma_mclk),
+    .clk         (nodiv_mclk),
+    .enable      (mclk_dma_div_en),
+    .scan_enable (scan_enable)
+);
+  `else
+   assign dma_mclk   = cpu_mclk;
+  `endif
 `else
-   assign mclk   = nodiv_mclk;
+   assign cpu_mclk   = nodiv_mclk;
+   assign dma_mclk   = nodiv_mclk;
 `endif
 
 
@@ -727,15 +840,15 @@ omsp_clock_gate clock_gate_mclk (
                                           (bcsctl1[`DIVAx]==2'b10) ? &aclk_div[1:0] :
                                                                      &aclk_div[2:0]);
 
-  always @ (posedge mclk or posedge puc_rst)
+  always @ (posedge nodiv_mclk or posedge puc_rst)
     if (puc_rst)                                     aclk_div <=  3'h0;
     else if ((bcsctl1[`DIVAx]!=2'b00) & lfxt_clk_en) aclk_div <=  aclk_div+3'h1;
 
-  always @ (posedge mclk or posedge puc_rst)
+  always @ (posedge nodiv_mclk or posedge puc_rst)
     if (puc_rst)  aclk_en <=  1'b0;
     else          aclk_en <=  aclk_en_nxt & cpu_en_s;
 
-  assign  aclk   = mclk;
+  assign  aclk   = nodiv_mclk;
 `endif
 
 //-----------------------------------------------------------
@@ -876,15 +989,15 @@ wire      smclk_en_nxt = smclk_in & ((bcsctl2[`DIVSx]==2'b00) ?  1'b1           
                                      (bcsctl2[`DIVSx]==2'b10) ? &smclk_div[1:0] :
                                                                 &smclk_div[2:0]);
 
-always @ (posedge mclk or posedge puc_rst)
+always @ (posedge nodiv_mclk or posedge puc_rst)
   if (puc_rst)  smclk_en <=  1'b0;
   else          smclk_en <=  smclk_en_nxt & cpu_en_s;
 
-always @ (posedge mclk or posedge puc_rst)
+always @ (posedge nodiv_mclk or posedge puc_rst)
   if (puc_rst)                                  smclk_div <=  3'h0;
   else if ((bcsctl2[`DIVSx]!=2'b00) & smclk_in) smclk_div <=  smclk_div+3'h1;
 
-wire  smclk  = mclk;
+wire  smclk  = nodiv_mclk;
 
 `endif
 
@@ -900,7 +1013,7 @@ wire  smclk  = mclk;
     omsp_sync_cell sync_cell_dbg_en (
        .data_out  (dbg_en_n_s),
        .data_in   (~dbg_en),
-       .clk       (mclk),
+       .clk       (cpu_mclk),
        .rst       (por)
     );
     assign dbg_en_s    = ~dbg_en_n_s;
@@ -921,7 +1034,7 @@ wire  smclk  = mclk;
   `ifdef ASIC_CLOCKING
   omsp_clock_gate clock_gate_dbg_clk (
       .gclk        (dbg_clk),
-      .clk         (mclk),
+      .clk         (cpu_mclk),
       .enable      (dbg_en_s),
       .scan_enable (scan_enable)
   );
@@ -979,7 +1092,7 @@ omsp_scan_mux scan_mux_por (
 
 // Reset Generation
 reg  dbg_rst_noscan;
-always @ (posedge mclk or posedge por)
+always @ (posedge cpu_mclk or posedge por)
   if (por)  dbg_rst_noscan <=  1'b1;
   else      dbg_rst_noscan <=  dbg_rst_nxt;
 
@@ -1032,7 +1145,7 @@ omsp_scan_mux scan_mux_puc_rst_a (
 omsp_sync_cell sync_cell_puc (
     .data_out  (puc_noscan_n),
     .data_in   (~puc_s),
-    .clk       (mclk),
+    .clk       (cpu_mclk),
     .rst       (puc_a_scan)
 );
 

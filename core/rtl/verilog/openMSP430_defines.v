@@ -133,6 +133,12 @@
 
 
 //-------------------------------------------------------
+// Include/Exclude DMA interface support
+//-------------------------------------------------------
+`define DMA_IF_EN
+
+
+//-------------------------------------------------------
 // Include/Exclude Non-Maskable-Interrupt support
 //-------------------------------------------------------
 `define NMI
@@ -281,15 +287,15 @@
 //               (i.e. the *_SIZE divided by 2)
 //-------------------------------------------------------
 
-// Custom Program memory (enabled with PMEM_SIZE_CUSTOM)
+// Custom Program memory    (enabled with PMEM_SIZE_CUSTOM)
 `define PMEM_CUSTOM_AWIDTH      10
 `define PMEM_CUSTOM_SIZE      2048
 
-// Custom Data memory    (enabled with DMEM_SIZE_CUSTOM)
+// Custom Data memory       (enabled with DMEM_SIZE_CUSTOM)
 `define DMEM_CUSTOM_AWIDTH       6
 `define DMEM_CUSTOM_SIZE       128
 
-// Custom Peripheral memory  (enabled with PER_SIZE_CUSTOM)
+// Custom Peripheral memory (enabled with PER_SIZE_CUSTOM)
 `define PER_CUSTOM_AWIDTH        8
 `define PER_CUSTOM_SIZE        512
 
@@ -777,6 +783,9 @@
 
 // Basic clock module: BCSCTL1 Control Register
 `define DIVAx       5:4
+`define DMA_CPUOFF  0
+`define DMA_SCG0    1
+`define DMA_OSCOFF  2
 
 // Basic clock module: BCSCTL2 Control Register
 `define SELMx       7
@@ -807,7 +816,11 @@
 //======================================
 
 // Debug interface: CPU version
-`define CPU_VERSION   3'h2
+//   0 -
+//   1 -
+//   2 -
+//   3 - Add DMA interface support
+`define CPU_VERSION   3'h3
 
 // Debug interface: Software breakpoint opcode
 `define DBG_SWBRK_OP 16'h4343

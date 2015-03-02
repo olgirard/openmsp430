@@ -153,15 +153,16 @@ wire                 ext_per_en;
 //=============================================================================
 
 //------------------------------------------
-// Arbiter between MSTR and Debug interface
+// Arbiter between DMA and Debug interface
 //------------------------------------------
-
+`ifdef DMA_IF_EN
+   
 // Debug-interface always stops the CPU
 // Master interface stops the CPU in priority mode
-assign      cpu_halt_cmd   =  dbg_halt_cmd | (dma_en & dma_priority);
+assign      cpu_halt_cmd  =  dbg_halt_cmd | (dma_en & dma_priority);
 
 // Master interface access is ready when the memory access occures
-assign      dma_ready = ~dbg_halt_cmd & (ext_dmem_en | ext_pmem_en | ext_per_en);
+assign      dma_ready     = ~dbg_halt_cmd & (ext_dmem_en | ext_pmem_en | ext_per_en);
 
 // Use delayed version of 'dma_ready' to mask the 'dma_dout' data output
 // when not accessed and reduce toggle rate (thus power consumption)
@@ -177,10 +178,28 @@ wire [15:1] ext_mem_addr  =  dbg_mem_en ? dbg_mem_addr  :  dma_addr;
 wire [15:0] ext_mem_dout  =  dbg_mem_en ? dbg_mem_dout  :  dma_din;
 
 // External interface read data
-assign      dbg_mem_din   = ext_mem_din;
-assign      dma_dout = ext_mem_din & {16{dma_ready_dly}};
+assign      dbg_mem_din   =  ext_mem_din;
+assign      dma_dout      =  ext_mem_din & {16{dma_ready_dly}};
 
 
+`else
+// Debug-interface always stops the CPU
+assign      cpu_halt_cmd  =  dbg_halt_cmd;
+
+// Master interface access is never ready when disabled
+assign      dma_ready     =  1'b0;
+
+// Debug interface only
+wire        ext_mem_en    =  dbg_mem_en;
+wire  [1:0] ext_mem_wr    =  dbg_mem_wr;
+wire [15:1] ext_mem_addr  =  dbg_mem_addr;
+wire [15:0] ext_mem_dout  =  dbg_mem_dout;
+
+// External interface read data
+assign      dbg_mem_din   =  ext_mem_din;
+assign      dma_dout      =  16'h0000;
+`endif
+   
 //------------------------------------------
 // DATA-MEMORY Interface
 //------------------------------------------

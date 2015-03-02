@@ -161,6 +161,11 @@
 `undef WATCHDOG
 `endif
 
+// Include/Exclude DMA interface support
+`ifdef DMA_IF_EN
+`undef DMA_IF_EN
+`endif
+
 // Include/Exclude Non-Maskable-Interrupt support
 `ifdef NMI
 `undef NMI
@@ -704,6 +709,15 @@
 // Basic clock module: BCSCTL1 Control Register
 `ifdef DIVAx
 `undef DIVAx
+`endif
+`ifdef DMA_CPUOFF
+`undef DMA_CPUOFF
+`endif
+`ifdef DMA_SCG0
+`undef DMA_SCG0
+`endif
+`ifdef DMA_OSCOFF
+`undef DMA_OSCOFF
 `endif
 
 // Basic clock module: BCSCTL2 Control Register
