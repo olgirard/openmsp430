@@ -71,6 +71,7 @@ wire               per_en;
 // Direct Memory Access interface
 wire        [15:0] dma_dout;
 wire               dma_ready;
+wire               dma_resp;
 reg         [15:1] dma_addr;
 reg         [15:0] dma_din;
 reg                dma_en;
@@ -389,6 +390,7 @@ openMSP430 dut (
     .mclk              (mclk),                 // Main system clock
     .dma_dout          (dma_dout),             // Direct Memory Access data output
     .dma_ready         (dma_ready),            // Direct Memory Access is complete
+    .dma_resp          (dma_resp),             // Direct Memory Access response (0:Okay / 1:Error)
     .per_addr          (per_addr),             // Peripheral address
     .per_din           (per_din),              // Peripheral data input
     .per_en            (per_en),               // Peripheral enable (high active)

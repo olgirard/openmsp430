@@ -59,6 +59,7 @@ module  omsp_mem_backbone (
     fe_pmem_wait,                       // Frontend wait for Instruction fetch
     dma_dout,                           // Direct Memory Access data output
     dma_ready,                          // Direct Memory Access is complete
+    dma_resp,                           // Direct Memory Access response (0:Okay / 1:Error)
     per_addr,                           // Peripheral address
     per_din,                            // Peripheral data input
     per_we,                             // Peripheral write enable (high active)
@@ -107,6 +108,7 @@ output        [15:0] fe_mdb_in;         // Frontend Memory data bus input
 output               fe_pmem_wait;      // Frontend wait for Instruction fetch
 output        [15:0] dma_dout;          // Direct Memory Access data output
 output               dma_ready;         // Direct Memory Access is complete
+output               dma_resp;          // Direct Memory Access response (0:Okay / 1:Error)
 output        [13:0] per_addr;          // Peripheral address
 output        [15:0] per_din;           // Peripheral data input
 output         [1:0] per_we;            // Peripheral write enable (high active)
@@ -142,9 +144,13 @@ input         [15:0] pmem_dout;         // Program Memory data output
 input                puc_rst;           // Main system reset
 input                scan_enable;       // Scan enable (active during scan shifting)
 
+wire                 ext_mem_en;
 wire          [15:0] ext_mem_din;
+wire                 ext_dmem_sel;
 wire                 ext_dmem_en;
+wire                 ext_pmem_sel;
 wire                 ext_pmem_en;
+wire                 ext_per_sel;
 wire                 ext_per_en;
 
 
@@ -161,8 +167,11 @@ wire                 ext_per_en;
 // Master interface stops the CPU in priority mode
 assign      cpu_halt_cmd  =  dbg_halt_cmd | (dma_en & dma_priority);
 
+// Return ERROR response if address lays outside the memory spaces (Peripheral, Data & Program memories)
+assign      dma_resp      = ~dbg_halt_cmd & ~(ext_dmem_sel | ext_pmem_sel | ext_per_sel) & dma_en;
+   
 // Master interface access is ready when the memory access occures
-assign      dma_ready     = ~dbg_halt_cmd & (ext_dmem_en | ext_pmem_en | ext_per_en);
+assign      dma_ready     = ~dbg_halt_cmd &  (ext_dmem_en  | ext_pmem_en  | ext_per_en | dma_resp);
 
 // Use delayed version of 'dma_ready' to mask the 'dma_dout' data output
 // when not accessed and reduce toggle rate (thus power consumption)
@@ -172,7 +181,7 @@ always @ (posedge mclk or posedge puc_rst)
   else          dma_ready_dly <=  dma_ready;
 
 // Mux between debug and master interface
-wire        ext_mem_en    =  dbg_mem_en | dma_en;
+assign      ext_mem_en    =  dbg_mem_en | dma_en;
 wire  [1:0] ext_mem_wr    =  dbg_mem_en ? dbg_mem_wr    :  dma_we;
 wire [15:1] ext_mem_addr  =  dbg_mem_en ? dbg_mem_addr  :  dma_addr;
 wire [15:0] ext_mem_dout  =  dbg_mem_en ? dbg_mem_dout  :  dma_din;
@@ -190,7 +199,7 @@ assign      cpu_halt_cmd  =  dbg_halt_cmd;
 assign      dma_ready     =  1'b0;
 
 // Debug interface only
-wire        ext_mem_en    =  dbg_mem_en;
+assign      ext_mem_en    =  dbg_mem_en;
 wire  [1:0] ext_mem_wr    =  dbg_mem_wr;
 wire [15:1] ext_mem_addr  =  dbg_mem_addr;
 wire [15:0] ext_mem_dout  =  dbg_mem_dout;
@@ -214,9 +223,9 @@ wire        [15:0] eu_dmem_addr  = {1'b0, eu_mab}-(`DMEM_BASE>>1);
 // -- not allowed to execute from data memory --
 
 // External Master/Debug interface access
-wire               ext_dmem_sel  = (ext_mem_addr[15:1]>=(`DMEM_BASE>>1)) &
+assign             ext_dmem_sel  = (ext_mem_addr[15:1]>=(`DMEM_BASE>>1)) &
                                    (ext_mem_addr[15:1]<((`DMEM_BASE+`DMEM_SIZE)>>1));
-assign             ext_dmem_en   = ext_mem_en & ext_dmem_sel & ~eu_dmem_en;
+assign             ext_dmem_en   = ext_mem_en &  ext_dmem_sel & ~eu_dmem_en;
 wire        [15:0] ext_dmem_addr = {1'b0, ext_mem_addr[15:1]}-(`DMEM_BASE>>1);
 
 
@@ -244,7 +253,7 @@ wire               fe_pmem_en    = fe_mb_en & fe_pmem_sel;
 wire        [15:0] fe_pmem_addr  = fe_mab-(PMEM_OFFSET>>1);
 
 // External Master/Debug interface access
-wire               ext_pmem_sel  = (ext_mem_addr[15:1]>=(PMEM_OFFSET>>1));
+assign             ext_pmem_sel  = (ext_mem_addr[15:1]>=(PMEM_OFFSET>>1));
 assign             ext_pmem_en   = ext_mem_en & ext_pmem_sel & ~eu_pmem_en & ~fe_pmem_en;
 wire        [15:0] ext_pmem_addr = {1'b0, ext_mem_addr[15:1]}-(PMEM_OFFSET>>1);
 
@@ -271,7 +280,7 @@ wire               eu_per_en     =  eu_mb_en & eu_per_sel;
 // -- not allowed to execute from peripherals memory space --
 
 // External Master/Debug interface access
-wire               ext_per_sel   =  (ext_mem_addr[15:1]<(`PER_SIZE>>1));
+assign             ext_per_sel   =  (ext_mem_addr[15:1]<(`PER_SIZE>>1));
 assign             ext_per_en    =  ext_mem_en & ext_per_sel & ~eu_per_en;
 
 // Peripheral Interface
@@ -338,7 +347,7 @@ assign fe_mdb_in = pmem_dout_bckup_sel ? pmem_dout_bckup : pmem_dout;
 reg [1:0] eu_mdb_in_sel;
 always @(posedge mclk or posedge puc_rst)
   if (puc_rst)  eu_mdb_in_sel  <= 2'b00;
-  else          eu_mdb_in_sel  <= {eu_pmem_en, per_en};
+  else          eu_mdb_in_sel  <= {eu_pmem_en, eu_per_en};
 
 // Mux
 assign          eu_mdb_in       = eu_mdb_in_sel[1] ? pmem_dout    :

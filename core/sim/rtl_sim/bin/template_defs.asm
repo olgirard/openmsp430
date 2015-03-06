@@ -250,5 +250,8 @@
 /*---------------------------------------------------------------------------*/
 /*                        PROGRAM MEMORY MAPPING                             */
 /*---------------------------------------------------------------------------*/
+
+.set    PMEM_BASE,       PMEM_BASE_VAL
+
 .set    PMEM_LENGTH,     PMEM_SIZE
 .set    PMEM_EDE_LENGTH, PMEM_EDE_SIZE

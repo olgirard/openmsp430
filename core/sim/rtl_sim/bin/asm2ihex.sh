@@ -94,9 +94,11 @@ sed -i "s/PMEM_SIZE/$PMEM_SIZE/g"         pmem_defs.asm
 sed -i "s/PER_SIZE_HEX/$PER_SIZE/g"       pmem_defs.asm
 if [ $MSPGCC_PFX == "msp430-elf" ]; then
     sed -i "s/PER_SIZE/.data/g"           pmem_defs.asm
+    sed -i "s/PMEM_BASE_VAL/.text/g"      pmem_defs.asm
     sed -i "s/PMEM_EDE_SIZE/0/g"          pmem_defs.asm
 else
     sed -i "s/PER_SIZE/$PER_SIZE/g"       pmem_defs.asm
+    sed -i "s/PMEM_BASE_VAL/$PMEM_BASE/g" pmem_defs.asm
     sed -i "s/PMEM_EDE_SIZE/$PMEM_SIZE/g" pmem_defs.asm
 fi
 

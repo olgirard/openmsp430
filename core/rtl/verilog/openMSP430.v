@@ -65,6 +65,7 @@ module  openMSP430 (
     mclk,                                    // Main system clock
     dma_dout,                                // Direct Memory Access data output
     dma_ready,                               // Direct Memory Access is complete
+    dma_resp,                                // Direct Memory Access response (0:Okay / 1:Error)
     per_addr,                                // Peripheral address
     per_din,                                 // Peripheral data input
     per_en,                                  // Peripheral enable (high active)
@@ -128,6 +129,7 @@ output               lfxt_wkup;              // ASIC ONLY: Low frequency oscilla
 output               mclk;                   // Main system clock
 output        [15:0] dma_dout;               // Direct Memory Access data output
 output               dma_ready;              // Direct Memory Access is complete
+output               dma_resp;               // Direct Memory Access response (0:Okay / 1:Error)
 output        [13:0] per_addr;               // Peripheral address
 output        [15:0] per_din;                // Peripheral data input
 output               per_en;                 // Peripheral enable (high active)
@@ -437,6 +439,7 @@ omsp_mem_backbone mem_backbone_0 (
     .fe_pmem_wait      (fe_pmem_wait),       // Frontend wait for Instruction fetch
     .dma_dout          (dma_dout),           // Direct Memory Access data output
     .dma_ready         (dma_ready),          // Direct Memory Access is complete
+    .dma_resp          (dma_resp),           // Direct Memory Access response (0:Okay / 1:Error)
     .per_addr          (per_addr),           // Peripheral address
     .per_din           (per_din),            // Peripheral data input
     .per_we            (per_we),             // Peripheral write enable (high active)
