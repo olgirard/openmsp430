@@ -41,6 +41,8 @@
 //============================================================================
 integer    dma_cnt_wr;
 integer    dma_cnt_rd;
+integer    dma_wr_error;
+integer    dma_rd_error;
 
 //---------------------
 // Generic write task
@@ -64,6 +66,13 @@ task dma_write;
       dma_addr   = 15'h0000;
       dma_din    = 16'h0000;
       dma_cnt_wr = dma_cnt_wr+1;
+
+      // Check transfer response
+      if (dma_resp != resp)
+	begin
+	   $display("ERROR: DMA interface write response check -- address: 0x%h -- response: %h / expected: %h (%t ns)", addr, dma_resp, resp, $time);
+	   dma_wr_error = dma_wr_error+1;
+	end
    end
 endtask
 
@@ -106,8 +115,6 @@ reg        dma_read_check_active;
 reg [15:0] dma_read_check_addr;
 reg [15:0] dma_read_check_data;
 reg [15:0] dma_read_check_mask;
-integer    dma_wr_error;
-integer    dma_rd_error;
 
 initial
   begin
@@ -134,6 +141,7 @@ task dma_read;
    input  [15:0] addr;   // Address
    input  [15:0] data;   // Data to check against
    input         resp;   // Expected transfer response (0: Okay / 1: Error)
+   input         check;  // Enable/disable read value check
    input         size;   // Access size (0: 8-bit / 1: 16-bit)
 
    begin
@@ -148,12 +156,19 @@ task dma_read;
       dma_addr = 15'h0000;
 
       // Trigger read check
-      dma_read_check_active =  1'b1;
+      dma_read_check_active =  check;
       dma_read_check_addr   =  addr;
       dma_read_check_data   =  data;
       dma_read_check_mask   =  size    ? 16'hFFFF :
                               (addr[0] ? 16'hFF00 : 16'h00FF);
       dma_cnt_rd            = dma_cnt_rd+1;
+
+      // Check transfer response
+      if (dma_resp != resp)
+	begin
+	   $display("ERROR: DMA interface read response check -- address: 0x%h -- response: %h / expected: %h (%t ns)", addr, dma_resp, resp, $time);
+	   dma_rd_error = dma_rd_error+1;
+	end
    end
 endtask
 
@@ -166,7 +181,7 @@ task dma_read_16b;
    input         resp;   // Expected transfer response (0: Okay / 1: Error)
 
    begin
-      dma_read(addr, data, resp, 1'b1);
+      dma_read(addr, data, resp, 1'b1, 1'b1);
    end
 endtask
 
@@ -179,8 +194,20 @@ task dma_read_8b;
    input         resp;   // Expected transfer response (0: Okay / 1: Error)
 
    begin
-      if (addr[0]) dma_read(addr, {data,  8'h00}, resp, 1'b0);
-      else         dma_read(addr, {8'h00, data }, resp, 1'b0);
+      if (addr[0]) dma_read(addr, {data,  8'h00}, resp, 1'b1, 1'b0);
+      else         dma_read(addr, {8'h00, data }, resp, 1'b1, 1'b0);
+   end
+endtask
+
+//--------------------------------
+// Read 16b value task (no check)
+//--------------------------------
+task dma_read_val_16b;
+   input  [15:0] addr;   // Address
+   input         resp;   // Expected transfer response (0: Okay / 1: Error)
+
+   begin
+      dma_read(addr, 16'h0000, resp, 1'b0, 1'b1);
    end
 endtask
 
