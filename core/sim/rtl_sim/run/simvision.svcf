@@ -1,0 +1,327 @@
+# SimVision Command Script (Thu Mar 05 23:22:58 CET 2015)
+#
+# Version 05.83.s009
+#
+# You can restore this configuration with:
+#
+#     simvision -input simvision.svcf
+#  or simvision -input simvision.svcf database1 database2 ...
+#
+
+
+#
+# preferences
+#
+preferences set toolbar-Windows-WaveWindow {
+  usual
+  hide icheck
+  position -pos 3
+}
+preferences set toolbar-Windows-WatchList {
+  usual
+  hide icheck
+}
+
+#
+# databases
+#
+database require tb_openMSP430 -hints {
+	file ./tb_openMSP430.trn
+	file /home/user1/temp/openmsp430/core/sim/rtl_sim/run/tb_openMSP430.trn
+}
+
+#
+# groups
+#
+catch {group new -name CPU -overlay 0}
+catch {group new -name {Clock & Reset} -overlay 0}
+catch {group new -name Registers -overlay 0}
+catch {group new -name {Data Memory} -overlay 0}
+catch {group new -name {DMA Interface} -overlay 0}
+catch {group new -name {DMEM Interface} -overlay 0}
+catch {group new -name {PMEM Interface} -overlay 0}
+catch {group new -name {Peripheral Interface} -overlay 0}
+
+group using CPU
+group set -overlay 0
+group set -comment {}
+group set -parents {}
+group set -groups {}
+group clear 0 end
+
+group insert \
+    tb_openMSP430.error \
+    {tb_openMSP430.inst_short[255:0]} \
+    {tb_openMSP430.inst_full[255:0]} \
+    {tb_openMSP430.inst_pc[15:0]} \
+    {tb_openMSP430.inst_number[31:0]} \
+    {tb_openMSP430.e_state[255:0]} \
+    {tb_openMSP430.i_state[255:0]}
+
+group using {Clock & Reset}
+group set -overlay 0
+group set -comment {}
+group set -parents {}
+group set -groups {}
+group clear 0 end
+
+group insert \
+    tb_openMSP430.reset_n \
+    tb_openMSP430.dut.por \
+    tb_openMSP430.puc_rst \
+    tb_openMSP430.dut.dbg_rst \
+    tb_openMSP430.lfxt_clk \
+    tb_openMSP430.dco_clk \
+    tb_openMSP430.mclk \
+    tb_openMSP430.dut.cpu_mclk \
+    tb_openMSP430.dut.dma_mclk \
+    tb_openMSP430.dut.dbg_clk
+
+group using Registers
+group set -overlay 0
+group set -comment {}
+group set -parents {}
+group set -groups {}
+group clear 0 end
+
+group insert \
+    {tb_openMSP430.r0[15:0]} \
+    {tb_openMSP430.r1[15:0]} \
+    {tb_openMSP430.r2[15:0]} \
+    {tb_openMSP430.r3[15:0]} \
+    {tb_openMSP430.r4[15:0]} \
+    {tb_openMSP430.r5[15:0]} \
+    {tb_openMSP430.r6[15:0]} \
+    {tb_openMSP430.r7[15:0]} \
+    {tb_openMSP430.r8[15:0]} \
+    {tb_openMSP430.r9[15:0]} \
+    {tb_openMSP430.r10[15:0]} \
+    {tb_openMSP430.r11[15:0]} \
+    {tb_openMSP430.r12[15:0]} \
+    {tb_openMSP430.r13[15:0]} \
+    {tb_openMSP430.r14[15:0]} \
+    {tb_openMSP430.r15[15:0]}
+
+group using {Data Memory}
+group set -overlay 0
+group set -comment {}
+group set -parents {}
+group set -groups {}
+group clear 0 end
+
+group insert \
+    {tb_openMSP430.mem200[15:0]} \
+    {tb_openMSP430.mem202[15:0]} \
+    {tb_openMSP430.mem204[15:0]} \
+    {tb_openMSP430.mem206[15:0]} \
+    {tb_openMSP430.mem208[15:0]} \
+    {tb_openMSP430.mem20A[15:0]} \
+    {tb_openMSP430.mem20C[15:0]} \
+    {tb_openMSP430.mem20E[15:0]} \
+    {tb_openMSP430.mem210[15:0]} \
+    {tb_openMSP430.mem212[15:0]} \
+    {tb_openMSP430.mem214[15:0]} \
+    {tb_openMSP430.mem216[15:0]} \
+    {tb_openMSP430.mem218[15:0]} \
+    {tb_openMSP430.mem21A[15:0]} \
+    {tb_openMSP430.mem21C[15:0]} \
+    {tb_openMSP430.mem21E[15:0]} \
+    {tb_openMSP430.mem220[15:0]} \
+    {tb_openMSP430.mem222[15:0]} \
+    {tb_openMSP430.mem224[15:0]} \
+    {tb_openMSP430.mem226[15:0]} \
+    {tb_openMSP430.mem228[15:0]} \
+    {tb_openMSP430.mem22A[15:0]} \
+    {tb_openMSP430.mem22C[15:0]} \
+    {tb_openMSP430.mem22E[15:0]} \
+    {tb_openMSP430.mem230[15:0]} \
+    {tb_openMSP430.mem232[15:0]} \
+    {tb_openMSP430.mem234[15:0]} \
+    {tb_openMSP430.mem236[15:0]} \
+    {tb_openMSP430.mem238[15:0]} \
+    {tb_openMSP430.mem23A[15:0]} \
+    {tb_openMSP430.mem23C[15:0]} \
+    {tb_openMSP430.mem23E[15:0]} \
+    {tb_openMSP430.mem240[15:0]} \
+    {tb_openMSP430.mem242[15:0]} \
+    {tb_openMSP430.mem244[15:0]} \
+    {tb_openMSP430.mem246[15:0]} \
+    {tb_openMSP430.mem248[15:0]} \
+    {tb_openMSP430.mem24A[15:0]} \
+    {tb_openMSP430.mem24C[15:0]} \
+    {tb_openMSP430.mem24E[15:0]} \
+    {tb_openMSP430.mem250[15:0]} \
+    {tb_openMSP430.mem252[15:0]} \
+    {tb_openMSP430.mem254[15:0]} \
+    {tb_openMSP430.mem256[15:0]} \
+    {tb_openMSP430.mem258[15:0]} \
+    {tb_openMSP430.mem25A[15:0]} \
+    {tb_openMSP430.mem25C[15:0]} \
+    {tb_openMSP430.mem25E[15:0]} \
+    {tb_openMSP430.mem260[15:0]} \
+    {tb_openMSP430.mem262[15:0]} \
+    {tb_openMSP430.mem264[15:0]} \
+    {tb_openMSP430.mem266[15:0]} \
+    {tb_openMSP430.mem268[15:0]} \
+    {tb_openMSP430.mem26A[15:0]} \
+    {tb_openMSP430.mem26C[15:0]} \
+    {tb_openMSP430.mem26E[15:0]} \
+    {tb_openMSP430.mem270[15:0]} \
+    {tb_openMSP430.mem272[15:0]} \
+    {tb_openMSP430.mem274[15:0]} \
+    {tb_openMSP430.mem276[15:0]} \
+    {tb_openMSP430.mem278[15:0]} \
+    {tb_openMSP430.mem27A[15:0]} \
+    {tb_openMSP430.mem27C[15:0]} \
+    {tb_openMSP430.mem27E[15:0]}
+
+group using {DMA Interface}
+group set -overlay 0
+group set -comment {}
+group set -parents {}
+group set -groups {}
+group clear 0 end
+
+group insert \
+    tb_openMSP430.dma_rd_error \
+    tb_openMSP430.dma_wr_error \
+    tb_openMSP430.dut.dma_priority \
+    tb_openMSP430.dut.dma_wkup \
+    tb_openMSP430.dut.dma_en \
+    {tb_openMSP430.dut.dma_we[1:0]} \
+    tb_openMSP430.dut.dma_ready \
+    tb_openMSP430.dut.dma_resp \
+    {tb_openMSP430.dut.dma_addr[15:1]} \
+    {tb_openMSP430.dut.dma_din[15:0]} \
+    {tb_openMSP430.dut.dma_dout[15:0]}
+
+group using {DMEM Interface}
+group set -overlay 0
+group set -comment {}
+group set -parents {}
+group set -groups {}
+group clear 0 end
+
+group insert \
+    tb_openMSP430.dmem_cen \
+    {tb_openMSP430.dmem_wen[1:0]} \
+    {tb_openMSP430.dmem_addr[12:0]} \
+    {tb_openMSP430.dmem_dout[15:0]} \
+    {tb_openMSP430.dmem_din[15:0]}
+
+group using {PMEM Interface}
+group set -overlay 0
+group set -comment {}
+group set -parents {}
+group set -groups {}
+group clear 0 end
+
+group insert \
+    tb_openMSP430.pmem_cen \
+    {tb_openMSP430.pmem_wen[1:0]} \
+    {tb_openMSP430.pmem_addr[8:0]} \
+    {tb_openMSP430.pmem_dout[15:0]} \
+    {tb_openMSP430.pmem_din[15:0]}
+
+group using {Peripheral Interface}
+group set -overlay 0
+group set -comment {}
+group set -parents {}
+group set -groups {}
+group clear 0 end
+
+group insert \
+    tb_openMSP430.per_en \
+    {tb_openMSP430.per_we[1:0]} \
+    {tb_openMSP430.per_addr[13:0]} \
+    {tb_openMSP430.per_din[15:0]} \
+    {tb_openMSP430.per_dout[15:0]}
+
+#
+# cursors
+#
+set time 1797ns
+if {[catch {cursor new -name  TimeA -time $time}] != ""} {
+    cursor set -using TimeA -time $time
+}
+
+#
+# mmaps
+#
+mmap new -reuse -name {Boolean as Logic} -contents {
+{%c=FALSE -edgepriority 1 -shape low}
+{%c=TRUE -edgepriority 1 -shape high}
+}
+mmap new -reuse -name {Example Map} -contents {
+{%b=11???? -bgcolor orange -label REG:%x -linecolor yellow -shape bus}
+{%x=1F -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=2C -bgcolor red -label ERROR -linecolor white -shape EVENT}
+{%x=* -label %x -linecolor gray -shape bus}
+}
+
+#
+# Waveform windows
+#
+if {[catch {window new WaveWindow -name "Waveform 1" -geometry 1680x872+0+0}] != ""} {
+    window geometry "Waveform 1" 1680x872+0+0
+}
+window target "Waveform 1" on
+waveform using {Waveform 1}
+waveform sidebar select designbrowser
+waveform set \
+    -primarycursor TimeA \
+    -signalnames name \
+    -signalwidth 175 \
+    -units ns \
+    -valuewidth 75
+cursor set -using TimeA -time 1797ns
+waveform baseline set -time 4,375,000ps
+
+set groupId [waveform add -groups CPU]
+set glist [waveform hierarchy contents $groupId]
+set id [lindex $glist 0]
+foreach {name attrs} {
+    tb_openMSP430.error {}
+    tb_openMSP430.inst_short {-radix %a}
+    tb_openMSP430.inst_full {-radix %a}
+    tb_openMSP430.inst_pc {}
+    tb_openMSP430.inst_number {}
+    tb_openMSP430.e_state {-radix %a}
+    tb_openMSP430.i_state {-radix %a}
+} {
+    set expected [ join [waveform signals -format native $id] ]
+    if {[string equal $name $expected]} {
+        if {$attrs != ""} {
+            eval waveform format $id $attrs
+        }
+    }
+        set glist [lrange $glist 1 end]
+        set id [lindex $glist 0]
+}
+
+set groupId [waveform add -groups {{Clock & Reset}}]
+waveform hierarchy collapse $groupId
+
+set groupId [waveform add -groups Registers]
+waveform hierarchy collapse $groupId
+
+set groupId [waveform add -groups {{Data Memory}}]
+waveform hierarchy collapse $groupId
+
+set groupId [waveform add -groups {{DMA Interface}}]
+
+set groupId [waveform add -groups {{DMEM Interface}}]
+waveform hierarchy collapse $groupId
+
+set groupId [waveform add -groups {{PMEM Interface}}]
+waveform hierarchy collapse $groupId
+
+set groupId [waveform add -groups {{Peripheral Interface}}]
+waveform hierarchy collapse $groupId
+
+set id [waveform add -signals [list tb_openMSP430.dut.mem_backbone_0.ext_per_sel \
+	tb_openMSP430.dut.mem_backbone_0.ext_pmem_sel \
+	tb_openMSP430.dut.mem_backbone_0.ext_mem_en \
+	tb_openMSP430.dut.mem_backbone_0.ext_dmem_sel ]]
+
+waveform xview limits 1797ns 4375ns
