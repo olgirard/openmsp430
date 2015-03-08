@@ -168,10 +168,10 @@ wire                 ext_per_en;
 assign      cpu_halt_cmd  =  dbg_halt_cmd | (dma_en & dma_priority);
 
 // Return ERROR response if address lays outside the memory spaces (Peripheral, Data & Program memories)
-assign      dma_resp      = ~dbg_halt_cmd & ~(ext_dmem_sel | ext_pmem_sel | ext_per_sel) & dma_en;
+assign      dma_resp      = ~dbg_mem_en & ~(ext_dmem_sel | ext_pmem_sel | ext_per_sel) & dma_en;
    
 // Master interface access is ready when the memory access occures
-assign      dma_ready     = ~dbg_halt_cmd &  (ext_dmem_en  | ext_pmem_en  | ext_per_en | dma_resp);
+assign      dma_ready     = ~dbg_mem_en &  (ext_dmem_en  | ext_pmem_en  | ext_per_en | dma_resp);
 
 // Use delayed version of 'dma_ready' to mask the 'dma_dout' data output
 // when not accessed and reduce toggle rate (thus power consumption)
@@ -195,8 +195,9 @@ assign      dma_dout      =  ext_mem_din & {16{dma_ready_dly}};
 // Debug-interface always stops the CPU
 assign      cpu_halt_cmd  =  dbg_halt_cmd;
 
-// Master interface access is never ready when disabled
-assign      dma_ready     =  1'b0;
+// Master interface access is always ready with error response when excluded
+assign      dma_resp      =  1'b1;
+assign      dma_ready     =  1'b1;
 
 // Debug interface only
 assign      ext_mem_en    =  dbg_mem_en;

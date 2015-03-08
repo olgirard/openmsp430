@@ -217,6 +217,7 @@ endtask
 //============================================================================
 
 integer    dma_rand_wait;
+integer    dma_rand_wait_disable;
 reg        dma_rand_rdwr;
 reg        dma_rand_if;
 integer	   dma_rand_data;
@@ -240,6 +241,7 @@ initial
      dma_verif_on      = 0;
      `endif     
    `endif
+     dma_rand_wait_disable = 0;
      dma_verif_verbose = 0;
      dma_cnt_wr        = 0;
      dma_cnt_rd        = 0;
@@ -269,7 +271,7 @@ initial
 	    begin
 	       // Randomize 1 or 0 wait states between accesses
 	       // (1/3 proba of getting 1 wait state)
-	       dma_rand_wait = ($urandom_range(2,0)==0);
+	       dma_rand_wait = dma_rand_wait_disable ? 0 : ($urandom_range(2,0)==0);
 	       repeat(dma_rand_wait) @(posedge mclk);
 
 	       // Randomize read/write accesses
