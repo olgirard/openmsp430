@@ -66,8 +66,8 @@ module  omsp_clock_module (
     puc_rst,                          // Main system reset
     smclk,                            // SMCLK
     smclk_en,                         // SMCLK enable
-				      
-// INPUTs			      
+                                      
+// INPUTs                             
     cpu_en,                           // Enable CPU code execution (asynchronous)
     cpuoff,                           // Turns off the CPU
     dbg_cpu_reset,                    // Reset CPU from debug interface
@@ -75,7 +75,7 @@ module  omsp_clock_module (
     dco_clk,                          // Fast oscillator (fast clock)
     lfxt_clk,                         // Low frequency oscillator (typ 32kHz)
     mclk_dma_enable,                  // DMA Sub-System Clock enable
-    mclk_dma_wkup,		      // DMA Sub-System Clock wake-up (asynchronous)
+    mclk_dma_wkup,                    // DMA Sub-System Clock wake-up (asynchronous)
     mclk_enable,                      // Main System Clock enable
     mclk_wkup,                        // Main System Clock wake-up (asynchronous)
     oscoff,                           // Turns off LFXT1 clock input
@@ -217,9 +217,14 @@ wire [7:0] dma_scg0_mask   = 8'h02;
     `else
 wire [7:0] dma_scg0_mask   = 8'h00;
     `endif
+    `ifdef SCG1_EN
+wire [7:0] dma_scg1_mask   = 8'h04;
+    `else
+wire [7:0] dma_scg1_mask   = 8'h00;
+    `endif
     `ifdef OSCOFF_EN
       `ifdef MCLK_MUX
-wire [7:0] dma_oscoff_mask = 8'h04;
+wire [7:0] dma_oscoff_mask = 8'h08;
       `else
 wire [7:0] dma_oscoff_mask = 8'h00;
       `endif
@@ -229,19 +234,22 @@ wire [7:0] dma_oscoff_mask = 8'h00;
   `else
 wire [7:0] dma_cpuoff_mask = 8'h00;
 wire [7:0] dma_scg0_mask   = 8'h00;
+wire [7:0] dma_scg1_mask   = 8'h00;
 wire [7:0] dma_oscoff_mask = 8'h00;
   `endif
 `else
 wire [7:0] divax_mask      = 8'h30;
 wire [7:0] dma_cpuoff_mask = 8'h00;
 wire [7:0] dma_scg0_mask   = 8'h00;
+wire [7:0] dma_scg1_mask   = 8'h00;
 wire [7:0] dma_oscoff_mask = 8'h00;
 `endif
 
 always @ (posedge dma_mclk or posedge puc_rst)
   if (puc_rst)          bcsctl1  <=  8'h00;
-  else if (bcsctl1_wr)  bcsctl1  <=  bcsctl1_nxt & (divax_mask    | dma_cpuoff_mask |
-                                                    dma_scg0_mask | dma_oscoff_mask); // Mask unused bits
+  else if (bcsctl1_wr)  bcsctl1  <=  bcsctl1_nxt & (divax_mask      |
+                                                    dma_cpuoff_mask | dma_oscoff_mask |
+                                                    dma_scg0_mask   | dma_scg1_mask   ); // Mask unused bits
 
 
 // BCSCTL2 Register
@@ -332,6 +340,21 @@ wire [15:0] per_dout =  bcsctl1_rd   |
    assign scg0_and_mclk_dma_wkup     = 1'b0;
   `endif
 
+   wire scg1_and_mclk_dma_enable;
+   wire scg1_and_mclk_dma_wkup;
+  `ifdef DMA_IF_EN
+    `ifdef SCG1_EN
+   omsp_and_gate and_scg1_mclk_dma_en     (.y(scg1_and_mclk_dma_enable),   .a(bcsctl1[`DMA_SCG1]),   .b(mclk_dma_enable));
+   omsp_and_gate and_scg1_mclk_dma_wkup   (.y(scg1_and_mclk_dma_wkup),     .a(bcsctl1[`DMA_SCG1]),   .b(mclk_dma_wkup));
+    `else
+   assign scg1_and_mclk_dma_enable   = 1'b0;
+   assign scg1_and_mclk_dma_wkup     = 1'b0;
+    `endif
+  `else
+   assign scg1_and_mclk_dma_enable   = 1'b0;
+   assign scg1_and_mclk_dma_wkup     = 1'b0;
+  `endif
+
    wire oscoff_and_mclk_dma_enable;
    wire oscoff_and_mclk_dma_wkup;
   `ifdef DMA_IF_EN
@@ -420,20 +443,20 @@ wire cpu_en_wkup;
    // Scan MUX for the asynchronous SET
    wire dco_wkup_set_scan;
    omsp_scan_mux scan_mux_dco_wkup (
-				    .scan_mode    (scan_mode),
-				    .data_in_scan (por_a),
-				    .data_in_func (dco_wkup_set | por),
-				    .data_out     (dco_wkup_set_scan)
-			           );
+                                    .scan_mode    (scan_mode),
+                                    .data_in_scan (por_a),
+                                    .data_in_func (dco_wkup_set | por),
+                                    .data_out     (dco_wkup_set_scan)
+                                   );
 
    // Scan MUX to increase coverage
    wire dco_wkup_clear;
    omsp_scan_mux scan_mux_dco_wkup_clear (
-			  	          .scan_mode    (scan_mode),
-				          .data_in_scan (dco_wkup_set),
-				          .data_in_func (1'b1),
-		 		          .data_out     (dco_wkup_clear)
-			                 );
+                                          .scan_mode    (scan_mode),
+                                          .data_in_scan (dco_wkup_set),
+                                          .data_in_func (1'b1),
+                                          .data_out     (dco_wkup_clear)
+                                         );
 
    // The wakeup is asynchronously set, synchronously released
    wire dco_wkup_n;
@@ -508,20 +531,20 @@ wire cpu_en_wkup;
    // Scan MUX for the asynchronous SET
    wire lfxt_wkup_set_scan;
    omsp_scan_mux scan_mux_lfxt_wkup (
-				     .scan_mode    (scan_mode),
-				     .data_in_scan (por_a),
-				     .data_in_func (lfxt_wkup_set | por),
-				     .data_out     (lfxt_wkup_set_scan)
-			            );
+                                     .scan_mode    (scan_mode),
+                                     .data_in_scan (por_a),
+                                     .data_in_func (lfxt_wkup_set | por),
+                                     .data_out     (lfxt_wkup_set_scan)
+                                    );
 
    // Scan MUX to increase coverage
    wire lfxt_wkup_clear;
    omsp_scan_mux scan_mux_lfxt_wkup_clear (
-			  	           .scan_mode    (scan_mode),
-				           .data_in_scan (lfxt_wkup_set),
-				           .data_in_func (1'b1),
-		 		           .data_out     (lfxt_wkup_clear)
-			                  );
+                                           .scan_mode    (scan_mode),
+                                           .data_in_scan (lfxt_wkup_set),
+                                           .data_in_func (1'b1),
+                                           .data_out     (lfxt_wkup_clear)
+                                          );
 
    // The wakeup is asynchronously set, synchronously released
    wire lfxt_wkup_n;
@@ -699,8 +722,8 @@ always @ (posedge nodiv_mclk or posedge puc_rst)
                           (bcsctl2[`DIVMx]==2'b10) ? &mclk_div[1:0] :
                                                      &mclk_div[2:0] ;
 
-  wire  mclk_div_en     = mclk_div_sel & mclk_active;
-  wire  mclk_dma_div_en = mclk_div_sel & mclk_dma_active;
+  wire  mclk_div_en     = mclk_active     & mclk_div_sel;
+  wire  mclk_dma_div_en = mclk_dma_active & mclk_div_sel;
 
 `else
   wire  mclk_div_en     = mclk_active;
@@ -771,13 +794,13 @@ omsp_clock_gate clock_gate_dma_mclk (
    always @ (posedge nodiv_aclk or posedge puc_lfxt_rst)
      if (puc_lfxt_rst)
        begin
-	  divax_s  <=  2'h0;
-	  divax_ss <=  2'h0;
+          divax_s  <=  2'h0;
+          divax_ss <=  2'h0;
        end
      else
        begin
-	  divax_s  <=  bcsctl1[`DIVAx];
-	  divax_ss <=  divax_s;
+          divax_s  <=  bcsctl1[`DIVAx];
+          divax_ss <=  divax_s;
        end
 
      // If the OSCOFF mode is enabled synchronize OSCOFF signal
@@ -876,7 +899,7 @@ assign nodiv_smclk = dco_clk;
 `ifdef ASIC_CLOCKING
   `ifdef SMCLK_MUX
 
-    // Synchronizers
+    // SMCLK_MUX Synchronizers
     //------------------------------------------------------
     // When the SMCLK MUX is enabled, the reset and DIVSx
     // and SCG1 signals must be synchronized, otherwise not.
@@ -919,44 +942,76 @@ assign nodiv_smclk = dco_clk;
      always @ (posedge nodiv_smclk or posedge puc_sm_rst)
        if (puc_sm_rst)
          begin
-  	    divsx_s  <=  2'h0;
-	    divsx_ss <=  2'h0;
-	 end
+            divsx_s  <=  2'h0;
+            divsx_ss <=  2'h0;
+         end
        else
-	 begin
-	    divsx_s  <=  bcsctl2[`DIVSx];
-	    divsx_ss <=  divsx_s;
-	 end
+         begin
+            divsx_s  <=  bcsctl2[`DIVSx];
+            divsx_ss <=  divsx_s;
+         end
     `endif
 
-   `else
+  `else
 
       wire       puc_sm_rst   = puc_rst;
       wire [1:0] divsx_ss     = bcsctl2[`DIVSx];
       wire       scg1_s       = scg1;
   `endif
 
+   // Wakeup synchronizer
+   //----------------------------
+   wire scg1_and_mclk_dma_enable_s;
+    
+   `ifdef SCG1_EN
+     `ifdef DMA_IF_EN
+       `ifdef SMCLK_MUX
+          omsp_sync_cell sync_cell_smclk_dma_wkup (
+             .data_out  (scg1_and_mclk_dma_enable_s),
+             .data_in   (scg1_and_mclk_dma_wkup | scg1_and_mclk_dma_enable),
+             .clk       (nodiv_smclk),
+             .rst       (puc_rst)
+          );
+       `else
+           wire scg1_and_mclk_dma_wkup_s;
+           omsp_sync_cell sync_cell_smclk_dma_wkup (
+             .data_out  (scg1_and_mclk_dma_wkup_s),
+             .data_in   (scg1_and_mclk_dma_wkup),
+             .clk       (nodiv_smclk),
+             .rst       (puc_rst)
+          );
+          assign scg1_and_mclk_dma_enable_s = scg1_and_mclk_dma_wkup_s | scg1_and_mclk_dma_enable;
+       `endif
+     `else
+      assign scg1_and_mclk_dma_enable_s = 1'b0;
+     `endif
+   `else
+      assign scg1_and_mclk_dma_enable_s = 1'b0;
+   `endif
 
 
    // Clock Divider
    //----------------------------
- `ifdef SMCLK_DIVIDER
+ `ifdef SCG1_EN
+   wire smclk_active  =  cpu_en_sm_s & (~scg1_s | scg1_and_mclk_dma_enable_s);
+ `else
+   wire smclk_active  =  cpu_en_sm_s;
+ `endif
 
+ `ifdef SMCLK_DIVIDER
    reg [2:0] smclk_div;
    always @ (posedge nodiv_smclk or posedge puc_sm_rst)
      if (puc_sm_rst)             smclk_div <=  3'h0;
      else if ((divsx_ss!=2'b00)) smclk_div <=  smclk_div+3'h1;
 
-   wire  smclk_div_en = cpu_en_sm_s & ~scg1_s & ((divsx_ss==2'b00) ?  1'b1           :
-                                                 (divsx_ss==2'b01) ?  smclk_div[0]   :
-                                                 (divsx_ss==2'b10) ? &smclk_div[1:0] :
-                                                                     &smclk_div[2:0]);
+   wire  smclk_div_sel = ((divsx_ss==2'b00) ?  1'b1           :
+                          (divsx_ss==2'b01) ?  smclk_div[0]   :
+                          (divsx_ss==2'b10) ? &smclk_div[1:0] :
+                                              &smclk_div[2:0]);
+
+   wire  smclk_div_en  = smclk_active & smclk_div_sel;
  `else
-   `ifdef SCG1_EN
-    wire smclk_div_en = cpu_en_sm_s & ~scg1_s;
-   `else
-    wire smclk_div_en = cpu_en_sm_s;
-   `endif
+   wire  smclk_div_en  = smclk_active;
  `endif
 
 
@@ -982,7 +1037,7 @@ assign nodiv_smclk = dco_clk;
 reg       smclk_en;
 reg [2:0] smclk_div;
 
-wire      smclk_in     = ~scg1 & (bcsctl2[`SELS] ? lfxt_clk_en : 1'b1);
+wire      smclk_in     = (~scg1 | (mclk_dma_enable & bcsctl1[`DMA_SCG1])) & (bcsctl2[`SELS] ? lfxt_clk_en : 1'b1);
 
 wire      smclk_en_nxt = smclk_in & ((bcsctl2[`DIVSx]==2'b00) ?  1'b1           :
                                      (bcsctl2[`DIVSx]==2'b01) ?  smclk_div[0]   :

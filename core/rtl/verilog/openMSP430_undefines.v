@@ -716,6 +716,9 @@
 `ifdef DMA_SCG0
 `undef DMA_SCG0
 `endif
+`ifdef DMA_SCG1
+`undef DMA_SCG1
+`endif
 `ifdef DMA_OSCOFF
 `undef DMA_OSCOFF
 `endif
