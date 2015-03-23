@@ -43,6 +43,7 @@ integer    dma_cnt_wr;
 integer    dma_cnt_rd;
 integer    dma_wr_error;
 integer    dma_rd_error;
+reg        dma_tfx_cancel;
 
 //---------------------
 // Generic write task
@@ -59,16 +60,16 @@ task dma_write;
       dma_we     = size    ? 2'b11  :
                    addr[0] ? 2'b10  :  2'b01;
       dma_din    = data;
-      @(posedge mclk);
-      while(~dma_ready) @(posedge mclk);
+      @(posedge mclk or posedge dma_tfx_cancel);
+      while(~dma_ready & ~dma_tfx_cancel) @(posedge mclk or posedge dma_tfx_cancel);
       dma_en     = 1'b0;
       dma_we     = 2'b00;
       dma_addr   = 15'h0000;
       dma_din    = 16'h0000;
-      dma_cnt_wr = dma_cnt_wr+1;
+      if (~dma_tfx_cancel) dma_cnt_wr = dma_cnt_wr+1;
 
       // Check transfer response
-      if (dma_resp != resp)
+      if (~dma_tfx_cancel & (dma_resp != resp))
 	begin
 	   $display("ERROR: DMA interface write response check -- address: 0x%h -- response: %h / expected: %h (%t ns)", addr, dma_resp, resp, $time);
 	   dma_wr_error = dma_wr_error+1;
@@ -124,8 +125,8 @@ initial
      dma_read_check_mask   = 16'h0000;
      forever
        begin
-	  @(negedge (mclk & dma_read_check_active));
-	  if ((dma_read_check_data !== (dma_read_check_mask & dma_dout)) & ~puc_rst)
+	  @(negedge (mclk & dma_read_check_active) or posedge dma_tfx_cancel);
+	  if (~dma_tfx_cancel & (dma_read_check_data !== (dma_read_check_mask & dma_dout)) & ~puc_rst)
 	    begin
 	       $display("ERROR: DMA interface read check -- address: 0x%h -- read: 0x%h / expected: 0x%h (%t ns)", dma_read_check_addr, (dma_read_check_mask & dma_dout), dma_read_check_data, $time);
 	       dma_rd_error = dma_rd_error+1;
@@ -150,8 +151,8 @@ task dma_read;
       dma_en   = 1'b1;
       dma_we   = 2'b00;
       dma_din  = 16'h0000;
-      @(posedge mclk);
-      while(~dma_ready) @(posedge mclk);
+      @(posedge mclk or posedge dma_tfx_cancel);
+      while(~dma_ready & ~dma_tfx_cancel) @(posedge mclk or posedge dma_tfx_cancel);
       dma_en   = 1'b0;
       dma_addr = 15'h0000;
 
@@ -161,10 +162,10 @@ task dma_read;
       dma_read_check_data   =  data;
       dma_read_check_mask   =  size    ? 16'hFFFF :
                               (addr[0] ? 16'hFF00 : 16'h00FF);
-      dma_cnt_rd            = dma_cnt_rd+1;
+      if (~dma_tfx_cancel) dma_cnt_rd = dma_cnt_rd+1;
 
       // Check transfer response
-      if (dma_resp != resp)
+      if (~dma_tfx_cancel & (dma_resp != resp))
 	begin
 	   $display("ERROR: DMA interface read response check -- address: 0x%h -- response: %h / expected: %h (%t ns)", addr, dma_resp, resp, $time);
 	   dma_rd_error = dma_rd_error+1;

@@ -170,7 +170,8 @@ for (( ii=0; ii<=$LAST_REGRESSION; ii++ ))
     ../bin/msp430sim dma_rdwr_8b              | tee $LOG_DIR/dma_rdwr_8b.log
     ../bin/msp430sim dma_resp                 | tee $LOG_DIR/dma_resp.log
     ../bin/msp430sim dma_dbg_arbiter          | tee $LOG_DIR/dma_dbg_arbiter.log
-    #../bin/msp430sim dma_lp_modes_asic        | tee $LOG_DIR/dma_lp_modes_asic.log
+    ../bin/msp430sim dma_lpm0_asic            | tee $LOG_DIR/dma_lpm0_asic.log
+    ../bin/msp430sim dma_lpm1_asic            | tee $LOG_DIR/dma_lpm1_asic.log
 
     # Simple full duplex UART (8N1 protocol)
     #../bin/msp430sim uart                    | tee $LOG_DIR/uart.log

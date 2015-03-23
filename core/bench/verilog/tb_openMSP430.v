@@ -293,6 +293,7 @@ initial
      dma_priority            = 1'b0;
      dma_we                  = 2'b00;
      dma_wkup                = 1'b0;
+     dma_tfx_cancel          = 1'b0;
      cpu_en                  = 1'b1;
      dbg_en                  = 1'b0;
      dbg_uart_rxd_sel        = 1'b0;
