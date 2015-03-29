@@ -544,10 +544,11 @@ initial
     `ifdef SCG0_EN
       bcsctl1_mask = bcsctl1_mask | 16'h0002;
     `endif
-    `ifdef OSCOFF_EN
-      `ifdef MCLK_MUX
+    `ifdef SCG1_EN
       bcsctl1_mask = bcsctl1_mask | 16'h0004;
-      `endif
+    `endif
+    `ifdef OSCOFF_EN
+      bcsctl1_mask = bcsctl1_mask | 16'h0008;
     `endif
   `endif
 `else

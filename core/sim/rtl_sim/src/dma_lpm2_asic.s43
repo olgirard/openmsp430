@@ -138,9 +138,9 @@ main:
 	mov    #0x2000, r15
 
 		
-        /* --------------------------   LPM0   ----------------------------- */
+        /* --------------------------   LPM2   ----------------------------- */
 
-	;; Go to LPM0 mode for all possible DMA configuration
+	;; Go to LPM2 mode for all possible DMA configuration
 
 	mov    #0x3000, r15
 
@@ -151,7 +151,7 @@ lpm0_loop:
 	cmp.b  r10,     &BCSCTL1
 	jge    lpm0_loop_done
 
- 	LPM0		  	 ; # CPU_MCLK off
+ 	LPM2		  	 ; # CPU_MCLK off + SMCLK off
  	mov    #0x0090, r14
  	call   #WAIT_FUNC
 

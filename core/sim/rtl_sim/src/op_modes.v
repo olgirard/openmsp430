@@ -21,7 +21,7 @@
 /* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA        */
 /*                                                                           */
 /*===========================================================================*/
-/*                            CPU OPERATING MODES                            */
+/*                  CPU OPERATING MODES (FPGA VERSION)                       */
 /*---------------------------------------------------------------------------*/
 /* Test the CPU Operating modes:                                             */
 /*                                 - CPUOFF (<=> R2[4]): turn off CPU.       */
@@ -131,8 +131,8 @@ initial
       aclk_cnt  = 0;
       smclk_cnt = 0;
       repeat (104) @(posedge mclk);
-      if (aclk_cnt  !== 16'h0004) tb_error("====== OSCOFF TEST 5: ACLK  IS NOT RUNNING =====");
-      if (smclk_cnt !== 16'h0004) tb_error("====== OSCOFF TEST 5: SMCLK IS NOT RUNNING ON LFXT1 =====");
+      if (aclk_cnt  !== 16'h0000) tb_error("====== OSCOFF TEST 5: ACLK  IS NOT STOPPED =====");
+      if (smclk_cnt !== 16'h0000) tb_error("====== OSCOFF TEST 5: SMCLK IS NOT STOPPED =====");
 
       @(r15==16'h2006);
       aclk_cnt  = 0;
@@ -187,6 +187,125 @@ initial
       repeat (80) @(negedge mclk);
       if (inst_cnt  <= 16'h0030) tb_error("====== CPUOFF TEST 6: CPU IS NOT RUNNING =====");
 
+      // DMA_SCG1
+      //--------------------------------------------------------
+   `ifdef DMA_IF_EN
+      @(r15==16'h4001);
+      dma_en    = 1'b1;
+      aclk_cnt  = 0;
+      smclk_cnt = 0;
+      repeat (104) @(posedge mclk);
+      dma_en    = 1'b0;
+      if (aclk_cnt  !== 16'h0004) tb_error("====== DMA_SCG1 TEST 1: ACLK  IS NOT RUNNING =====");
+      if (smclk_cnt !== 16'h0000) tb_error("====== DMA_SCG1 TEST 1: SMCLK IS RUNNING =====");
+
+      @(r15==16'h4002);
+      dma_en    = 1'b1;
+      aclk_cnt  = 0;
+      smclk_cnt = 0;
+      repeat (104) @(posedge mclk);
+      dma_en    = 1'b0;
+      if (aclk_cnt  !== 16'h0003) tb_error("====== DMA_SCG1 TEST 2: ACLK  IS NOT RUNNING =====");
+      if (smclk_cnt !== 16'h0000) tb_error("====== DMA_SCG1 TEST 2: SMCLK IS RUNNING =====");
+
+      @(r15==16'h4003);
+      dma_en    = 1'b1;
+      aclk_cnt  = 0;
+      smclk_cnt = 0;
+      repeat (104) @(posedge mclk);
+      dma_en    = 1'b0;
+      if (aclk_cnt  !== 16'h0003) tb_error("====== DMA_SCG1 TEST 3: ACLK  IS NOT RUNNING =====");
+      if (smclk_cnt !== 16'h000D) tb_error("====== DMA_SCG1 TEST 3: SMCLK IS NOT RUNNING =====");
+
+      @(r15==16'h4004);
+      dma_en    = 1'b1;
+      aclk_cnt  = 0;
+      smclk_cnt = 0;
+      repeat (104) @(posedge mclk);
+      dma_en    = 1'b0;
+      if (aclk_cnt  !== 16'h0004) tb_error("====== DMA_SCG1 TEST 4: ACLK  IS NOT RUNNING =====");
+      if (smclk_cnt !== 16'h000D) tb_error("====== DMA_SCG1 TEST 4: SMCLK IS NOT RUNNING =====");
+
+      @(r15==16'h4005);
+      dma_en    = 1'b1;
+      aclk_cnt  = 0;
+      smclk_cnt = 0;
+      repeat (104) @(posedge mclk);
+      dma_en    = 1'b0;
+      if (aclk_cnt  !== 16'h0003) tb_error("====== DMA_SCG1 TEST 5: ACLK  IS NOT RUNNING =====");
+      if (smclk_cnt !== 16'h0000) tb_error("====== DMA_SCG1 TEST 5: SMCLK IS RUNNING =====");
+
+      @(r15==16'h4006);
+      dma_en    = 1'b1;
+      aclk_cnt  = 0;
+      smclk_cnt = 0;
+      repeat (104) @(posedge mclk);
+      dma_en    = 1'b0;
+      if (aclk_cnt  !== 16'h0003) tb_error("====== DMA_SCG1 TEST 6: ACLK  IS NOT RUNNING =====");
+      if (smclk_cnt !== 16'h000D) tb_error("====== DMA_SCG1 TEST 6: SMCLK IS NOT RUNNING =====");
+   `endif
+
+      @(r15==16'h5000);
+
+      // DMA_OSCOFF
+      //--------------------------------------------------------
+   `ifdef DMA_IF_EN
+      @(r15==16'h5001);
+      dma_en    = 1'b1;
+      aclk_cnt  = 0;
+      smclk_cnt = 0;
+      repeat (104) @(posedge mclk);
+      dma_en    = 1'b0;
+      if (aclk_cnt  !== 16'h0000) tb_error("====== DMA_OSCOFF TEST 1: ACLK  IS RUNNING =====");
+      if (smclk_cnt !== 16'h000D) tb_error("====== DMA_OSCOFF TEST 1: SMCLK IS RUNNING =====");
+
+      @(r15==16'h5002);
+      dma_en    = 1'b1;
+      aclk_cnt  = 0;
+      smclk_cnt = 0;
+      repeat (104) @(posedge mclk);
+      dma_en    = 1'b0;
+      if (aclk_cnt  !== 16'h0004) tb_error("====== DMA_OSCOFF TEST 2: ACLK  IS NOT RUNNING =====");
+      if (smclk_cnt !== 16'h000D) tb_error("====== DMA_OSCOFF TEST 2: SMCLK IS NOT RUNNING =====");
+
+      @(r15==16'h5003);
+      dma_en    = 1'b1;
+      aclk_cnt  = 0;
+      smclk_cnt = 0;
+      repeat (104) @(posedge mclk);
+      dma_en    = 1'b0;
+      if (aclk_cnt  !== 16'h0000) tb_error("====== DMA_OSCOFF TEST 3: ACLK  IS RUNNING =====");
+      if (smclk_cnt !== 16'h000D) tb_error("====== DMA_OSCOFF TEST 3: SMCLK IS NOT RUNNING =====");
+
+      @(r15==16'h5004);
+      dma_en    = 1'b1;
+      aclk_cnt  = 0;
+      smclk_cnt = 0;
+      repeat (104) @(posedge mclk);
+      dma_en    = 1'b0;
+      if (aclk_cnt  !== 16'h0003) tb_error("====== DMA_OSCOFF TEST 4: ACLK  IS NOT RUNNING =====");
+      if (smclk_cnt !== 16'h000D) tb_error("====== DMA_OSCOFF TEST 4: SMCLK IS NOT RUNNING =====");
+
+      @(r15==16'h5005);
+      dma_en    = 1'b1;
+      aclk_cnt  = 0;
+      smclk_cnt = 0;
+      repeat (104) @(posedge mclk);
+      dma_en    = 1'b0;
+      if (aclk_cnt  !== 16'h0000) tb_error("====== DMA_OSCOFF TEST 5: ACLK  IS RUNNING =====");
+      if (smclk_cnt !== 16'h000D) tb_error("====== DMA_OSCOFF TEST 5: SMCLK IS NOT RUNNING =====");
+
+      @(r15==16'h5006);
+      dma_en    = 1'b1;
+      aclk_cnt  = 0;
+      smclk_cnt = 0;
+      repeat (104) @(posedge mclk);
+      dma_en    = 1'b0;
+      if (aclk_cnt  !== 16'h0003) tb_error("====== DMA_OSCOFF TEST 6: ACLK  IS NOT RUNNING =====");
+      if (smclk_cnt !== 16'h000D) tb_error("====== DMA_OSCOFF TEST 6: SMCLK IS NOT RUNNING =====");
+   `endif
+
+      @(r15==16'h6000);
 `endif
 
       stimulus_done = 1;

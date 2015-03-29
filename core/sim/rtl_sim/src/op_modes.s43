@@ -21,7 +21,7 @@
 /* Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA        */
 /*                                                                           */
 /*===========================================================================*/
-/*                            CPU OPERATING MODES                            */
+/*                  CPU OPERATING MODES (FPGA VERSION)                       */
 /*---------------------------------------------------------------------------*/
 /* Test the CPU Operating modes:                                             */
 /*                                 - CPUOFF (<=> R2[4]): turn off CPU.       */
@@ -74,11 +74,11 @@ main:
  	mov    #0x0020, r14
         call   #WAIT_FUNC
 
-	mov    #0x1003, r15      ; # SCG1=1 (SMCLK off) with IRQ
+	mov    #0x1003, r15     ; # SCG1=1 (SMCLK off) with IRQ
  	mov    #0x0020, r14
         call   #WAIT_FUNC
 
-	mov    #0x1004, r15      ; # SCG1=1 (SMCLK off) return from IRQ
+	mov    #0x1004, r15     ; # SCG1=1 (SMCLK off) return from IRQ
  	mov    #0x0020, r14
         call   #WAIT_FUNC
 
@@ -98,27 +98,27 @@ main:
  	mov    #0x0050, r14
         call   #WAIT_FUNC
 
- 	mov.b  #0x00, &BCSCTL2  ; # Div /1 --> select DCOCLK
+ 	mov.b  #0x00, &BCSCTL2  ; # Div /1 --> SMCLK select DCOCLK
 	mov    #0x0028, r2      ; # OSCOFF=1 (LFXT1 off)
 	mov    #0x2002, r15
  	mov    #0x0050, r14
         call   #WAIT_FUNC
 
-	mov    #0x2003, r15      ; # OSCOFF=1 (LFXT1 off) with IRQ
+	mov    #0x2003, r15     ; # OSCOFF=1 (LFXT1 off) with IRQ
  	mov    #0x0050, r14
         call   #WAIT_FUNC
 
-	mov    #0x2004, r15      ; # OSCOFF=1 (LFXT1 off) return from IRQ
+	mov    #0x2004, r15     ; # OSCOFF=1 (LFXT1 off) return from IRQ
  	mov    #0x0050, r14
         call   #WAIT_FUNC
 	
-  	mov.b  #0x08, &BCSCTL2  ; # Div /1 --> select LFXT1CLK
+  	mov.b  #0x08, &BCSCTL2  ; # Div /1 --> SMCLK select LFXT1CLK
  	mov    #0x0028, r2      ; # OSCOFF=1 (LFXT1 off)
  	mov    #0x2005, r15
   	mov    #0x0050, r14
         call   #WAIT_FUNC
 
- 	mov.b  #0x00, &BCSCTL2  ; # Div /1 --> select DCOCLK
+ 	mov.b  #0x00, &BCSCTL2  ; # Div /1 --> SMCLK select DCOCLK
 	mov    #0x0008, r2      ; # OSCOFF=0 (LFXT1 on)
 	mov    #0x2006, r15
  	mov    #0x0050, r14
@@ -151,6 +151,91 @@ main:
 	mov    #0x0008, r2      ; # CPUOFF=0 (CPU on)
  	mov    #0x0020, r14
         call   #WAIT_FUNC
+
+	mov     #0x4000, r15
+	
+
+        /* -------------- DMA_SCG1 --------------------------------------------- */
+
+ 	mov.b  #0x06, &BCSCTL2  ; # Div /8
+
+ 	mov.b  #0x00, &BCSCTL1  ; # DMA_OSCOFF=0 / DMA_SCG1=0
+	mov    #0x0088, r2      ; # SCG1=1 (SMCLK off)
+	mov    #0x4001, r15
+ 	mov    #0x0020, r14
+        call   #WAIT_FUNC
+
+ 	mov.b  #0x02, &BCSCTL1  ; # DMA_OSCOFF=1 / DMA_SCG1=0
+	mov    #0x0088, r2      ; # SCG1=1 (SMCLK off)
+	mov    #0x4002, r15
+ 	mov    #0x0020, r14
+        call   #WAIT_FUNC
+
+ 	mov.b  #0x08, &BCSCTL1  ; # DMA_OSCOFF=0 / DMA_SCG1=1
+	mov    #0x0088, r2      ; # SCG1=1 (SMCLK off)
+	mov    #0x4003, r15
+ 	mov    #0x0020, r14
+        call   #WAIT_FUNC
+
+ 	mov.b  #0x0A, &BCSCTL1  ; # DMA_OSCOFF=1 / DMA_SCG1=1
+	mov    #0x0088, r2      ; # SCG1=1 (SMCLK off)
+	mov    #0x4004, r15
+ 	mov    #0x0020, r14
+        call   #WAIT_FUNC
+	
+ 	mov.b  #0x00, &BCSCTL1  ; # DMA_OSCOFF=0 / DMA_SCG1=0
+	mov    #0x0088, r2      ; # SCG1=1 (SMCLK off)
+	mov    #0x4005, r15
+ 	mov    #0x0020, r14
+        call   #WAIT_FUNC
+
+	mov    #0x0008, r2      ; # SCG1=0 (SMCLK on)
+	mov    #0x4006, r15
+ 	mov    #0x0020, r14
+        call   #WAIT_FUNC
+	
+	mov    #0x5000, r15
+
+        /* -------------- DMA_OSCOFF --------------------------------------------------- */
+
+ 	mov.b  #0x06, &BCSCTL2  ; # Div /8
+
+ 	mov.b  #0x00, &BCSCTL1  ; # DMA_OSCOFF=0 / DMA_SCG1=0
+	mov    #0x0028, r2      ; # OSCOFF=1 (LFXT1 off)
+	mov    #0x5001, r15
+ 	mov    #0x0020, r14
+        call   #WAIT_FUNC
+
+ 	mov.b  #0x02, &BCSCTL1  ; # DMA_OSCOFF=1 / DMA_SCG1=0
+	mov    #0x0028, r2      ; # OSCOFF=1 (LFXT1 off)
+	mov    #0x5002, r15
+ 	mov    #0x0020, r14
+        call   #WAIT_FUNC
+
+ 	mov.b  #0x08, &BCSCTL1  ; # DMA_OSCOFF=0 / DMA_SCG1=1
+	mov    #0x0028, r2      ; # OSCOFF=1 (LFXT1 off)
+	mov    #0x5003, r15
+ 	mov    #0x0020, r14
+        call   #WAIT_FUNC
+
+ 	mov.b  #0x0A, &BCSCTL1  ; # DMA_OSCOFF=1 / DMA_SCG1=1
+	mov    #0x0028, r2      ; # OSCOFF=1 (LFXT1 off)
+	mov    #0x5004, r15
+ 	mov    #0x0020, r14
+        call   #WAIT_FUNC
+	
+ 	mov.b  #0x00, &BCSCTL1  ; # DMA_OSCOFF=0 / DMA_SCG1=0
+	mov    #0x0028, r2      ; # OSCOFF=1 (LFXT1 off)
+	mov    #0x5005, r15
+ 	mov    #0x0020, r14
+        call   #WAIT_FUNC
+
+	mov    #0x0008, r2      ; # OSCOFF=1 (LFXT1 on)
+	mov    #0x5006, r15
+ 	mov    #0x0020, r14
+        call   #WAIT_FUNC
+	
+	mov    #0x6000, r15
 
 	
 				

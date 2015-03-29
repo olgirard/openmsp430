@@ -95,13 +95,13 @@
 .macro DMA_CPUOFF
  bis.b  #0x01, &BCSCTL1
 .endm
-.macro DMA_SCG0
+.macro DMA_OSCOFF
  bis.b  #0x02, &BCSCTL1
 .endm
-.macro DMA_SCG1
+.macro DMA_SCG0
  bis.b  #0x04, &BCSCTL1
 .endm
-.macro DMA_OSCOFF
+.macro DMA_SCG1
  bis.b  #0x08, &BCSCTL1
 .endm
 
@@ -140,7 +140,7 @@ main:
 		
         /* --------------------------   LPM1   ----------------------------- */
 
-	;; Go to LPM0 mode for all possible DMA configuration
+	;; Go to LPM1 mode for all possible DMA configuration
 
 	mov    #0x3000, r15
 
