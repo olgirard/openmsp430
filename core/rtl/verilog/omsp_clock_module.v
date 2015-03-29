@@ -212,24 +212,20 @@ wire [7:0] dma_cpuoff_mask = 8'h01;
     `else
 wire [7:0] dma_cpuoff_mask = 8'h00;
     `endif
+    `ifdef OSCOFF_EN
+wire [7:0] dma_oscoff_mask = 8'h02;
+    `else
+wire [7:0] dma_oscoff_mask = 8'h00;
+    `endif
     `ifdef SCG0_EN
-wire [7:0] dma_scg0_mask   = 8'h02;
+wire [7:0] dma_scg0_mask   = 8'h04;
     `else
 wire [7:0] dma_scg0_mask   = 8'h00;
     `endif
     `ifdef SCG1_EN
-wire [7:0] dma_scg1_mask   = 8'h04;
+wire [7:0] dma_scg1_mask   = 8'h08;
     `else
 wire [7:0] dma_scg1_mask   = 8'h00;
-    `endif
-    `ifdef OSCOFF_EN
-      `ifdef MCLK_MUX
-wire [7:0] dma_oscoff_mask = 8'h08;
-      `else
-wire [7:0] dma_oscoff_mask = 8'h00;
-      `endif
-    `else
-wire [7:0] dma_oscoff_mask = 8'h00;
     `endif
   `else
 wire [7:0] dma_cpuoff_mask = 8'h00;
@@ -241,8 +237,13 @@ wire [7:0] dma_oscoff_mask = 8'h00;
 wire [7:0] divax_mask      = 8'h30;
 wire [7:0] dma_cpuoff_mask = 8'h00;
 wire [7:0] dma_scg0_mask   = 8'h00;
-wire [7:0] dma_scg1_mask   = 8'h00;
+  `ifdef DMA_IF_EN
+wire [7:0] dma_oscoff_mask = 8'h02;
+wire [7:0] dma_scg1_mask   = 8'h08;
+  `else
 wire [7:0] dma_oscoff_mask = 8'h00;
+wire [7:0] dma_scg1_mask   = 8'h00;
+  `endif
 `endif
 
 always @ (posedge dma_mclk or posedge puc_rst)
@@ -359,13 +360,8 @@ wire [15:0] per_dout =  bcsctl1_rd   |
    wire oscoff_and_mclk_dma_wkup;
   `ifdef DMA_IF_EN
     `ifdef OSCOFF_EN
-      `ifdef MCLK_MUX
    omsp_and_gate and_oscoff_mclk_dma_en   (.y(oscoff_and_mclk_dma_enable), .a(bcsctl1[`DMA_OSCOFF]), .b(mclk_dma_enable));
    omsp_and_gate and_oscoff_mclk_dma_wkup (.y(oscoff_and_mclk_dma_wkup),   .a(bcsctl1[`DMA_OSCOFF]), .b(mclk_dma_wkup));
-      `else
-   assign oscoff_and_mclk_dma_enable = 1'b0;
-   assign oscoff_and_mclk_dma_wkup   = 1'b0;
-      `endif
     `else
    assign oscoff_and_mclk_dma_enable = 1'b0;
    assign oscoff_and_mclk_dma_wkup   = 1'b0;
@@ -404,8 +400,8 @@ wire cpu_en_wkup;
    wire dco_disable_by_scg0;
    wire dco_disable_by_cpu_en;
    wire dco_enable_nxt;
-   omsp_and_gate and_dco_dis1 (.y(cpu_enabled_with_dco),   .a(~bcsctl2[`SELMx]),     .b(cpuoff_and_mclk_enable | scg0_and_mclk_dma_enable));
-   omsp_and_gate and_dco_dis2 (.y(dco_not_enabled_by_dbg), .a(~dbg_en_s),            .b(~cpu_enabled_with_dco));
+   omsp_and_gate and_dco_dis1 (.y(cpu_enabled_with_dco),   .a(~bcsctl2[`SELMx]),     .b(cpuoff_and_mclk_enable));
+   omsp_and_gate and_dco_dis2 (.y(dco_not_enabled_by_dbg), .a(~dbg_en_s),            .b(~(cpu_enabled_with_dco | scg0_and_mclk_dma_enable)));
    omsp_and_gate and_dco_dis3 (.y(dco_disable_by_scg0),    .a(scg0),                 .b(dco_not_enabled_by_dbg));
    omsp_and_gate and_dco_dis4 (.y(dco_disable_by_cpu_en),  .a(~cpu_en_s),            .b(~mclk_enable));
    omsp_and_gate and_dco_dis5 (.y(dco_enable_nxt),         .a(~dco_disable_by_scg0), .b(~dco_disable_by_cpu_en));
@@ -426,7 +422,6 @@ wire cpu_en_wkup;
          .rst       (por)
       );
    `else
-
       assign dco_enable     = ~dco_disable;
    `endif
 
@@ -435,10 +430,10 @@ wire cpu_en_wkup;
    //      - if the DCO wants to be synchronously enabled (i.e dco_enable_nxt=1)
    wire dco_mclk_wkup;
    wire dco_en_wkup;
-   omsp_and_gate and_dco_mclk_wkup (.y(dco_mclk_wkup), .a(mclk_wkup | scg0_and_mclk_dma_wkup), .b(~bcsctl2[`SELMx]));
-   omsp_and_gate and_dco_en_wkup   (.y(dco_en_wkup),   .a(~dco_enable),                        .b(dco_enable_nxt));
+   omsp_and_gate and_dco_mclk_wkup (.y(dco_mclk_wkup), .a(mclk_wkup),   .b(~bcsctl2[`SELMx]));
+   omsp_and_gate and_dco_en_wkup   (.y(dco_en_wkup),   .a(~dco_enable), .b(dco_enable_nxt));
 
-   wire dco_wkup_set = dco_mclk_wkup | dco_en_wkup | cpu_en_wkup;
+   wire dco_wkup_set = dco_mclk_wkup | scg0_and_mclk_dma_wkup | dco_en_wkup | cpu_en_wkup;
 
    // Scan MUX for the asynchronous SET
    wire dco_wkup_set_scan;
@@ -497,8 +492,8 @@ wire cpu_en_wkup;
    wire lfxt_disable_by_oscoff;
    wire lfxt_disable_by_cpu_en;
    wire lfxt_enable_nxt;
-   omsp_and_gate and_lfxt_dis1 (.y(cpu_enabled_with_lfxt),   .a(bcsctl2[`SELMx]),         .b(cpuoff_and_mclk_enable | oscoff_and_mclk_dma_enable));
-   omsp_and_gate and_lfxt_dis2 (.y(lfxt_not_enabled_by_dbg), .a(~dbg_en_s),               .b(~cpu_enabled_with_lfxt));
+   omsp_and_gate and_lfxt_dis1 (.y(cpu_enabled_with_lfxt),   .a(bcsctl2[`SELMx]),         .b(cpuoff_and_mclk_enable));
+   omsp_and_gate and_lfxt_dis2 (.y(lfxt_not_enabled_by_dbg), .a(~dbg_en_s),               .b(~(cpu_enabled_with_lfxt | oscoff_and_mclk_dma_enable)));
    omsp_and_gate and_lfxt_dis3 (.y(lfxt_disable_by_oscoff),  .a(oscoff),                  .b(lfxt_not_enabled_by_dbg));
    omsp_and_gate and_lfxt_dis4 (.y(lfxt_disable_by_cpu_en),  .a(~cpu_en_s),               .b(~mclk_enable));
    omsp_and_gate and_lfxt_dis5 (.y(lfxt_enable_nxt),         .a(~lfxt_disable_by_oscoff), .b(~lfxt_disable_by_cpu_en));
@@ -523,10 +518,10 @@ wire cpu_en_wkup;
    //      - if the LFXT wants to be synchronously enabled (i.e lfxt_enable_nxt=1)
    wire lfxt_mclk_wkup;
    wire lfxt_en_wkup;
-   omsp_and_gate and_lfxt_mclk_wkup (.y(lfxt_mclk_wkup), .a(mclk_wkup | oscoff_and_mclk_dma_wkup), .b(bcsctl2[`SELMx]));
-   omsp_and_gate and_lfxt_en_wkup   (.y(lfxt_en_wkup),   .a(~lfxt_enable),                         .b(lfxt_enable_nxt));
+   omsp_and_gate and_lfxt_mclk_wkup (.y(lfxt_mclk_wkup), .a(mclk_wkup),    .b(bcsctl2[`SELMx]));
+   omsp_and_gate and_lfxt_en_wkup   (.y(lfxt_en_wkup),   .a(~lfxt_enable), .b(lfxt_enable_nxt));
 
-   wire   lfxt_wkup_set  = lfxt_mclk_wkup | lfxt_en_wkup | cpu_en_wkup;
+   wire   lfxt_wkup_set  = lfxt_mclk_wkup | oscoff_and_mclk_dma_wkup | lfxt_en_wkup | cpu_en_wkup;
 
    // Scan MUX for the asynchronous SET
    wire lfxt_wkup_set_scan;
@@ -583,7 +578,7 @@ always @ (posedge nodiv_mclk or posedge por)
   if (por) lfxt_clk_dly <=  1'b0;
   else     lfxt_clk_dly <=  lfxt_clk_s;
 
-wire   lfxt_clk_en = (lfxt_clk_s & ~lfxt_clk_dly) & ~(oscoff & ~bcsctl2[`SELS]);
+wire   lfxt_clk_en = (lfxt_clk_s & ~lfxt_clk_dly) & (~oscoff | (mclk_dma_enable & bcsctl1[`DMA_OSCOFF]));
 assign lfxt_enable = 1'b1;
 assign lfxt_wkup   = 1'b0;
 `endif
@@ -770,9 +765,12 @@ omsp_clock_gate clock_gate_dma_mclk (
 
    wire nodiv_aclk = lfxt_clk;
 
+   // Synchronizers
+   //------------------------------------------------------
+
    // Local Reset synchronizer
-   wire puc_lfxt_rst;
    wire puc_lfxt_noscan_n;
+   wire puc_lfxt_rst;
    omsp_sync_cell sync_cell_puc_lfxt (
        .data_out     (puc_lfxt_noscan_n),
        .data_in      (1'b1),
@@ -785,6 +783,19 @@ omsp_clock_gate clock_gate_dma_mclk (
        .data_in_func (~puc_lfxt_noscan_n),
        .data_out     (puc_lfxt_rst)
    );
+
+   // If the OSCOFF mode is enabled synchronize OSCOFF signal
+   wire oscoff_s;
+   `ifdef OSCOFF_EN
+       omsp_sync_cell sync_cell_oscoff (
+         .data_out     (oscoff_s),
+         .data_in      (oscoff),
+         .clk          (nodiv_aclk),
+         .rst          (puc_lfxt_rst)
+       );
+   `else
+   assign oscoff_s = 1'b0;
+   `endif
 
    // Local synchronizer for the bcsctl1.DIVAx configuration
    // (note that we can live with a full bus synchronizer as
@@ -803,18 +814,6 @@ omsp_clock_gate clock_gate_dma_mclk (
           divax_ss <=  divax_s;
        end
 
-     // If the OSCOFF mode is enabled synchronize OSCOFF signal
-     wire oscoff_s;
-     `ifdef OSCOFF_EN
-         omsp_sync_cell sync_cell_oscoff (
-           .data_out     (oscoff_s),
-           .data_in      (oscoff),
-           .clk          (nodiv_aclk),
-           .rst          (puc_lfxt_rst)
-         );
-     `else
-     assign oscoff_s = 1'b0;
-     `endif
   `else
    wire       puc_lfxt_rst = puc_rst;
    wire       nodiv_aclk   = dco_clk;
@@ -822,16 +821,41 @@ omsp_clock_gate clock_gate_dma_mclk (
    wire       oscoff_s     = oscoff;
   `endif
 
-   // Divider
+   // Wakeup synchronizer
+   //----------------------------
+   wire oscoff_and_mclk_dma_enable_s;
+    
+   `ifdef OSCOFF_EN
+     `ifdef DMA_IF_EN
+          omsp_sync_cell sync_cell_aclk_dma_wkup (
+             .data_out  (oscoff_and_mclk_dma_enable_s),
+             .data_in   (oscoff_and_mclk_dma_wkup | oscoff_and_mclk_dma_enable),
+             .clk       (nodiv_aclk),
+             .rst       (puc_lfxt_rst)
+          );
+     `else
+      assign oscoff_and_mclk_dma_enable_s = 1'b0;
+     `endif
+   `else
+      assign oscoff_and_mclk_dma_enable_s = 1'b0;
+   `endif
+
+   // Clock Divider
+   //----------------------------
+
+   wire      aclk_active  =  cpu_en_aux_s & (~oscoff_s | oscoff_and_mclk_dma_enable_s);
+
    reg [2:0] aclk_div;
    always @ (posedge nodiv_aclk or posedge puc_lfxt_rst)
      if (puc_lfxt_rst)           aclk_div <=  3'h0;
      else if ((divax_ss!=2'b00)) aclk_div <=  aclk_div+3'h1;
 
-   wire      aclk_div_en =  cpu_en_aux_s & ~oscoff_s & ((divax_ss==2'b00) ?  1'b1          :
-                                                        (divax_ss==2'b01) ?  aclk_div[0]   :
-                                                        (divax_ss==2'b10) ? &aclk_div[1:0] :
-                                                                            &aclk_div[2:0]);
+   wire      aclk_div_sel =  ((divax_ss==2'b00) ?  1'b1          :
+                              (divax_ss==2'b01) ?  aclk_div[0]   :
+                              (divax_ss==2'b10) ? &aclk_div[1:0] :
+                                                  &aclk_div[2:0]);
+
+   wire      aclk_div_en  =  aclk_active & aclk_div_sel;
 
    // Clock gate
    omsp_clock_gate clock_gate_aclk (
@@ -921,8 +945,8 @@ assign nodiv_smclk = dco_clk;
      );
 
      // SCG1 synchronizer
-     `ifdef SCG1_EN
      wire scg1_s;
+     `ifdef SCG1_EN
      omsp_sync_cell sync_cell_scg1 (
          .data_out     (scg1_s),
          .data_in      (scg1),
@@ -930,7 +954,7 @@ assign nodiv_smclk = dco_clk;
          .rst          (puc_sm_rst)
      );
      `else
-     wire scg1_s = 1'b0;
+     assign scg1_s = 1'b0;
      `endif
 
     `ifdef SMCLK_DIVIDER
@@ -970,7 +994,7 @@ assign nodiv_smclk = dco_clk;
              .data_out  (scg1_and_mclk_dma_enable_s),
              .data_in   (scg1_and_mclk_dma_wkup | scg1_and_mclk_dma_enable),
              .clk       (nodiv_smclk),
-             .rst       (puc_rst)
+             .rst       (puc_sm_rst)
           );
        `else
            wire scg1_and_mclk_dma_wkup_s;
@@ -978,7 +1002,7 @@ assign nodiv_smclk = dco_clk;
              .data_out  (scg1_and_mclk_dma_wkup_s),
              .data_in   (scg1_and_mclk_dma_wkup),
              .clk       (nodiv_smclk),
-             .rst       (puc_rst)
+             .rst       (puc_sm_rst)
           );
           assign scg1_and_mclk_dma_enable_s = scg1_and_mclk_dma_wkup_s | scg1_and_mclk_dma_enable;
        `endif
@@ -1037,7 +1061,8 @@ assign nodiv_smclk = dco_clk;
 reg       smclk_en;
 reg [2:0] smclk_div;
 
-wire      smclk_in     = (~scg1 | (mclk_dma_enable & bcsctl1[`DMA_SCG1])) & (bcsctl2[`SELS] ? lfxt_clk_en : 1'b1);
+wire      smclk_in     = (scg1 & ~(mclk_dma_enable & bcsctl1[`DMA_SCG1])) ? 1'b0        :
+                          bcsctl2[`SELS]                                  ? lfxt_clk_en : 1'b1;
 
 wire      smclk_en_nxt = smclk_in & ((bcsctl2[`DIVSx]==2'b00) ?  1'b1           :
                                      (bcsctl2[`DIVSx]==2'b01) ?  smclk_div[0]   :
