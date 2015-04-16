@@ -72,7 +72,7 @@ for file in $LOG_DIR/*.log ; do
         passed_nr=`expr $passed_nr + 1`
     elif [ $skipped_ok == 1 ]; then
         skipped_nr=`expr $skipped_nr + 1`
-    elif [ $failed_ok == 1 ]; then
+    elif [ $failed_ok != 0 ]; then
         failed_nr=`expr $failed_nr + 1`
     else
         aborted_nr=`expr $aborted_nr + 1`
@@ -105,7 +105,7 @@ for file in $LOG_DIR/*.log ; do
     elif [ $skipped_ok == 1 ]; then
         result="${normal} SKIPPED ${normal}"
         replay_color="${normal}"
-    elif [ $failed_ok == 1 ]; then
+    elif [ $failed_ok != 0 ]; then
         result="${red} FAILED  ${normal}"
         replay_color="${red}"
     else
@@ -155,7 +155,7 @@ if [ $failed_nr != 0 ]; then
     echo "${red_bold} FAILED TESTS:${normal}"
     for file in $LOG_DIR/*.log ; do
         failed_ok=`grep -c FAILED $file`
-        if [ $failed_ok == 1 ]; then
+        if [ $failed_ok != 0 ]; then
             echo "${red_bold}                 -  $file ${normal}"
         fi
     done

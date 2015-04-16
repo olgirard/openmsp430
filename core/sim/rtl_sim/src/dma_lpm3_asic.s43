@@ -143,12 +143,13 @@ main:
 	;; Go to LPM3 mode for all possible DMA configuration
 
 	mov    #0x3000, r15
+	mov    #0x0000, r12
 
  	mov    #0x0010, r10      ; # Number of combination to try
 	mov.b  #0x00,   &BCSCTL1 ; # Initialize DMA low-power mode
 
 lpm0_loop:
-	cmp.b  r10,     &BCSCTL1
+	cmp.b  r10,     r12
 	jge    lpm0_loop_done
 
  	LPM3		  	 ; # CPU_MCLK off + SMCLK off + DCO off
@@ -156,7 +157,8 @@ lpm0_loop:
  	call   #WAIT_FUNC
 
 	inc    r15
-	inc.b  &BCSCTL1		 ; # Set DMA low-power mode for next round
+	inc    r12
+	mov.b  r12,     &BCSCTL1 ; # Set DMA low-power mode for next round
 	jmp    lpm0_loop
 	
 lpm0_loop_done:	

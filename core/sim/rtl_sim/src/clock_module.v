@@ -226,7 +226,7 @@ initial
       if (r5  !== 16'h0000) tb_error("====== BCSCTL2 rd/wr access error (test 1) =====");
 
   `ifdef DMA_IF_EN
-      if (r6  !== 16'h003C) tb_error("====== BCSCTL1 rd/wr access error (test 2) =====");
+      if (r6  !== 16'h003A) tb_error("====== BCSCTL1 rd/wr access error (test 2) =====");
   `else
       if (r6  !== 16'h0030) tb_error("====== BCSCTL1 rd/wr access error (test 2) =====");
   `endif
