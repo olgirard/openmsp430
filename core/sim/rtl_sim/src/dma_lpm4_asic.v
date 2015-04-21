@@ -141,10 +141,10 @@ initial
 	   $display("\nLPM4 (CPUOFF+SCG0+SCG1+OSCOFF) -  {DMA_SCG1, DMA_SCG0, DMA_OSCOFF, DMA_CPUOFF}={%d, %d, %d, %d}\n", cfg_idx[3], cfg_idx[2], cfg_idx[1], cfg_idx[0]);
 
 	   //                                                {SCG1 , SCG0 , OSCOFF }
-	   full_lpm_clock_check ( lpm_clocks_status         ({1'b1 , 1'b1 ,  1'b1  }),                              // Get running clocks in low power mode
+	   full_lpm_clock_check ( lpm_clocks_status         ({1'b1 , 1'b1 ,  1'b1  }),                                                       // Get running clocks in low power mode
 
-           //                                                { DMA_SCG1 , DMA_SCG0 , DMA_OSCOFF, DMA_CPUOFF }
-                                  lmp_clocks_status_dma_wkup({cfg_idx[3],cfg_idx[2], cfg_idx[1], cfg_idx[0] }));    // Get running clocks in low power mode with DMA wake-up
+           //                                                {SCG1 , SCG0 , OSCOFF }  { DMA_SCG1 , DMA_SCG0 , DMA_OSCOFF, DMA_CPUOFF }
+                                  lmp_clocks_status_dma_wkup({1'b1 , 1'b1 ,  1'b1  }, {cfg_idx[3],cfg_idx[2], cfg_idx[1], cfg_idx[0] }));    // Get running clocks in low power mode with DMA wake-up
 	end
 
       $display("");
@@ -341,16 +341,20 @@ task irq_exit_lp_mode;
 
 endtask
 
-
 //----------------------------------------------------------------------------------//
 //                    DETECT CLOCKS RESTORED WITH DMA WAKEUP                        //
 //----------------------------------------------------------------------------------//
 function [3:0] lmp_clocks_status_dma_wkup;
 
+   input [3:0] lpm_config;           // {  SCG1  ,   SCG0  ,   OSCOFF               }
    input [3:0] dma_lpm_config;       // {DMA_SCG1, DMA_SCG0, DMA_OSCOFF, DMA_CPUOFF }
   
-   reg   [2:0] lpm_rtl_support;      // {  SCG1  ,   SCG0  ,   OSCOFF  }
+   reg   [3:0] combined_lpm_config;  // {DMA_SCG1, DMA_SCG0, DMA_OSCOFF, DMA_CPUOFF }
+   reg   [2:0] lpm_rtl_support;      // {  SCG1  ,   SCG0  ,   OSCOFF               }
    begin
+
+      // Combine low power configuration with the DMA wakeup one
+      assign combined_lpm_config  =  dma_lpm_config | {~lpm_config, 1'b0};
 
       // Get supported RTL configuration
       lpm_rtl_support =                   3'h0;
@@ -366,30 +370,30 @@ function [3:0] lmp_clocks_status_dma_wkup;
 
       // Depending on RTL configuration, figure out which clocks are running when a DMA wakeup is applied
       case(lpm_rtl_support)
-        //                                               SMCLK       ,      DCO_CLK      ,       ACLK        ,      MCLK_DMA
-        4'b000 :   lmp_clocks_status_dma_wkup  = {        1'b1       ,       1'b1        ,       1'b1        , dma_lpm_config[0] };
-
-        4'b001 :   lmp_clocks_status_dma_wkup  = {        1'b1       ,       1'b1        , dma_lpm_config[1] , dma_lpm_config[0] };
+        //                                               SMCLK            ,      DCO_CLK           ,       ACLK             ,      MCLK_DMA
+        4'b000 :   lmp_clocks_status_dma_wkup  = {        1'b1            ,       1'b1             ,       1'b1             , combined_lpm_config[0] };
+								        		       
+        4'b001 :   lmp_clocks_status_dma_wkup  = {        1'b1            ,       1'b1             , combined_lpm_config[1] , combined_lpm_config[0] };
 
         4'b010 : begin
-                   lmp_clocks_status_dma_wkup  = { dma_lpm_config[2] , dma_lpm_config[2] ,       1'b1        , dma_lpm_config[0] };
-                   lmp_clocks_status_dma_wkup  = {        1'b1       ,       1'b1        ,       1'b1        , dma_lpm_config[2] } & lmp_clocks_status_dma_wkup;
+                   lmp_clocks_status_dma_wkup  = { combined_lpm_config[2] , combined_lpm_config[2] ,       1'b1             , combined_lpm_config[0] };
+                   lmp_clocks_status_dma_wkup  = {        1'b1            ,       1'b1             ,       1'b1             , combined_lpm_config[2] } & lmp_clocks_status_dma_wkup;
                  end
         4'b011 : begin
-                   lmp_clocks_status_dma_wkup  = { dma_lpm_config[2] , dma_lpm_config[2] , dma_lpm_config[1] , dma_lpm_config[0] };
-                   lmp_clocks_status_dma_wkup  = {        1'b1       ,       1'b1        ,       1'b1        , dma_lpm_config[2] } & lmp_clocks_status_dma_wkup;
-                 end
-        4'b100 :   lmp_clocks_status_dma_wkup  = { dma_lpm_config[3] ,       1'b1        ,       1'b1        , dma_lpm_config[0] };
-
-        4'b101 :   lmp_clocks_status_dma_wkup  = { dma_lpm_config[3] ,       1'b1        , dma_lpm_config[1] , dma_lpm_config[0] };
+                   lmp_clocks_status_dma_wkup  = { combined_lpm_config[2] , combined_lpm_config[2] , combined_lpm_config[1] , combined_lpm_config[0] };
+                   lmp_clocks_status_dma_wkup  = {        1'b1            ,       1'b1             ,       1'b1             , combined_lpm_config[2] } & lmp_clocks_status_dma_wkup;
+                 end									          		         
+        4'b100 :   lmp_clocks_status_dma_wkup  = { combined_lpm_config[3] ,       1'b1             ,       1'b1             , combined_lpm_config[0] };
+											          
+        4'b101 :   lmp_clocks_status_dma_wkup  = { combined_lpm_config[3] ,       1'b1             , combined_lpm_config[1] , combined_lpm_config[0] };
 
         4'b110 : begin
-                   lmp_clocks_status_dma_wkup  = { dma_lpm_config[3] , dma_lpm_config[2] ,       1'b1        , dma_lpm_config[0] };
-                   lmp_clocks_status_dma_wkup  = { dma_lpm_config[2] ,       1'b1        ,       1'b1        , dma_lpm_config[2] } & lmp_clocks_status_dma_wkup;
+                   lmp_clocks_status_dma_wkup  = { combined_lpm_config[3] , combined_lpm_config[2] ,       1'b1             , combined_lpm_config[0] };
+                   lmp_clocks_status_dma_wkup  = { combined_lpm_config[2] ,       1'b1             ,       1'b1             , combined_lpm_config[2] } & lmp_clocks_status_dma_wkup;
                  end
         4'b111 : begin
-                   lmp_clocks_status_dma_wkup  = { dma_lpm_config[3] , dma_lpm_config[2] , dma_lpm_config[1] , dma_lpm_config[0] };
-                   lmp_clocks_status_dma_wkup  = { dma_lpm_config[2] ,       1'b1        ,       1'b1        , dma_lpm_config[2] } & lmp_clocks_status_dma_wkup;
+                   lmp_clocks_status_dma_wkup  = { combined_lpm_config[3] , combined_lpm_config[2] , combined_lpm_config[1] , combined_lpm_config[0] };
+                   lmp_clocks_status_dma_wkup  = { combined_lpm_config[2] ,       1'b1             ,       1'b1             , combined_lpm_config[2] } & lmp_clocks_status_dma_wkup;
                  end
       endcase
 
