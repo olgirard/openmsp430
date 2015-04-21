@@ -48,6 +48,10 @@ initial
       $display(" ===============================================");
       $display("|                 START SIMULATION              |");
       $display(" ===============================================");
+      // Disable automatic DMA verification
+      #10;
+      dma_verif_on = 0;
+
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 

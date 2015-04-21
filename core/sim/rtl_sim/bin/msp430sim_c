@@ -156,4 +156,4 @@ echo "Convert IHEX file to Verilog MEMH format..."
 
 # Start verilog simulation
 echo "Start Verilog simulation..."
-../bin/rtlsim.sh    stimulus.v pmem.mem $submitfile
+../bin/rtlsim.sh    stimulus.v pmem.mem $submitfile 0 "NO_DMA_VERIF"
