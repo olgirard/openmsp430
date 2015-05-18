@@ -70,7 +70,7 @@ and/or ROM sizes.
 
 The following diagram shows the openMSP430 design structure:
 <br><br>
-<img src="http://opencores.org/usercontent,img,1354053264" alt="CPU Structure" title="CPU Structure" width="80%">
+<img src="http://opencores.org/usercontent,img,1430426442" alt="CPU Structure" title="CPU Structure" width="80%">
 <br>
 <ul>
 	<li><b>Frontend</b>: This module performs the instruction Fetch and Decode tasks. It also contains the execution state machine.</li>
@@ -82,8 +82,8 @@ Contains all the required logic for a Nexus class 3 debugging unit
 (without trace). Communication with the host is performed with a standard
 two-wire interface following either the UART 8N1 or I<sup>2</sup>C serial protocol.</li>
    <li><b>Memory backbone</b>: This block
-performs a simple arbitration between the frontend and execution-unit
-for program, data and peripheral memory access.</li>
+performs a simple arbitration between frontend, execution-unit, DMA and Serial-Debug interfaces
+for program, data and peripheral memory accesses.</li>
    <li><b>Basic Clock Module</b>: Generates MCLK, ACLK, SMCLK and manage the low power modes.</li>
    <li><b>SFRs</b>: The <b>S</b>pecial <b>F</b>unction <b>R</b>egister<b>s</b> block contain diverse configuration registers (NMI, Watchdog, ...).</li>
    <li><b>Watchdog</b>:
@@ -239,7 +239,13 @@ In this section, some additional features are available in order to match the ne
 `define WATCHDOG<br>
       <br>
       <br>
-///-------------------------------------------------------<br>
+//-------------------------------------------------------<br>
+// Include/Exclude DMA interface support<br>
+//-------------------------------------------------------<br>
+//`define DMA_IF_EN<br>
+      <br>
+      <br>
+//-------------------------------------------------------<br>
 // Include/Exclude Non-Maskable-Interrupt support<br>
 //--------------------------------------------------------<br>
 `define NMI<br>
@@ -476,7 +482,7 @@ For example, in a dual-core openMSP430 system, the cores can be instantiated as 
 </tbody>
 </table>
 <br>
-The values of these parameters are then directly accessible through the CPU_NR register of the SFR peripheral.<br>
+The values of these parameters are then directly accessible by software through the CPU_NR register of the SFR peripheral.<br>
 For example, if both cores share the same program memory, the software can take advantage of this information as following:
 <br><br>
 <table border="0" cellpadding="0" cellspacing="4">
@@ -520,7 +526,7 @@ shifted up, which means that the linker script of your favorite
 toolchain will have to be modified accordingly.<br>
 The following schematic should hopefully illustrate this:<br>
 <br><br>
-<img src="usercontent,img,1306066277" alt="Memory mapping" title="Memory mapping" width="80%">
+<img src="http://opencores.org/usercontent,img,1306066277" alt="Memory mapping" title="Memory mapping" width="80%">
 <br>
 <br><br>
 
@@ -710,6 +716,33 @@ Set to 0 if unused.<br>
 <td> Reset Pin (active low, asynchronous and non-glitchy)                             </td>
 	</tr>
 
+	<tr> <td colspan="5" align="center"> <b><i>Interrupts</i></b>                     </td></tr>
+	<tr>
+		  <td> irq                                                              </td>
+		  <td> Input                                                            </td>
+		  <td> `IRQ_NR-2<b><sup><font color="#ff0000">1</font></sup></b>        </td>
+		  <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Maskable interrupts (one-hot signal)                             </td>
+   </tr>
+	<tr> 
+	     <td> nmi                                                              </td>
+	     <td> Input                                                            </td>
+	     <td> 1                                                                </td>
+	     <td style="vertical-align: top; text-align: center;">&lt;async&gt;<br>
+or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
+<td> Non-maskable interrupt (asynchronous and non-glitchy)<br>
+Set to 0 if unused.<br>
+                            </td>
+	</tr>
+	<tr>
+	     <td> irq_acc                                                          </td>
+	     <td> Output                                                           </td>
+	     <td> `IRQ_NR-2<b><sup><font color="#ff0000">1</font></sup></b>        </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Interrupt request accepted (one-hot signal)                      </td>
+	</tr>
 
 	<tr> <td colspan="5" align="center"> <b><i>Program Memory interface</i></b>       </td></tr>
 	<tr> 
@@ -836,33 +869,78 @@ Set to 0 if unused.<br>
       </td>
 <td> Peripheral write enable (high active)                            </td>
 	</tr>
-
-	<tr> <td colspan="5" align="center"> <b><i>Interrupts</i></b>                     </td></tr>
+	<tr> <td colspan="5" align="center"> <b><i>Direct Memory Access interface</i></b> </td></tr>
 	<tr>
-		  <td> irq                                                              </td>
-		  <td> Input                                                            </td>
-		  <td> `IRQ_NR-2<b><sup><font color="#ff0000">1</font></sup></b>        </td>
-		  <td style="vertical-align: top; text-align: center;">mclk<br>
+	     <td> dma_addr                                                         </td>
+	     <td> Input                                                            </td>
+	     <td> 15                                                               </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
       </td>
-<td> Maskable interrupts (one-hot signal)                             </td>
+<td> Direct Memory Access address                                              </td>
+	</tr>
+	<tr>
+	     <td> dma_din                                                          </td>
+	     <td> Input                                                            </td>
+	     <td> 16                                                               </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access data input                                           </td>
    </tr>
-	<tr> 
-	     <td> nmi                                                              </td>
+	<tr>
+	     <td> dma_dout                                                         </td>
+	     <td> Output                                                           </td>
+	     <td> 16                                                               </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access data output                                          </td>
+	</tr>
+	<tr>
+	     <td> dma_en                                                           </td>
+	     <td> Input                                                            </td>
+	     <td> 1                                                                </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access enable (high active)                                 </td>
+	</tr>
+	<tr>
+	     <td> dma_priority                                                     </td>
+	     <td> Input                                                            </td>
+	     <td> 1                                                                </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access priority (0:low / 1:high)                            </td>
+	</tr>
+	<tr>
+	     <td> dma_ready                                                        </td>
+	     <td> Output                                                           </td>
+	     <td> 1                                                                </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access is complete                                          </td>
+	</tr>
+	<tr>
+	     <td> dma_resp                                                         </td>
+	     <td> Output                                                           </td>
+	     <td> 1                                                                </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access response (0:Okay / 1:Error)                          </td>
+	</tr>
+	<tr>
+	     <td> dma_we                                                           </td>
+	     <td> Input                                                            </td>
+	     <td> 2                                                                </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access write byte enable (high active)                      </td>
+	</tr>
+	<tr>
+	     <td> dma_wkup                                                         </td>
 	     <td> Input                                                            </td>
 	     <td> 1                                                                </td>
 	     <td style="vertical-align: top; text-align: center;">&lt;async&gt;<br>
-or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
-<td> Non-maskable interrupt (asynchronous and non-glitchy)<br>
-Set to 0 if unused.<br>
-                            </td>
-	</tr>
-	<tr>
-	     <td> irq_acc                                                          </td>
-	     <td> Output                                                           </td>
-	     <td> `IRQ_NR-2<b><sup><font color="#ff0000">1</font></sup></b>        </td>
-	     <td style="vertical-align: top; text-align: center;">mclk<br>
       </td>
-<td> Interrupt request accepted (one-hot signal)                      </td>
+<td> ASIC ONLY: DMA Wake-up (asynchronous and non-glitchy)                     </td>
 	</tr>
 
 	<tr> <td colspan="5" align="center"> <b><i>Serial Debug interface</i></b>         </td></tr>

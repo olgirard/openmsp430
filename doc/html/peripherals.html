@@ -55,7 +55,7 @@ clock muxes.
 <br>
 With these constrains, the Basic Clock Module is implemented as following:
 <br><br>
-<img src="usercontent,img,1319831724" alt="Clock structure diagram" title="Clock structure diagram" width="80%">
+<img src="http://opencores.org/usercontent,img,1319831724" alt="Clock structure diagram" title="Clock structure diagram" width="80%">
 <br>
 <b>Note</b>: CPUOFF doesn't switch MCLK off and will instead bring the
 CPU state machines in an IDLE state while MCLK will still be running.
@@ -63,7 +63,7 @@ CPU state machines in an IDLE state while MCLK will still be running.
 
 In order to '<i>clock</i>' a register with ACLK or SMCLK, the following structure needs to be implemented:
 <br><br>
-<img src="usercontent,img,1246434793" alt="Clock implementation example" title="Clock implementation example">
+<img src="http://opencores.org/usercontent,img,1246434793" alt="Clock implementation example" title="Clock implementation example">
 <br><br>For example, the following Verilog code would implement a counter clocked with SMCLK:
 <br>
 <table border="0" cellpadding="0" cellspacing="4">
@@ -86,34 +86,118 @@ In order to '<i>clock</i>' a register with ACLK or SMCLK, the following structur
 </tr>
 </tbody></table>
 <br><br>
-<b>Register Description</b>
+<b>Register Description (FPGA)</b>
+<br><br>
+<table border="1">
+<tbody><tr align="center">
+<td rowspan="2"><b>Register Name</b></td>
+<td rowspan="2"><b>Address</b></td>
+<td colspan="16"><b>Bit Field</b></td>
+</tr>
+<tr align="center">
+<td>7</td>
+<td>6</td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr align="center">
+<td>DCOCTL</td>
+<td>0x0004</td>
+<td colspan="8"><small><i>not implemented</i></small></td>
+</tr>
+<tr align="center">
+<td>BCSTL1</td>
+<td>0x0006</td>
+<td colspan="2"><small><i>unused</i></small></td>
+<td colspan="2"><b>DIVAx</b></td>
+<td colspan="4"><small><i>unused</i></small></td>
+</tr>
+<tr align="center">
+<td>BCSTL2</td>
+<td>0x0008</td>
+<td colspan="4"><small><i>unused</i></small></td>
+<td colspan="1"><b>SELS</b></td>
+<td colspan="2"><b>DIVSx</b></td>
+<td colspan="1"><small><i>unused</i></small></td>
+</tr>
+</tbody>
+</table>
 <ul>
-	<li>DCOCTL: Not implemented</li>
-	<li>BCSCTL1:
-	<ul>
-      <li>BCSCTL1[7:6]: Unused</li>
-      <li>BCSCTL1[5:4]: DIVAx</li>
-      <li>BCSCTL1[4:0]: Unused</li>
-	</ul>
-	</li>	
-	<li>BCSCTL2:
-	<ul>
-      <li>BCSCTL2[7:4]: Unused</li>
-      <li>BCSCTL2[3]&nbsp;&nbsp;&nbsp;: SELS</li>
-      <li>BCSCTL2[2:1]: DIVSx</li>
-      <li>BCSCTL2[0]&nbsp;&nbsp;&nbsp;: Unused</li>
-	</ul></li>
+	<li>BCSCTL1.<b>DIVAx</b>&emsp;: ACLK_EN divider (1/2/4/8)</li>
+	<li>BCSCTL2.<b>SELS</b>&nbsp;&nbsp;&emsp;: SMCLK_EN clock selection (0:DCO_CLK / 1:LFXT_CLK)</li>
+    <li>BCSCTL2.<b>DIVSx</b>&emsp;: SMCLK_EN divider (1/2/4/8)</li>
+</ul>
 
-</ul><a name="2.1.2_Basic_Clock_Module_ASIC"></a>
+<a name="2.1.2_Basic_Clock_Module_ASIC"></a>
 <h3>2.1.2 Basic Clock Module: ASIC</h3>
 <br>
 When targeting an ASIC, up to all clock management
 options available in the <a href="http://www.ti.com/litv/pdf/slau049f">MSP430x1xx Family User's Guide</a> (Chapter 4) can be included:<br><br>
 
-<img src="usercontent,img,1319832480" alt="Clock structure diagram" title="Clock structure diagram" width="80%"><br>
+<img src="http://opencores.org/usercontent,img,1319832480" alt="Clock structure diagram" title="Clock structure diagram" width="80%"><br>
 Additional info can be found in the <a href="http://opencores.org/project,openmsp430,asic%20implementation">ASIC implementation</a>
 section.<br>
 <br>
+<b>Register Description (ASIC)</b>
+<br><br>
+<table border="1">
+<tbody><tr align="center">
+<td rowspan="2"><b>Register Name</b></td>
+<td rowspan="2"><b>Address</b></td>
+<td colspan="16"><b>Bit Field</b></td>
+</tr>
+<tr align="center">
+<td>7</td>
+<td>6</td>
+<td>5</td>
+<td>4</td>
+<td>3</td>
+<td>2</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr align="center">
+<td>DCOCTL</td>
+<td>0x0004</td>
+<td colspan="8"><small><i>not implemented</i></small></td>
+</tr>
+<tr align="center">
+<td>BCSTL1</td>
+<td>0x0006</td>
+<td colspan="2"><small><i>unused</i></small></td>
+<td colspan="2"><b>DIVAx</b></td>
+<td colspan="1"><b><small>DMA_SCG1</small></b></td>
+<td colspan="1"><b><small>DMA_SCG0</small></b></td>
+<td colspan="1"><b><small>DMA_OSCOFF</small></b></td>
+<td colspan="1"><b><small>DMA_CPUOFF</small></b></td>
+</tr>
+<tr align="center">
+<td>BCSTL2</td>
+<td>0x0008</td>
+<td colspan="1"><b>SELMx</b></td>
+<td colspan="1"><small><i>unused</i></small></td>
+<td colspan="2"><b>DIVMx</b></td>
+<td colspan="1"><b>SELS</b></td>
+<td colspan="2"><b>DIVSx</b></td>
+<td colspan="1"><small><i>unused</i></small></td>
+</tr>
+</tbody>
+</table>
+<ul>
+	<li>BCSCTL1.<b>DIVAx</b>&emsp;&emsp;&emsp;&emsp;&emsp;: ACLK clock divider (1/2/4/8)</li>
+	<li>BCSCTL1.<b>DMA_SCG1</b>&nbsp;&nbsp;&emsp;&emsp;: Restore SMCLK with DMA wakeup</li>
+	<li>BCSCTL1.<b>DMA_SCG0</b>&nbsp;&nbsp;&emsp;&emsp;: Restore DCO oscillator with DMA wakeup</li>
+	<li>BCSCTL1.<b>DMA_OSCOFF</b>&emsp;: Restore LFXT oscillator with DMA wakeup</li>
+	<li>BCSCTL1.<b>DMA_CPUOFF</b>&emsp;: Restore MCLK with DMA wakeup</li>
+	<li>BCSCTL2.<b>SELMx</b>&nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;: MCLK clock selection (0:DCO_CLK / 1:LFXT_CLK)</li>
+    <li>BCSCTL2.<b>DIVMx</b>&nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;: MCLK clock divider (1/2/4/8)</li>
+	<li>BCSCTL2.<b>SELS</b>&nbsp;&nbsp;&emsp;&emsp;&emsp;&emsp;&emsp;: SMCLK clock selection (0:DCO_CLK / 1:LFXT_CLK)</li>
+    <li>BCSCTL2.<b>DIVSx</b>&emsp;&emsp;&emsp;&emsp;&emsp;: SMCLK clock divider (1/2/4/8)</li>
+</ul>
 
 <a name="2.1.3_SFR"></a>
 <h3>2.1.3 SFR</h3>

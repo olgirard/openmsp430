@@ -1,0 +1,312 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head><title>openMSP430 DMA Interface</title>
+
+<meta http-equiv="content-type" content="text/html; charset=utf-8"></head><body>
+<h3>Table of content</h3>
+
+<ul>
+  <li><a href="#1.%20Introduction">         1. Introduction</a></li>
+  <li><a href="#2.%20Signal%20list">        2. Signal list</a></li>
+  <li><a href="#3.%20Protocol">             3. Protocol</a></li>
+	<ul>
+       <li><a href="#3.1%20Simple%20transfer">               3.1 Simple transfer</a></li>
+       <li><a href="#3.2%20Transfer%20with%20wait%20states"> 3.2 Transfer with wait states</a></li>
+       <li><a href="#3.3%20Multiple%20transfers">            3.3 Multiple transfers</a></li>
+       <li><a href="#3.4%20Transfer%20response">             3.4 Transfer response</a></li>
+       <li><a href="#3.5%20Priority%20control">              3.5 Priority control</a></li>
+   	   <ul>
+          <li><a href="#3.5.1%20Data%20rate%20control">      3.5.1 Data rate control</a></li>
+          <li><a href="#3.5.2%20Bootloader%20case">          3.5.2 Bootloader case</a></li>
+	   </ul>
+	</ul>
+  <li><a href="#4.%20ASIC%20Implementation">4. ASIC Implementation</a></li>
+	<ul>
+ 	   <li><a href="#4.1%20Clock%20domains">     4.1 Clock domains</a></li>
+       <li><a href="#4.2%20DMA%20wakeup">        4.2 DMA wakeup</a></li>
+	</ul>
+</ul>
+
+<a name="1.%20Introduction"></a>
+<h1>1. Introduction</h1>
+
+The openMSP430 Direct-Memory-Access interface acts as a gateway to the whole logical 64kB memory space and can
+be enabled be uncommenting the DMA_IF_EN macro in the <i>"openMSP430_defines.sv"</i> file:<br><br>
+<code>
+//-------------------------------------------------------<br>
+// Include/Exclude DMA interface support<br>
+//-------------------------------------------------------<br>
+`define DMA_IF_EN<br>
+</code>
+<br>
+It supports the efficient connection of Bootloader, DMA controller, Memory-BIST or any other hardware
+unit requiring direct read/write access to the CPU memory space.  
+<br>
+The interface is also designed as to reuse the existing arbitration logic within the memory-backbone
+and thus minimize to timing costs of its physical implementation (i.e. no additional muxing layer on
+an already critical timing path).
+<br><br>
+An simple system using the DMA interface typically consists of a DMA master directly connected to
+openMSP430 core:
+<br><img src="http://opencores.org/usercontent,img,1431381105" alt="DMA simple systems" title="DMA simple systems" width="100%">
+<br><br>
+However, it is also possible to combine different DMA masters using a custom arbitration logic:
+<br><img src="http://opencores.org/usercontent,img,1431381122" alt="DMA complex system" title="DMA complex system" width="100%">
+<br><br>
+
+<a name="2.%20Signal%20list"></a>
+<h1>2. Signal list</h1>
+
+<table border="1">
+<tbody>
+<tr align="center">
+   <td><b>Name</b></td>
+   <td><b>Source</b></td>
+   <td><b>Type</b></td>
+   <td><b>Description</b></td>
+</tr>
+<tr>
+   <td><b>MCLK</b><br><small>System clock</small></td>
+   <td align="center">&nbsp;openMSP430&nbsp;</td>
+   <td align="center">System</td>
+   <td>This clock times all DMA transfers. All signal timings are related to the rising edge of MCLK.</td>
+</tr>
+<tr>
+   <td><b>PUC_RST</b><br><small>System reset</small></td>
+   <td align="center">&nbsp;openMSP430&nbsp;</td>
+   <td align="center">System</td>
+   <td>The system reset is active HIGH and is used to reset the sytem, including the DMA master(s).</td>
+</tr>
+<tr>
+   <td><b>DMA_WKUP</b><br><small>Wakeup</small></td>
+   <td align="center">DMA Master<br><small>(Asynchronous)</small></td>
+   <td align="center">System</td>
+   <td>When HIGH in a Low-Power-Mode, the wakeup signal restores the clocks necessary for the DMA transfer (see <a href="#4.%20ASIC%20Implementation">ASIC Implementation</a> section).</td>
+</tr>
+<tr>
+   <td><b>DMA_ADDR[15:1]</b><br><small>Address bus</small></td>
+   <td align="center">DMA Master</td>
+   <td align="center">Address</td>
+   <td>This is the 15-bit address bus allowing to access the 64kB address space (16b words).</td>
+</tr>
+<tr>
+   <td><b>DMA_DIN[15:0]</b><br><small>Write data bus</small></td>
+   <td align="center">DMA Master</td>
+   <td align="center">Data</td>
+   <td>The write data bus is used to transfer data from the DMA master to openMSP430 system during write operations.</td>
+</tr>
+<tr>
+   <td><b>DMA_DOUT[15:0]</b><br><small>Read data bus</small></td>
+   <td align="center">&nbsp;openMSP430&nbsp;</td>
+   <td align="center">Data</td>
+   <td>The read data bus is used to transfer data from the openMSP430 system to the DMA master during read operations.</td>
+</tr>
+<tr>
+   <td><b>DMA_EN</b><br><small>Transfer enable</small></td>
+   <td align="center">DMA Master</td>
+   <td align="center">Control</td>
+   <td>Indicates that the current DMA transfer is active.</td>
+</tr>
+<tr>
+   <td><b>DMA_WE[1:0]</b><br><small>Transfer direction</small></td>
+   <td align="center">DMA Master</td>
+   <td align="center">Control</td>
+   <td>When HIGH, this signal indicates a write transfer on the selected byte, and a read transfer when LOW.</td>
+</tr>
+<tr>
+   <td><b>DMA_PRIORITY</b><br><small>Transfer priority</small></td>
+   <td align="center">DMA Master</td>
+   <td align="center">Control</td>
+   <td>When HIGH, this signal indicates a high priority DMA transfer (i.e. CPU is stopped). When LOW, low priority DMA transfer have to wait for the CPU to free the accessed ressource.</td>
+</tr>
+<tr>
+   <td><b>DMA_READY</b><br><small>Transfer done</small></td>
+   <td align="center">&nbsp;openMSP430&nbsp;</td>
+   <td align="center">Response</td>
+   <td>When HIGH the DMA_READY signal indicates that a transfer has finished on the bus. This signal may be driven LOW to add wait states to the transfer.</td>
+</tr>
+<tr>
+   <td><b>DMA_RESP</b><br><small>Transfer response</small></td>
+   <td align="center">&nbsp;openMSP430&nbsp;</td>
+   <td align="center">Response</td>
+   <td>The transfer response provides additional information on the status of a transfer (OKAY if LOW, ERROR when HIGH).</td>
+</tr>
+</tbody>
+</table>
+
+<br>
+
+<a name="3.%20Protocol"></a>
+<h1>3. Protocol</h1>
+
+<a name="3.1%20Simple%20transfer"></a>
+<h2>3.1 Simple transfer</h2>
+
+The following figure shows the simplest transfer, one with no wait states.<br>
+<br><img src="http://opencores.org/usercontent,img,1431552266" alt="DMA simple transfer" title="DMA simple transfer" width="60%"><br>
+In a simple transfer with no wait states:
+<ul>
+  <li>The DMA master drives the address, control signals and write data onto the bus after the rising edge of MCLK.</li>
+  <li>The openMSP430 ressource (pmem/dmem/peripheral) then samples the address, control and write data information on the next rising edge of the clock.</li>
+  <li>For read access, after the openMSP430 ressource has sampled the address and control it can start to drive the read data
+  	  and this is sampled by the DMA master on the third rising edge of the clock.</li>
+</ul>
+
+<a name="3.2%20Transfer%20with%20wait%20states"></a>
+<h2>3.2 Transfer with wait states</h2>
+The openMSP430 can insert wait states into any transfer, as shown in the following figure, which extends
+the transfer by two clock cycles, thus taking additional time for completion.
+<br><img src="http://opencores.org/usercontent,img,1431552287" alt="DMA transfer with wait states" title="DMA transfer with wait states" width="90%"><br>
+For both read and write operations the DMA master must hold the address, control and write data stable throughout the extended cycles.
+<br><br>
+<b>Note:</b> wait states are inserted by the openMSP430 if the CPU is currently busy reading or writing to the same ressource that the DMA controller also wants to access.
+<br>
+<a name="3.3%20Multiple%20transfers"></a>
+<h2>3.3 Multiple transfers</h2>
+
+The following figure shows three transfers to unrelated addresses, A, B & C.
+
+<br><img src="http://opencores.org/usercontent,img,1431552310" alt="DMA multiple transfer" title="DMA multiple transfer" width="100%"><br>
+We can here observe:
+<ul>
+  <li>the transfers to addresses A and C are both zero wait state.</li>
+  <li>the transfer to address B is one wait state.</li>
+  <li>the read data from A is available during the <b>first</b> clock cycle when the address and control B are applied.</li>
+  <li>the read data from B is available during the clock cycle when the address and control C are applied.</li>
+</ul>
+
+<a name="3.4%20Transfer%20response"></a>
+<h2>3.4 Transfer response</h2>
+
+The following figure shows two transfers to unrelated addresses, A & B.
+
+<br><img src="http://opencores.org/usercontent,img,1431552329" alt="DMA error response" title="DMA error response" width="70%"><br>
+We can here observe:
+<ul>
+  <li>the transfer to address A returns an ERROR response (note that transfer returning an ERROR response <b>never</b> have wait states).</li>
+  <li>the transfer to address B is a regular transfer (i.e. OKAY response) without wait state.</li>
+</ul>
+<b>Note:</b> an ERROR response are generated if the transfer address lays between the program and data memories, where nothing is mapped.
+<br>
+
+<a name="3.5%20Priority%20control"></a>
+<h2>3.5 Priority control</h2>
+
+<a name="3.5.1%20Data%20rate%20control"></a>
+<h3>3.5.1 Data rate control</h3>
+The DMA_PRIORITY control signal is available to the DMA master for controlling the application data rate requirements.<br>
+<ul>
+  <li>When CLEARED, DMA transfers have a <b>fixed lower priority</b> than the CPU. This means that depending on the
+exact kind of instructions currently executed by the CPU, the completion time of the DMA transfers cannot be
+predicted (i.e. DMA transfers are completed only when the CPU is not accessing the trageted ressource).</li>
+  <li>When SET, DMA transfers have a <b>fixed higher priority</b> over the CPU. This means that the CPU will
+will stop execution and give the full bandwidth to the DMA controller. In that scenario, DMA transfers complete
+in a single clock cycle (i.e. without any wait states), as the targeted ressources are always available
+(i.e. the CPU is not executing).</li>
+  <li>If the application requirements need something in between (namely a minimum DMA transfer data-rate with reduced effect
+on the firmware exection), then the DMA master can dynamically change the DMA_PRIORITY as required.</li> 
+</ul>
+These scenario are illustrated in the following figure.
+<br><img src="http://opencores.org/usercontent,img,1431638398" alt="DMA error response" title="DMA error response" width="100%"><br>
+We can here observe:
+<ul>
+  <li>phase <b>A</b> illustrates LOW-PRIORITY transfers. Less DMA transfer are completed during that time as shown by the number of wait states.</li>
+  <li>phase <b>B</b> illustrates HIGH-PRIORITY transfers. DMA transfers are completed with each clock cycle (i.e. no wait state).</li>
+  <li>phase <b>C</b> illustrates MIXED-PRIORITY transfers where the DMA controller is dynamically adjusting the priority to achieve its target minimum data-rate.</li>
+</ul>
+
+<a name="3.5.2%20Bootloader%20case"></a>
+<h3>3.5.2 Bootloader case</h3>
+In general, the purpose of a bootloader is to initialize the program memory at startup (i.e after Power-On-Reset).<br>
+DMA transfers driven by the bootloader should therefore be performed in HIGH-PRIORITY mode, as the CPU should not start
+executing instructions on a non-initialized memory.<br>
+Once the memory initialization is completed, a reset pulse should be generated by the bootloader to make sure the CPU
+re-fetches the new RESET vector from the program memory.<br>
+<br>
+A bootloader could be for example be connected as following:
+<br><img src="http://opencores.org/usercontent,img,1431724552" alt="DMA bootloader" title="DMA bootloader" width="50%"><br>
+
+The bootloading sequence is illustrated in the following figure:
+<br><img src="http://opencores.org/usercontent,img,1431724534" alt="DMA bootloader waveform" title="DMA bootloader waveform" width="100%"><br>
+
+<a name="4.%20ASIC%20Implementation"></a>
+<h1>4. ASIC Implementation</h1>
+
+<a name="4.1%20Clock%20domains"></a>
+<h2>4.1 Clock domains</h2>
+If the ASIC low power options are enabled, it is possible to perform DMA accesses when the main CPU is in <b>any</b> Low-Power-Mode (LPMx).<br>
+However, in order to avoid unnecessary power consumption while restoring the clocks for the DMA transfer, the MCLK
+system clock has been split into two clock domains.
+<ul>
+  <li>MCLK_CPU : clocks the CPU core itself, namely the frontend and execution logic.
+  	             When the CPU is in LPMx mode, this clock is ALWAYS OFF, even if a DMA transfer is currently on going.</li>
+  <li>MCLK_DMA : clocks the rest of the system (excluding the DBG interface) and gives access to the 64kB memory
+  	             adddress range to the DMA master. This clock is restored in LPMx modes by asserting the DMA_WKUP pin.</li>
+</ul>
+This table summarizes the clock operating modes:<br><br>
+<table border="1">
+<tbody><tr align="center">
+<td rowspan="2"><b>Clock Name</b></td>
+<td rowspan="2"><b>CPU Active</b></td>
+<td colspan="2"><b>CPU Low-Power-Mode</b></td>
+</tr>
+<tr align="center">
+<td>DMA_WKUP=0</td>
+<td>DMA_WKUP=1</td>
+</tr>
+<tr align="center">
+<td>MCLK_CPU</td>
+<td>ON</td>
+<td>OFF</td>
+<td>OFF</td>
+</tr>
+<tr align="center">
+<td>MCLK_DMA</td>
+<td>ON</td>
+<td>OFF</td>
+<td>ON</td>
+</tr>
+</tbody>
+</table>
+<br>
+Clock domains are illustrated in the following diagram:
+<br><img src="http://opencores.org/usercontent,img,1431726489" alt="DMA clock domains" title="DMA clock domains" width="50%"><br>
+
+<a name="4.2%20DMA%20wakeup"></a>
+<h2>4.2 DMA wakeup</h2>
+As shown in the "Peripherals" chapter, the Basic-Clock-Module has several
+control registers giving some flexibility to the firmware as to which clocks
+are restored when the DMA_WKUP pin is asserted.<br><br>
+
+<table border="1">
+<tbody><tr align="center">
+<td rowspan="2"><b>Register Name</b></td>
+<td rowspan="2"><b>Address</b></td>
+<td colspan="16"><b>Bit Field</b></td>
+</tr>
+<tr align="center">
+<td>7</td><td>6</td><td>5</td><td>4</td>
+<td>3</td><td>2</td><td>1</td><td>0</td>
+</tr>
+<tr align="center">
+<td>BCSTL1</td>
+<td>0x0006</td>
+<td colspan="2"><small><i>unused</i></small></td>
+<td colspan="2"><b>DIVAx</b></td>
+<td colspan="1"><b><small>DMA_SCG1</small></b></td>
+<td colspan="1"><b><small>DMA_SCG0</small></b></td>
+<td colspan="1"><b><small>DMA_OSCOFF</small></b></td>
+<td colspan="1"><b><small>DMA_CPUOFF</small></b></td>
+</tr>
+</tbody>
+</table>
+<ul>
+	<li><b>DMA_SCG1</b>&nbsp;&nbsp;&emsp;&emsp;: Restore SMCLK with DMA wakeup</li>
+	<li><b>DMA_SCG0</b>&nbsp;&nbsp;&emsp;&emsp;: Restore DCO oscillator with DMA wakeup</li>
+	<li><b>DMA_OSCOFF</b>&emsp;: Restore LFXT oscillator with DMA wakeup</li>
+	<li><b>DMA_CPUOFF</b>&emsp;: Restore MCLK_DMA with DMA wakeup</li>
+</ul>
+Note that the DMA_WKUP functionality can be disabled by keeping all these bitfields <b>CLEARED</b>.
+<br>
+<br>
+
+</body></html>

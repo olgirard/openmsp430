@@ -9,11 +9,12 @@
 	<li><a href="#4.%20Program%20Memory">      4. Program Memory</a></li>	
 	<li><a href="#5.%20Data%20Memory">         5. Data Memory</a></li>	
 	<li><a href="#6.%20Peripherals">           6. Peripherals</a></li>	
-	<li><a href="#7.%20Interrupts">            7. Interrupts</a></li>	
-	<li><a href="#8.%20Serial%20Debug%20Interface">8. Serial Debug Interface</a></li>	
+	<li><a href="#7.%20DMA%20Interface">       7. Direct Memory Access Interface</a></li>	
+	<li><a href="#8.%20Interrupts">            8. Interrupts</a></li>	
+	<li><a href="#9.%20Serial%20Debug%20Interface">9. Serial Debug Interface</a></li>	
 	<ul>
- 	   <li><a href="#8.1%20UART">                  8.1 UART Configuration</a></li>
-     	<li><a href="#8.2%20I2C">                   8.2 I2C Configuration</a></li>
+ 	   <li><a href="#9.1%20UART">                  9.1 UART Configuration</a></li>
+       <li><a href="#9.2%20I2C">                   9.2 I2C Configuration</a></li>
 	</ul>
 </ul>
 
@@ -24,7 +25,7 @@ core interfaces in order to facilitate its integration within an ASIC
 or FPGA.<br><br>The
 following diagram shows an overview of the openMSP430 core connectivity
 in an FPGA system (i.e. all ASIC specific pins are left unused):<br><br>
-<img src="http://opencores.org/usercontent,img,1353268529" alt="Core Integration" title="Core Integration" width="100%">
+<img src="http://opencores.org/usercontent,img,1430948924" alt="Core Integration" title="Core Integration" width="100%">
 <br><br>
 The full pinout of the core is summarized in the following table.<br>
 <br>
@@ -280,17 +281,90 @@ or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
 	     <td style="vertical-align: top; text-align: center;">mclk</td>
 <td> Peripheral write byte enable (high active)                       </td>
 	</tr>
+	<tr> <td colspan="5" align="center"> <b><i>Direct Memory Access interface</i></b> </td></tr>
+	<tr>
+	     <td> <a href="#7.%20DMA%20Interface">dma_addr</a>                                                         </td>
+	     <td style="text-align: center;"> Input                                                            </td>
+	     <td style="text-align: center;"> 15                                                               </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access address                                              </td>
+	</tr>
+	<tr>
+	     <td> <a href="#7.%20DMA%20Interface">dma_din</a>                                                          </td>
+	     <td style="text-align: center;"> Input                                                            </td>
+	     <td style="text-align: center;"> 16                                                               </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access data input                                           </td>
+   </tr>
+	<tr>
+	     <td> <a href="#7.%20DMA%20Interface">dma_dout</a>                                                         </td>
+	     <td style="text-align: center;"> Output                                                           </td>
+	     <td style="text-align: center;"> 16                                                               </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access data output                                          </td>
+	</tr>
+	<tr>
+	     <td> <a href="#7.%20DMA%20Interface">dma_en</a>                                                           </td>
+	     <td style="text-align: center;"> Input                                                            </td>
+	     <td style="text-align: center;"> 1                                                                </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access enable (high active)                                 </td>
+	</tr>
+	<tr>
+	     <td> <a href="#7.%20DMA%20Interface">dma_priority</a>                                                     </td>
+	     <td style="text-align: center;"> Input                                                            </td>
+	     <td style="text-align: center;"> 1                                                                </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access priority (0:low / 1:high)                            </td>
+	</tr>
+	<tr>
+	     <td> <a href="#7.%20DMA%20Interface">dma_ready</a>                                                        </td>
+	     <td style="text-align: center;"> Output                                                           </td>
+	     <td style="text-align: center;"> 1                                                                </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access is complete                                          </td>
+	</tr>
+	<tr>
+	     <td> <a href="#7.%20DMA%20Interface">dma_resp</a>                                                         </td>
+	     <td style="text-align: center;"> Output                                                           </td>
+	     <td style="text-align: center;"> 1                                                                </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access response (0:Okay / 1:Error)                          </td>
+	</tr>
+	<tr>
+	     <td> <a href="#7.%20DMA%20Interface">dma_we</a>                                                           </td>
+	     <td style="text-align: center;"> Input                                                            </td>
+	     <td style="text-align: center;"> 2                                                                </td>
+	     <td style="vertical-align: top; text-align: center;">mclk<br>
+      </td>
+<td> Direct Memory Access write byte enable (high active)                      </td>
+	</tr>
+	<tr>
+	     <td> <a href="#7.%20DMA%20Interface">dma_wkup</a>                                                         </td>
+	     <td style="text-align: center;"> Input                                                            </td>
+	     <td style="text-align: center;"> 1                                                                </td>
+	     <td style="vertical-align: top; text-align: center;">&lt;async&gt;<br>
+      </td>
+<td> ASIC ONLY: DMA Wake-up (asynchronous and non-glitchy)                     </td>
+	</tr>
 
 	<tr> <td colspan="5" align="center"> <b><i>Interrupts</i></b>                     </td></tr>
 	<tr>
-		  <td> <a href="#7.%20Interrupts">irq</a>                                </td>
+		  <td> <a href="#8.%20Interrupts">irq</a>                                </td>
 		  <td style="text-align: center;"> Input                                                            </td>
 		  <td style="text-align: center;"> <small>`IRQ_NR-2</small><sup style="font-weight: bold; color: red;">1</sup></td>
 		  <td style="vertical-align: top; text-align: center;">mclk</td>
 <td> Maskable interrupts (one-hot signal)                             </td>
    </tr>
 	<tr> 
-	     <td> <a href="#7.%20Interrupts">nmi</a>                                </td>
+	     <td> <a href="#8.%20Interrupts">nmi</a>                                </td>
 	     <td style="text-align: center;"> Input                                                            </td>
 	     <td style="text-align: center;"> 1                                                                </td>
 	     <td style="vertical-align: top; text-align: center;">&lt;async&gt;<br>
@@ -299,7 +373,7 @@ or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
 <td> Non-maskable interrupt (asynchronous)                            </td>
 	</tr>
 	<tr>
-	     <td> <a href="#7.%20Interrupts">irq_acc</a>                            </td>
+	     <td> <a href="#8.%20Interrupts">irq_acc</a>                            </td>
 	     <td style="text-align: center;"> Output                                                           </td>
 	     <td style="text-align: center;"> <small>`IRQ_NR-2</small><sup style="font-weight: bold; color: red;">1</sup></td>
 	     <td style="vertical-align: top; text-align: center;">mclk</td>
@@ -308,7 +382,7 @@ or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
 
 	<tr> <td colspan="5" align="center"> <b><i>Serial Debug interface</i></b>         </td></tr>
 	<tr> 
-	     <td> <a href="#8.%20Serial%20Debug%20Interface">dbg_en</a>                 </td>
+	     <td> <a href="#9.%20Serial%20Debug%20Interface">dbg_en</a>                 </td>
 	     <td style="text-align: center;"> Input                                                            </td>
 	     <td style="text-align: center;"> 1                                                                </td>
 	     <td style="vertical-align: top; text-align: center;">&lt;async&gt;<br>
@@ -317,28 +391,28 @@ or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
 <td> Debug interface enable (asynchronous)<span class="Apple-style-span" style="color: rgb(0, 0, 0); font-family: 'Times New Roman'; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: 2; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; font-size: medium;"><span class="Apple-converted-space">&nbsp;</span><b><sup><font color="#ff0000">3</font></sup></b></span>                            </td>
 	</tr>
 	<tr> 
-	     <td> <a href="#8.%20Serial%20Debug%20Interface">dbg_freeze</a>             </td>
+	     <td> <a href="#9.%20Serial%20Debug%20Interface">dbg_freeze</a>             </td>
 	     <td style="text-align: center;"> Output                                                           </td>
 	     <td style="text-align: center;"> 1                                                                </td>
 	     <td style="vertical-align: top; text-align: center;">mclk</td>
 <td> Freeze peripherals                                               </td>
 	</tr>
 	<tr> 
-	     <td> <a href="#8.1%20UART">dbg_uart_txd</a>           </td>
+	     <td> <a href="#9.1%20UART">dbg_uart_txd</a>           </td>
 	     <td style="text-align: center;"> Output                                                           </td>
 	     <td style="text-align: center;"> 1                                                                </td>
 	     <td style="vertical-align: top; text-align: center;">mclk</td>
 <td> Debug interface: UART TXD                                        </td>
 	</tr>
 	<tr> 
-	     <td> <a href="#8.1%20UART">dbg_uart_rxd</a>           </td>
+	     <td> <a href="#9.1%20UART">dbg_uart_rxd</a>           </td>
 	     <td style="text-align: center;"> Input                                                            </td>
 	     <td style="text-align: center;"> 1                                                                </td>
 	     <td style="vertical-align: top; text-align: center;">&lt;async&gt;<br>
       </td>
 <td> Debug interface: UART RXD (asynchronous)                         </td>
 	</tr><tr>
-      <td><a href="#8.2%20I2C">dbg_i2c_addr</a></td>
+      <td><a href="#9.2%20I2C">dbg_i2c_addr</a></td>
       <td style="text-align: center;">Input</td>
       <td style="text-align: center;"> 1</td>
       <td style="vertical-align: top; text-align: center;">mclk<br>
@@ -346,7 +420,7 @@ or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
  <td> Debug interface: I2C Address </td>
     </tr>
     <tr>
-      <td><a href="#8.2%20I2C">dbg_i2c_broadcast</a></td>
+      <td><a href="#9.2%20I2C">dbg_i2c_broadcast</a></td>
       <td style="text-align: center;">Input</td>
       <td style="text-align: center;"> 1</td>
       <td style="vertical-align: top; text-align: center;">mclk<br>
@@ -354,21 +428,21 @@ or mclk<b><sup><font color="#ff0000">4</font></sup></b></td>
  <td> Debug interface: I2C Broadcast Address (for multicore only) </td>
     </tr>
     <tr>
-      <td><a href="#8.2%20I2C">dbg_i2c_scl</a></td>
+      <td><a href="#9.2%20I2C">dbg_i2c_scl</a></td>
       <td style="text-align: center;">Input</td>
       <td style="text-align: center;"> 1</td>
       <td style="vertical-align: top; text-align: center;">&lt;async&gt;</td>
  <td> Debug interface: I2C SCL </td>
     </tr>
     <tr>
-      <td><a href="#8.2%20I2C">dbg_i2c_sda_in</a></td>
+      <td><a href="#9.2%20I2C">dbg_i2c_sda_in</a></td>
       <td style="text-align: center;">Input</td>
       <td style="text-align: center;"> 1</td>
       <td style="vertical-align: top; text-align: center;">&lt;async&gt;</td>
 <td> Debug interface: I2C SDA input </td>
     </tr>
     <tr>
-      <td><a href="#8.2%20I2C">dbg_i2c_sda_out</a></td>
+      <td><a href="#9.2%20I2C">dbg_i2c_sda_out</a></td>
       <td style="text-align: center;">Output</td>
       <td style="text-align: center;"> 1</td>
       <td style="vertical-align: top; text-align: center;">mclk<br>
@@ -632,10 +706,78 @@ The following waveform illustrates some read/write access to the peripheral regi
 <img src="http://opencores.org/usercontent,img,1263320825" alt="Waveforms: Peripherals - Jan 12." title="Waveforms: Peripherals - Jan 12." width="100%">
 <br><br>
 
-	
-<a name="7. Interrupts"></a>	
+<a name="7. DMA Interface"></a>	
 <div style="text-align: right;"><a href="#TOC">Top</a></div>
-<h1>7. Interrupts</h1> As with the original MSP430, the interrupt
+<h1>7. Direct Memory Access Interface</h1>
+
+Before moving on, please note that further details about the DMA interface can
+be found in its <a href="http://opencores.org/project,openmsp430,dma%20interface">dedicated section</a>.<br>
+<br>
+The protocol between the DMA interface master (DMA controller, bootloader, ...) and the openMSP430 core is similar
+to the one followed between the openMSP430 and its data memory.
+<br> However, it comes with a few additional features to support wait states, error response, priority and wakeup (for LPMx modes).<br>
+<br>
+The signal description goes as following:
+<ul>
+	<li><b><font color="#0000b0">DMA_EN</font></b>:
+this signal enables a DMA transfer and can be released once the transfer is completed, as signaled by DMA_READY.
+		<br><br>
+	</li>
+	<li>
+	    <b><font color="#0000b0">DMA_ADDR</font></b>:
+Logical address of the 16bit word currently accessed by the interface. The address must stay valid until the transfer is completed, as signaled by DMA_READY.
+<br><b>Note:</b> the integrated oMSP memory backbone module decode the specified <b>logical</b> DMA address and maps it accordingly to the <b>physical</b> address of the Program, Data or Peripheral memory. 
+	     <br><br>
+	</li>
+	<li>
+	    <b><font color="#00b000">DMA_DOUT</font></b>:
+When performing a read acces, the DMA data output is valid during the MCLK cycle immediately following the end of the transfer, as signaled by DMA_READY.
+	     <br><br>
+	</li>
+	<li>
+	    <b><font color="#0000b0">DMA_WE</font></b>:
+This signal, asserted together with DMA_EN, allows to selects which byte should be written during the transfer.
+DMA_WE[0] activates a write on the lower byte, DMA_WE[1] a write on the upper byte.<br><br>
+	</li>
+	<li>
+	    <b><font color="#0000b0">DMA_DIN</font></b>:
+When performing a write access, the DMA data input must stay valid until the transfer is completed, as signaled by DMA ready.
+	     <br><br>
+	</li>
+	<li>
+	    <b><font color="#0000b0">DMA_PRIORITY</font></b>:
+When <b>SET</b>, the oMSP memory backbone gives highest priority to the DMA transfer and stops CPU execution.
+<br>When <b>CLEARED</b>, the oMSP memory backbone gives highest priority to CPU execution and the DMA transfer is completed only when the CPU doesn't access the targeted ressource (pmem, dmem or peripheral).
+<br><b>Note</b>: a DMA controller can control the DMA data rate without stalling the CPU by dynamically asserting/deasserting the DMA_PRIORITY port between transfers.
+	     <br><br>
+	</li>
+	<li>
+	    <b><font color="#00b000">DMA_READY</font></b>:
+This port signals that the current DMA transfer is completed.
+<br><b>Note</b>: DMA_READY is typically hold low when the CPU owns the interface of the target ressource.
+	     <br><br>
+	</li>
+	<li>
+	    <b><font color="#00b000">DMA_RESP</font></b>:
+This port signals if the current transfer was successful (0) or if an error occured (1) and is valid together with DMA_READY.
+<br><b>Note</b>: an error is typically signaled when an access is performed outside of any memory mapped area (for example between Program and Data memory).
+	     <br><br>
+	</li>
+	<li>
+	    <b><font color="#0000b0">DMA_WKUP</font></b>:
+For ASIC implementations supporting the Low-Power-Modes, this port is used to asynchronously restore the clocks before performing a DMA transfer.
+<br><b>Note</b>: it is possible to control which clocks are restored during a DMA wakeup using the <b>BCSTL1</b> register of the Basic Clock Module.	  
+	     <br><br>
+	</li>
+</ul>
+The following waveform illustrates some read/write access using the DMA interface:<br><br>
+<img src="http://opencores.org/usercontent,img,1431293399" alt="Waveforms: DMA transfer" title="Waveforms: DMA transfer" width="100%">
+<br><br>
+
+	
+<a name="8. Interrupts"></a>	
+<div style="text-align: right;"><a href="#TOC">Top</a></div>
+<h1>8. Interrupts</h1> As with the original MSP430, the interrupt
 priorities of the openMSP430 are fixed in hardware accordingly to the
 connectivity of the <i>NMI</i> and <i>IRQ</i> ports.<br>
 If two interrupts are pending simultaneously, the higher priority interrupt will be serviced first.<br>
@@ -757,9 +899,9 @@ The following waveform illustrates a TAIV interrupt issued by the Timer-A, which
 <br><br>
 
 
-<a name="8. Serial Debug Interface"></a>	
+<a name="9. Serial Debug Interface"></a>	
 <div style="text-align: right;"><a href="#TOC">Top</a></div>
-<h1>8. Serial Debug Interface</h1>
+<h1>9. Serial Debug Interface</h1>
 The serial debug interface module provides a two-wires communication
 bus (UART or I2C) for remote debugging and an additional freeze signal which might be
 useful for some peripherals (typically timers).<br>
@@ -779,8 +921,8 @@ watchdog every times the user stops the CPU during a debugging session.
 <br><br>
 	</li>
 </ul>
-<a name="8.1 UART"></a>	
-<h2>8.1 UART Configuration</h2>
+<a name="9.1 UART"></a>	
+<h2>9.1 UART Configuration</h2>
 <ul>
 	<li>
 	    <b><font color="#00b000">DBG_UART_TXD</font>&nbsp;/&nbsp;<font color="#0000b0">DBG_UART_RXD</font></b>: these signals are typically connected to an RS-232 transceiver and will allow a PC to communicate with the openMSP430 core.
@@ -790,8 +932,8 @@ watchdog every times the user stops the CPU during a debugging session.
 The following waveform shows some communication traffic on the UART serial bus :<br><br>
 <img src="http://opencores.org/usercontent,img,1263320887" alt="Waveforms: SDI - Jan 12. 2010" title="Waveforms: SDI - Jan 12. 2010" width="100%">
 <br><br>
-<a name="8.2 I2C"></a>	
-<h2>8.2 I2C Configuration</h2>
+<a name="9.2 I2C"></a>	
+<h2>9.2 I2C Configuration</h2>
 <ul>
 	<li>
 	    <b><font color="#0000b0">DBG_I2C_ADDR</font></b>: I2C Device address of the oMSP core (between 8 and 119). In a multi-core configuration each core has its own address.

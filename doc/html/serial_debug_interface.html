@@ -1080,7 +1080,7 @@ There are plenty tutorials on Internet regarding RS232 based protocols.
 However, here is quick recap about 8N1 (1 Start bit, 8 Data bits, No
 Parity, 1 Stop bit):<br>
 <br>
-<img src="usercontent,img,1247419201" alt="8N1 Serial Protocol" title="8N1 Serial Protocol">
+<img src="http://opencores.org/usercontent,img,1247419201" alt="8N1 Serial Protocol" title="8N1 Serial Protocol">
 <br>
 As you can see in the above diagram, data transmission starts with a
 Start bit, followed by the data bits (LSB sent first and MSB sent
@@ -1091,7 +1091,7 @@ Interface expects a synchronization frame from the host computer in
 order to determine the communication speed (i.e. the baud rate).<br>
 The synchronization frame looks as following: 
 <br>
-<img src="usercontent,img,1247420610" alt="Debug Synchronization Frame" title="Debug Synchronization Frame">
+<img src="http://opencores.org/usercontent,img,1247420610" alt="Debug Synchronization Frame" title="Debug Synchronization Frame">
 <br>
 As you can see, the host simply sends the 0x80 value. The openMSP430
 will then measure the time between the falling and rising edge, divide
@@ -1111,7 +1111,7 @@ data frames after receiving the command.
 <h3>3.3.1 Command Frame</h3>
 The command frame looks as following:
 <br>
-<img src="usercontent,img,1247427400" alt="Debug Command Frame" title="Debug Command Frame">
+<img src="http://opencores.org/usercontent,img,1247427400" alt="Debug Command Frame" title="Debug Command Frame">
 <br>
 <table border="0">
 <tbody><tr>
@@ -1132,13 +1132,13 @@ The command frame looks as following:
 <h3>3.3.2 Write access</h3>
 A write access transaction looks like this:
 <br>
-<img src="usercontent,img,1247428987" alt="Debug Write Transaction" title="Debug Write Transaction">
+<img src="http://opencores.org/usercontent,img,1247428987" alt="Debug Write Transaction" title="Debug Write Transaction">
 
 <a name="3.3.3 Read access"></a>
 <h3>3.3.3 Read access</h3>
 A read access transaction looks like this:
 <br>
-<img src="usercontent,img,1247429086" alt="Debug Read Transaction" title="Debug Read Transaction">
+<img src="http://opencores.org/usercontent,img,1247429086" alt="Debug Read Transaction" title="Debug Read Transaction">
 
 <a name="3.4 Read/Write burst implementation for the CPU Memory access"></a>
 <h2>3.4 Read/Write burst implementation for the CPU Memory access</h2>In
@@ -1150,13 +1150,13 @@ Instead, the data transfer starts immediately after the MEM_CTL.START bit has be
 <h3>3.4.1 Write Burst access</h3>
 A write burst transaction looks like this:
 <br>
-<img src="usercontent,img,1247430408" alt="Debug Write Burst Transaction" title="Debug Write Burst Transaction">
+<img src="http://opencores.org/usercontent,img,1247430408" alt="Debug Write Burst Transaction" title="Debug Write Burst Transaction">
 
 <a name="3.4.2 Read Burst access"></a>
 <h3>3.4.2 Read Burst access</h3>
 A read burst transaction looks like this:
 <br>
-<img src="usercontent,img,1247430449" alt="Debug Read Burst Transaction" title="Debug Read Burst Transaction">
+<img src="http://opencores.org/usercontent,img,1247430449" alt="Debug Read Burst Transaction" title="Debug Read Burst Transaction">
 
 <a name="4. Debug Communication Interface: I2C"></a>
 <div style="text-align: right;"><a href="#TOC">Top</a></div>
@@ -1172,7 +1172,7 @@ and the openMSP430.
 There are plenty tutorials on Internet regarding the I2C protocol (see the official <a href="http://www.nxp.com/documents/user_manual/UM10204.pdf">I2C specification</a> for more info).<br>
 A simple byte read or write frame looks as following:<br>
 <br>
-<img src="usercontent,img,1352582784" alt="I2C Protocol" title="I2C Protocol" width="80%">
+<img src="http://opencores.org/usercontent,img,1352582784" alt="I2C Protocol" title="I2C Protocol" width="80%">
 <br><a name="4.2 Synchronization frame"></a>
 <h2>4.2 Synchronization frame</h2>
 Unlike the UART interface, the I2C is a synchronous communication protocol.<br>
@@ -1188,7 +1188,7 @@ data frames after receiving the command.
 <h3>4.3.1 Command Frame</h3>
 The command frame looks as following:
 <br>
-<img src="usercontent,img,1352584261" alt="Debug command frame" title="Debug command frame" width="100%">
+<img src="http://opencores.org/usercontent,img,1352584261" alt="Debug command frame" title="Debug command frame" width="100%">
 <br>
 <table border="0">
 <tbody><tr>
@@ -1209,13 +1209,13 @@ The command frame looks as following:
 <h3>4.3.2 Write access</h3>
 A write access transaction looks like this:
 <br>
-<img src="usercontent,img,1352586896" alt="I2C Debug Write Transaction" title="I2C Debug Write Transaction" width="100%">
+<img src="http://opencores.org/usercontent,img,1352586896" alt="I2C Debug Write Transaction" title="I2C Debug Write Transaction" width="100%">
 
 <a name="4.3.3 Read access"></a>
 <h3>4.3.3 Read access</h3>
 A read access transaction looks like this:
 <br>
-<img src="usercontent,img,1352586064" alt="I2C Debug Read Transaction" title="I2C Debug Read Transaction" width="100%">
+<img src="http://opencores.org/usercontent,img,1352586064" alt="I2C Debug Read Transaction" title="I2C Debug Read Transaction" width="100%">
 
 <a name="4.4 Read/Write burst implementation for the CPU Memory access"></a>
 <h2>4.4 Read/Write burst implementation for the CPU Memory access</h2>In
@@ -1227,13 +1227,13 @@ Instead, the data transfer starts immediately after the MEM_CTL.START bit has be
 <h3>4.4.1 Write Burst access</h3>
 A write burst transaction looks like this:
 <br>
-<img src="usercontent,img,1352673100" alt="I2C Debug Write Burst Transaction" title="I2C Debug Write Burst Transaction" width="100%">
+<img src="http://opencores.org/usercontent,img,1352673100" alt="I2C Debug Write Burst Transaction" title="I2C Debug Write Burst Transaction" width="100%">
 
 <a name="4.4.2 Read Burst access"></a>
 <h3>4.4.2 Read Burst access</h3>
 A read burst transaction looks like this:
 <br>
-<img src="usercontent,img,1352672466" alt="I2C Debug Read Burst Transaction" title="I2C Debug Read Burst Transaction" width="100%">
+<img src="http://opencores.org/usercontent,img,1352672466" alt="I2C Debug Read Burst Transaction" title="I2C Debug Read Burst Transaction" width="100%">
 
 <div style="text-align: right;"><a href="#TOC">Top</a></div>
 
