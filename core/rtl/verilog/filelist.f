@@ -6,7 +6,7 @@
 // derivative work contains the original copyright notice and the associated
 // disclaimer.
 //
-// This source file is free software; you can redistribute it and/or modify
+// This source file is free software; you can redistribute it and/or modify0
 // it under the terms of the GNU Lesser General Public License as published
 // by the Free Software Foundation; either version 2.1 of the License, or
 // (at your option) any later version.
@@ -21,9 +21,9 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 //-----------------------------------------------------------------------------
-// 
-// File Name: submit.f
-// 
+//
+// File Name: filelist.f
+//
 // Author(s):
 //             - Olivier Girard,    olgirard@gmail.com
 //
