@@ -165,7 +165,8 @@ wire        mclk_op1;
 omsp_clock_gate clock_gate_op1 (.gclk(mclk_op1),
                                 .clk (mclk), .enable(op1_wr), .scan_enable(scan_enable));
 `else
-wire        mclk_op1 = mclk;
+wire        UNUSED_scan_enable = scan_enable;
+wire        mclk_op1           = mclk;
 `endif
 
 always @ (posedge mclk_op1 or posedge puc_rst)

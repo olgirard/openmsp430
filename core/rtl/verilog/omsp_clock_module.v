@@ -66,8 +66,8 @@ module  omsp_clock_module (
     puc_rst,                          // Main system reset
     smclk,                            // SMCLK
     smclk_en,                         // SMCLK enable
-                                      
-// INPUTs                             
+
+// INPUTs
     cpu_en,                           // Enable CPU code execution (asynchronous)
     cpuoff,                           // Turns off the CPU
     dbg_cpu_reset,                    // Reset CPU from debug interface
@@ -324,6 +324,7 @@ wire [15:0] per_dout =  bcsctl1_rd   |
    assign cpuoff_and_mclk_enable     = 1'b0;
    assign cpuoff_and_mclk_dma_enable = 1'b0;
    assign cpuoff_and_mclk_dma_wkup   = 1'b0;
+   wire   UNUSED_cpuoff              = cpuoff;
   `endif
 
    wire scg0_and_mclk_dma_enable;
@@ -335,6 +336,7 @@ wire [15:0] per_dout =  bcsctl1_rd   |
     `else
    assign scg0_and_mclk_dma_enable   = 1'b0;
    assign scg0_and_mclk_dma_wkup     = 1'b0;
+   wire   UNUSED_scg0_mclk_dma_wkup  = mclk_dma_wkup;
     `endif
   `else
    assign scg0_and_mclk_dma_enable   = 1'b0;
@@ -350,6 +352,7 @@ wire [15:0] per_dout =  bcsctl1_rd   |
     `else
    assign scg1_and_mclk_dma_enable   = 1'b0;
    assign scg1_and_mclk_dma_wkup     = 1'b0;
+   wire   UNUSED_scg1_mclk_dma_wkup  = mclk_dma_wkup;
     `endif
   `else
    assign scg1_and_mclk_dma_enable   = 1'b0;
@@ -365,12 +368,19 @@ wire [15:0] per_dout =  bcsctl1_rd   |
     `else
    assign oscoff_and_mclk_dma_enable = 1'b0;
    assign oscoff_and_mclk_dma_wkup   = 1'b0;
+   wire   UNUSED_oscoff_mclk_dma_wkup= mclk_dma_wkup;
     `endif
   `else
    assign oscoff_and_mclk_dma_enable = 1'b0;
    assign oscoff_and_mclk_dma_wkup   = 1'b0;
+  wire  UNUSED_mclk_dma_wkup         = mclk_dma_wkup;
   `endif
+`else
+  wire  UNUSED_cpuoff                = cpuoff;
+  wire  UNUSED_mclk_enable           = mclk_enable;
+  wire  UNUSED_mclk_dma_wkup         = mclk_dma_wkup;
 `endif
+
 
 //-----------------------------------------------------------
 // 5.1) HIGH SPEED SYSTEM CLOCK GENERATOR (DCO_CLK)
@@ -465,8 +475,10 @@ wire cpu_en_wkup;
    omsp_and_gate and_dco_wkup (.y(dco_wkup), .a(~dco_wkup_n), .b(cpu_en));
 
 `else
-   assign dco_enable    = 1'b1;
-   assign dco_wkup      = 1'b1;
+   assign dco_enable          = 1'b1;
+   assign dco_wkup            = 1'b1;
+   wire   UNUSED_scg0         = scg0;
+   wire   UNUSED_cpu_en_wkup1 = cpu_en_wkup;
 `endif
 
 
@@ -553,8 +565,11 @@ wire cpu_en_wkup;
    omsp_and_gate and_lfxt_wkup (.y(lfxt_wkup), .a(~lfxt_wkup_n), .b(cpu_en));
 
 `else
-   assign lfxt_enable    = 1'b1;
-   assign lfxt_wkup      = 1'b0;
+   assign lfxt_enable                   = 1'b1;
+   assign lfxt_wkup                     = 1'b0;
+   wire   UNUSED_oscoff                 = oscoff;
+  wire    UNUSED_cpuoff_and_mclk_enable = cpuoff_and_mclk_enable;
+   wire   UNUSED_cpu_en_wkup2           = cpu_en_wkup;
 `endif
 
 
@@ -590,7 +605,7 @@ assign lfxt_wkup   = 1'b0;
 
 //-----------------------------------------------------------
 // 6.1) GLOBAL CPU ENABLE
-//-----------------------------------------------------------
+//----------------------------------------------------------
 // ACLK and SMCLK are directly switched-off
 // with the cpu_en pin (after synchronization).
 // MCLK will be switched off once the CPU reaches
@@ -657,7 +672,7 @@ omsp_clock_mux clock_mux_mclk (
    .clk_in1   (lfxt_clk),
    .reset     (por),
    .scan_mode (scan_mode),
-   .select    (bcsctl2[`SELMx])
+   .select_in (bcsctl2[`SELMx])
 );
 `else
 assign nodiv_mclk   =  dco_clk;
@@ -690,6 +705,7 @@ omsp_sync_cell sync_cell_mclk_wkup (
 `else
    assign cpuoff_and_mclk_dma_wkup_s = 1'b0;
    assign mclk_wkup_s                = 1'b0;
+   wire   UNUSED_mclk_wkup           = mclk_wkup;
 `endif
 
 
@@ -824,7 +840,7 @@ omsp_clock_gate clock_gate_dma_mclk (
    // Wakeup synchronizer
    //----------------------------
    wire oscoff_and_mclk_dma_enable_s;
-    
+
    `ifdef OSCOFF_EN
      `ifdef DMA_IF_EN
           omsp_sync_cell sync_cell_aclk_dma_wkup (
@@ -865,16 +881,21 @@ omsp_clock_gate clock_gate_dma_mclk (
       .scan_enable (scan_enable)
    );
 
- `else
+  `else
     `ifdef LFXT_DOMAIN
-    assign  aclk    = lfxt_clk;
+    assign  aclk                = lfxt_clk;
     `else
-    assign  aclk    = dco_clk;
+    assign  aclk                = dco_clk;
     `endif
+    wire    UNUSED_cpu_en_aux_s = cpu_en_aux_s;
   `endif
 
+ `ifdef LFXT_DOMAIN
+ `else
+    wire    UNUSED_lfxt_clk     = lfxt_clk;
+ `endif
 
-    assign  aclk_en = 1'b1;
+    assign  aclk_en             = 1'b1;
 
 
 // FPGA MODE
@@ -895,8 +916,12 @@ omsp_clock_gate clock_gate_dma_mclk (
     if (puc_rst)  aclk_en <=  1'b0;
     else          aclk_en <=  aclk_en_nxt & cpu_en_s;
 
-  assign  aclk   = nodiv_mclk;
+  assign  aclk               = nodiv_mclk;
+
+  wire    UNUSED_scan_enable = scan_enable;
+  wire    UNUSED_scan_mode   = scan_mode;
 `endif
+
 
 //-----------------------------------------------------------
 // 6.4) SMCLK GENERATION
@@ -911,7 +936,7 @@ omsp_clock_mux clock_mux_smclk (
    .clk_in1   (lfxt_clk),
    .reset     (por),
    .scan_mode (scan_mode),
-   .select    (bcsctl2[`SELS])
+   .select_in (bcsctl2[`SELS])
 );
 `else
 assign nodiv_smclk = dco_clk;
@@ -954,7 +979,9 @@ assign nodiv_smclk = dco_clk;
          .rst          (puc_sm_rst)
      );
      `else
-     assign scg1_s = 1'b0;
+     assign scg1_s            = 1'b0;
+     wire   UNUSED_scg1       = scg1;
+     wire   UNUSED_puc_sm_rst = puc_sm_rst;
      `endif
 
     `ifdef SMCLK_DIVIDER
@@ -986,7 +1013,7 @@ assign nodiv_smclk = dco_clk;
    // Wakeup synchronizer
    //----------------------------
    wire scg1_and_mclk_dma_enable_s;
-    
+
    `ifdef SCG1_EN
      `ifdef DMA_IF_EN
        `ifdef SMCLK_MUX
@@ -1096,16 +1123,18 @@ wire  smclk  = nodiv_mclk;
        .clk       (cpu_mclk),
        .rst       (por)
     );
-    assign dbg_en_s    = ~dbg_en_n_s;
-    wire   dbg_rst_nxt =  dbg_en_n_s;
+    assign dbg_en_s      = ~dbg_en_n_s;
+    wire   dbg_rst_nxt   =  dbg_en_n_s;
 `else
-    assign dbg_en_s    =  dbg_en;
-    wire   dbg_rst_nxt = ~dbg_en;
+    assign dbg_en_s      =  dbg_en;
+    wire   dbg_rst_nxt   = ~dbg_en;
 `endif
 `else
-    assign dbg_en_s    =  1'b0;
-    wire   dbg_rst_nxt =  1'b0;
+    assign dbg_en_s      =  1'b0;
+    wire   dbg_rst_nxt   =  1'b0;
+    wire   UNUSED_dbg_en =  dbg_en;
 `endif
+
 
 
 // Serial Debug Interface Clock gate

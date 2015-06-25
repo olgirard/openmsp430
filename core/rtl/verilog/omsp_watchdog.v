@@ -167,7 +167,8 @@ wire       mclk_wdtctl;
 omsp_clock_gate clock_gate_wdtctl (.gclk(mclk_wdtctl),
                                    .clk (mclk), .enable(wdtctl_wr), .scan_enable(scan_enable));
 `else
-wire       mclk_wdtctl = mclk;
+wire       UNUSED_scan_enable = scan_enable;
+wire       mclk_wdtctl        = mclk;
 `endif
 
 `ifdef NMI
@@ -242,13 +243,15 @@ omsp_clock_mux clock_mux_watchdog (
    .clk_in1   (aclk),
    .reset     (puc_rst),
    .scan_mode (scan_mode),
-   .select    (wdtctl[2])
+   .select_in (wdtctl[2])
 );
 `else
   `ifdef WATCHDOG_NOMUX_ACLK
-     assign wdt_clk =  aclk;
+     assign wdt_clk      = aclk;
+     wire   UNUSED_smclk = smclk;
   `else
-     assign wdt_clk =  smclk;
+     wire   UNUSED_aclk  = aclk;
+     assign wdt_clk      = smclk;
   `endif
 `endif
 
@@ -423,12 +426,12 @@ always @ (posedge wdt_clk_cnt or posedge wdt_rst)
 // Watchdog wakeup cell
 wire wdt_wkup_pre;
 omsp_wakeup_cell wakeup_cell_wdog (
-				   .wkup_out   (wdt_wkup_pre),    // Wakup signal (asynchronous)
-				   .scan_clk   (mclk),            // Scan clock
-				   .scan_mode  (scan_mode),       // Scan mode
-				   .scan_rst   (puc_rst),         // Scan reset
-				   .wkup_clear (wdtifg_clr_reg),  // Glitch free wakeup event clear
-				   .wkup_event (wdtqn_edge_reg)   // Glitch free asynchronous wakeup event
+                                   .wkup_out   (wdt_wkup_pre),    // Wakup signal (asynchronous)
+                                   .scan_clk   (mclk),            // Scan clock
+                                   .scan_mode  (scan_mode),       // Scan mode
+                                   .scan_rst   (puc_rst),         // Scan reset
+                                   .wkup_clear (wdtifg_clr_reg),  // Glitch free wakeup event clear
+                                   .wkup_event (wdtqn_edge_reg)   // Glitch free asynchronous wakeup event
 );
 
 // When not in HOLD, the watchdog can generate a wakeup when:
@@ -470,6 +473,10 @@ always @ (posedge mclk or posedge por)
   if (por) wdt_reset <= 1'b0;
   else     wdt_reset <= wdtpw_error | (wdtifg_set & ~wdttmsel);
 
+
+// LINT cleanup
+wire        UNUSED_smclk_en = smclk_en;
+wire        UNUSED_aclk_en  = aclk_en;
 
 
 //=============================================================================
@@ -545,8 +552,12 @@ always @ (posedge mclk or posedge por)
   else     wdt_reset <= wdtpw_error | (wdtifg_set & ~wdttmsel);
 
 
+// LINT cleanup
+wire        UNUSED_scan_mode = scan_mode;
+wire        UNUSED_smclk     = smclk;
+wire        UNUSED_aclk      = aclk;
 `endif
-
+wire [15:0] UNUSED_per_din   = per_din;
 
 endmodule // omsp_watchdog
 

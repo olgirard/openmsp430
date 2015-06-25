@@ -61,7 +61,6 @@ module  omsp_dbg_i2c (
     dbg_i2c_broadcast,                 // Debug interface: I2C Broadcast Address (for multicore systems)
     dbg_i2c_scl,                       // Debug interface: I2C SCL
     dbg_i2c_sda_in,                    // Debug interface: I2C SDA IN
-    dbg_rd_rdy,                        // Debug register data is ready for read
     dbg_rst,                           // Debug unit reset
     mem_burst,                         // Burst on going
     mem_burst_end,                     // End TX/RX burst
@@ -86,7 +85,6 @@ input         [6:0] dbg_i2c_addr;      // Debug interface: I2C ADDRESS
 input         [6:0] dbg_i2c_broadcast; // Debug interface: I2C Broadcast Address (for multicore systems)
 input               dbg_i2c_scl;       // Debug interface: I2C SCL
 input               dbg_i2c_sda_in;    // Debug interface: I2C SDA IN
-input               dbg_rd_rdy;        // Debug register data is ready for read
 input               dbg_rst;           // Debug unit reset
 input               mem_burst;         // Burst on going
 input               mem_burst_end;     // End TX/RX burst
@@ -314,6 +312,10 @@ assign i2c_addr_not_valid =  (i2c_state == RX_ADDR) && shift_rx_done && (
                               (shift_buf[7:1] != dbg_i2c_broadcast[6:0]) &&
 `endif
                               (shift_buf[7:1] != dbg_i2c_addr[6:0]));
+`ifdef DBG_I2C_BROADCAST
+`else
+wire [6:0] UNUSED_dbg_i2c_broadcast = dbg_i2c_broadcast;
+`endif
 
 // Utility signals
 wire        shift_rx_data_done = shift_rx_done & (i2c_state==RX_DATA);

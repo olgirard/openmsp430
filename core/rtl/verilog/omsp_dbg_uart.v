@@ -122,8 +122,8 @@ always @ (posedge dbg_clk or posedge dbg_rst)
 reg        rxd_maj;
 
 wire       rxd_maj_nxt = (uart_rxd   & rxd_buf[0]) |
-			 (uart_rxd   & rxd_buf[1]) |
-			 (rxd_buf[0] & rxd_buf[1]);
+                         (uart_rxd   & rxd_buf[1]) |
+                         (rxd_buf[0] & rxd_buf[1]);
 
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst) rxd_maj <=  1'b1;

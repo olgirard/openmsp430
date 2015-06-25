@@ -81,9 +81,9 @@ module  omsp_register_file (
 
 // OUTPUTs
 //=========
-output 	            cpuoff;       // Turns off the CPU
-output 	            gie;          // General interrupt enable
-output 	            oscoff;       // Turns off LFXT1 clock input
+output              cpuoff;       // Turns off the CPU
+output              gie;          // General interrupt enable
+output              oscoff;       // Turns off LFXT1 clock input
 output       [15:0] pc_sw;        // Program counter software value
 output              pc_sw_wr;     // Program counter software write
 output       [15:0] reg_dest;     // Selected register destination content
@@ -155,7 +155,8 @@ wire       mclk_r1;
 omsp_clock_gate clock_gate_r1 (.gclk(mclk_r1),
                                .clk (mclk), .enable(r1_en), .scan_enable(scan_enable));
 `else
-wire       mclk_r1 = mclk;
+wire       UNUSED_scan_enable = scan_enable;
+wire       mclk_r1            = mclk;
 `endif
 
 always @(posedge mclk_r1 or posedge puc_rst)
@@ -167,6 +168,8 @@ always @(posedge mclk_r1 or posedge puc_rst)
 `else
   else if (r1_inc)    r1 <= reg_incr_val    & 16'hfffe;
 `endif
+
+wire UNUSED_reg_sp_val_0  = reg_sp_val[0];
 
 
 // R2: Status register
@@ -567,7 +570,7 @@ always @(posedge mclk_r15 or posedge puc_rst)
  `ifdef CLOCK_GATING
   else              r15 <= reg_incr_val;
 `else
- else if (r15_inc)  r15 <= reg_incr_val;
+  else if (r15_inc) r15 <= reg_incr_val;
 `endif
 
 

@@ -69,14 +69,14 @@ module  omsp_frontend (
     mab,                               // Frontend Memory address bus
     mb_en,                             // Frontend Memory bus enable
     mclk_dma_enable,                   // DMA Sub-System Clock enable
-    mclk_dma_wkup,		       // DMA Sub-System Clock wake-up (asynchronous)
+    mclk_dma_wkup,                     // DMA Sub-System Clock wake-up (asynchronous)
     mclk_enable,                       // Main System Clock enable
     mclk_wkup,                         // Main System Clock wake-up (asynchronous)
     nmi_acc,                           // Non-Maskable interrupt request accepted
     pc,                                // Program counter
     pc_nxt,                            // Next PC value (for CALL & IRQ)
-				       
-// INPUTs			       
+
+// INPUTs
     cpu_en_s,                          // Enable CPU code execution (synchronous)
     cpu_halt_cmd,                      // Halt CPU command
     cpuoff,                            // Turns off the CPU
@@ -311,7 +311,8 @@ wire       mclk_irq_num;
 omsp_clock_gate clock_gate_irq_num (.gclk(mclk_irq_num),
                                     .clk (mclk), .enable(irq_detect), .scan_enable(scan_enable));
 `else
-wire       mclk_irq_num = mclk;
+wire       UNUSED_scan_enable = scan_enable;
+wire       mclk_irq_num       = mclk;
 `endif
 
 // Combine all IRQs
@@ -319,7 +320,7 @@ wire       mclk_irq_num = mclk;
 wire [62:0] irq_all     = {nmi_pnd, irq, 48'h0000_0000_0000} |
 `else
 `ifdef  IRQ_32
-wire [62:0] irq_all     = {nmi_pnd, irq, 32'h0000}           |
+wire [62:0] irq_all     = {nmi_pnd, irq, 32'h0000_0000}      |
 `else
 `ifdef  IRQ_64
 wire [62:0] irq_all     = {nmi_pnd, irq}                     |
@@ -376,6 +377,8 @@ omsp_and_gate and_mclk_dma_wkup (.y(mclk_dma_wkup), .a(dma_wkup),             .b
   `else
 assign  mclk_dma_wkup   = 1'b0;
 assign  mclk_dma_enable = 1'b0;
+wire    UNUSED_dma_en   = dma_en;
+wire    UNUSED_dma_wkup = dma_wkup;
   `endif
 `else
 
@@ -384,6 +387,11 @@ assign  mclk_dma_wkup   = 1'b1;
 assign  mclk_dma_enable = 1'b1;
 assign  mclk_wkup       = 1'b1;
 assign  mclk_enable     = 1'b1;
+wire    UNUSED_dma_en   = dma_en;
+wire    UNUSED_wkup     = wkup;
+wire    UNUSED_wdt_wkup = wdt_wkup;
+wire    UNUSED_nmi_wkup = nmi_wkup;
+wire    UNUSED_dma_wkup = dma_wkup;
 `endif
 
 //=============================================================================

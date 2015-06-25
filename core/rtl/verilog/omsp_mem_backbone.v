@@ -162,14 +162,14 @@ wire                 ext_per_en;
 // Arbiter between DMA and Debug interface
 //------------------------------------------
 `ifdef DMA_IF_EN
-   
+
 // Debug-interface always stops the CPU
 // Master interface stops the CPU in priority mode
 assign      cpu_halt_cmd  =  dbg_halt_cmd | (dma_en & dma_priority);
 
 // Return ERROR response if address lays outside the memory spaces (Peripheral, Data & Program memories)
 assign      dma_resp      = ~dbg_mem_en & ~(ext_dmem_sel | ext_pmem_sel | ext_per_sel) & dma_en;
-   
+
 // Master interface access is ready when the memory access occures
 assign      dma_ready     = ~dbg_mem_en &  (ext_dmem_en  | ext_pmem_en  | ext_per_en | dma_resp);
 
@@ -208,15 +208,24 @@ wire [15:0] ext_mem_dout  =  dbg_mem_dout;
 // External interface read data
 assign      dbg_mem_din   =  ext_mem_din;
 assign      dma_dout      =  16'h0000;
+
+// LINT Cleanup
+wire [15:1] UNUSED_dma_addr     = dma_addr;
+wire [15:0] UNUSED_dma_din      = dma_din;
+wire        UNUSED_dma_en       = dma_en;
+wire        UNUSED_dma_priority = dma_priority;
+wire  [1:0] UNUSED_dma_we       = dma_we;
+
 `endif
-   
+
 //------------------------------------------
 // DATA-MEMORY Interface
 //------------------------------------------
+parameter          DMEM_END      = `DMEM_BASE+`DMEM_SIZE;
 
 // Execution unit access
 wire               eu_dmem_sel   = (eu_mab>=(`DMEM_BASE>>1)) &
-                                   (eu_mab<((`DMEM_BASE+`DMEM_SIZE)>>1));
+                                   (eu_mab< ( DMEM_END >>1));
 wire               eu_dmem_en    = eu_mb_en & eu_dmem_sel;
 wire        [15:0] eu_dmem_addr  = {1'b0, eu_mab}-(`DMEM_BASE>>1);
 
@@ -225,7 +234,7 @@ wire        [15:0] eu_dmem_addr  = {1'b0, eu_mab}-(`DMEM_BASE>>1);
 
 // External Master/Debug interface access
 assign             ext_dmem_sel  = (ext_mem_addr[15:1]>=(`DMEM_BASE>>1)) &
-                                   (ext_mem_addr[15:1]<((`DMEM_BASE+`DMEM_SIZE)>>1));
+                                   (ext_mem_addr[15:1]< ( DMEM_END >>1));
 assign             ext_dmem_en   = ext_mem_en &  ext_dmem_sel & ~eu_dmem_en;
 wire        [15:0] ext_dmem_addr = {1'b0, ext_mem_addr[15:1]}-(`DMEM_BASE>>1);
 
@@ -318,7 +327,8 @@ wire mclk_bckup;
 omsp_clock_gate clock_gate_bckup (.gclk(mclk_bckup),
                                   .clk (mclk), .enable(fe_pmem_save), .scan_enable(scan_enable));
 `else
-wire mclk_bckup = mclk;
+wire UNUSED_scan_enable = scan_enable;
+wire mclk_bckup         = mclk;
 `endif
 
 reg  [15:0] pmem_dout_bckup;

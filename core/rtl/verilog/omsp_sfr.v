@@ -247,11 +247,11 @@ wire  [8:0] dmem_size    = (`DMEM_SIZE >> 7);  // cpu_id_dmem *  128 = data memo
 wire  [5:0] pmem_size    = (`PMEM_SIZE >> 10); // cpu_id_pmem * 1024 = program memory size
 
 assign      cpu_id       = {pmem_size,
-			    dmem_size,
-			    mpy_info,
-			    per_space,
-			    user_version,
-			    cpu_asic,
+                            dmem_size,
+                            mpy_info,
+                            per_space,
+                            user_version,
+                            cpu_asic,
                             cpu_version};
 
 
@@ -309,15 +309,16 @@ wire nmi_pol = nmi ^ wdtnmies;
    // NMI event capture
    wire   nmi_capture;
    omsp_wakeup_cell wakeup_cell_nmi (
-				     .wkup_out   (nmi_capture),     // Wakup signal (asynchronous)
-				     .scan_clk   (mclk),            // Scan clock
-				     .scan_mode  (scan_mode),       // Scan mode
-				     .scan_rst   (puc_rst),         // Scan reset
-				     .wkup_clear (nmi_capture_rst), // Glitch free wakeup event clear
-				     .wkup_event (nmi_pol)          // Glitch free asynchronous wakeup event
+                                     .wkup_out   (nmi_capture),     // Wakup signal (asynchronous)
+                                     .scan_clk   (mclk),            // Scan clock
+                                     .scan_mode  (scan_mode),       // Scan mode
+                                     .scan_rst   (puc_rst),         // Scan reset
+                                     .wkup_clear (nmi_capture_rst), // Glitch free wakeup event clear
+                                     .wkup_event (nmi_pol)          // Glitch free asynchronous wakeup event
    );
   `else
-   wire   nmi_capture = nmi_pol;
+   wire   UNUSED_scan_mode = scan_mode;
+   wire   nmi_capture      = nmi_pol;
   `endif
 
    // Synchronization
@@ -330,8 +331,9 @@ wire nmi_pol = nmi ^ wdtnmies;
    );
 
 `else
-   wire   nmi_capture = nmi_pol;
-   wire   nmi_s       = nmi_pol;
+   wire   UNUSED_scan_mode = scan_mode;
+   wire   nmi_capture      = nmi_pol;
+   wire   nmi_s            = nmi_pol;
 `endif
 
 //-----------------------------------
@@ -360,10 +362,16 @@ wire        nmi_wkup  = 1'b0;
 
 `else
 
-wire        nmi_pnd   = 1'b0;
-wire        nmi_wkup  = 1'b0;
-
+wire        nmi_pnd          = 1'b0;
+wire        nmi_wkup         = 1'b0;
+wire        UNUSED_scan_mode = scan_mode;
+wire        UNUSED_nmi       = nmi;
+wire        UNUSED_nmi_acc   = nmi_acc;
+wire        UNUSED_wdtnmies  = wdtnmies;
 `endif
+
+// LINT cleanup
+wire  [7:0] UNUSED_per_din_15_8 = per_din[15:8];
 
 endmodule // omsp_sfr
 

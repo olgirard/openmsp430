@@ -40,7 +40,7 @@
 // $LastChangedBy: olivier.girard $
 // $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
-//`define OMSP_NO_INCLUDE
+`define OMSP_NO_INCLUDE
 `ifdef OMSP_NO_INCLUDE
 `else
 `include "openMSP430_undefines.v"
@@ -150,9 +150,9 @@
 // Indicates the number of interrupt vectors supported
 // (16, 32 or 64).
 //-------------------------------------------------------
-//`define IRQ_16
+`define IRQ_16
 //`define IRQ_32
-`define IRQ_64
+//`define IRQ_64
 
 
 //-------------------------------------------------------
@@ -258,10 +258,10 @@
 // (i.e. Flash/OTP/ROM/...) or when you are interested
 // in data breakpoints.
 //-------------------------------------------------------
-`define  DBG_HWBRK_0
-`define  DBG_HWBRK_1
-`define  DBG_HWBRK_2
-`define  DBG_HWBRK_3
+//`define  DBG_HWBRK_0
+//`define  DBG_HWBRK_1
+//`define  DBG_HWBRK_2
+//`define  DBG_HWBRK_3
 
 
 //-------------------------------------------------------
@@ -272,7 +272,7 @@
 // access lays within an address range.
 // Note that this feature is not supported by GDB.
 //-------------------------------------------------------
-`define DBG_HWBRK_RANGE
+//`define DBG_HWBRK_RANGE
 
 
 //-------------------------------------------------------
@@ -369,7 +369,7 @@
 // DCO_CLK and LFXT_CLK with the BCSCTL2.SELMx register.
 // When commented, DCO_CLK is selected.
 //-------------------------------------------------------
-`define MCLK_MUX
+//`define MCLK_MUX
 
 //-------------------------------------------------------
 // SMCLK: Clock Mux
@@ -379,7 +379,7 @@
 // DCO_CLK and LFXT_CLK with the BCSCTL2.SELS register.
 // When commented, DCO_CLK is selected.
 //-------------------------------------------------------
-`define SMCLK_MUX
+//`define SMCLK_MUX
 
 //-------------------------------------------------------
 // WATCHDOG: Clock Mux
@@ -391,7 +391,7 @@
 // WATCHDOG_NOMUX_ACLK define is uncommented, SMCLK is
 // selected otherwise.
 //-------------------------------------------------------
-`define WATCHDOG_MUX
+//`define WATCHDOG_MUX
 //`define WATCHDOG_NOMUX_ACLK
 
 

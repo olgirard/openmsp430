@@ -475,6 +475,7 @@ omsp_mem_backbone mem_backbone_0 (
     .scan_enable       (scan_enable)         // Scan enable (active during scan shifting)
 );
 
+wire UNUSED_fe_mab_0 = fe_mab[0];
 
 //=============================================================================
 // 6)  SPECIAL FUNCTION REGISTERS
@@ -542,12 +543,16 @@ omsp_watchdog watchdog_0 (
     .wdtifg_sw_set     (wdtifg_sw_set)       // Watchdog-timer interrupt flag software set
 );
 `else
-assign per_dout_wdog = 16'h0000;
-assign wdt_irq       =  1'b0;
-assign wdt_reset     =  1'b0;
-assign wdt_wkup      =  1'b0;
-assign wdtifg        =  1'b0;
-assign wdtnmies      =  1'b0;
+assign per_dout_wdog        = 16'h0000;
+assign wdt_irq              =  1'b0;
+assign wdt_reset            =  1'b0;
+assign wdt_wkup             =  1'b0;
+assign wdtifg               =  1'b0;
+assign wdtnmies             =  1'b0;
+wire   UNUSED_por           =  por;
+wire   UNUSED_wdtie         =  wdtie;
+wire   UNUSED_wdtifg_sw_clr =  wdtifg_sw_clr;
+wire   UNUSED_wdtifg_sw_set =  wdtifg_sw_set;
 `endif
 
 
@@ -629,16 +634,30 @@ omsp_dbg dbg_0 (
 );
 
 `else
-assign dbg_cpu_reset   =  1'b0;
-assign dbg_freeze      =  ~cpu_en_s;
-assign dbg_halt_cmd    =  1'b0;
-assign dbg_i2c_sda_out =  1'b1;
-assign dbg_mem_addr    = 16'h0000;
-assign dbg_mem_dout    = 16'h0000;
-assign dbg_mem_en      =  1'b0;
-assign dbg_mem_wr      =  2'b00;
-assign dbg_reg_wr      =  1'b0;
-assign dbg_uart_txd    =  1'b1;
+assign      dbg_cpu_reset            =  1'b0;
+assign      dbg_freeze               =  ~cpu_en_s;
+assign      dbg_halt_cmd             =  1'b0;
+assign      dbg_i2c_sda_out          =  1'b1;
+assign      dbg_mem_addr             = 16'h0000;
+assign      dbg_mem_dout             = 16'h0000;
+assign      dbg_mem_en               =  1'b0;
+assign      dbg_mem_wr               =  2'b00;
+assign      dbg_reg_wr               =  1'b0;
+assign      dbg_uart_txd             =  1'b1;
+wire        UNUSED_decode_noirq      = decode_noirq;
+wire [31:0] UNUSED_cpu_id            = cpu_id;
+wire        UNUSED_eu_mab_0          = eu_mab[0];
+wire        UNUSED_dbg_clk           = dbg_clk;
+wire        UNUSED_dbg_rst           = dbg_rst;
+wire        UNUSED_dbg_en_s          = dbg_en_s;
+wire [15:0] UNUSED_dbg_mem_din       = dbg_mem_din;
+wire [15:0] UNUSED_dbg_reg_din       = dbg_reg_din;
+wire        UNUSED_puc_pnd_set       = puc_pnd_set;
+wire  [6:0] UNUSED_dbg_i2c_addr      = dbg_i2c_addr;
+wire  [6:0] UNUSED_dbg_i2c_broadcast = dbg_i2c_broadcast;
+wire        UNUSED_dbg_i2c_scl       = dbg_i2c_scl;
+wire        UNUSED_dbg_i2c_sda_in    = dbg_i2c_sda_in;
+wire        UNUSED_dbg_uart_rxd      = dbg_uart_rxd;
 `endif
 
 

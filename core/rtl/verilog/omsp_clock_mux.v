@@ -51,7 +51,7 @@ module  omsp_clock_mux (
     clk_in1,                   // Clock input 1
     reset,                     // Reset
     scan_mode,                 // Scan mode (clk_in0 is selected in scan mode)
-    select                     // Clock selection
+    select_in                  // Clock selection
 );
 
 // OUTPUTs
@@ -64,7 +64,7 @@ input          clk_in0;        // Clock input 0
 input          clk_in1;        // Clock input 1
 input          reset;          // Reset
 input          scan_mode;      // Scan mode (clk_in0 is selected in scan mode)
-input          select;         // Clock selection
+input          select_in;      // Clock selection
 
 
 //===========================================================================================================================//
@@ -77,7 +77,7 @@ input          select;         // Clock selection
 //                                                                                                                           //
 //                                                                                                                           //
 //                                   +-----.     +--------+   +--------+                                                     //
-//       select >>----+-------------O|      \    |        |   |        |          +-----.                                    //
+//    select_in >>----+-------------O|      \    |        |   |        |          +-----.                                    //
 //                    |              |       |---| D    Q |---| D    Q |--+-------|      \                                   //
 //                    |     +-------O|      /    |        |   |        |  |       |       |O-+                               //
 //                    |     |        +-----'     |        |   |        |  |   +--O|      /   |                               //
@@ -129,7 +129,7 @@ wire gated_clk_in1;
 // CLK_IN0 Selection
 //-----------------------------------------------------------------------------
 
-assign in0_select = ~select & ~in1_select_ss;
+assign in0_select = ~select_in & ~in1_select_ss;
 
 always @ (posedge clk_in0_inv or posedge reset)
   if (reset) in0_select_s  <=  1'b1;
@@ -146,7 +146,7 @@ assign in0_enable = in0_select_ss | scan_mode;
 // CLK_IN1 Selection
 //-----------------------------------------------------------------------------
 
-assign in1_select =  select & ~in0_select_ss;
+assign in1_select =  select_in & ~in0_select_ss;
 
 always @ (posedge clk_in1_inv or posedge reset)
   if (reset) in1_select_s  <=  1'b0;

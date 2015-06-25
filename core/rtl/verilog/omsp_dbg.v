@@ -131,7 +131,7 @@ input               puc_pnd_set;       // PUC pending set for the serial debug i
 wire  [5:0] dbg_addr;
 wire [15:0] dbg_din;
 wire        dbg_wr;
-reg 	    mem_burst;
+reg         mem_burst;
 wire        dbg_reg_rd;
 wire        dbg_mem_rd;
 reg         dbg_mem_rd_dly;
@@ -408,8 +408,8 @@ wire        mem_access;
 wire        mem_data_wr = reg_wr[MEM_DATA];
 
 wire [15:0] dbg_mem_din_bw = ~mem_bw      ? dbg_mem_din                :
-	                      mem_addr[0] ? {8'h00, dbg_mem_din[15:8]} :
-	                                    {8'h00, dbg_mem_din[7:0]};
+                              mem_addr[0] ? {8'h00, dbg_mem_din[15:8]} :
+                                            {8'h00, dbg_mem_din[7:0]};
 
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)             mem_data <=  16'h0000;
@@ -487,9 +487,13 @@ omsp_dbg_hwbrk dbg_hwbr_0 (
 );
 
 `else
-assign brk0_halt =  1'b0;
-assign brk0_pnd  =  1'b0;
-assign brk0_dout = 16'h0000;
+assign      brk0_halt       =  1'b0;
+assign      brk0_pnd        =  1'b0;
+assign      brk0_dout       = 16'h0000;
+wire [15:0] UNUSED_eu_mab   =  eu_mab;
+wire        UNUSED_eu_mb_en =  eu_mb_en;
+wire  [1:0] UNUSED_eu_mb_wr =  eu_mb_wr;
+wire [15:0] UNUSED_pc       =  pc;
 `endif
 
 `ifdef DBG_HWBRK_1
@@ -813,13 +817,17 @@ omsp_dbg_uart dbg_uart_0 (
 );
 
 `else
-    assign dbg_uart_txd    =  1'b1;
+    assign dbg_uart_txd        =  1'b1;
+
+    wire   UNUSED_dbg_uart_rxd =  dbg_uart_rxd;
+
+
   `ifdef DBG_I2C
   `else
-    assign dbg_addr        =  6'h00;
-    assign dbg_din         = 16'h0000;
-    assign dbg_rd          =  1'b0;
-    assign dbg_wr          =  1'b0;
+    assign dbg_addr            =  6'h00;
+    assign dbg_din             = 16'h0000;
+    assign dbg_rd              =  1'b0;
+    assign dbg_wr              =  1'b0;
   `endif
 `endif
 
@@ -843,7 +851,6 @@ omsp_dbg_i2c dbg_i2c_0 (
     .dbg_i2c_broadcast (dbg_i2c_broadcast), // Debug interface: I2C Broadcast Address (for multicore systems)
     .dbg_i2c_scl       (dbg_i2c_scl),       // Debug interface: I2C SCL
     .dbg_i2c_sda_in    (dbg_i2c_sda_in),    // Debug interface: I2C SDA IN
-    .dbg_rd_rdy        (dbg_rd_rdy),        // Debug register data is ready for read
     .dbg_rst           (dbg_rst),           // Debug unit reset
     .mem_burst         (mem_burst),         // Burst on going
     .mem_burst_end     (mem_burst_end),     // End TX/RX burst
@@ -853,7 +860,13 @@ omsp_dbg_i2c dbg_i2c_0 (
 );
 
 `else
-    assign dbg_i2c_sda_out =  1'b1;
+    assign     dbg_i2c_sda_out          = 1'b1;
+
+    wire [6:0] UNUSED_dbg_i2c_addr      = dbg_i2c_addr;
+    wire [6:0] UNUSED_dbg_i2c_broadcast = dbg_i2c_broadcast;
+    wire       UNUSED_dbg_i2c_scl       = dbg_i2c_scl;
+    wire       UNUSED_dbg_i2c_sda_in    = dbg_i2c_sda_in;
+    wire       UNUSED_dbg_rd_rdy        = dbg_rd_rdy;
 `endif
 
 endmodule // omsp_dbg
