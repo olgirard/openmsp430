@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_clock_mux.v
-// 
+//
 // *Module Description:
 //                       Standard clock mux for the openMSP430
 //
@@ -51,7 +51,7 @@ module  omsp_clock_mux (
     clk_in1,                   // Clock input 1
     reset,                     // Reset
     scan_mode,                 // Scan mode (clk_in0 is selected in scan mode)
-    select                     // Clock selection
+    select_in                  // Clock selection
 );
 
 // OUTPUTs
@@ -64,7 +64,7 @@ input          clk_in0;        // Clock input 0
 input          clk_in1;        // Clock input 1
 input          reset;          // Reset
 input          scan_mode;      // Scan mode (clk_in0 is selected in scan mode)
-input          select;         // Clock selection
+input          select_in;      // Clock selection
 
 
 //===========================================================================================================================//
@@ -77,7 +77,7 @@ input          select;         // Clock selection
 //                                                                                                                           //
 //                                                                                                                           //
 //                                   +-----.     +--------+   +--------+                                                     //
-//       select >>----+-------------O|      \    |        |   |        |          +-----.                                    //
+//    select_in >>----+-------------O|      \    |        |   |        |          +-----.                                    //
 //                    |              |       |---| D    Q |---| D    Q |--+-------|      \                                   //
 //                    |     +-------O|      /    |        |   |        |  |       |       |O-+                               //
 //                    |     |        +-----'     |        |   |        |  |   +--O|      /   |                               //
@@ -108,7 +108,7 @@ input          select;         // Clock selection
 //-----------------------------------------------------------------------------
 // Wire declarations
 //-----------------------------------------------------------------------------
-   
+
 wire in0_select;
 reg  in0_select_s;
 reg  in0_select_ss;
@@ -128,9 +128,9 @@ wire gated_clk_in1;
 //-----------------------------------------------------------------------------
 // CLK_IN0 Selection
 //-----------------------------------------------------------------------------
-   
-assign in0_select = ~select & ~in1_select_ss;
-   
+
+assign in0_select = ~select_in & ~in1_select_ss;
+
 always @ (posedge clk_in0_inv or posedge reset)
   if (reset) in0_select_s  <=  1'b1;
   else       in0_select_s  <=  in0_select;
@@ -145,9 +145,9 @@ assign in0_enable = in0_select_ss | scan_mode;
 //-----------------------------------------------------------------------------
 // CLK_IN1 Selection
 //-----------------------------------------------------------------------------
-   
-assign in1_select =  select & ~in0_select_ss;
-   
+
+assign in1_select =  select_in & ~in0_select_ss;
+
 always @ (posedge clk_in1_inv or posedge reset)
   if (reset) in1_select_s  <=  1'b0;
   else       in1_select_s  <=  in1_select;
@@ -158,7 +158,7 @@ always @ (posedge clk_in1     or posedge reset)
 
 assign in1_enable = in1_select_ss & ~scan_mode;
 
-   
+
 //-----------------------------------------------------------------------------
 // Clock MUX
 //-----------------------------------------------------------------------------
@@ -179,7 +179,7 @@ assign clk_in1_inv   = ~clk_in1;
 // Replace with standard cell NAND2
 assign gated_clk_in0 = ~(clk_in0_inv & in0_enable);
 assign gated_clk_in1 = ~(clk_in1_inv & in1_enable);
-   
+
 
 // Replace with standard cell AND2
 assign clk_out       =  (gated_clk_in0 & gated_clk_in1);
@@ -187,6 +187,3 @@ assign clk_out       =  (gated_clk_in0 & gated_clk_in1);
 
 
 endmodule // omsp_clock_gate
-
-
-

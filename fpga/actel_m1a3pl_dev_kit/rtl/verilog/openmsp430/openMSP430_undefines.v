@@ -26,9 +26,9 @@
 // THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: openMSP430_undefines.v
-// 
+//
 // *Module Description:
 //                      openMSP430 Verilog `undef file
 //
@@ -159,6 +159,11 @@
 // Include/Exclude Watchdog timer
 `ifdef WATCHDOG
 `undef WATCHDOG
+`endif
+
+// Include/Exclude DMA interface support
+`ifdef DMA_IF_EN
+`undef DMA_IF_EN
 `endif
 
 // Include/Exclude Non-Maskable-Interrupt support
@@ -704,6 +709,18 @@
 // Basic clock module: BCSCTL1 Control Register
 `ifdef DIVAx
 `undef DIVAx
+`endif
+`ifdef DMA_CPUOFF
+`undef DMA_CPUOFF
+`endif
+`ifdef DMA_SCG0
+`undef DMA_SCG0
+`endif
+`ifdef DMA_SCG1
+`undef DMA_SCG1
+`endif
+`ifdef DMA_OSCOFF
+`undef DMA_OSCOFF
 `endif
 
 // Basic clock module: BCSCTL2 Control Register

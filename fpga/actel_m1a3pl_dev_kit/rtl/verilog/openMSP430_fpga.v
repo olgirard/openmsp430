@@ -21,9 +21,9 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: openMSP430_fpga.v
-// 
+//
 // *Module Description:
 //                      openMSP430 FPGA Top-level
 //                      (targeting an Actel ProASIC3L).
@@ -37,7 +37,7 @@
 // $LastChangedDate: 2009-12-29 21:58:14 +0100 (Tue, 29 Dec 2009) $
 //----------------------------------------------------------------------------
 `include "openMSP430_defines.v"
-  
+
 module openMSP430_fpga (
 
 // OUTPUTs
@@ -123,7 +123,7 @@ wire          [3:0] cntrl2;
 wire         [15:0] per_dout_dac_x;
 wire         [15:0] per_dout_dac_y;
 
-  
+
 //=============================================================================
 // 2)  PLL & CLOCK GENERATION
 //=============================================================================
@@ -149,7 +149,7 @@ wire [4:0] obdiv  = V-5'h01;
 wire [4:0] ocdiv  = W-5'h01;
 wire [6:0] findiv = N-7'h01;
 wire [6:0] fbdiv  = M-7'h01;
-   
+
 PLL #(.VCOFREQUENCY(FVCO))  pll_0 (
 
 // PLL Inputs
@@ -285,7 +285,7 @@ PLL #(.VCOFREQUENCY(FVCO))  pll_0 (
 // 1.5 V +- 5% |   24    43.75 |    33.75 87.5 |  67.5   175  |   135   350   |
 //-------------+---------------+---------------+--------------+---------------+
 
-   
+
 //=============================================================================
 // 3)  PROGRAM AND DATA MEMORIES
 //=============================================================================
@@ -296,7 +296,7 @@ dmem_128B dmem_lo (.WD(dmem_din[7:0]),  .RD(dmem_dout[7:0]),  .WEN(dmem_wen[0] |
 pmem_2kB  pmem_hi (.WD(pmem_din[15:8]), .RD(pmem_dout[15:8]), .WEN(pmem_wen[1] | pmem_cen), .REN(~pmem_wen[1] | pmem_cen), .WADDR(pmem_addr) , .RADDR(pmem_addr), .RWCLK(mclk), .RESET(~puc_rst));
 pmem_2kB  pmem_lo (.WD(pmem_din[7:0]),  .RD(pmem_dout[7:0]),  .WEN(pmem_wen[0] | pmem_cen), .REN(~pmem_wen[0] | pmem_cen), .WADDR(pmem_addr) , .RADDR(pmem_addr), .RWCLK(mclk), .RESET(~puc_rst));
 
-  
+
 //=============================================================================
 // 4)  OPENMSP430
 //=============================================================================
@@ -319,10 +319,13 @@ openMSP430 openMSP430_0 (
     .lfxt_enable       (),             // ASIC ONLY: Low frequency oscillator enable
     .lfxt_wkup         (),             // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
     .mclk              (mclk),         // Main system clock
+    .dma_dout          (),             // Direct Memory Access data output
+    .dma_ready         (),             // Direct Memory Access is complete
+    .dma_resp          (),             // Direct Memory Access response (0:Okay / 1:Error)
     .per_addr          (per_addr),     // Peripheral address
     .per_din           (per_din),      // Peripheral data input
-    .per_we            (per_we),       // Peripheral write enable (high active)
     .per_en            (per_en),       // Peripheral enable (high active)
+    .per_we            (per_we),       // Peripheral write enable (high active)
     .pmem_addr         (pmem_addr),    // Program Memory address
     .pmem_cen          (pmem_cen),     // Program Memory chip enable (low active)
     .pmem_din          (pmem_din),     // Program Memory data input (optional)
@@ -343,6 +346,12 @@ openMSP430 openMSP430_0 (
     .dmem_dout         (dmem_dout),    // Data Memory data output
     .irq               (irq_bus),      // Maskable interrupts
     .lfxt_clk          (1'b0),         // Low frequency oscillator (typ 32kHz)
+    .dma_addr          (15'h0000),     // Direct Memory Access address
+    .dma_din           (16'h0000),     // Direct Memory Access data input
+    .dma_en            (1'b0),         // Direct Memory Access enable (high active)
+    .dma_priority      (1'b0),         // Direct Memory Access priority (0:low / 1:high)
+    .dma_we            (2'b00),        // Direct Memory Access write byte enable (high active)
+    .dma_wkup          (1'b0),         // ASIC ONLY: DMA Sub-System Wake-up (asynchronous and non-glitchy)
     .nmi               (nmi),          // Non-maskable interrupt (asynchronous)
     .per_dout          (per_dout),     // Peripheral data output
     .pmem_dout         (pmem_dout),    // Program Memory data output
@@ -362,7 +371,7 @@ openMSP430 openMSP430_0 (
 //-----------------------------------
 
 dac_spi_if #(1, 9'h190) dac_spi_if_x (
- 
+
 // OUTPUTs
     .cntrl1       (cntrl1),         // Control value 1
     .cntrl2       (cntrl2),         // Control value 2
@@ -370,7 +379,7 @@ dac_spi_if #(1, 9'h190) dac_spi_if_x (
     .per_dout     (per_dout_dac_x), // Peripheral data output
     .sclk         (sclk_x),         // SPI Serial Clock
     .sync_n       (sync_n_x),       // SPI Frame synchronization signal (low active)
- 
+
 // INPUTs
     .mclk         (mclk),           // Main system clock
     .per_addr     (per_addr),       // Peripheral address
@@ -381,7 +390,7 @@ dac_spi_if #(1, 9'h190) dac_spi_if_x (
 );
 
 dac_spi_if #(1, 9'h1A0) dac_spi_if_y (
- 
+
 // OUTPUTs
     .cntrl1       (),               // Control value 1
     .cntrl2       (),               // Control value 2
@@ -389,7 +398,7 @@ dac_spi_if #(1, 9'h1A0) dac_spi_if_y (
     .per_dout     (per_dout_dac_y), // Peripheral data output
     .sclk         (sclk_y),         // SPI Serial Clock
     .sync_n       (sync_n_y),       // SPI Frame synchronization signal (low active)
- 
+
 // INPUTs
     .mclk         (mclk),           // Main system clock
     .per_addr     (per_addr),       // Peripheral address
@@ -432,7 +441,7 @@ omsp_gpio #(.P1_EN(1),
     .p6_dout_en   (),              // Port 6 data output enable
     .p6_sel       (),              // Port 6 function select
     .per_dout     (per_dout_dio),  // Peripheral data output
-			     
+
 // INPUTs
     .mclk         (mclk),          // Main system clock
     .p1_din       (p1_din),        // Port 1 data input
@@ -494,7 +503,7 @@ assign per_dout = per_dout_dio   |
                   per_dout_tA    |
                   per_dout_dac_x |
                   per_dout_dac_y;
-   
+
 //
 // Assign interrupts
 //-------------------------------
@@ -525,6 +534,5 @@ assign  p1_din  =  8'h00;
 
 assign  led     =  {cntrl1, p1_dout[0], p1_dout[0], cntrl2};
 
-   
-endmodule // openMSP430_fpga
 
+endmodule // openMSP430_fpga

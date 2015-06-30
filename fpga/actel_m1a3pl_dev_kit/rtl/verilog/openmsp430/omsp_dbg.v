@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_dbg.v
-// 
+//
 // *Module Description:
 //                       Debug interface
 //
@@ -36,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
-// $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $Rev$
+// $LastChangedBy$
+// $LastChangedDate$
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -58,7 +58,7 @@ module  omsp_dbg (
     dbg_mem_wr,                        // Debug unit memory write
     dbg_reg_wr,                        // Debug unit CPU register write
     dbg_uart_txd,                      // Debug interface: UART TXD
-			     
+
 // INPUTs
     cpu_en_s,                          // Enable CPU code execution (synchronous)
     cpu_id,                            // CPU ID
@@ -131,7 +131,7 @@ input               puc_pnd_set;       // PUC pending set for the serial debug i
 wire  [5:0] dbg_addr;
 wire [15:0] dbg_din;
 wire        dbg_wr;
-reg 	    mem_burst;
+reg         mem_burst;
 wire        dbg_reg_rd;
 wire        dbg_mem_rd;
 reg         dbg_mem_rd_dly;
@@ -152,7 +152,7 @@ wire [15:0] brk2_dout;
 wire        brk3_halt;
 wire        brk3_pnd;
 wire [15:0] brk3_dout;
-    
+
 // Number of registers
 parameter           NR_REG       = 25;
 
@@ -236,7 +236,7 @@ parameter           CPU_NR_D     = (BASE_D << CPU_NR);
 wire  [5:0] dbg_addr_in = mem_burst ? MEM_DATA : dbg_addr;
 
 // Register address decode
-reg  [NR_REG-1:0]  reg_dec; 
+reg  [NR_REG-1:0]  reg_dec;
 always @(dbg_addr_in)
   case (dbg_addr_in)
     CPU_ID_LO :  reg_dec  =  CPU_ID_LO_D;
@@ -291,7 +291,7 @@ wire  [NR_REG-1:0] reg_rd    = reg_dec & {NR_REG{reg_read}};
 //=============================================================================
 
 // CPU_ID Register
-//-----------------   
+//-----------------
 //              -------------------------------------------------------------------
 // CPU_ID_LO:  | 15  14  13  12  11  10  9  |  8  7  6  5  4  |  3   |   2  1  0   |
 //             |----------------------------+-----------------+------+-------------|
@@ -324,7 +324,7 @@ wire [15:0] cpu_nr = {cpu_nr_total, cpu_nr_inst};
 reg   [6:3] cpu_ctl;
 
 wire        cpu_ctl_wr = reg_wr[CPU_CTL];
-   
+
 always @ (posedge dbg_clk or posedge dbg_rst)
 `ifdef DBG_RST_BRK_EN
   if (dbg_rst)         cpu_ctl <=  4'h6;
@@ -339,7 +339,7 @@ wire        halt_cpu = cpu_ctl_wr & dbg_din[`HALT]  & ~dbg_halt_st;
 wire        run_cpu  = cpu_ctl_wr & dbg_din[`RUN]   &  dbg_halt_st;
 wire        istep    = cpu_ctl_wr & dbg_din[`ISTEP] &  dbg_halt_st;
 
-   
+
 // CPU_STAT Register
 //------------------------------------------------------------------------------------
 //      7           6          5           4           3         2      1       0
@@ -359,7 +359,7 @@ always @ (posedge dbg_clk or posedge dbg_rst)
 wire  [7:0] cpu_stat_full = {brk3_pnd, brk2_pnd, brk1_pnd, brk0_pnd,
                              cpu_stat, 1'b0, dbg_halt_st};
 
-   
+
 //=============================================================================
 // 4)  REGISTER: MEMORY INTERFACE
 //=============================================================================
@@ -385,7 +385,7 @@ wire  [7:0] cpu_stat_full = {brk3_pnd, brk2_pnd, brk1_pnd, brk0_pnd,
 reg   [3:1] mem_ctl;
 
 wire        mem_ctl_wr = reg_wr[MEM_CTL];
-   
+
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)         mem_ctl <=  3'h0;
   else if (mem_ctl_wr) mem_ctl <=  dbg_din[3:1];
@@ -398,51 +398,51 @@ always @ (posedge dbg_clk or posedge dbg_rst)
   else          mem_start <=  mem_ctl_wr & dbg_din[0];
 
 wire        mem_bw    = mem_ctl[3];
-   
+
 // MEM_DATA Register
-//------------------   
+//------------------
 reg  [15:0] mem_data;
 reg  [15:0] mem_addr;
 wire        mem_access;
-   
+
 wire        mem_data_wr = reg_wr[MEM_DATA];
 
 wire [15:0] dbg_mem_din_bw = ~mem_bw      ? dbg_mem_din                :
-	                      mem_addr[0] ? {8'h00, dbg_mem_din[15:8]} :
-	                                    {8'h00, dbg_mem_din[7:0]};
-   
+                              mem_addr[0] ? {8'h00, dbg_mem_din[15:8]} :
+                                            {8'h00, dbg_mem_din[7:0]};
+
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)             mem_data <=  16'h0000;
   else if (mem_data_wr)    mem_data <=  dbg_din;
   else if (dbg_reg_rd)     mem_data <=  dbg_reg_din;
   else if (dbg_mem_rd_dly) mem_data <=  dbg_mem_din_bw;
 
-   
+
 // MEM_ADDR Register
-//------------------   
+//------------------
 reg  [15:0] mem_cnt;
 
 wire        mem_addr_wr  = reg_wr[MEM_ADDR];
 wire        dbg_mem_acc  = (|dbg_mem_wr | (dbg_rd_rdy & ~mem_ctl[2]));
 wire        dbg_reg_acc  = ( dbg_reg_wr | (dbg_rd_rdy &  mem_ctl[2]));
-   
-wire [15:0] mem_addr_inc = (mem_cnt==16'h0000)                       ? 16'h0000 : 
-                           (mem_burst &  dbg_mem_acc & ~mem_bw)      ? 16'h0002 : 
-                           (mem_burst & (dbg_mem_acc | dbg_reg_acc)) ? 16'h0001 : 16'h0000; 
-   
+
+wire [15:0] mem_addr_inc = (mem_cnt==16'h0000)                       ? 16'h0000 :
+                           (mem_burst &  dbg_mem_acc & ~mem_bw)      ? 16'h0002 :
+                           (mem_burst & (dbg_mem_acc | dbg_reg_acc)) ? 16'h0001 : 16'h0000;
+
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)          mem_addr <=  16'h0000;
   else if (mem_addr_wr) mem_addr <=  dbg_din;
   else                  mem_addr <=  mem_addr + mem_addr_inc;
-   
+
 // MEM_CNT Register
-//------------------   
+//------------------
 
 wire        mem_cnt_wr  = reg_wr[MEM_CNT];
 
 wire [15:0] mem_cnt_dec = (mem_cnt==16'h0000)                       ? 16'h0000 :
                           (mem_burst & (dbg_mem_acc | dbg_reg_acc)) ? 16'hffff : 16'h0000;
-   
+
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)         mem_cnt <=  16'h0000;
   else if (mem_cnt_wr) mem_cnt <=  dbg_din;
@@ -472,7 +472,7 @@ omsp_dbg_hwbrk dbg_hwbr_0 (
     .brk_halt     (brk0_halt),    // Hardware breakpoint command
     .brk_pnd      (brk0_pnd),     // Hardware break/watch-point pending
     .brk_dout     (brk0_dout),    // Hardware break/watch-point register data input
-			     
+
 // INPUTs
     .brk_reg_rd   (brk0_reg_rd),  // Hardware break/watch-point register read select
     .brk_reg_wr   (brk0_reg_wr),  // Hardware break/watch-point register write select
@@ -487,9 +487,13 @@ omsp_dbg_hwbrk dbg_hwbr_0 (
 );
 
 `else
-assign brk0_halt =  1'b0;
-assign brk0_pnd  =  1'b0;
-assign brk0_dout = 16'h0000;
+assign      brk0_halt       =  1'b0;
+assign      brk0_pnd        =  1'b0;
+assign      brk0_dout       = 16'h0000;
+wire [15:0] UNUSED_eu_mab   =  eu_mab;
+wire        UNUSED_eu_mb_en =  eu_mb_en;
+wire  [1:0] UNUSED_eu_mb_wr =  eu_mb_wr;
+wire [15:0] UNUSED_pc       =  pc;
 `endif
 
 `ifdef DBG_HWBRK_1
@@ -511,7 +515,7 @@ omsp_dbg_hwbrk dbg_hwbr_1 (
     .brk_halt     (brk1_halt),    // Hardware breakpoint command
     .brk_pnd      (brk1_pnd),     // Hardware break/watch-point pending
     .brk_dout     (brk1_dout),    // Hardware break/watch-point register data input
-			     
+
 // INPUTs
     .brk_reg_rd   (brk1_reg_rd),  // Hardware break/watch-point register read select
     .brk_reg_wr   (brk1_reg_wr),  // Hardware break/watch-point register write select
@@ -550,7 +554,7 @@ omsp_dbg_hwbrk dbg_hwbr_2 (
     .brk_halt     (brk2_halt),    // Hardware breakpoint command
     .brk_pnd      (brk2_pnd),     // Hardware break/watch-point pending
     .brk_dout     (brk2_dout),    // Hardware break/watch-point register data input
-			     
+
 // INPUTs
     .brk_reg_rd   (brk2_reg_rd),  // Hardware break/watch-point register read select
     .brk_reg_wr   (brk2_reg_wr),  // Hardware break/watch-point register write select
@@ -589,7 +593,7 @@ omsp_dbg_hwbrk dbg_hwbr_3 (
     .brk_halt     (brk3_halt),    // Hardware breakpoint command
     .brk_pnd      (brk3_pnd),     // Hardware break/watch-point pending
     .brk_dout     (brk3_dout),    // Hardware break/watch-point register data input
-			     
+
 // INPUTs
     .brk_reg_rd   (brk3_reg_rd),  // Hardware break/watch-point register read select
     .brk_reg_wr   (brk3_reg_wr),  // Hardware break/watch-point register write select
@@ -653,12 +657,12 @@ always @ (posedge dbg_clk or posedge dbg_rst)
 //--------------------------
 wire dbg_cpu_reset  = cpu_ctl[`CPU_RST];
 
-   
+
 // Break after reset
 //--------------------------
 wire halt_rst = cpu_ctl[`RST_BRK_EN] & dbg_en_s & puc_pnd_set;
 
-   
+
 // Freeze peripherals
 //--------------------------
 wire dbg_freeze = dbg_halt_st & (cpu_ctl[`FRZ_BRK_EN] | ~cpu_en_s);
@@ -677,7 +681,7 @@ always @(posedge dbg_clk or posedge dbg_rst)
   else if (istep) inc_step <= 2'b11;
   else            inc_step <= {inc_step[0], 1'b0};
 
-   
+
 // Run / Halt
 //--------------------------
 reg   halt_flag;
@@ -696,7 +700,7 @@ always @(posedge dbg_clk or posedge dbg_rst)
 
 wire dbg_halt_cmd = (halt_flag | halt_flag_set) & ~inc_step[1];
 
-     
+
 //============================================================================
 // 8) MEMORY CONTROL
 //============================================================================
@@ -718,7 +722,7 @@ assign mem_burst_rd = (mem_burst_start & ~mem_ctl[1]);
 assign mem_burst_wr = (mem_burst_start &  mem_ctl[1]);
 
 // Trigger CPU Register or memory access during a burst
-reg        mem_startb;   
+reg        mem_startb;
 always @(posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst) mem_startb <= 1'b0;
   else         mem_startb <= (mem_burst & (dbg_wr | dbg_rd)) | mem_burst_rd;
@@ -726,7 +730,7 @@ always @(posedge dbg_clk or posedge dbg_rst)
 // Combine single and burst memory start of sequence
 wire       mem_seq_start = ((mem_start & ~|mem_cnt) | mem_startb);
 
-   
+
 // Memory access state machine
 //------------------------------
 reg  [1:0] mem_state;
@@ -741,7 +745,7 @@ parameter  M_ACCESS     = 2'h3;
 // State transition
 always @(mem_state or mem_seq_start or dbg_halt_st)
   case (mem_state)
-    M_IDLE       : mem_state_nxt = ~mem_seq_start ? M_IDLE       : 
+    M_IDLE       : mem_state_nxt = ~mem_seq_start ? M_IDLE       :
                                     dbg_halt_st   ? M_ACCESS     : M_SET_BRK;
     M_SET_BRK    : mem_state_nxt =  dbg_halt_st   ? M_ACCESS_BRK : M_SET_BRK;
     M_ACCESS_BRK : mem_state_nxt =  M_IDLE;
@@ -785,7 +789,7 @@ always @(posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst) dbg_mem_rd_dly <= 1'b0;
   else         dbg_mem_rd_dly <= dbg_mem_rd;
 
-      
+
 //=============================================================================
 // 9)  UART COMMUNICATION
 //=============================================================================
@@ -798,7 +802,7 @@ omsp_dbg_uart dbg_uart_0 (
     .dbg_rd           (dbg_rd),           // Debug register data read
     .dbg_uart_txd     (dbg_uart_txd),     // Debug interface: UART TXD
     .dbg_wr           (dbg_wr),           // Debug register data write
-			     
+
 // INPUTs
     .dbg_clk          (dbg_clk),          // Debug unit clock
     .dbg_dout         (dbg_dout),         // Debug register data output
@@ -813,13 +817,17 @@ omsp_dbg_uart dbg_uart_0 (
 );
 
 `else
-    assign dbg_uart_txd    =  1'b1;
+    assign dbg_uart_txd        =  1'b1;
+
+    wire   UNUSED_dbg_uart_rxd =  dbg_uart_rxd;
+
+
   `ifdef DBG_I2C
   `else
-    assign dbg_addr        =  6'h00;
-    assign dbg_din         = 16'h0000;
-    assign dbg_rd          =  1'b0;
-    assign dbg_wr          =  1'b0;
+    assign dbg_addr            =  6'h00;
+    assign dbg_din             = 16'h0000;
+    assign dbg_rd              =  1'b0;
+    assign dbg_wr              =  1'b0;
   `endif
 `endif
 
@@ -843,7 +851,6 @@ omsp_dbg_i2c dbg_i2c_0 (
     .dbg_i2c_broadcast (dbg_i2c_broadcast), // Debug interface: I2C Broadcast Address (for multicore systems)
     .dbg_i2c_scl       (dbg_i2c_scl),       // Debug interface: I2C SCL
     .dbg_i2c_sda_in    (dbg_i2c_sda_in),    // Debug interface: I2C SDA IN
-    .dbg_rd_rdy        (dbg_rd_rdy),        // Debug register data is ready for read
     .dbg_rst           (dbg_rst),           // Debug unit reset
     .mem_burst         (mem_burst),         // Burst on going
     .mem_burst_end     (mem_burst_end),     // End TX/RX burst
@@ -853,7 +860,13 @@ omsp_dbg_i2c dbg_i2c_0 (
 );
 
 `else
-    assign dbg_i2c_sda_out =  1'b1;
+    assign     dbg_i2c_sda_out          = 1'b1;
+
+    wire [6:0] UNUSED_dbg_i2c_addr      = dbg_i2c_addr;
+    wire [6:0] UNUSED_dbg_i2c_broadcast = dbg_i2c_broadcast;
+    wire       UNUSED_dbg_i2c_scl       = dbg_i2c_scl;
+    wire       UNUSED_dbg_i2c_sda_in    = dbg_i2c_sda_in;
+    wire       UNUSED_dbg_rd_rdy        = dbg_rd_rdy;
 `endif
 
 endmodule // omsp_dbg

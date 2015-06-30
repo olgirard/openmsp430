@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_multiplier.v
-// 
+//
 // *Module Description:
 //                       16x16 Hardware multiplier.
 //
@@ -135,7 +135,7 @@ wire [DEC_SZ-1:0] reg_dec     =  (OP1_MPY_D   &  {DEC_SZ{(reg_addr == OP1_MPY  )
                                  (RESLO_D     &  {DEC_SZ{(reg_addr == RESLO    )}})  |
                                  (RESHI_D     &  {DEC_SZ{(reg_addr == RESHI    )}})  |
                                  (SUMEXT_D    &  {DEC_SZ{(reg_addr == SUMEXT   )}});
-		   
+
 // Read/Write probes
 wire              reg_write   =  |per_we & reg_sel;
 wire              reg_read    = ~|per_we & reg_sel;
@@ -152,7 +152,7 @@ wire       [15:0] per_din_msk =  per_din & {{8{per_we[1]}}, 8'hff};
 //============================================================================
 
 // OP1 Register
-//-----------------   
+//-----------------
 reg  [15:0] op1;
 
 wire        op1_wr = reg_wr[OP1_MPY]  |
@@ -165,7 +165,8 @@ wire        mclk_op1;
 omsp_clock_gate clock_gate_op1 (.gclk(mclk_op1),
                                 .clk (mclk), .enable(op1_wr), .scan_enable(scan_enable));
 `else
-wire        mclk_op1 = mclk;
+wire        UNUSED_scan_enable = scan_enable;
+wire        mclk_op1           = mclk;
 `endif
 
 always @ (posedge mclk_op1 or posedge puc_rst)
@@ -178,9 +179,9 @@ always @ (posedge mclk_op1 or posedge puc_rst)
 
 wire [15:0] op1_rd  = op1;
 
-   
+
 // OP2 Register
-//-----------------   
+//-----------------
 reg  [15:0] op2;
 
 wire        op2_wr = reg_wr[OP2];
@@ -203,9 +204,9 @@ always @ (posedge mclk_op2 or posedge puc_rst)
 
 wire [15:0] op2_rd  = op2;
 
-   
+
 // RESLO Register
-//-----------------   
+//-----------------
 reg  [15:0] reslo;
 
 wire [15:0] reslo_nxt;
@@ -234,7 +235,7 @@ wire [15:0] reslo_rd = early_read ? reslo_nxt : reslo;
 
 
 // RESHI Register
-//-----------------   
+//-----------------
 reg  [15:0] reshi;
 
 wire [15:0] reshi_nxt;
@@ -261,9 +262,9 @@ always @ (posedge mclk_reshi or posedge puc_rst)
 
 wire [15:0] reshi_rd = early_read ? reshi_nxt  : reshi;
 
- 
+
 // SUMEXT Register
-//-----------------   
+//-----------------
 reg  [1:0] sumext_s;
 
 wire [1:0] sumext_s_nxt;
@@ -331,10 +332,10 @@ always @ (posedge mclk_op1 or posedge puc_rst)
 // Detect whenever the RESHI and RESLO registers should be cleared
 assign      result_clr = op2_wr & ~acc_sel;
 
-// Combine RESHI & RESLO 
+// Combine RESHI & RESLO
 wire [31:0] result     = {reshi, reslo};
 
-   
+
 // 16x16 Multiplier (result computed in 1 clock cycle)
 //-----------------------------------------------------
 `ifdef MPY_16x16
@@ -374,7 +375,7 @@ assign early_read   = 1'b0;
 // 16x8 Multiplier (result computed in 2 clock cycles)
 //-----------------------------------------------------
 `else
-  
+
 // Detect start of a multiplication
 reg [1:0] cycle;
 always @ (posedge mclk or posedge puc_rst)
@@ -390,13 +391,13 @@ wire signed  [8:0] op2_hi_xp = {sign_sel & op2[15], op2[15:8]};
 wire signed  [8:0] op2_lo_xp = {              1'b0, op2[7:0]};
 wire signed  [8:0] op2_xp    = cycle[0] ? op2_hi_xp : op2_lo_xp;
 
-     
+
 // 17x9 signed multiplication
 wire signed [25:0] product    = op1_xp * op2_xp;
 
 wire        [31:0] product_xp = cycle[0] ? {product[23:0], 8'h00} :
                                            {{8{sign_sel & product[23]}}, product[23:0]};
-   
+
 // Accumulate
 wire [32:0] result_nxt  = {1'b0, result} + {1'b0, product_xp[31:0]};
 
