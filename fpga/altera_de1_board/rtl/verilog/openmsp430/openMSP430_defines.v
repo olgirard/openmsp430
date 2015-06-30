@@ -40,7 +40,7 @@
 // $LastChangedBy: olivier.girard $
 // $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
-`define OMSP_NO_INCLUDE
+//`define OMSP_NO_INCLUDE
 `ifdef OMSP_NO_INCLUDE
 `else
 `include "openMSP430_undefines.v"
@@ -100,7 +100,7 @@
 
 
 // Include/Exclude Serial Debug interface
-`define DBG_EN
+//`define DBG_EN
 
 
 //============================================================================
@@ -117,7 +117,7 @@
 // interface.
 // (see CPU_ID.USER_VERSION field in the documentation)
 //-------------------------------------------------------
-`define USER_VERSION 5'b00000
+`define USER_VERSION 5'b00010
 
 
 //-------------------------------------------------------
@@ -135,7 +135,7 @@
 //-------------------------------------------------------
 // Include/Exclude DMA interface support
 //-------------------------------------------------------
-`define DMA_IF_EN
+//`define DMA_IF_EN
 
 
 //-------------------------------------------------------
@@ -172,8 +172,8 @@
 //
 //-------------------------------------------------------
 `define SYNC_NMI
-//`define SYNC_CPU_EN
-//`define SYNC_DBG_EN
+`define SYNC_CPU_EN
+`define SYNC_DBG_EN
 
 
 //-------------------------------------------------------
@@ -310,7 +310,7 @@
 // WARNING: if you target an FPGA, leave this define
 //          commented.
 //-------------------------------------------------------
-`define ASIC
+//`define ASIC
 
 
 //============================================================================
@@ -369,7 +369,7 @@
 // DCO_CLK and LFXT_CLK with the BCSCTL2.SELMx register.
 // When commented, DCO_CLK is selected.
 //-------------------------------------------------------
-//`define MCLK_MUX
+`define MCLK_MUX
 
 //-------------------------------------------------------
 // SMCLK: Clock Mux
@@ -379,7 +379,7 @@
 // DCO_CLK and LFXT_CLK with the BCSCTL2.SELS register.
 // When commented, DCO_CLK is selected.
 //-------------------------------------------------------
-//`define SMCLK_MUX
+`define SMCLK_MUX
 
 //-------------------------------------------------------
 // WATCHDOG: Clock Mux
@@ -391,7 +391,7 @@
 // WATCHDOG_NOMUX_ACLK define is uncommented, SMCLK is
 // selected otherwise.
 //-------------------------------------------------------
-//`define WATCHDOG_MUX
+`define WATCHDOG_MUX
 //`define WATCHDOG_NOMUX_ACLK
 
 
