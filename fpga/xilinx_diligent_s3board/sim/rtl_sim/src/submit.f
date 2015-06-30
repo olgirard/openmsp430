@@ -21,9 +21,9 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 //-----------------------------------------------------------------------------
-// 
+//
 // File Name: submit.f
-// 
+//
 // Author(s):
 //             - Olivier Girard,    olgirard@gmail.com
 //
@@ -48,9 +48,9 @@
 //=============================================================================
 +libext+.v
 
--y /opt/Xilinx/12.2/ISE_DS/ISE/verilog/src/unisims/
--y /opt/Xilinx/12.2/ISE_DS/ISE/verilog/src/simprims/
--y /opt/Xilinx/12.2/ISE_DS/ISE/verilog/src/XilinxCoreLib/
+-y /opt/Xilinx/14.4/ISE_DS/ISE/verilog/src/unisims/
+-y /opt/Xilinx/14.4/ISE_DS/ISE/verilog/src/simprims/
+-y /opt/Xilinx/14.4/ISE_DS/ISE/verilog/src/XilinxCoreLib/
 
 
 //=============================================================================
@@ -97,4 +97,3 @@
 ../../../rtl/verilog/openmsp430/omsp_clock_mux.v
 ../../../rtl/verilog/openmsp430/periph/omsp_gpio.v
 ../../../rtl/verilog/openmsp430/periph/omsp_timerA.v
-

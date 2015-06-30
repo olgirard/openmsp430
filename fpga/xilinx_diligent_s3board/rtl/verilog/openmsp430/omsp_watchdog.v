@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_watchdog.v
-// 
+//
 // *Module Description:
 //                       Watchdog Timer
 //
@@ -157,7 +157,7 @@ wire [DEC_SZ-1:0] reg_rd    = reg_dec & {DEC_SZ{reg_read}};
 // WDTCTL Register
 //-----------------
 // WDTNMI is not implemented and therefore masked
-   
+
 reg  [7:0] wdtctl;
 
 wire       wdtctl_wr = reg_wr[WDTCTL];
@@ -167,7 +167,8 @@ wire       mclk_wdtctl;
 omsp_clock_gate clock_gate_wdtctl (.gclk(mclk_wdtctl),
                                    .clk (mclk), .enable(wdtctl_wr), .scan_enable(scan_enable));
 `else
-wire       mclk_wdtctl = mclk;
+wire       UNUSED_scan_enable = scan_enable;
+wire       mclk_wdtctl        = mclk;
 `endif
 
 `ifdef NMI
@@ -187,7 +188,7 @@ parameter [7:0] WDTSSEL_MASK  = 8'h04;
 `endif
 
 parameter [7:0] WDTCTL_MASK   = (8'b1001_0011 | WDTSSEL_MASK | WDTNMIES_MASK);
-   
+
 always @ (posedge mclk_wdtctl or posedge puc_rst)
   if (puc_rst)        wdtctl <=  8'h00;
 `ifdef CLOCK_GATING
@@ -242,19 +243,21 @@ omsp_clock_mux clock_mux_watchdog (
    .clk_in1   (aclk),
    .reset     (puc_rst),
    .scan_mode (scan_mode),
-   .select    (wdtctl[2])
+   .select_in (wdtctl[2])
 );
 `else
   `ifdef WATCHDOG_NOMUX_ACLK
-     assign wdt_clk =  aclk;
+     assign wdt_clk      = aclk;
+     wire   UNUSED_smclk = smclk;
   `else
-     assign wdt_clk =  smclk;
+     wire   UNUSED_aclk  = aclk;
+     assign wdt_clk      = smclk;
   `endif
 `endif
 
 // Reset synchronizer for the watchdog local clock domain
 //--------------------------------------------------------
-   
+
 wire wdt_rst_noscan;
 wire wdt_rst;
 
@@ -272,7 +275,7 @@ omsp_scan_mux scan_mux_wdt_rst (
     .data_in_func (wdt_rst_noscan),
     .data_out     (wdt_rst)
 );
-   
+
 
 // Watchog counter clear (synchronization)
 //-----------------------------------------
@@ -423,12 +426,12 @@ always @ (posedge wdt_clk_cnt or posedge wdt_rst)
 // Watchdog wakeup cell
 wire wdt_wkup_pre;
 omsp_wakeup_cell wakeup_cell_wdog (
-				   .wkup_out   (wdt_wkup_pre),    // Wakup signal (asynchronous)
-				   .scan_clk   (mclk),            // Scan clock
-				   .scan_mode  (scan_mode),       // Scan mode
-				   .scan_rst   (puc_rst),         // Scan reset
-				   .wkup_clear (wdtifg_clr_reg),  // Glitch free wakeup event clear
-				   .wkup_event (wdtqn_edge_reg)   // Glitch free asynchronous wakeup event
+                                   .wkup_out   (wdt_wkup_pre),    // Wakup signal (asynchronous)
+                                   .scan_clk   (mclk),            // Scan clock
+                                   .scan_mode  (scan_mode),       // Scan mode
+                                   .scan_rst   (puc_rst),         // Scan reset
+                                   .wkup_clear (wdtifg_clr_reg),  // Glitch free wakeup event clear
+                                   .wkup_event (wdtqn_edge_reg)   // Glitch free asynchronous wakeup event
 );
 
 // When not in HOLD, the watchdog can generate a wakeup when:
@@ -471,6 +474,10 @@ always @ (posedge mclk or posedge por)
   else     wdt_reset <= wdtpw_error | (wdtifg_set & ~wdttmsel);
 
 
+// LINT cleanup
+wire        UNUSED_smclk_en = smclk_en;
+wire        UNUSED_aclk_en  = aclk_en;
+
 
 //=============================================================================
 // 6)  WATCHDOG TIMER (FPGA IMPLEMENTATION)
@@ -497,7 +504,7 @@ always @ (posedge mclk or posedge puc_rst)
   else if (wdtcnt_clr)   wdtcnt <= 16'h0000;
   else if (wdtcnt_incr)  wdtcnt <= wdtcnt_nxt;
 
-   
+
 // Interval selection mux
 //--------------------------
 reg        wdtqn;
@@ -545,8 +552,12 @@ always @ (posedge mclk or posedge por)
   else     wdt_reset <= wdtpw_error | (wdtifg_set & ~wdttmsel);
 
 
+// LINT cleanup
+wire        UNUSED_scan_mode = scan_mode;
+wire        UNUSED_smclk     = smclk;
+wire        UNUSED_aclk      = aclk;
 `endif
-
+wire [15:0] UNUSED_per_din   = per_din;
 
 endmodule // omsp_watchdog
 

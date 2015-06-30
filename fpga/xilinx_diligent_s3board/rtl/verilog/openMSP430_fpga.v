@@ -21,9 +21,9 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: openMSP430_fpga.v
-// 
+//
 // *Module Description:
 //                      openMSP430 FPGA Top-level for the Diligent
 //                     Spartan-3 starter kit.
@@ -334,7 +334,7 @@ wire        [15:0] per_dout_uart;
 wire               hw_uart_txd;
 wire               hw_uart_rxd;
 
-      
+
 // Others
 wire               reset_pin;
 
@@ -362,12 +362,12 @@ DCM dcm_adv_clk_main (
     .CLK90        (),
     .CLK180       (),
     .CLK270       (),
-    .CLK2X        (), 
+    .CLK2X        (),
     .CLK2X180     (),
     .CLKDV        (),
     .CLKFX        (dcm_clk),
     .CLKFX180     (),
-    .PSDONE       (), 
+    .PSDONE       (),
     .STATUS       (),
     .LOCKED       (dcm_locked),
 
@@ -402,30 +402,30 @@ defparam dcm_adv_clk_main.CLKFX_MULTIPLY        = 2;
 DCM dcm_adv_clk_main (
 
 // OUTPUTs
-    .CLKDV        (dcm_clk), 
-    .CLKFX        (), 
-    .CLKFX180     (), 
-    .CLK0         (CLK0_BUF), 
-    .CLK2X        (), 
-    .CLK2X180     (), 
-    .CLK90        (), 
-    .CLK180       (), 
-    .CLK270       (), 
-    .LOCKED       (dcm_locked), 
-    .PSDONE       (), 
+    .CLKDV        (dcm_clk),
+    .CLKFX        (),
+    .CLKFX180     (),
+    .CLK0         (CLK0_BUF),
+    .CLK2X        (),
+    .CLK2X180     (),
+    .CLK90        (),
+    .CLK180       (),
+    .CLK270       (),
+    .LOCKED       (dcm_locked),
+    .PSDONE       (),
     .STATUS       (),
 
 // INPUTs
-    .CLKFB        (CLKFB_IN), 
-    .CLKIN        (clk_50M_in), 
-    .PSEN         (1'b0), 
-    .PSINCDEC     (1'b0), 
-    .DSSEN        (1'b0), 
-    .PSCLK        (1'b0), 
-    .RST          (reset_pin) 
+    .CLKFB        (CLKFB_IN),
+    .CLKIN        (clk_50M_in),
+    .PSEN         (1'b0),
+    .PSINCDEC     (1'b0),
+    .DSSEN        (1'b0),
+    .PSCLK        (1'b0),
+    .RST          (reset_pin)
 );
 BUFG CLK0_BUFG_INST (
-    .I(CLK0_BUF), 
+    .I(CLK0_BUF),
     .O(CLKFB_IN)
 );
 
@@ -444,18 +444,18 @@ defparam dcm_adv_clk_main.DUTY_CYCLE_CORRECTION = "TRUE";
 defparam dcm_adv_clk_main.FACTORY_JF            = 16'h8080;
 defparam dcm_adv_clk_main.PHASE_SHIFT           = 0;
 defparam dcm_adv_clk_main.STARTUP_WAIT          = "FALSE";
-// synopsys translate_on  
+// synopsys translate_on
 `endif
 
-   
+
 //wire 	  dcm_locked = 1'b1;
 //wire      reset_n;
-   
+
 //reg 	  dcm_clk;
 //always @(posedge clk_50M_in)
 //  if (~reset_n) dcm_clk <= 1'b0;
 //  else          dcm_clk <= ~dcm_clk;
-   
+
 
 // Clock buffers
 //------------------------
@@ -473,7 +473,7 @@ wire reset_pin_n = ~reset_pin;
 // Release the reset only, if the DCM is locked
 assign  reset_n = reset_pin_n & dcm_locked;
 
-//Include the startup device   
+//Include the startup device
 wire  gsr_tb;
 wire  gts_tb;
 STARTUP_SPARTAN3 xstartup (.CLK(clk_sys), .GSR(gsr_tb), .GTS(gts_tb));
@@ -501,6 +501,9 @@ openMSP430 openMSP430_0 (
     .lfxt_enable       (),             // ASIC ONLY: Low frequency oscillator enable
     .lfxt_wkup         (),             // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
     .mclk              (mclk),         // Main system clock
+    .dma_dout          (),             // Direct Memory Access data output
+    .dma_ready         (),             // Direct Memory Access is complete
+    .dma_resp          (),             // Direct Memory Access response (0:Okay / 1:Error)
     .per_addr          (per_addr),     // Peripheral address
     .per_din           (per_din),      // Peripheral data input
     .per_we            (per_we),       // Peripheral write enable (high active)
@@ -525,6 +528,12 @@ openMSP430 openMSP430_0 (
     .dmem_dout         (dmem_dout),    // Data Memory data output
     .irq               (irq_bus),      // Maskable interrupts
     .lfxt_clk          (1'b0),         // Low frequency oscillator (typ 32kHz)
+    .dma_addr          (15'h0000),     // Direct Memory Access address
+    .dma_din           (16'h0000),     // Direct Memory Access data input
+    .dma_en            (1'b0),         // Direct Memory Access enable (high active)
+    .dma_priority      (1'b0),         // Direct Memory Access priority (0:low / 1:high)
+    .dma_we            (2'b00),        // Direct Memory Access write byte enable (high active)
+    .dma_wkup          (1'b0),         // ASIC ONLY: DMA Sub-System Wake-up (asynchronous and non-glitchy)
     .nmi               (nmi),          // Non-maskable interrupt (asynchronous)
     .per_dout          (per_dout),     // Peripheral data output
     .pmem_dout         (pmem_dout),    // Program Memory data output
@@ -572,7 +581,7 @@ omsp_gpio #(.P1_EN(1),
     .p6_dout_en   (),              // Port 6 data output enable
     .p6_sel       (),              // Port 6 function select
     .per_dout     (per_dout_dio),  // Peripheral data output
-			     
+
 // INPUTs
     .mclk         (mclk),          // Main system clock
     .p1_din       (p1_din),        // Port 1 data input
@@ -626,7 +635,7 @@ omsp_timerA timerA_0 (
     .taclk        (taclk)          // TACLK external timer clock (SLOW)
 );
 
-   
+
 //
 // Four-Digit, Seven-Segment LED Display driver
 //----------------------------------------------
@@ -690,7 +699,7 @@ assign per_dout = per_dout_dio  |
                   per_dout_tA   |
                   per_dout_7seg |
                   per_dout_uart;
-   
+
 //
 // Assign interrupts
 //-------------------------------
@@ -891,7 +900,7 @@ OBUF  LED3_PIN       (.I(p3_dout[3] & p3_dout_en[3]),  .O(LED3));
 OBUF  LED2_PIN       (.I(p3_dout[2] & p3_dout_en[2]),  .O(LED2));
 OBUF  LED1_PIN       (.I(p3_dout[1] & p3_dout_en[1]),  .O(LED1));
 OBUF  LED0_PIN       (.I(p3_dout[0] & p3_dout_en[0]),  .O(LED0));
-   
+
 // Push Button Switches
 //----------------------
 IBUF  BTN2_PIN       (.O(),                            .I(BTN2));
@@ -949,7 +958,7 @@ OBUF  UART_TXD_PIN   (.I(uart_txd_out),                .O(UART_TXD));
 IBUF  UART_RXD_A_PIN (.O(),                            .I(UART_RXD_A));
 OBUF  UART_TXD_A_PIN (.I(1'b0),                        .O(UART_TXD_A));
 
-   
+
 // PS/2 Mouse/Keyboard Port
 //--------------------------
 IOBUF PS2_D_PIN      (.O(), .I(1'b0), .T(1'b1),        .IO(PS2_D));
@@ -1026,4 +1035,3 @@ OBUF  VGA_VS_PIN     (.I(1'b0),                        .O(VGA_VS));
 
 
 endmodule // openMSP430_fpga
-
