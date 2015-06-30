@@ -26,9 +26,9 @@
 // THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: openMSP430_defines.v
-// 
+//
 // *Module Description:
 //                      openMSP430 Configuration file
 //
@@ -36,11 +36,11 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev$
-// $LastChangedBy$
-// $LastChangedDate$
+// $Rev: 103 $
+// $LastChangedBy: olivier.girard $
+// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
-//`define OMSP_NO_INCLUDE
+`define OMSP_NO_INCLUDE
 `ifdef OMSP_NO_INCLUDE
 `else
 `include "openMSP430_undefines.v"
@@ -100,7 +100,7 @@
 
 
 // Include/Exclude Serial Debug interface
-//`define DBG_EN
+`define DBG_EN
 
 
 //============================================================================
@@ -117,7 +117,7 @@
 // interface.
 // (see CPU_ID.USER_VERSION field in the documentation)
 //-------------------------------------------------------
-`define USER_VERSION 5'b00010
+`define USER_VERSION 5'b00000
 
 
 //-------------------------------------------------------
@@ -130,6 +130,12 @@
 //        - Possibility to generate a software PUC reset
 //-------------------------------------------------------
 `define WATCHDOG
+
+
+//-------------------------------------------------------
+// Include/Exclude DMA interface support
+//-------------------------------------------------------
+`define DMA_IF_EN
 
 
 //-------------------------------------------------------
@@ -166,8 +172,8 @@
 //
 //-------------------------------------------------------
 `define SYNC_NMI
-`define SYNC_CPU_EN
-`define SYNC_DBG_EN
+//`define SYNC_CPU_EN
+//`define SYNC_DBG_EN
 
 
 //-------------------------------------------------------
@@ -281,15 +287,15 @@
 //               (i.e. the *_SIZE divided by 2)
 //-------------------------------------------------------
 
-// Custom Program memory (enabled with PMEM_SIZE_CUSTOM)
+// Custom Program memory    (enabled with PMEM_SIZE_CUSTOM)
 `define PMEM_CUSTOM_AWIDTH      10
 `define PMEM_CUSTOM_SIZE      2048
 
-// Custom Data memory    (enabled with DMEM_SIZE_CUSTOM)
+// Custom Data memory       (enabled with DMEM_SIZE_CUSTOM)
 `define DMEM_CUSTOM_AWIDTH       6
 `define DMEM_CUSTOM_SIZE       128
 
-// Custom Peripheral memory  (enabled with PER_SIZE_CUSTOM)
+// Custom Peripheral memory (enabled with PER_SIZE_CUSTOM)
 `define PER_CUSTOM_AWIDTH        8
 `define PER_CUSTOM_SIZE        512
 
@@ -304,7 +310,7 @@
 // WARNING: if you target an FPGA, leave this define
 //          commented.
 //-------------------------------------------------------
-//`define ASIC
+`define ASIC
 
 
 //============================================================================
@@ -363,7 +369,7 @@
 // DCO_CLK and LFXT_CLK with the BCSCTL2.SELMx register.
 // When commented, DCO_CLK is selected.
 //-------------------------------------------------------
-`define MCLK_MUX
+//`define MCLK_MUX
 
 //-------------------------------------------------------
 // SMCLK: Clock Mux
@@ -373,7 +379,7 @@
 // DCO_CLK and LFXT_CLK with the BCSCTL2.SELS register.
 // When commented, DCO_CLK is selected.
 //-------------------------------------------------------
-`define SMCLK_MUX
+//`define SMCLK_MUX
 
 //-------------------------------------------------------
 // WATCHDOG: Clock Mux
@@ -385,7 +391,7 @@
 // WATCHDOG_NOMUX_ACLK define is uncommented, SMCLK is
 // selected otherwise.
 //-------------------------------------------------------
-`define WATCHDOG_MUX
+//`define WATCHDOG_MUX
 //`define WATCHDOG_NOMUX_ACLK
 
 
@@ -777,6 +783,10 @@
 
 // Basic clock module: BCSCTL1 Control Register
 `define DIVAx       5:4
+`define DMA_CPUOFF  0
+`define DMA_SCG0    1
+`define DMA_SCG1    2
+`define DMA_OSCOFF  3
 
 // Basic clock module: BCSCTL2 Control Register
 `define SELMx       7
@@ -807,7 +817,10 @@
 //======================================
 
 // Debug interface: CPU version
-`define CPU_VERSION   3'h2
+//   1 - FPGA support only (Pre-BSD licence era)
+//   2 - Add ASIC support
+//   3 - Add DMA interface support
+`define CPU_VERSION   3'h3
 
 // Debug interface: Software breakpoint opcode
 `define DBG_SWBRK_OP 16'h4343
@@ -871,7 +884,7 @@ CONFIGURATION ERROR: I2C OR UART DEBUG INTERFACE SHOULD BE ENABLED
 // the 16x16 multiplier (1 cycle) instead of the
 // default 16x8 multplier (2 cycles)
 //`define MPY_16x16
-  
+
 //======================================
 // CONFIGURATION CHECKS
 //======================================
@@ -896,7 +909,7 @@ CONFIGURATION ERROR: THE MCLK_MUX CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENAB
  `endif
  `ifdef SMCLK_MUX
 CONFIGURATION ERROR: THE SMCLK_MUX CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
- `endif   
+ `endif
  `ifdef WATCHDOG_MUX
 CONFIGURATION ERROR: THE WATCHDOG_MUX CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
  `else
@@ -906,5 +919,5 @@ CONFIGURATION ERROR: THE WATCHDOG_NOMUX_ACLK CAN ONLY BE ENABLED IF THE LFXT_DOM
  `endif
  `ifdef OSCOFF_EN
 CONFIGURATION ERROR: THE OSCOFF LOW POWER MODE CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
- `endif   
+ `endif
 `endif

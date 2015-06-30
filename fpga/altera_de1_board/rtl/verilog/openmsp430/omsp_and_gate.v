@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_and_gate.v
-// 
+//
 // *Module Description:
 //                       Generic AND gate cell for the openMSP430
 //
@@ -84,6 +84,3 @@ assign  y  =  a & b;
 
 
 endmodule // omsp_and_gate
-
-
-

@@ -308,6 +308,9 @@ openMSP430 openMSP430_0 (
     .lfxt_enable       (),             // ASIC ONLY: Low frequency oscillator enable
     .lfxt_wkup         (),             // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
     .mclk              (mclk),         // Main system clock
+    .dma_dout          (),             // Direct Memory Access data output
+    .dma_ready         (),             // Direct Memory Access is complete
+    .dma_resp          (),             // Direct Memory Access response (0:Okay / 1:Error)
     .per_addr          (per_addr),     // Peripheral address
     .per_din           (per_din),      // Peripheral data input
     .per_we            (per_we),       // Peripheral write enable (high active)
@@ -332,6 +335,12 @@ openMSP430 openMSP430_0 (
     .dmem_dout         (dmem_dout),    // Data Memory data output
     .irq               (irq_bus),      // Maskable interrupts
     .lfxt_clk          (1'b0),         // Low frequency oscillator (typ 32kHz)
+    .dma_addr          (15'h0000),     // Direct Memory Access address
+    .dma_din           (16'h0000),     // Direct Memory Access data input
+    .dma_en            (1'b0),         // Direct Memory Access enable (high active)
+    .dma_priority      (1'b0),         // Direct Memory Access priority (0:low / 1:high)
+    .dma_we            (2'b00),        // Direct Memory Access write byte enable (high active)
+    .dma_wkup          (1'b0),         // ASIC ONLY: DMA Sub-System Wake-up (asynchronous and non-glitchy)
     .nmi               (nmi),          // Non-maskable interrupt (asynchronous)
     .per_dout          (per_dout),     // Peripheral data output
     .pmem_dout         (pmem_dout),    // Program Memory data output
@@ -693,4 +702,3 @@ assign UART_TXD = uart_txd_out;
 
 
 endmodule
-

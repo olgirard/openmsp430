@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_alu.v
-// 
+//
 // *Module Description:
 //                       openMSP430 ALU
 //
@@ -191,7 +191,7 @@ wire [16:0] alu_dadd       = {alu_dadd3, alu_dadd2[3:0], alu_dadd1[3:0], alu_dad
 
 // Shifter for rotate instructions (RRC & RRA)
 wire        alu_shift_msb  = inst_so[`RRC] ? status[0]     :
-	                     inst_bw       ? op_src[7]     : op_src[15];
+                             inst_bw       ? op_src[7]     : op_src[15];
 wire        alu_shift_7    = inst_bw       ? alu_shift_msb : op_src[8];
 wire [16:0] alu_shift      = {1'b0, alu_shift_msb, op_src[15:9], alu_shift_7, op_src[7:1]};
 
@@ -249,6 +249,14 @@ assign  alu_stat    = inst_alu[`ALU_SHIFT]  ? {1'b0, N,Z,op_src_in[0]} :
 
 assign  alu_stat_wr = (inst_alu[`ALU_STAT_F] & exec_cycle) ? 4'b1111 : 4'b0000;
 
+
+// LINT cleanup
+wire    UNUSED_inst_so_rra  = inst_so[`RRA];
+wire    UNUSED_inst_so_push = inst_so[`PUSH];
+wire    UNUSED_inst_so_call = inst_so[`CALL];
+wire    UNUSED_inst_so_reti = inst_so[`RETI];
+wire    UNUSED_inst_jmp     = inst_jmp[`JMP];
+wire    UNUSED_inst_alu     = inst_alu[`EXEC_NO_WR];
 
 endmodule // omsp_alu
 
