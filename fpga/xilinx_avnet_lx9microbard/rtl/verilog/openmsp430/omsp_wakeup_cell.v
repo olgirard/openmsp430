@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_wakeup_cell.v
-// 
+//
 // *Module Description:
 //                       Generic Wakeup cell
 //

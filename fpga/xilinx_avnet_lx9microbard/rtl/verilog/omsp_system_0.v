@@ -21,9 +21,9 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: omsp_system_1.v
-// 
+//
 // *Module Description:
 //                      openMSP430 System 0.
 //                      This core is dedicated to communication and
@@ -105,7 +105,7 @@ output               uart_txd;             // UART Data Transmit (TXD)
 input          [3:0] switch;               // Input switches
 output         [1:0] led;                  // LEDs
 
-   
+
 //=============================================================================
 // 1)  INTERNAL WIRES/REGISTERS/PARAMETERS DECLARATION
 //=============================================================================
@@ -186,6 +186,9 @@ openMSP430 #(.INST_NR (0),
     .lfxt_enable       (),                   // ASIC ONLY: Low frequency oscillator enable
     .lfxt_wkup         (),                   // ASIC ONLY: Low frequency oscillator wake-up (asynchronous)
     .mclk              (mclk),               // Main system clock
+    .dma_dout          (),                   // Direct Memory Access data output
+    .dma_ready         (),                   // Direct Memory Access is complete
+    .dma_resp          (),                   // Direct Memory Access response (0:Okay / 1:Error)
     .per_addr          (per_addr),           // Peripheral address
     .per_din           (per_din),            // Peripheral data input
     .per_we            (per_we),             // Peripheral write enable (high active)
@@ -210,6 +213,12 @@ openMSP430 #(.INST_NR (0),
     .dmem_dout         (dmem_dout),          // Data Memory data output
     .irq               (irq_bus),            // Maskable interrupts
     .lfxt_clk          (1'b0),               // Low frequency oscillator (typ 32kHz)
+    .dma_addr          (15'h0000),           // Direct Memory Access address
+    .dma_din           (16'h0000),           // Direct Memory Access data input
+    .dma_en            (1'b0),               // Direct Memory Access enable (high active)
+    .dma_priority      (1'b0),               // Direct Memory Access priority (0:low / 1:high)
+    .dma_we            (2'b00),              // Direct Memory Access write byte enable (high active)
+    .dma_wkup          (1'b0),               // ASIC ONLY: DMA Sub-System Wake-up (asynchronous and non-glitchy)
     .nmi               (nmi),                // Non-maskable interrupt (asynchronous)
     .per_dout          (per_dout),           // Peripheral data output
     .pmem_dout         (pmem_dout),          // Program Memory data output
@@ -257,7 +266,7 @@ omsp_gpio #(.P1_EN(1),
     .p6_dout_en   (),                      // Port 6 data output enable
     .p6_sel       (),                      // Port 6 function select
     .per_dout     (per_dout_gpio),         // Peripheral data output
-			     
+
 // INPUTs
     .mclk         (mclk),                  // Main system clock
     .p1_din       (p1_din),                // Port 1 data input
@@ -374,6 +383,3 @@ assign irq_bus  =  {1'b0,         // Vector 13  (0xFFFA)
 
 
 endmodule // omsp_system_0
-
-
-

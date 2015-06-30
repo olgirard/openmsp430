@@ -26,9 +26,9 @@
 // THE POSSIBILITY OF SUCH DAMAGE
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: openMSP430_defines.v
-// 
+//
 // *Module Description:
 //                      openMSP430 Configuration file
 //
@@ -130,6 +130,12 @@
 //        - Possibility to generate a software PUC reset
 //-------------------------------------------------------
 `define WATCHDOG
+
+
+//-------------------------------------------------------
+// Include/Exclude DMA interface support
+//-------------------------------------------------------
+//`define DMA_IF_EN
 
 
 //-------------------------------------------------------
@@ -281,15 +287,15 @@
 //               (i.e. the *_SIZE divided by 2)
 //-------------------------------------------------------
 
-// Custom Program memory (enabled with PMEM_SIZE_CUSTOM)
+// Custom Program memory    (enabled with PMEM_SIZE_CUSTOM)
 `define PMEM_CUSTOM_AWIDTH      10
 `define PMEM_CUSTOM_SIZE      2048
 
-// Custom Data memory    (enabled with DMEM_SIZE_CUSTOM)
+// Custom Data memory       (enabled with DMEM_SIZE_CUSTOM)
 `define DMEM_CUSTOM_AWIDTH       6
 `define DMEM_CUSTOM_SIZE       128
 
-// Custom Peripheral memory  (enabled with PER_SIZE_CUSTOM)
+// Custom Peripheral memory (enabled with PER_SIZE_CUSTOM)
 `define PER_CUSTOM_AWIDTH        8
 `define PER_CUSTOM_SIZE        512
 
@@ -777,6 +783,10 @@
 
 // Basic clock module: BCSCTL1 Control Register
 `define DIVAx       5:4
+`define DMA_CPUOFF  0
+`define DMA_SCG0    1
+`define DMA_SCG1    2
+`define DMA_OSCOFF  3
 
 // Basic clock module: BCSCTL2 Control Register
 `define SELMx       7
@@ -807,7 +817,10 @@
 //======================================
 
 // Debug interface: CPU version
-`define CPU_VERSION   3'h2
+//   1 - FPGA support only (Pre-BSD licence era)
+//   2 - Add ASIC support
+//   3 - Add DMA interface support
+`define CPU_VERSION   3'h3
 
 // Debug interface: Software breakpoint opcode
 `define DBG_SWBRK_OP 16'h4343
@@ -871,7 +884,7 @@ CONFIGURATION ERROR: I2C OR UART DEBUG INTERFACE SHOULD BE ENABLED
 // the 16x16 multiplier (1 cycle) instead of the
 // default 16x8 multplier (2 cycles)
 //`define MPY_16x16
-  
+
 //======================================
 // CONFIGURATION CHECKS
 //======================================
@@ -896,7 +909,7 @@ CONFIGURATION ERROR: THE MCLK_MUX CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENAB
  `endif
  `ifdef SMCLK_MUX
 CONFIGURATION ERROR: THE SMCLK_MUX CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
- `endif   
+ `endif
  `ifdef WATCHDOG_MUX
 CONFIGURATION ERROR: THE WATCHDOG_MUX CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
  `else
@@ -906,5 +919,5 @@ CONFIGURATION ERROR: THE WATCHDOG_NOMUX_ACLK CAN ONLY BE ENABLED IF THE LFXT_DOM
  `endif
  `ifdef OSCOFF_EN
 CONFIGURATION ERROR: THE OSCOFF LOW POWER MODE CAN ONLY BE ENABLED IF THE LFXT_DOMAIN IS ENABLED AS WELL
- `endif   
+ `endif
 `endif

@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_uart.v
-// 
+//
 // *Module Description:
 //                       Simple full duplex UART (8N1 protocol).
 //
@@ -97,18 +97,18 @@ parameter [DEC_WD-1:0] CTRL        =  'h0,
                        DATA_TX     =  'h4,
                        DATA_RX     =  'h5;
 
-   
+
 // Register one-hot decoder utilities
 parameter              DEC_SZ      =  (1 << DEC_WD);
 parameter [DEC_SZ-1:0] BASE_REG    =  {{DEC_SZ-1{1'b0}}, 1'b1};
 
 // Register one-hot decoder
 parameter [DEC_SZ-1:0] CTRL_D      = (BASE_REG << CTRL),
-                       STATUS_D    = (BASE_REG << STATUS), 
-                       BAUD_LO_D   = (BASE_REG << BAUD_LO), 
-                       BAUD_HI_D   = (BASE_REG << BAUD_HI), 
-                       DATA_TX_D   = (BASE_REG << DATA_TX), 
-                       DATA_RX_D   = (BASE_REG << DATA_RX); 
+                       STATUS_D    = (BASE_REG << STATUS),
+                       BAUD_LO_D   = (BASE_REG << BAUD_LO),
+                       BAUD_HI_D   = (BASE_REG << BAUD_HI),
+                       DATA_TX_D   = (BASE_REG << DATA_TX),
+                       DATA_RX_D   = (BASE_REG << DATA_RX);
 
 
 //============================================================================
@@ -209,7 +209,7 @@ always @ (posedge mclk or posedge puc_rst)
 assign     status = {status_tx_empty_pnd, status_tx_pnd,   status_rx_ovflw_pnd, status_rx_pnd,
                      status_tx_full,      status_tx_busy,  1'b0,                status_rx_busy};
 
-   
+
 // BAUD_LO Register
 //-----------------
 reg  [7:0] baud_lo;
@@ -235,7 +235,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 
 wire [15:0] baudrate = {baud_hi, baud_lo};
- 
+
 
 // DATA_TX Register
 //-----------------
@@ -286,7 +286,7 @@ wire [15:0] per_dout  =  ctrl_rd    |
 
 wire uclk_en = ctrl_smclk_sel ? smclk_en : 1'b1;
 
-   
+
 //=============================================================================
 // 5)  UART RECEIVE LINE SYNCHRONIZTION & FILTERING
 //=============================================================================
@@ -297,13 +297,12 @@ wire     uart_rxd_sync_n;
 
 omsp_sync_cell sync_cell_uart_rxd (
     .data_out  (uart_rxd_sync_n),
-    .data_meta (),
     .data_in   (~uart_rxd),
     .clk       (mclk),
     .rst       (puc_rst)
 );
 wire uart_rxd_sync = ~uart_rxd_sync_n;
-   
+
 // RXD input buffer
 //--------------------------------
 reg  [1:0] rxd_buf;
@@ -319,7 +318,7 @@ wire [1:0] rxd_maj_cnt = {1'b0, uart_rxd_sync}   +
                          {1'b0, rxd_buf[0]}      +
                          {1'b0, rxd_buf[1]};
 wire       rxd_maj_nxt = (rxd_maj_cnt>=2'b10);
-   
+
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst) rxd_maj <=  1'b1;
   else         rxd_maj <=  rxd_maj_nxt;
@@ -327,11 +326,11 @@ always @ (posedge mclk or posedge puc_rst)
 wire rxd_s  =  rxd_maj;
 wire rxd_fe =  rxd_maj & ~rxd_maj_nxt;
 
-   
+
 //=============================================================================
 // 6)  UART RECEIVE
 //=============================================================================
-   
+
 // RX Transfer counter
 //------------------------
 reg  [3:0] rxfer_bit;
@@ -399,12 +398,12 @@ assign  status_rx_busy          = (rxfer_bit!=4'h0);
 //-----------------------------
 reg        txfer_triggered;
 wire       txfer_start;
-   
+
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)          txfer_triggered <=  1'b0;
   else if (data_tx_wr)  txfer_triggered <=  1'b1;
   else if (txfer_start) txfer_triggered <=  1'b0;
- 
+
 
 // TX Transfer counter
 //------------------------
@@ -453,7 +452,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign  uart_txd = txfer_buf[0];
 
-   
+
 // Status flags
 //-------------------------
 
@@ -486,6 +485,5 @@ assign  irq_uart_rx    = (status_rx_pnd       & ctrl_ien_rx)        |
 assign  irq_uart_tx    = (status_tx_pnd       & ctrl_ien_tx)        |
                          (status_tx_empty_pnd & ctrl_ien_tx_empty);
 
-  
-endmodule // uart
 
+endmodule // uart

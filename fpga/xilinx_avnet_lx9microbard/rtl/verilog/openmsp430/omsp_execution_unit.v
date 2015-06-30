@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_execution_unit.v
-// 
+//
 // *Module Description:
 //                       openMSP430 Execution unit
 //
@@ -36,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 174 $
-// $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2013-01-30 22:18:42 +0100 (Wed, 30 Jan 2013) $
+// $Rev$
+// $LastChangedBy$
+// $LastChangedDate$
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -90,14 +90,14 @@ module  omsp_execution_unit (
 
 // OUTPUTs
 //=========
-output 	            cpuoff;        // Turns off the CPU
+output              cpuoff;        // Turns off the CPU
 output       [15:0] dbg_reg_din;   // Debug unit CPU register data input
-output 	            gie;           // General interrupt enable
+output              gie;           // General interrupt enable
 output       [15:0] mab;           // Memory address bus
 output              mb_en;         // Memory bus enable
 output        [1:0] mb_wr;         // Memory bus write transfer
 output       [15:0] mdb_out;       // Memory data bus output
-output 	            oscoff;        // Turns off LFXT1 clock input
+output              oscoff;        // Turns off LFXT1 clock input
 output       [15:0] pc_sw;         // Program counter software value
 output              pc_sw_wr;      // Program counter software write
 output              scg0;          // System clock generator 1. Turns off the DCO
@@ -166,7 +166,7 @@ wire reg_sr_wr    =  (e_state==`E_DST_RD) & inst_so[`RETI];
 
 wire reg_sr_clr   =  (e_state==`E_IRQ_2);
 
-wire reg_pc_call  = ((e_state==`E_EXEC)   & inst_so[`CALL]) | 
+wire reg_pc_call  = ((e_state==`E_EXEC)   & inst_so[`CALL]) |
                     ((e_state==`E_DST_WR) & inst_so[`RETI]);
 
 wire reg_incr     =  (exec_done          & inst_as[`INDIR_I]) |
@@ -413,6 +413,15 @@ always @(posedge mclk_mdb_in_buf or posedge puc_rst)
 `endif
 
 assign mdb_in_val = mdb_in_buf_valid ? mdb_in_buf : mdb_in_bw;
+
+
+// LINT cleanup
+wire   UNUSED_inst_ad_idx     = inst_ad[`IDX];
+wire   UNUSED_inst_ad_indir   = inst_ad[`INDIR];
+wire   UNUSED_inst_ad_indir_i = inst_ad[`INDIR_I];
+wire   UNUSED_inst_ad_symb    = inst_ad[`SYMB];
+wire   UNUSED_inst_ad_imm     = inst_ad[`IMM];
+wire   UNUSED_inst_ad_const   = inst_ad[`CONST];
 
 
 endmodule // omsp_execution_unit

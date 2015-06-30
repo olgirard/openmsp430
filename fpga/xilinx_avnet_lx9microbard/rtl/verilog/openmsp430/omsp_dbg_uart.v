@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_dbg_uart.v
-// 
+//
 // *Module Description:
 //                       Debug UART communication interface (8N1, Half-duplex)
 //
@@ -36,9 +36,9 @@
 //              - Olivier Girard,    olgirard@gmail.com
 //
 //----------------------------------------------------------------------------
-// $Rev: 103 $
-// $LastChangedBy: olivier.girard $
-// $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
+// $Rev$
+// $LastChangedBy$
+// $LastChangedDate$
 //----------------------------------------------------------------------------
 `ifdef OMSP_NO_INCLUDE
 `else
@@ -53,7 +53,7 @@ module  omsp_dbg_uart (
     dbg_rd,                         // Debug register data read
     dbg_uart_txd,                   // Debug interface: UART TXD
     dbg_wr,                         // Debug register data write
-			     
+
 // INPUTs
     dbg_clk,                        // Debug unit clock
     dbg_dout,                       // Debug register data output
@@ -109,7 +109,7 @@ input               mem_bw;         // Burst byte width
 `else
     wire uart_rxd = dbg_uart_rxd;
 `endif
-   
+
 // RXD input buffer
 //--------------------------------
 reg  [1:0] rxd_buf;
@@ -122,9 +122,9 @@ always @ (posedge dbg_clk or posedge dbg_rst)
 reg        rxd_maj;
 
 wire       rxd_maj_nxt = (uart_rxd   & rxd_buf[0]) |
-			 (uart_rxd   & rxd_buf[1]) |
-			 (rxd_buf[0] & rxd_buf[1]);
-   
+                         (uart_rxd   & rxd_buf[1]) |
+                         (rxd_buf[0] & rxd_buf[1]);
+
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst) rxd_maj <=  1'b1;
   else         rxd_maj <=  rxd_maj_nxt;
@@ -133,7 +133,7 @@ wire rxd_s    =  rxd_maj;
 wire rxd_fe   =  rxd_maj & ~rxd_maj_nxt;
 wire rxd_re   = ~rxd_maj &  rxd_maj_nxt;
 wire rxd_edge =  rxd_maj ^  rxd_maj_nxt;
-   
+
 //=============================================================================
 // 2)  UART STATE MACHINE
 //=============================================================================
@@ -179,7 +179,7 @@ always @(uart_state or xfer_buf_nxt or mem_burst or mem_burst_wr or mem_burst_rd
     default  : uart_state_nxt =  RX_CMD;
   // pragma coverage on
   endcase
-   
+
 // State machine
 always @(posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)                          uart_state <= RX_SYNC;
@@ -191,7 +191,7 @@ wire cmd_valid = (uart_state==RX_CMD) & xfer_done;
 wire rx_active = (uart_state==RX_DATA1) | (uart_state==RX_DATA2) | (uart_state==RX_CMD);
 wire tx_active = (uart_state==TX_DATA1) | (uart_state==TX_DATA2);
 
-   
+
 //=============================================================================
 // 3)  UART SYNCHRONIZATION
 //=============================================================================
@@ -218,12 +218,12 @@ wire [`DBG_UART_XFER_CNT_W-1:0] bit_cnt_max = sync_cnt[`DBG_UART_XFER_CNT_W+2:3]
 `else
 wire [`DBG_UART_XFER_CNT_W-1:0] bit_cnt_max = `DBG_UART_CNT;
 `endif
-   
-   
+
+
 //=============================================================================
 // 4)  UART RECEIVE / TRANSMIT
 //=============================================================================
-   
+
 // Transfer counter
 //------------------------
 reg                      [3:0] xfer_bit;
@@ -233,7 +233,7 @@ wire       txd_start    = dbg_rd_rdy | (xfer_done & (uart_state==TX_DATA1));
 wire       rxd_start    = (xfer_bit==4'h0) & rxd_fe & ((uart_state!=RX_SYNC));
 wire       xfer_bit_inc = (xfer_bit!=4'h0) & (xfer_cnt=={`DBG_UART_XFER_CNT_W{1'b0}});
 assign     xfer_done    = rx_active ? (xfer_bit==4'ha) : (xfer_bit==4'hb);
-   
+
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)                       xfer_bit <=  4'h0;
   else if (txd_start | rxd_start)    xfer_bit <=  4'h1;
@@ -260,12 +260,12 @@ always @ (posedge dbg_clk or posedge dbg_rst)
 // Generate TXD output
 //------------------------
 reg dbg_uart_txd;
-   
+
 always @ (posedge dbg_clk or posedge dbg_rst)
   if (dbg_rst)                       dbg_uart_txd <=  1'b1;
   else if (xfer_bit_inc & tx_active) dbg_uart_txd <=  xfer_buf[0];
 
- 
+
 //=============================================================================
 // 5) INTERFACE TO DEBUG REGISTERS
 //=============================================================================
@@ -288,8 +288,8 @@ wire        dbg_wr     = (xfer_done & (uart_state==RX_DATA2));
 wire        dbg_rd     = mem_burst ? (xfer_done & (uart_state==TX_DATA2)) :
                                      (cmd_valid & ~xfer_buf_nxt[`DBG_UART_WR]) | mem_burst_rd;
 
-	    
-   
+
+
 endmodule // omsp_dbg_uart
 
 `ifdef OMSP_NO_INCLUDE
