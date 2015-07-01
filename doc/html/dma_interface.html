@@ -39,7 +39,7 @@ be enabled be uncommenting the DMA_IF_EN macro in the <i>"openMSP430_defines.sv"
 </code>
 <br>
 It supports the efficient connection of Bootloader, DMA controller, Memory-BIST or any other hardware
-unit requiring direct read/write access to the CPU memory space.  
+unit requiring direct read/write access to the CPU memory space.
 <br>
 The interface is also designed as to reuse the existing arbitration logic within the memory-backbone
 and thus minimize to timing costs of its physical implementation (i.e. no additional muxing layer on
@@ -47,10 +47,10 @@ an already critical timing path).
 <br><br>
 An simple system using the DMA interface typically consists of a DMA master directly connected to
 openMSP430 core:
-<br><img src="http://opencores.org/usercontent,img,1431381105" alt="DMA simple systems" title="DMA simple systems" width="100%">
+<br><img src="http://opencores.org/usercontent,img,1431381105" alt="DMA simple systems" title="DMA simple systems" width="80%">
 <br><br>
 However, it is also possible to combine different DMA masters using a custom arbitration logic:
-<br><img src="http://opencores.org/usercontent,img,1431381122" alt="DMA complex system" title="DMA complex system" width="100%">
+<br><img src="http://opencores.org/usercontent,img,1431381122" alt="DMA complex system" title="DMA complex system" width="80%">
 <br><br>
 
 <a name="2.%20Signal%20list"></a>
@@ -203,7 +203,7 @@ will stop execution and give the full bandwidth to the DMA controller. In that s
 in a single clock cycle (i.e. without any wait states), as the targeted ressources are always available
 (i.e. the CPU is not executing).</li>
   <li>If the application requirements need something in between (namely a minimum DMA transfer data-rate with reduced effect
-on the firmware exection), then the DMA master can dynamically change the DMA_PRIORITY as required.</li> 
+on the firmware exection), then the DMA master can dynamically change the DMA_PRIORITY as required.</li>
 </ul>
 These scenario are illustrated in the following figure.
 <br><img src="http://opencores.org/usercontent,img,1431638398" alt="DMA error response" title="DMA error response" width="100%"><br>
