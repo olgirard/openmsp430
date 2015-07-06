@@ -234,8 +234,9 @@ always @ (posedge mclk or posedge puc_rst)
   else                 tacctl0  <=  (tacctl0              | {14'h0000, cov0_set, ccifg0_set}) & {15'h7fff, ~irq_ta0_acc};
 
 wire        cci0;
+wire        cci0_s;
 reg         scci0;
-wire [15:0] tacctl0_full = tacctl0 | {5'h00, scci0, 6'h00, cci0, 3'h0};
+wire [15:0] tacctl0_full = tacctl0 | {5'h00, scci0, 6'h00, cci0_s, 3'h0};
 
 
 // TACCR0 Register
@@ -266,8 +267,9 @@ always @ (posedge mclk or posedge puc_rst)
   else                 tacctl1 <=  (tacctl1              | {14'h0000, cov1_set, ccifg1_set}) & {15'h7fff, ~ccifg1_clr};
 
 wire        cci1;
+wire        cci1_s;
 reg         scci1;
-wire [15:0] tacctl1_full = tacctl1 | {5'h00, scci1, 6'h00, cci1, 3'h0};
+wire [15:0] tacctl1_full = tacctl1 | {5'h00, scci1, 6'h00, cci1_s, 3'h0};
 
 
 // TACCR1 Register
@@ -298,8 +300,9 @@ always @ (posedge mclk or posedge puc_rst)
   else                 tacctl2 <=  (tacctl2              | {14'h0000, cov2_set, ccifg2_set}) & {15'h7fff, ~ccifg2_clr};
 
 wire        cci2;
+wire        cci2_s;
 reg         scci2;
-wire [15:0] tacctl2_full = tacctl2 | {5'h00, scci2, 6'h00, cci2, 3'h0};
+wire [15:0] tacctl2_full = tacctl2 | {5'h00, scci2, 6'h00, cci2_s, 3'h0};
 
 
 // TACCR2 Register
@@ -473,10 +476,6 @@ assign cci2 = (tacctl2[`TACCISx]==2'b00) ? ta_cci2a :
               (tacctl2[`TACCISx]==2'b10) ?     1'b0 : 1'b1;
 
 // CCIx synchronization
-wire cci0_s;
-wire cci1_s;
-wire cci2_s;
-
 omsp_sync_cell sync_cell_cci0 (
     .data_out (cci0_s),
     .data_in  (cci0),

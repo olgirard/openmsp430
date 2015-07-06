@@ -43,7 +43,7 @@ WAIT_FUNC:
 	dec r14
 	jnz WAIT_FUNC
 	ret
-	
+
 main:
  	mov  #DMEM_250, r1 	; # Initialize stack pointer
 	mov  #0x0000, &DMEM_200
@@ -62,15 +62,23 @@ main:
 	mov  #0x0000, &TACCR0
 	mov  #0x0000, &TACCTL0  ; # CCIxA
  	mov  #0x0001, &DMEM_200
+	nop
+	nop
 	mov &TACCTL0, &DMEM_202
  	mov  #0x0002, &DMEM_200
+	nop
+	nop
 	mov &TACCTL0, &DMEM_204
  	mov  #0x0003, &DMEM_200
 
 	mov  #0x1000, &TACCTL0  ; # CCIxB
  	mov  #0x0004, &DMEM_200
+	nop
+	nop
 	mov &TACCTL0, &DMEM_202
  	mov  #0x0005, &DMEM_200
+	nop
+	nop
 	mov &TACCTL0, &DMEM_204
  	mov  #0x0006, &DMEM_200
 
@@ -93,15 +101,23 @@ main:
 	mov  #0x0000, &TACCR1
 	mov  #0x0000, &TACCTL1  ; # CCIxA
  	mov  #0x0011, &DMEM_200
+	nop
+	nop
 	mov &TACCTL1, &DMEM_202
  	mov  #0x0012, &DMEM_200
+	nop
+	nop
 	mov &TACCTL1, &DMEM_204
  	mov  #0x0013, &DMEM_200
 
 	mov  #0x1000, &TACCTL1  ; # CCIxB
  	mov  #0x0014, &DMEM_200
+	nop
+	nop
 	mov &TACCTL1, &DMEM_202
  	mov  #0x0015, &DMEM_200
+	nop
+	nop
 	mov &TACCTL1, &DMEM_204
  	mov  #0x0016, &DMEM_200
 
@@ -124,15 +140,23 @@ main:
 	mov  #0x0000, &TACCR2
 	mov  #0x0000, &TACCTL2  ; # CCIxA
  	mov  #0x0021, &DMEM_200
+	nop
+	nop
 	mov &TACCTL2, &DMEM_202
  	mov  #0x0022, &DMEM_200
+	nop
+	nop
 	mov &TACCTL2, &DMEM_204
  	mov  #0x0023, &DMEM_200
 
 	mov  #0x1000, &TACCTL2  ; # CCIxB
  	mov  #0x0024, &DMEM_200
+	nop
+	nop
 	mov &TACCTL2, &DMEM_202
  	mov  #0x0025, &DMEM_200
+	nop
+	nop
 	mov &TACCTL2, &DMEM_204
  	mov  #0x0026, &DMEM_200
 
@@ -150,8 +174,8 @@ main:
 	mov &TACCTL2, &DMEM_204
  	mov  #0x002C, &DMEM_200
 
-	
-	dint		
+
+	dint
 	mov  #0x0000, &DMEM_200
 	mov  #0x1000, r15
 
@@ -180,7 +204,7 @@ main:
 	mov  &TACCR0, &DMEM_204
 	mov  #0x0000, &TACCTL0
  	mov  #0x0003, &DMEM_200
-	
+
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0x4110, &TACCTL0  ; # Rising edge, Interrupt enable
@@ -197,7 +221,7 @@ main:
 	mov  &TACCR0, &DMEM_204
 	mov  #0x0000, &TACCTL0
  	mov  #0x0006, &DMEM_200
-	
+
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0x8110, &TACCTL0  ; # Falling edge, Interrupt enable
@@ -214,7 +238,7 @@ main:
 	mov  &TACCR0, &DMEM_204
 	mov  #0x0000, &TACCTL0
  	mov  #0x0009, &DMEM_200
-	
+
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0xC110, &TACCTL0  ; # Rising/Falling edge, Interrupt enable
@@ -231,7 +255,7 @@ main:
 	mov  &TACCR0, &DMEM_204
 	mov  #0x0000, &TACCTL0
  	mov  #0x000C, &DMEM_200
-	
+
 
 	                        ; # --------- Comparator 1 ----------
 	mov  #0x0204, &TACTL
@@ -250,7 +274,7 @@ main:
 	mov  &TACCR1, &DMEM_204
 	mov  #0x0000, &TACCTL1
  	mov  #0x0003, &DMEM_200
-	
+
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0x4110, &TACCTL1  ; # Rising edge, Interrupt enable
@@ -267,7 +291,7 @@ main:
 	mov  &TACCR1, &DMEM_204
 	mov  #0x0000, &TACCTL1
  	mov  #0x0006, &DMEM_200
-	
+
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0x8110, &TACCTL1  ; # Falling edge, Interrupt enable
@@ -284,7 +308,7 @@ main:
 	mov  &TACCR1, &DMEM_204
 	mov  #0x0000, &TACCTL1
  	mov  #0x0009, &DMEM_200
-	
+
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0xC110, &TACCTL1  ; # Rising/Falling edge, Interrupt enable
@@ -302,7 +326,7 @@ main:
 	mov  #0x0000, &TACCTL1
  	mov  #0x000C, &DMEM_200
 
-	
+
 	                        ; # --------- Comparator 2 ----------
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
@@ -320,7 +344,7 @@ main:
 	mov  &TACCR2, &DMEM_204
 	mov  #0x0000, &TACCTL2
  	mov  #0x0003, &DMEM_200
-	
+
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0x4110, &TACCTL2  ; # Rising edge, Interrupt enable
@@ -337,7 +361,7 @@ main:
 	mov  &TACCR2, &DMEM_204
 	mov  #0x0000, &TACCTL2
  	mov  #0x0006, &DMEM_200
-	
+
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0x8110, &TACCTL2  ; # Falling edge, Interrupt enable
@@ -354,7 +378,7 @@ main:
 	mov  &TACCR2, &DMEM_204
 	mov  #0x0000, &TACCTL2
  	mov  #0x0009, &DMEM_200
-	
+
 	mov  #0x0204, &TACTL
 	mov  #0x1234, &TAR
 	mov  #0xC110, &TACCTL2  ; # Rising/Falling edge, Interrupt enable
@@ -371,12 +395,12 @@ main:
 	mov  &TACCR2, &DMEM_204
 	mov  #0x0000, &TACCTL2
  	mov  #0x000C, &DMEM_200
-	
 
-	dint		
+
+	dint
 	mov  #0x0000, &DMEM_200
 	mov  #0x2000, r15
-	
+
        /* --------------   TIMER A TEST:  CAPTURE OVERFLOW ----------------- */
 
 	mov  #0x0200, &TACTL
@@ -469,11 +493,11 @@ main:
  	mov  #0x0000, &TACCTL2
   	mov  #0x0006, &DMEM_200
 
-	dint		
+	dint
 	mov  #0x0000, &DMEM_200
 	mov  #0x3000, r15
 
-		
+
         /* ----------------------         END OF TEST        --------------- */
 end_of_test:
 	nop
@@ -486,7 +510,7 @@ TIMERA_CCR0_VECTOR:
 	inc  &DMEM_200
 	reti
 
-	
+
 TIMERA_TAIV_VECTOR:
 	mov     &TAR, &DMEM_204
 	mov    &TAIV, &DMEM_206
