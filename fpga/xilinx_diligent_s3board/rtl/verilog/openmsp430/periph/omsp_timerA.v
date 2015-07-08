@@ -28,7 +28,7 @@
 //----------------------------------------------------------------------------
 //
 // *File Name: omsp_timerA.v
-// 
+//
 // *Module Description:
 //                       Timer A top-level
 //
@@ -185,14 +185,14 @@ wire [DEC_SZ-1:0] reg_rd    = reg_dec & {512{reg_read}};
 //============================================================================
 
 // TACTL Register
-//-----------------   
+//-----------------
 reg   [9:0] tactl;
 
 wire        tactl_wr = reg_wr[TACTL];
 wire        taclr    = tactl_wr & per_din[`TACLR];
 wire        taifg_set;
 wire        taifg_clr;
-   
+
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)       tactl <=  10'h000;
   else if (tactl_wr) tactl <=  ((per_din[9:0] & 10'h3f3) | {9'h000, taifg_set}) & {9'h1ff, ~taifg_clr};
@@ -200,7 +200,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 
 // TAR Register
-//-----------------   
+//-----------------
 reg  [15:0] tar;
 
 wire        tar_wr = reg_wr[TAR];
@@ -212,7 +212,7 @@ wire        tar_dec;
 wire [15:0] tar_add  = tar_inc ? 16'h0001 :
                        tar_dec ? 16'hffff : 16'h0000;
 wire [15:0] tar_nxt  = tar_clr ? 16'h0000 : (tar+tar_add);
-  
+
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)                     tar <=  16'h0000;
   else if  (tar_wr)                tar <=  per_din;
@@ -221,12 +221,12 @@ always @ (posedge mclk or posedge puc_rst)
 
 
 // TACCTL0 Register
-//------------------   
+//------------------
 reg  [15:0] tacctl0;
 
 wire        tacctl0_wr = reg_wr[TACCTL0];
 wire        ccifg0_set;
-wire        cov0_set;   
+wire        cov0_set;
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)         tacctl0  <=  16'h0000;
@@ -234,12 +234,13 @@ always @ (posedge mclk or posedge puc_rst)
   else                 tacctl0  <=  (tacctl0              | {14'h0000, cov0_set, ccifg0_set}) & {15'h7fff, ~irq_ta0_acc};
 
 wire        cci0;
+wire        cci0_s;
 reg         scci0;
-wire [15:0] tacctl0_full = tacctl0 | {5'h00, scci0, 6'h00, cci0, 3'h0};
+wire [15:0] tacctl0_full = tacctl0 | {5'h00, scci0, 6'h00, cci0_s, 3'h0};
 
-   
+
 // TACCR0 Register
-//------------------   
+//------------------
 reg  [15:0] taccr0;
 
 wire        taccr0_wr = reg_wr[TACCR0];
@@ -250,28 +251,29 @@ always @ (posedge mclk or posedge puc_rst)
   else if (taccr0_wr) taccr0 <=  per_din;
   else if (cci0_cap)  taccr0 <=  tar;
 
-   
+
 // TACCTL1 Register
-//------------------   
+//------------------
 reg  [15:0] tacctl1;
 
 wire        tacctl1_wr = reg_wr[TACCTL1];
 wire        ccifg1_set;
 wire        ccifg1_clr;
-wire        cov1_set;   
-   
+wire        cov1_set;
+
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)         tacctl1 <=  16'h0000;
   else if (tacctl1_wr) tacctl1 <=  ((per_din & 16'hf9f7) | {14'h0000, cov1_set, ccifg1_set}) & {15'h7fff, ~ccifg1_clr};
   else                 tacctl1 <=  (tacctl1              | {14'h0000, cov1_set, ccifg1_set}) & {15'h7fff, ~ccifg1_clr};
 
 wire        cci1;
+wire        cci1_s;
 reg         scci1;
-wire [15:0] tacctl1_full = tacctl1 | {5'h00, scci1, 6'h00, cci1, 3'h0};
+wire [15:0] tacctl1_full = tacctl1 | {5'h00, scci1, 6'h00, cci1_s, 3'h0};
 
-   
+
 // TACCR1 Register
-//------------------   
+//------------------
 reg  [15:0] taccr1;
 
 wire        taccr1_wr = reg_wr[TACCR1];
@@ -284,26 +286,27 @@ always @ (posedge mclk or posedge puc_rst)
 
 
 // TACCTL2 Register
-//------------------   
+//------------------
 reg  [15:0] tacctl2;
 
 wire        tacctl2_wr = reg_wr[TACCTL2];
 wire        ccifg2_set;
 wire        ccifg2_clr;
-wire        cov2_set;   
-   
+wire        cov2_set;
+
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)         tacctl2 <=  16'h0000;
   else if (tacctl2_wr) tacctl2 <=  ((per_din & 16'hf9f7) | {14'h0000, cov2_set, ccifg2_set}) & {15'h7fff, ~ccifg2_clr};
   else                 tacctl2 <=  (tacctl2              | {14'h0000, cov2_set, ccifg2_set}) & {15'h7fff, ~ccifg2_clr};
 
 wire        cci2;
+wire        cci2_s;
 reg         scci2;
-wire [15:0] tacctl2_full = tacctl2 | {5'h00, scci2, 6'h00, cci2, 3'h0};
+wire [15:0] tacctl2_full = tacctl2 | {5'h00, scci2, 6'h00, cci2_s, 3'h0};
 
-   
+
 // TACCR2 Register
-//------------------   
+//------------------
 reg  [15:0] taccr2;
 
 wire        taccr2_wr = reg_wr[TACCR2];
@@ -314,13 +317,13 @@ always @ (posedge mclk or posedge puc_rst)
   else if (taccr2_wr) taccr2 <=  per_din;
   else if (cci2_cap)  taccr2 <=  tar;
 
-   
-// TAIV Register
-//------------------   
 
-wire [3:0] taiv = (tacctl1[`TACCIFG] & tacctl1[`TACCIE]) ? 4'h2 : 
-                  (tacctl2[`TACCIFG] & tacctl2[`TACCIE]) ? 4'h4 : 
-                  (tactl[`TAIFG]     & tactl[`TAIE])     ? 4'hA : 
+// TAIV Register
+//------------------
+
+wire [3:0] taiv = (tacctl1[`TACCIFG] & tacctl1[`TACCIE]) ? 4'h2 :
+                  (tacctl2[`TACCIFG] & tacctl2[`TACCIE]) ? 4'h4 :
+                  (tactl[`TAIFG]     & tactl[`TAIE])     ? 4'hA :
                                                            4'h0;
 
 assign     ccifg1_clr = (reg_rd[TAIV] | reg_wr[TAIV]) & (taiv==4'h2);
@@ -353,7 +356,7 @@ wire [15:0] per_dout   =  tactl_rd   |
                           taccr2_rd  |
                           taiv_rd;
 
-   
+
 //============================================================================
 // 5) Timer A counter control
 //============================================================================
@@ -382,23 +385,23 @@ omsp_sync_cell sync_cell_inclk (
 //-----------------------------------------------------------
 
 reg  taclk_dly;
-   
+
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst) taclk_dly <=  1'b0;
-  else         taclk_dly <=  taclk_s;    
+  else         taclk_dly <=  taclk_s;
 
 wire taclk_en = taclk_s & ~taclk_dly;
 
-   
+
 reg  inclk_dly;
-   
+
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst) inclk_dly <=  1'b0;
-  else         inclk_dly <=  inclk_s;    
+  else         inclk_dly <=  inclk_s;
 
 wire inclk_en = inclk_s & ~inclk_dly;
 
-   
+
 // Timer clock input mux
 //-----------------------------------------------------------
 
@@ -406,7 +409,7 @@ wire sel_clk = (tactl[`TASSELx]==2'b00) ? taclk_en :
                (tactl[`TASSELx]==2'b01) ?  aclk_en :
                (tactl[`TASSELx]==2'b10) ? smclk_en : inclk_en;
 
-     
+
 // Generate update pluse for the counter (<=> divided clock)
 //-----------------------------------------------------------
 reg [2:0] clk_div;
@@ -415,20 +418,20 @@ assign    tar_clk = sel_clk & ((tactl[`TAIDx]==2'b00) ?  1'b1         :
                                (tactl[`TAIDx]==2'b01) ?  clk_div[0]   :
                                (tactl[`TAIDx]==2'b10) ? &clk_div[1:0] :
                                                         &clk_div[2:0]);
-	  
+
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)                               clk_div <=  3'h0;
   else if  (tar_clk | taclr)                 clk_div <=  3'h0;
   else if ((tactl[`TAMCx]!=2'b00) & sel_clk) clk_div <=  clk_div+3'h1;
 
-  
+
 // Time counter control signals
 //-----------------------------------------------------------
 
 assign  tar_clr   = ((tactl[`TAMCx]==2'b01) & (tar>=taccr0))         |
                     ((tactl[`TAMCx]==2'b11) & (taccr0==16'h0000));
 
-assign  tar_inc   =  (tactl[`TAMCx]==2'b01) | (tactl[`TAMCx]==2'b10) | 
+assign  tar_inc   =  (tactl[`TAMCx]==2'b01) | (tactl[`TAMCx]==2'b10) |
                     ((tactl[`TAMCx]==2'b11) & ~tar_dec);
 
 reg tar_dir;
@@ -441,10 +444,10 @@ always @ (posedge mclk or posedge puc_rst)
        else if       (tar>=taccr0)    tar_dir <=  1'b1;
     end
   else                                tar_dir <=  1'b0;
-   
+
 assign tar_dec = tar_dir | ((tactl[`TAMCx]==2'b11) & (tar>=taccr0));
 
-   
+
 //============================================================================
 // 6) Timer A comparator
 //============================================================================
@@ -473,10 +476,6 @@ assign cci2 = (tacctl2[`TACCISx]==2'b00) ? ta_cci2a :
               (tacctl2[`TACCISx]==2'b10) ?     1'b0 : 1'b1;
 
 // CCIx synchronization
-wire cci0_s;
-wire cci1_s;
-wire cci2_s;
-
 omsp_sync_cell sync_cell_cci0 (
     .data_out (cci0_s),
     .data_in  (cci0),
@@ -515,7 +514,7 @@ always @ (posedge mclk or posedge puc_rst)
        cci2_dly <=  cci2_s;
     end
 
-   
+
 // Generate SCCIx
 //------------------
 
@@ -585,7 +584,7 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst) cci2_sync <=  1'b0;
   else         cci2_sync <=  (tar_clk & cci2_evt_s) | (tar_clk & cci2_evt & ~cci2_evt_s);
 
-   
+
 // Generate final capture command
 //-----------------------------------
 
@@ -593,7 +592,7 @@ assign cci0_cap  = tacctl0[`TASCS] ? cci0_sync : cci0_evt;
 assign cci1_cap  = tacctl1[`TASCS] ? cci1_sync : cci1_evt;
 assign cci2_cap  = tacctl2[`TASCS] ? cci2_sync : cci2_evt;
 
-   
+
 // Generate capture overflow flag
 //-----------------------------------
 
@@ -603,14 +602,14 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)             cap0_taken <=  1'b0;
   else if (cci0_cap)       cap0_taken <=  1'b1;
   else if (cap0_taken_clr) cap0_taken <=  1'b0;
-   
+
 reg  cap1_taken;
 wire cap1_taken_clr = reg_rd[TACCR1] | (tacctl1_wr & tacctl1[`TACOV] & ~per_din[`TACOV]);
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)             cap1_taken <=  1'b0;
   else if (cci1_cap)       cap1_taken <=  1'b1;
   else if (cap1_taken_clr) cap1_taken <=  1'b0;
-      
+
 reg  cap2_taken;
 wire cap2_taken_clr = reg_rd[TACCR2] | (tacctl2_wr & tacctl2[`TACOV] & ~per_din[`TACOV]);
 always @ (posedge mclk or posedge puc_rst)
@@ -618,12 +617,12 @@ always @ (posedge mclk or posedge puc_rst)
   else if (cci2_cap)       cap2_taken <=  1'b1;
   else if (cap2_taken_clr) cap2_taken <=  1'b0;
 
-   
+
 assign cov0_set = cap0_taken & cci0_cap & ~reg_rd[TACCR0];
-assign cov1_set = cap1_taken & cci1_cap & ~reg_rd[TACCR1];   
+assign cov1_set = cap1_taken & cci1_cap & ~reg_rd[TACCR1];
 assign cov2_set = cap2_taken & cci2_cap & ~reg_rd[TACCR2];
-  
-      
+
+
 //============================================================================
 // 8) Timer A output unit
 //============================================================================
@@ -661,7 +660,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign  ta_out0_en = ~tacctl0[`TACAP];
 
-   
+
 // Output unit 1
 //-------------------
 reg  ta_out1;
@@ -695,7 +694,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign  ta_out1_en = ~tacctl1[`TACAP];
 
-   
+
 // Output unit 2
 //-------------------
 reg  ta_out2;
@@ -729,7 +728,7 @@ always @ (posedge mclk or posedge puc_rst)
 
 assign  ta_out2_en = ~tacctl2[`TACAP];
 
-   
+
 //============================================================================
 // 9) Timer A interrupt generation
 //============================================================================
@@ -743,13 +742,13 @@ assign   ccifg0_set  = tacctl0[`TACAP] ? cci0_cap : (tar_clk &  ((tactl[`TAMCx]!
 assign   ccifg1_set  = tacctl1[`TACAP] ? cci1_cap : (tar_clk &  ((tactl[`TAMCx]!=2'b00) & equ1));
 assign   ccifg2_set  = tacctl2[`TACAP] ? cci2_cap : (tar_clk &  ((tactl[`TAMCx]!=2'b00) & equ2));
 
-  
+
 wire     irq_ta0    = (tacctl0[`TACCIFG] & tacctl0[`TACCIE]);
 
 wire     irq_ta1    = (tactl[`TAIFG]     & tactl[`TAIE])     |
                       (tacctl1[`TACCIFG] & tacctl1[`TACCIE]) |
                       (tacctl2[`TACCIFG] & tacctl2[`TACCIE]);
-   
+
 
 endmodule // omsp_timerA
 
