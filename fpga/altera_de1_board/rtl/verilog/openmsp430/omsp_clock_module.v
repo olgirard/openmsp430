@@ -418,9 +418,10 @@ wire cpu_en_wkup;
 
    // Register to prevent glitch propagation
    reg  dco_disable;
-   always @(posedge nodiv_mclk_n or posedge por)
+   wire dco_wkup_set_scan_observe;
+   always @(posedge nodiv_mclk or posedge por)
    if (por) dco_disable <= 1'b1;
-   else     dco_disable <= ~dco_enable_nxt;
+   else     dco_disable <= ~dco_enable_nxt | dco_wkup_set_scan_observe;
 
    // Note that a synchronizer is required if the MCLK mux is included
    wire dco_clk_n  = ~dco_clk;
@@ -432,7 +433,10 @@ wire cpu_en_wkup;
          .rst       (por)
       );
    `else
-      assign dco_enable     = ~dco_disable;
+      reg  dco_enable;
+      always @(posedge nodiv_mclk_n or posedge por)
+      if (por) dco_enable <= 1'b0;
+      else     dco_enable <= ~dco_disable;
    `endif
 
    // The DCO oscillator will get an asynchronous wakeup if:
@@ -455,19 +459,18 @@ wire cpu_en_wkup;
                                    );
 
    // Scan MUX to increase coverage
-   wire dco_wkup_clear;
-   omsp_scan_mux scan_mux_dco_wkup_clear (
-                                          .scan_mode    (scan_mode),
-                                          .data_in_scan (dco_wkup_set),
-                                          .data_in_func (1'b1),
-                                          .data_out     (dco_wkup_clear)
-                                         );
+   omsp_scan_mux scan_mux_dco_wkup_observe (
+                                            .scan_mode    (scan_mode),
+                                            .data_in_scan (dco_wkup_set),
+                                            .data_in_func (1'b0),
+                                            .data_out     (dco_wkup_set_scan_observe)
+                                           );
 
    // The wakeup is asynchronously set, synchronously released
    wire dco_wkup_n;
    omsp_sync_cell sync_cell_dco_wkup (
        .data_out  (dco_wkup_n),
-       .data_in   (dco_wkup_clear),
+       .data_in   (1'b1),
        .clk       (dco_clk_n),
        .rst       (dco_wkup_set_scan)
    );
@@ -512,9 +515,10 @@ wire cpu_en_wkup;
 
    // Register to prevent glitch propagation
    reg  lfxt_disable;
-   always @(posedge nodiv_mclk_n or posedge por)
+   wire lfxt_wkup_set_scan_observe;
+   always @(posedge nodiv_mclk or posedge por)
    if (por) lfxt_disable <= 1'b1;
-   else     lfxt_disable <= ~lfxt_enable_nxt;
+   else     lfxt_disable <= ~lfxt_enable_nxt | lfxt_wkup_set_scan_observe;
 
    // Synchronize the OSCOFF control signal to the LFXT clock domain
    wire lfxt_clk_n  = ~lfxt_clk;
@@ -545,19 +549,18 @@ wire cpu_en_wkup;
                                     );
 
    // Scan MUX to increase coverage
-   wire lfxt_wkup_clear;
-   omsp_scan_mux scan_mux_lfxt_wkup_clear (
-                                           .scan_mode    (scan_mode),
-                                           .data_in_scan (lfxt_wkup_set),
-                                           .data_in_func (1'b1),
-                                           .data_out     (lfxt_wkup_clear)
-                                          );
+   omsp_scan_mux scan_mux_lfxt_wkup_observe (
+                                             .scan_mode    (scan_mode),
+                                             .data_in_scan (lfxt_wkup_set),
+                                             .data_in_func (1'b0),
+                                             .data_out     (lfxt_wkup_set_scan_observe)
+                                            );
 
    // The wakeup is asynchronously set, synchronously released
    wire lfxt_wkup_n;
    omsp_sync_cell sync_cell_lfxt_wkup (
        .data_out  (lfxt_wkup_n),
-       .data_in   (lfxt_wkup_clear),
+       .data_in   (1'b1),
        .clk       (lfxt_clk_n),
        .rst       (lfxt_wkup_set_scan)
    );

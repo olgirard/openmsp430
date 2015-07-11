@@ -323,16 +323,17 @@ wire fe_pmem_save    = (~fe_pmem_en &  fe_pmem_en_dly) & ~cpu_halt_st;
 wire fe_pmem_restore = ( fe_pmem_en & ~fe_pmem_en_dly) |  cpu_halt_st;
 
 `ifdef CLOCK_GATING
-wire mclk_bckup;
-omsp_clock_gate clock_gate_bckup (.gclk(mclk_bckup),
+wire mclk_bckup_gated;
+omsp_clock_gate clock_gate_bckup (.gclk(mclk_bckup_gated),
                                   .clk (mclk), .enable(fe_pmem_save), .scan_enable(scan_enable));
+`define MCLK_BCKUP           mclk_bckup_gated
 `else
-wire UNUSED_scan_enable = scan_enable;
-wire mclk_bckup         = mclk;
+wire    UNUSED_scan_enable = scan_enable;
+`define MCLK_BCKUP           mclk        // use macro to solve delta cycle issues with some mixed VHDL/Verilog simulators
 `endif
 
 reg  [15:0] pmem_dout_bckup;
-always @(posedge mclk_bckup or posedge puc_rst)
+always @(posedge `MCLK_BCKUP or posedge puc_rst)
   if (puc_rst)              pmem_dout_bckup     <=  16'h0000;
 `ifdef CLOCK_GATING
   else                      pmem_dout_bckup     <=  pmem_dout;
