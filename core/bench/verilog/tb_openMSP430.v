@@ -251,7 +251,7 @@ initial
        begin
           #25;   // 20 MHz
           dco_local_enable = (dco_enable===1) ? dco_enable : (dco_wkup===1);
-          if (dco_local_enable)
+          if (dco_local_enable | scan_mode)
             dco_clk = ~dco_clk;
        end
   end
