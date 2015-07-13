@@ -369,7 +369,7 @@
 // DCO_CLK and LFXT_CLK with the BCSCTL2.SELMx register.
 // When commented, DCO_CLK is selected.
 //-------------------------------------------------------
-//`define MCLK_MUX
+`define MCLK_MUX
 
 //-------------------------------------------------------
 // SMCLK: Clock Mux
@@ -379,7 +379,7 @@
 // DCO_CLK and LFXT_CLK with the BCSCTL2.SELS register.
 // When commented, DCO_CLK is selected.
 //-------------------------------------------------------
-//`define SMCLK_MUX
+`define SMCLK_MUX
 
 //-------------------------------------------------------
 // WATCHDOG: Clock Mux
@@ -391,7 +391,7 @@
 // WATCHDOG_NOMUX_ACLK define is uncommented, SMCLK is
 // selected otherwise.
 //-------------------------------------------------------
-//`define WATCHDOG_MUX
+`define WATCHDOG_MUX
 //`define WATCHDOG_NOMUX_ACLK
 
 
@@ -445,7 +445,7 @@
 // This allows to switch off the DCO oscillator in the
 // following low power modes: LPM1, LPM3, LPM4
 //-------------------------------------------------------
-//`define SCG0_EN
+`define SCG0_EN
 
 //-------------------------------------------------------
 // LOW POWER MODE: SCG1
@@ -467,6 +467,18 @@
 //-------------------------------------------------------
 `define OSCOFF_EN
 
+//-------------------------------------------------------
+// SCAN REPAIR NEG-EDGE CLOCKED FLIP-FLOPS
+//-------------------------------------------------------
+// When uncommented, a scan mux will be infered to
+// replace all inverted clocks with regular ones when
+// in scan mode.
+//
+// Note: standard scan insertion tool can usually deal
+//       with mixed rising/falling edge FF... so there
+//       is usually no need to uncomment this.
+//-------------------------------------------------------
+//`define SCAN_REPAIR_INV_CLOCKS
 
 `endif
 `endif
