@@ -467,6 +467,18 @@
 //-------------------------------------------------------
 `define OSCOFF_EN
 
+//-------------------------------------------------------
+// SCAN REPAIR NEG-EDGE CLOCKED FLIP-FLOPS
+//-------------------------------------------------------
+// When uncommented, a scan mux will be infered to
+// replace all inverted clocks with regular ones when
+// in scan mode.
+//
+// Note: standard scan insertion tool can usually deal
+//       with mixed rising/falling edge FF... so there
+//       is usually no need to uncomment this.
+//-------------------------------------------------------
+//`define SCAN_REPAIR_INV_CLOCKS
 
 `endif
 `endif
