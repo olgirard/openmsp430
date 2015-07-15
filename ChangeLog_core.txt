@@ -1,3 +1,23 @@
+2015-07-15 [r205]  
+
+	* Thanks again to Johan W. good feedback, the following updates are
+	  implemented: - Change code to fix delta cycle issues on some
+	  simulators in mixed VHDL/Verilog environment. - Update
+	  oscillators enable generation to relax a critical timing paths in
+	  the ASIC version. - Add option to scan fix inverted clocks in the
+	  ASIC version (disabled by default as this is supported by most
+	  tools).
+
+2015-07-08 [r204]  
+
+	* Fix DMA interface RTL merge problem (defines got wrong values).
+	  Fix CDC issue with the timerA (thanks to Johan for catching
+	  that).
+
+2015-07-01 [r202]  
+
+	* Add DMA interface support + LINT cleanup
+
 2015-01-21 [r200]  
 
 	* Major verificaiton and benchmark update to support both MSPGCC
