@@ -171,7 +171,11 @@ else
 fi
 
 # Source the extracted configuration file
-source pmem.sh
+if [ `uname -o` = "Cygwin" ]
+then
+dos2unix pmem.sh
+fi
+source   pmem.sh
 
 # Compile assembler code
 echo "Compile, link & generate IHEX file (Program Memory: $pmemsize B, Data Memory: $dmemsize B, Peripheral Space: $persize B)..."
