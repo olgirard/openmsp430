@@ -142,7 +142,7 @@ echo " Seed: $seed"
 echo ""
 
 # Create links
-if [ `uname -o` = "Cygwin" ]
+if [ `uname` = "Cygwin" ]
 then
     cp $asmfile pmem.s43
     cp $verfile stimulus.v
@@ -154,13 +154,13 @@ fi
 # Make local copy of the openMSP403 configuration file
 # and prepare it for MSPGCC preprocessing
 cp  $incfile  ./pmem.h
-sed -i 's/`ifdef/#ifdef/g'         ./pmem.h
-sed -i 's/`else/#else/g'           ./pmem.h
-sed -i 's/`endif/#endif/g'         ./pmem.h
-sed -i 's/`define/#define/g'       ./pmem.h
-sed -i 's/`include/\/\/#include/g' ./pmem.h
-sed -i 's/`//g'                    ./pmem.h
-sed -i "s/'//g"                    ./pmem.h
+sed -ie 's/`ifdef/#ifdef/g'         ./pmem.h
+sed -ie 's/`else/#else/g'           ./pmem.h
+sed -ie 's/`endif/#endif/g'         ./pmem.h
+sed -ie 's/`define/#define/g'       ./pmem.h
+sed -ie 's/`include/\/\/#include/g' ./pmem.h
+sed -ie 's/`//g'                    ./pmem.h
+sed -ie "s/'//g"                    ./pmem.h
 
 # Use MSPGCC preprocessor to extract the Program, Data
 # and Peripheral memory sizes
@@ -171,7 +171,7 @@ else
 fi
 
 # Source the extracted configuration file
-if [ `uname -o` = "Cygwin" ]
+if [ `uname` = "Cygwin" ]
 then
 dos2unix pmem.sh
 fi

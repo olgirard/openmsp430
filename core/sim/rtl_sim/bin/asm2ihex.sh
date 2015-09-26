@@ -52,7 +52,7 @@ if [ -z "$MSPGCC_PFX" ]; then
     else
 	MSPGCC_PFX=msp430-elf
     fi
-fi  
+fi
 
 ###############################################################################
 #               Check if definition & assembler files exist                   #
@@ -84,22 +84,22 @@ STACK_INIT=$((PER_SIZE+0x0080))
 
 cp  $3  ./pmem.x
 cp  $4  ./pmem_defs.asm
-sed -i "s/PMEM_BASE/$PMEM_BASE/g"         pmem.x
-sed -i "s/PMEM_SIZE/$PMEM_SIZE/g"         pmem.x
-sed -i "s/DMEM_SIZE/$DMEM_SIZE/g"         pmem.x
-sed -i "s/PER_SIZE/$PER_SIZE/g"           pmem.x
-sed -i "s/STACK_INIT/$STACK_INIT/g"       pmem.x
+sed -ie "s/PMEM_BASE/$PMEM_BASE/g"         pmem.x
+sed -ie "s/PMEM_SIZE/$PMEM_SIZE/g"         pmem.x
+sed -ie "s/DMEM_SIZE/$DMEM_SIZE/g"         pmem.x
+sed -ie "s/PER_SIZE/$PER_SIZE/g"           pmem.x
+sed -ie "s/STACK_INIT/$STACK_INIT/g"       pmem.x
 
-sed -i "s/PMEM_SIZE/$PMEM_SIZE/g"         pmem_defs.asm
-sed -i "s/PER_SIZE_HEX/$PER_SIZE/g"       pmem_defs.asm
+sed -ie "s/PMEM_SIZE/$PMEM_SIZE/g"         pmem_defs.asm
+sed -ie "s/PER_SIZE_HEX/$PER_SIZE/g"       pmem_defs.asm
 if [ $MSPGCC_PFX == "msp430-elf" ]; then
-    sed -i "s/PER_SIZE/.data/g"           pmem_defs.asm
-    sed -i "s/PMEM_BASE_VAL/.text/g"      pmem_defs.asm
-    sed -i "s/PMEM_EDE_SIZE/0/g"          pmem_defs.asm
+    sed -ie "s/PER_SIZE/.data/g"           pmem_defs.asm
+    sed -ie "s/PMEM_BASE_VAL/.text/g"      pmem_defs.asm
+    sed -ie "s/PMEM_EDE_SIZE/0/g"          pmem_defs.asm
 else
-    sed -i "s/PER_SIZE/$PER_SIZE/g"       pmem_defs.asm
-    sed -i "s/PMEM_BASE_VAL/$PMEM_BASE/g" pmem_defs.asm
-    sed -i "s/PMEM_EDE_SIZE/$PMEM_SIZE/g" pmem_defs.asm
+    sed -ie "s/PER_SIZE/$PER_SIZE/g"       pmem_defs.asm
+    sed -ie "s/PMEM_BASE_VAL/$PMEM_BASE/g" pmem_defs.asm
+    sed -ie "s/PMEM_EDE_SIZE/$PMEM_SIZE/g" pmem_defs.asm
 fi
 
 

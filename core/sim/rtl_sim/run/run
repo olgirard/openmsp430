@@ -22,7 +22,7 @@ export MSPGCC_PFX
 #                   - vcs       : VCS
 #                   - vsim      : Modelsim
 #                   - isim      : Xilinx simulator
-OMSP_SIMULATOR=ncverilog
+OMSP_SIMULATOR=iverilog
 export OMSP_SIMULATOR
 
 rm -rf cov_work
