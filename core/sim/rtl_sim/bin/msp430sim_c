@@ -123,7 +123,7 @@ else
 fi
 
 # Source the extracted configuration file
-if [ `uname` = "Cygwin" ]
+if [[ $(uname -s) == CYGWIN* ]];
 then
 dos2unix pmem.sh
 fi
@@ -137,7 +137,7 @@ make
 cd ../../run/
 
 # Create links
-if [ `uname` = "Cygwin" ]
+if [[ $(uname -s) == CYGWIN* ]];
 then
     cp $elffile pmem.elf
     cp $verfile stimulus.v

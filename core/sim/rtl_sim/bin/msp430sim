@@ -142,7 +142,7 @@ echo " Seed: $seed"
 echo ""
 
 # Create links
-if [ `uname` = "Cygwin" ]
+if [[ $(uname -s) == CYGWIN* ]];
 then
     cp $asmfile pmem.s43
     cp $verfile stimulus.v
@@ -171,7 +171,7 @@ else
 fi
 
 # Source the extracted configuration file
-if [ `uname` = "Cygwin" ]
+if [[ $(uname -s) == CYGWIN* ]];
 then
 dos2unix pmem.sh
 fi

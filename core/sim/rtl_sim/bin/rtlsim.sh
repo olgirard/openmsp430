@@ -82,7 +82,7 @@ if [ "${OMSP_SIMULATOR:-iverilog}" = iverilog ]; then
         iverilog -o simv -c $3 -D SEED=$4 -D $5
     fi
 
-    if [ `uname` = "Cygwin" ]
+    if [[ $(uname -s) == CYGWIN* ]];
     then
      	vvp.exe ./simv
     else
