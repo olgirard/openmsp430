@@ -21,7 +21,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #-----------------------------------------------------------------------------------------------------------
-# 
+#
 # File Name:   dbg_functions.tcl
 #
 # Author(s):
@@ -75,7 +75,7 @@
 #               - ClrStatus       (CpuNr)
 #               - GetChipAlias    (CpuNr)
 #               - GetAllowedSpeeds()
-# 
+#
 #-----------------------------------------------------------------------------------------------------------
 
 #==========================================================================================================#
@@ -115,8 +115,8 @@ for {set i 0} {$i<128} {incr i} {
 #  omsp_info(<cpu_nr>,hw_break)             ->  Number of hardware breakpoints
 #  omsp_info(<cpu_nr>,cpu_ver)              ->  From CPU_ID  : CPU Version
 #  omsp_info(<cpu_nr>,user_ver)             ->  From CPU_ID  : User version
-#  omsp_info(<cpu_nr>,per_size)             ->  From CPU_ID  : Peripheral address size 
-#  omsp_info(<cpu_nr>,dmem_size)            ->  From CPU_ID  : Data memory size 
+#  omsp_info(<cpu_nr>,per_size)             ->  From CPU_ID  : Peripheral address size
+#  omsp_info(<cpu_nr>,dmem_size)            ->  From CPU_ID  : Data memory size
 #  omsp_info(<cpu_nr>,pmem_size)            ->  From CPU_ID  : Program memory size
 #  omsp_info(<cpu_nr>,mpy)                  ->  From CPU_ID  : Hardware multiplier
 #  omsp_info(<cpu_nr>,asic)                 ->  From CPU_ID  : ASIC/FPGA version
@@ -127,15 +127,15 @@ for {set i 0} {$i<128} {incr i} {
 #  omsp_info(<cpu_nr>,extra,1,Contact)      ->  From XML File: Contact person
 #  omsp_info(<cpu_nr>,extra,2,Email)        ->  From XML File: Email of contact person
 #  omsp_info(<cpu_nr>,extra,3,URL)          ->  From XML File: URL of the project
-#  omsp_info(<cpu_nr>,extra,4,per_size)     ->  From XML File: Custom Peripheral address size 
-#  omsp_info(<cpu_nr>,extra,5,dmem_size)    ->  From XML File: Custom Data memory size 
+#  omsp_info(<cpu_nr>,extra,4,per_size)     ->  From XML File: Custom Peripheral address size
+#  omsp_info(<cpu_nr>,extra,5,dmem_size)    ->  From XML File: Custom Data memory size
 #  omsp_info(<cpu_nr>,extra,6,pmem_size)    ->  From XML File: Custom Program memory size
 #  omsp_info(<cpu_nr>,extra,?,????)         ->  From XML File: ... any extra stuff
 #
 #==========================================================================================================#
 global omsp_info
 
-# Initialize connection status 
+# Initialize connection status
 set    omsp_info(connected) 0
 
 # Support up to 128 multicore implementations
@@ -169,7 +169,7 @@ source $scriptDir/dbg_i2c_usb-iss.tcl
 # Result     : 0 if error, 1 otherwise.                                       #
 #=============================================================================#
 proc GetDevice {CpuNr} {
-    
+
     global omsp_conf
     global omsp_info
 
@@ -213,7 +213,7 @@ proc GetDevice {CpuNr} {
 
         # Get number of hardware breakpoints
         set omsp_info($CpuNr,hw_break)  [InitBreakUnits $CpuNr]
-    
+
         # Connection with the CPU is now active
         set omsp_info($CpuNr,connected) 1
     }
@@ -260,7 +260,7 @@ proc ReleaseDevice {CpuNr Addr} {
 # Result     : 0 if error, 1 otherwise.                                       #
 #=============================================================================#
 proc ExecutePOR {CpuNr} {
-  
+
     global omsp_conf
 
     # Copy global variable to local for code readability
@@ -311,7 +311,7 @@ proc SetPC {CpuNr Addr} {
 # Result     : 0 if error, 1 otherwise.                                       #
 #=============================================================================#
 proc HaltCPU {CpuNr} {
-  
+
     global omsp_conf
 
     # Copy global variable to local for code readability
@@ -342,7 +342,7 @@ proc HaltCPU {CpuNr} {
 # Result     : 0 if error, 1 otherwise.                                       #
 #=============================================================================#
 proc ReleaseCPU {CpuNr} {
-  
+
     global omsp_conf
 
     # Copy global variable to local for code readability
@@ -555,7 +555,7 @@ proc VerifyMem {CpuNr StartAddr DataList {DumpOnError 0}} {
 # Result     : 0 if error, 1 otherwise.                                       #
 #=============================================================================#
 proc ExecutePOR_Halt {CpuNr} {
-  
+
     global omsp_conf
 
     # Copy global variable to local for code readability
@@ -602,7 +602,7 @@ proc GetCPU_ID {CpuNr} {
     set cpu_id_lo [${if}::dbg_rd $cpuaddr CPU_ID_LO]
     set cpu_id_hi [${if}::dbg_rd $cpuaddr CPU_ID_HI]
     set cpu_nr    [${if}::dbg_rd $cpuaddr CPU_NR]
-    
+
     # Check if value is valid
     if {[string eq "0x" $cpu_id_lo]} {
         set cpu_id_lo "0x0000"
@@ -613,7 +613,7 @@ proc GetCPU_ID {CpuNr} {
     if {[string eq "0x" $cpu_nr]} {
         set cpu_nr    "0x0000"
     }
-    
+
     # Remove the "0x" prefix
     regsub {0x} $cpu_id_lo {} cpu_id_lo
     regsub {0x} $cpu_id_hi {} cpu_id_hi
@@ -714,8 +714,8 @@ proc VerifyCPU_ID {CpuNr} {
 
     if {[string eq "0x00000000" $cpu_id_full] |
         ([string length $cpu_id_full]!=10)    |
-        ($omsp_info($CpuNr,cpu_ver) >3)       } {
-    
+        ($omsp_info($CpuNr,cpu_ver) >4)       } {
+
         puts "\n"
         puts "ERROR: cpu_id not valid: $cpu_id_full"
         puts ""
@@ -978,7 +978,7 @@ proc EraseROM {CpuNr} {
     set rom_size  [lindex [GetCPU_ID_SIZE $CpuNr] 0]
     set rom_start [expr 0x10000-$rom_size]
 
-    if {$rom_size!=-1} {   
+    if {$rom_size!=-1} {
         set DataList ""
         for {set i 0} {$i<$rom_size} {incr i} {
             lappend DataList 0x00
@@ -1266,7 +1266,7 @@ proc GetChipAlias {CpuNr} {
                 set currentTYPE  ""
             }
         }
-        
+
         # Detect the current TAG
         if {($type == "XML") & ($etype == "START")} {
             regsub {omsp:} $val {} val
