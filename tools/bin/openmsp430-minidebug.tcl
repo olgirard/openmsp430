@@ -22,16 +22,16 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #------------------------------------------------------------------------------
-# 
+#
 # File Name: openmsp430-minidebug.tcl
-# 
+#
 # Author(s):
 #             - Olivier Girard,    olgirard@gmail.com
 #
 #------------------------------------------------------------------------------
-# $Rev$
-# $LastChangedBy$
-# $LastChangedDate$
+# $Rev: 169 $
+# $LastChangedBy: olivier.girard $
+# $LastChangedDate: 2012-12-06 22:11:29 +0100 (Thu, 06 Dec 2012) $
 #------------------------------------------------------------------------------
 
 ###############################################################################
@@ -180,7 +180,7 @@ proc connect_openMSP430 {} {
             }
 
             # Disable connection section
-            .ctrl.connect.serial.p1       configure -state disabled     
+            .ctrl.connect.serial.p1       configure -state disabled
             .ctrl.connect.serial.p2       configure -state disabled
             .ctrl.connect.serial.connect  configure -state disabled
 
@@ -261,7 +261,7 @@ proc connect_openMSP430 {} {
             .ctrl.tclscript.ft.file       configure -state normal
             .ctrl.tclscript.ft.browse     configure -state normal
             .ctrl.tclscript.fb.read       configure -state normal
-            
+
             # Activate the code debugger section
             .code.rb.txt                  configure -state normal
             .code.rb.none                 configure -state normal
@@ -313,12 +313,12 @@ proc displayMore  { } {
     scrollbar .omsp_extra_info.extra.yscroll -orient vertical   -command {.omsp_extra_info.extra.text yview}
     pack      .omsp_extra_info.extra.yscroll -side right -fill both
     text      .omsp_extra_info.extra.text    -wrap word -height 20 -font TkFixedFont -yscrollcommand {.omsp_extra_info.extra.yscroll set}
-    pack      .omsp_extra_info.extra.text    -side right 
+    pack      .omsp_extra_info.extra.text    -side right
 
     # Create OK button
     button .omsp_extra_info.okay -text "OK" -font {-weight bold}  -command {destroy .omsp_extra_info}
     pack   .omsp_extra_info.okay -side bottom -expand true -fill x -padx 5 -pady {0 10}
-    
+
 
     # Fill the text widget will configuration info
     .omsp_extra_info.extra.text tag configure bold -font {-family TkFixedFont -weight bold}
@@ -366,7 +366,7 @@ proc displayMore  { } {
     }
 }
 
-proc highlightLine { line tagNameNew tagNameOld type } { 
+proc highlightLine { line tagNameNew tagNameOld type } {
     .code.text tag remove $tagNameOld 1.0     end
     .code.text tag remove $tagNameNew 1.0     end
 
@@ -385,7 +385,7 @@ proc highlightCode   { } {
     global color
 
     if {$codeSelect!=1} {
-        
+
         # Update PC
         regsub {0x} $reg(0) {} pc_val
         set code_match [.code.text search "$pc_val:" 1.0 end]
@@ -512,7 +512,7 @@ proc updateCodeView {} {
             set fp [open $temp_ihex_file r]
             set debug_info [read $fp]
             close $fp
-        
+
             file delete $temp_ihex_file
 
         } elseif {$codeSelect==2} {
@@ -588,7 +588,7 @@ proc readPmem {} {
     global pmemIHEX
     global mem_sizes
     global isPmemRead
-   
+
     # Get program memory start address
     set startAddr [format "0x%04x" [expr 0x10000-[lindex $mem_sizes 0]]]
 
@@ -606,7 +606,7 @@ proc readPmem {} {
 
     # Convert the binary content into Intel-HEX format
     set pmemIHEX [bin2ihex $startAddr $binData]
-    
+
     # Update debugger view
     set isPmemRead 1
     updateCodeView
@@ -650,7 +650,7 @@ proc loadProgram {load} {
     if {![string eq $binFileType "ihex"] & ![string eq $binFileType "hex"] & ![string eq $binFileType "elf"]} {
         .ctrl.load.info.l configure -text "[string toupper $binFileType] file format not supported\"" -fg red
         return 0
-    } 
+    }
 
     if {[string eq $binFileType "hex"]} {
         set binFileType "ihex"
@@ -686,7 +686,7 @@ proc loadProgram {load} {
         .ctrl.load.info.l configure -text "$errMsg" -fg red
         return 0
     }
- 
+
     # Wait until bin file is present on the filesystem
     if {![waitForFile $bin_file]} {
         .ctrl.load.info.l configure -text "Timeout: ELF to BIN file conversion problem with \"msp430-objcopy\" executable" -fg red
@@ -935,7 +935,7 @@ proc updateBreakpoint {brkpt_num} {
 
     # Set the breakpoint
     if {$brkpt(en_$brkpt_num)==1} {
-            
+
         # Make sure the specified address is an opcode
         regsub {0x} $brkpt(addr_$brkpt_num) {} brkpt_val
         set code_match [.code.text search "$brkpt_val:" 1.0 end]
@@ -945,7 +945,7 @@ proc updateBreakpoint {brkpt_num} {
 
         } else {
             set brkpt(data_$brkpt_num) [ReadMem $CpuNr 0 $brkpt(addr_$brkpt_num)]
-            
+
             # Only set a breakpoint if there is not already one there :-P
             if {$brkpt(data_$brkpt_num)=="0x4343"} {
                 .ctrl.cpu.brkpt.addr$brkpt_num    configure -state normal
@@ -1032,7 +1032,7 @@ proc selectCPU {CpuNr_next} {
         .menu.cpu2     configure -relief sunken  -font $font_bold   -fg "\#00ae00" -activeforeground "\#00ae00"
         .menu.cpu3     configure -relief raised  -font $font_normal -fg "\#000000" -activeforeground "\#000000"
 
-    } else { 
+    } else {
         .menu.cpu0     configure -relief raised  -font $font_normal -fg "\#000000" -activeforeground "\#000000"
         .menu.cpu1     configure -relief raised  -font $font_normal -fg "\#000000" -activeforeground "\#000000"
         .menu.cpu2     configure -relief raised  -font $font_normal -fg "\#000000" -activeforeground "\#000000"
@@ -1162,8 +1162,8 @@ proc advancedConfiguration {} {
 
     # Create OK/Cancel button
     button .omsp_adapt_config.ok.okay   -text "OK"     -command {set omsp_conf(interface) [string tolower "${temp_if}_${temp_adapt}"]
-                                                                 set omsp_nr              $temp_nrcore; 
-                                                                 set omsp_conf(0,cpuaddr) $temp_addr(0); 
+                                                                 set omsp_nr              $temp_nrcore;
+                                                                 set omsp_conf(0,cpuaddr) $temp_addr(0);
                                                                  set omsp_conf(1,cpuaddr) $temp_addr(1);
                                                                  set omsp_conf(2,cpuaddr) $temp_addr(2);
                                                                  set omsp_conf(3,cpuaddr) $temp_addr(3);
@@ -1226,13 +1226,13 @@ proc updateAdvancedConfiguration {{w ""} {sel ""}} {
 
             if {$temp_nrcore < 2} {.omsp_adapt_config.main.i2c.cpu1.s configure -state disabled
             } else                {.omsp_adapt_config.main.i2c.cpu1.s configure -state normal}
-        
+
             if {$temp_nrcore < 3} {.omsp_adapt_config.main.i2c.cpu2.s configure -state disabled
             } else                {.omsp_adapt_config.main.i2c.cpu2.s configure -state normal}
-        
+
             if {$temp_nrcore < 4} {.omsp_adapt_config.main.i2c.cpu3.s configure -state disabled
             } else                {.omsp_adapt_config.main.i2c.cpu3.s configure -state normal}
- 
+
 
         }
     }
@@ -1240,7 +1240,7 @@ proc updateAdvancedConfiguration {{w ""} {sel ""}} {
 
 proc saveContext {CpuNr} {
 
-    global current_file_name   
+    global current_file_name
     global brkpt
     global mem
     global mem_sizes
@@ -1283,7 +1283,7 @@ proc saveContext {CpuNr} {
 
 proc restoreContext {CpuNr} {
 
-    global current_file_name   
+    global current_file_name
     global brkpt
     global mem
     global mem_sizes
@@ -1302,7 +1302,7 @@ proc restoreContext {CpuNr} {
     set binFileType $backup($CpuNr,binFileType)
     set isPmemRead  $backup($CpuNr,isPmemRead)
     set codeSelect  $backup($CpuNr,codeSelect)
-    
+
     for {set i 0} {$i<16} {incr i} {
         set mem(address_$i) $backup($CpuNr,mem_addr_$i)
     }
@@ -1425,7 +1425,7 @@ pack   .ctrl.tclscript        -side top    -padx 10       -pady {0 20}   -fill x
 ####################################
 
 # Exit button
-button .menu.exit      -text "Exit" -command {clearBreakpoints; exit 0}
+button .menu.exit      -text "Exit" -command {clearBreakpoints; utils::uart_close; exit 0}
 pack   .menu.exit      -side left
 
 # CPU selection buttons
@@ -1442,7 +1442,7 @@ pack   .menu.cpu3      -side left -padx 10
 
 # openMSP430 label
 label  .menu.omsp      -text "openMSP430 mini debugger" -anchor center -fg "\#6a5acd" -font {-weight bold -size 16}
-pack   .menu.omsp      -side right -padx 20 
+pack   .menu.omsp      -side right -padx 20
 
 # Serial Port fields
 label    .ctrl.connect.serial.l1    -text "Device Port:"  -anchor w
@@ -1609,7 +1609,7 @@ pack   .ctrl.tclscript.ft.l      -side left -padx "0 10"
 entry  .ctrl.tclscript.ft.file   -width 58 -relief sunken -textvariable tcl_file_name -state disabled
 pack   .ctrl.tclscript.ft.file   -side left -padx 10
 button .ctrl.tclscript.ft.browse -text "Browse" -width 9 -state disabled -command {set tcl_file_name [tk_getOpenFile -filetypes {{{TCL Files} {.tcl}} {{All Files} *}}]}
-pack   .ctrl.tclscript.ft.browse -side right -padx 5 
+pack   .ctrl.tclscript.ft.browse -side right -padx 5
 frame  .ctrl.tclscript.fb
 pack   .ctrl.tclscript.fb        -side top -fill x
 button .ctrl.tclscript.fb.read   -text "Source TCL script !" -state disabled -command {if {[file exists $tcl_file_name]} {source $tcl_file_name}}

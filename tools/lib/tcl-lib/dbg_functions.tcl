@@ -28,9 +28,9 @@
 #             - Olivier Girard,    olgirard@gmail.com
 #
 #-----------------------------------------------------------------------------------------------------------
-# $Rev$
-# $LastChangedBy$
-# $LastChangedDate$
+# $Rev: 208 $
+# $LastChangedBy: olivier.girard $
+# $LastChangedDate: 2015-10-20 22:58:56 +0200 (Tue, 20 Oct 2015) $
 #-----------------------------------------------------------------------------------------------------------
 #
 # Description: Main utility functions for the openMSP430 serial debug
@@ -191,17 +191,18 @@ proc GetDevice {CpuNr} {
         set omsp_info(connected) 1
     }
 
-
     # Open Connection with the CPU
     if {$omsp_info($CpuNr,connected)==0} {
 
         # Connect to the CPU
         if {![${if}::dbg_connect $cpuaddr]} {
+	    utils::uart_close
             return 0
         }
 
         # Make sure the CPU_ID is correct
         if {![VerifyCPU_ID $CpuNr]} {
+	    utils::uart_close
             return 0
         }
 
@@ -244,6 +245,9 @@ proc ReleaseDevice {CpuNr Addr} {
         set result [expr $result+[SetPC      $CpuNr $Addr]]
         set result [expr $result+[ReleaseCPU $CpuNr]]
     }
+
+    # Close serial connection
+    utils::uart_close
 
     if {$result==3} {
         return 1

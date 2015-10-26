@@ -21,7 +21,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------------
-# 
+#
 # File Name:   dbg_utils.tcl
 #
 # Author(s):
@@ -41,9 +41,10 @@
 #
 #         - utils::uart_port_list  ()
 #         - utils::uart_open       (Device,       Baudrate)
+#         - utils::uart_close      ()
 #         - utils::uart_tx         (Data)
 #         - utils::uart_rx         (Format,       Length)
-# 
+#
 #----------------------------------------------------------------------------------
 namespace eval utils {
 
@@ -87,6 +88,9 @@ namespace eval utils {
 			      set serial_ports [list /dev/ttyS0 /dev/ttyS1 /dev/ttyS2 /dev/ttyS3]
 			  }
                          }
+            {Darwin}     {
+		          set serial_ports [glob -nocomplain /dev/cu.*]
+                         }
             {Windows NT} {
                           package require registry
                           set serial_base "HKEY_LOCAL_MACHINE\\HARDWARE\\DEVICEMAP\\SERIALCOMM"
@@ -94,15 +98,15 @@ namespace eval utils {
                           foreach valueName $values {
 			      lappend serial_ports "[registry get $serial_base $valueName]:"
 			  }
-                          }
-            default       {set serial_ports ""}
+                         }
+            default      {set serial_ports ""}
         }
 
         return $serial_ports
     }
 
     #=============================================================================#
-    # utils::uart_open (Device, Baudrate)                                         #
+    # utils::uart_open (Device, Configure, Baudrate)                              #
     #-----------------------------------------------------------------------------#
     # Description: Open and configure the UART connection.                        #
     # Arguments  : Device    - Serial port device (i.e. /dev/ttyS0 or COM2:)      #
@@ -111,18 +115,19 @@ namespace eval utils {
     # Result     : 0 if error, 1 otherwise.                                       #
     #=============================================================================#
     proc uart_open {Device Configure Baudrate} {
-    
+
         global serial_ch
 
 	# Open device for reading and writing
-	if {[catch {open $Device RDWR} serial_ch]} {
+	if {[catch {open $Device [list RDWR]} serial_ch]} {
+	    uart_close
 	    return 0
 	}
- 
+
 	if {$Configure} {
 	    # Setup the baud rate
 	    fconfigure $serial_ch -mode "$Baudrate,n,8,1"
-            
+
 	    # Block on read, don't buffer output
 	    fconfigure $serial_ch -blocking 1 -buffering none -translation binary -timeout 1000
 
@@ -134,6 +139,31 @@ namespace eval utils {
     }
 
     #=============================================================================#
+    # utils::uart_close (Device)                                                  #
+    #-----------------------------------------------------------------------------#
+    # Description: Closse the UART connection.                                    #
+    # Arguments  : None                                                           #
+    # Result     : 0 if error, 1 otherwise.                                       #
+    #=============================================================================#
+    proc uart_close {} {
+
+        global serial_ch
+
+	# Close the serial port
+	if {[info exists serial_ch]} {
+
+	    if {[catch {close $serial_ch} response]} {
+		puts "Error while closing serial port:"
+		puts "$response"
+		after 500
+		return 0
+	    }
+	    after 500
+	}
+	return 1
+    }
+
+    #=============================================================================#
     # utils::uart_tx (Data)                                                       #
     #-----------------------------------------------------------------------------#
     # Description: Transmit data over the serial debug interface.                 #
@@ -141,7 +171,7 @@ namespace eval utils {
     # Result     : 0 if error, 1 otherwise.                                       #
     #=============================================================================#
     proc uart_tx {Data} {
-        
+
         global serial_ch
         set allchar ""
 	# Format data
@@ -165,11 +195,11 @@ namespace eval utils {
     # Result     : List of received values, in hexadecimal.                       #
     #=============================================================================#
     proc uart_rx {Format Length} {
-        
+
         global serial_ch
-        
+
         if { [catch {read $serial_ch $Length} rx_data] } {
-            
+
             set hex_data "0000"
         } else {
             set hex_data ""
@@ -187,7 +217,7 @@ namespace eval utils {
         }
         set formated_data ""
         for {set i 0} {$i<[expr $Length/$num_byte]} {incr i} {
-        
+
             set data ""
             for {set j $num_byte} {$j>0} {set j [expr $j-1]} {
                 append data [lindex $hex_data [expr ($i*$num_byte)+$j-1]]

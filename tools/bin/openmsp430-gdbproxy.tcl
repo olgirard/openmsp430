@@ -22,16 +22,16 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #------------------------------------------------------------------------------
-# 
+#
 # File Name: openmsp430-gdbproxy.tcl
-# 
+#
 # Author(s):
 #             - Olivier Girard,    olgirard@gmail.com
 #
 #------------------------------------------------------------------------------
-# $Rev$
-# $LastChangedBy$
-# $LastChangedDate$
+# $Rev: 198 $
+# $LastChangedBy: olivier.girard $
+# $LastChangedDate: 2014-10-07 21:30:05 +0200 (Tue, 07 Oct 2014) $
 #------------------------------------------------------------------------------
 
 ###############################################################################
@@ -149,21 +149,21 @@ if {![string eq $omsp_conf(interface) "uart_generic"] &
     ![string eq $omsp_conf(interface) "i2c_usb-iss"]} {
     puts "\nERROR: Specified adaptor is not valid (should be \"uart_generic\" or \"i2c_usb-iss\")"
     help
-    exit 1   
+    exit 1
 }
 
 # Make sure the I2C address is an integer
 if {![string is integer $omsp_conf(0,cpuaddr)]} {
     puts "\nERROR: Specified I2C address is not an integer"
     help
-    exit 1   
+    exit 1
 }
 
 # Make sure the I2C address is valid
 if {($omsp_conf(0,cpuaddr)<8) | ($omsp_conf(0,cpuaddr)>119)} {
     puts "\nERROR: Specified I2C address should lay between 7 and 120"
     help
-    exit 1   
+    exit 1
 }
 
 # If the selected interface is a UART, make sure the selected speed is an integer
@@ -171,7 +171,7 @@ if {[string eq $omsp_conf(interface) "uart_generic"]} {
     if {![string is integer $omsp_conf(baudrate)]} {
         puts "\nERROR: Specified UART communication speed is not an integer"
         help
-        exit 1   
+        exit 1
     }
 } elseif {[string eq $omsp_conf(interface) "i2c_usb-iss"]} {
     if {[lsearch [lindex [GetAllowedSpeeds] 2] $omsp_conf(baudrate)]==-1} {
@@ -181,7 +181,7 @@ if {[string eq $omsp_conf(interface) "uart_generic"]} {
             puts "                              - $allowedVal"
         }
         puts ""
-        exit 1   
+        exit 1
     }
 }
 
@@ -267,6 +267,7 @@ if {$shell} {
 
     # Start server for GDB
     if {![startServer 0]} {
+	utils::uart_close
         exit 1
     }
 
@@ -281,7 +282,7 @@ proc getConfiguration {} {
 
     regexp {(.+)_(.+)} $omsp_conf(interface) whole_match tmp_if tmp_adapter
 
-    set gui_dbg_if  [string toupper $tmp_if] 
+    set gui_dbg_if  [string toupper $tmp_if]
     set gui_adapter [string toupper $tmp_adapter]
 
     return 1
@@ -356,7 +357,7 @@ proc updateConfiguration {{w ""} {sel ""}} {
             .connect.cfg.ad.i2c_addr.s1     configure -state normal
             .connect.cfg.ad.i2c_nr.f.soft.b configure -state normal
         }
-        
+
         if {$omsp_nr < 3} {
             .connect.cfg.ad.core_nr.l2      configure -state disabled
             .connect.cfg.ad.server_port.p2  configure -state disabled
@@ -368,7 +369,7 @@ proc updateConfiguration {{w ""} {sel ""}} {
             .connect.cfg.ad.arrow.l2        configure -state normal
             .connect.cfg.ad.i2c_addr.s2     configure -state normal
         }
-        
+
         if {$omsp_nr < 4} {
             .connect.cfg.ad.core_nr.l3      configure -state disabled
             .connect.cfg.ad.server_port.p3  configure -state disabled
@@ -428,12 +429,12 @@ pack   .tclscript -side top -padx 10 -pady 10 -fill x
 ####################################
 
 # Exit button
-button .menu.exit -text "Exit" -command {stopAllServers; exit 0}
+button .menu.exit -text "Exit" -command {stopAllServers; utils::uart_close; exit 0}
 pack   .menu.exit -side left
 
 # openMSP430 label
 label  .menu.omsp      -text "openMSP430 GDB proxy" -anchor center -fg "\#6a5acd" -font {-weight bold -size 14}
-pack   .menu.omsp      -side right -padx 20 
+pack   .menu.omsp      -side right -padx 20
 
 # Create the Configuration, Start & Info frames
 getConfiguration
@@ -468,7 +469,7 @@ combobox .connect.cfg.if.config2.adapter.p2      -textvariable gui_adapter -edit
 eval     .connect.cfg.if.config2.adapter.p2      list insert end [list "GENERIC"]
 pack     .connect.cfg.if.config2.adapter.p2      -side right -padx 5
 
-# Device port & Speed selection 
+# Device port & Speed selection
 frame    .connect.cfg.if.config1.serial_port
 pack     .connect.cfg.if.config1.serial_port     -side top   -padx 5 -pady {10 10} -fill x
 label    .connect.cfg.if.config1.serial_port.l1  -text "Device Port:"  -anchor w
@@ -489,78 +490,78 @@ pack     .connect.cfg.if.config2.serial_port.p2  -side right -padx 5
 frame    .connect.cfg.ad.core_nr
 pack     .connect.cfg.ad.core_nr     -side left -padx 5 -pady {0 20} -fill y
 label    .connect.cfg.ad.core_nr.l3  -text "Core 3:" -anchor w
-pack     .connect.cfg.ad.core_nr.l3  -side bottom  -padx {25 0} -pady {10 10} 
+pack     .connect.cfg.ad.core_nr.l3  -side bottom  -padx {25 0} -pady {10 10}
 label    .connect.cfg.ad.core_nr.l2  -text "Core 2:" -anchor w
-pack     .connect.cfg.ad.core_nr.l2  -side bottom  -padx {25 0} -pady {10 2} 
+pack     .connect.cfg.ad.core_nr.l2  -side bottom  -padx {25 0} -pady {10 2}
 label    .connect.cfg.ad.core_nr.l1  -text "Core 1:" -anchor w
-pack     .connect.cfg.ad.core_nr.l1  -side bottom  -padx {25 0} -pady {10 2} 
+pack     .connect.cfg.ad.core_nr.l1  -side bottom  -padx {25 0} -pady {10 2}
 label    .connect.cfg.ad.core_nr.l0  -text "Core 0:" -anchor w
-pack     .connect.cfg.ad.core_nr.l0  -side bottom  -padx {25 0} -pady {10 2} 
+pack     .connect.cfg.ad.core_nr.l0  -side bottom  -padx {25 0} -pady {10 2}
 
 frame    .connect.cfg.ad.server_port
 pack     .connect.cfg.ad.server_port    -side left -padx 5 -pady {0 20} -fill y
 entry    .connect.cfg.ad.server_port.p3 -textvariable server(3,port) -relief sunken -width 10
-pack     .connect.cfg.ad.server_port.p3 -side bottom  -padx 5 -pady {10 10} 
+pack     .connect.cfg.ad.server_port.p3 -side bottom  -padx 5 -pady {10 10}
 entry    .connect.cfg.ad.server_port.p2 -textvariable server(2,port) -relief sunken -width 10
-pack     .connect.cfg.ad.server_port.p2 -side bottom  -padx 5 -pady {10 0} 
+pack     .connect.cfg.ad.server_port.p2 -side bottom  -padx 5 -pady {10 0}
 entry    .connect.cfg.ad.server_port.p1 -textvariable server(1,port) -relief sunken -width 10
-pack     .connect.cfg.ad.server_port.p1 -side bottom  -padx 5 -pady {10 0} 
+pack     .connect.cfg.ad.server_port.p1 -side bottom  -padx 5 -pady {10 0}
 entry    .connect.cfg.ad.server_port.p0 -textvariable server(0,port) -relief sunken -width 10
-pack     .connect.cfg.ad.server_port.p0 -side bottom  -padx 5 -pady {10 0} 
+pack     .connect.cfg.ad.server_port.p0 -side bottom  -padx 5 -pady {10 0}
 label    .connect.cfg.ad.server_port.l  -text "Proxy Server Port" -anchor w
-pack     .connect.cfg.ad.server_port.l  -side bottom  -padx 5 -pady {10 0} 
+pack     .connect.cfg.ad.server_port.l  -side bottom  -padx 5 -pady {10 0}
 
 frame    .connect.cfg.ad.arrow
 pack     .connect.cfg.ad.arrow     -side left -padx 5 -pady {0 20} -fill y
 label    .connect.cfg.ad.arrow.l3  -text "==>" -anchor w
-pack     .connect.cfg.ad.arrow.l3  -side bottom  -padx 5 -pady {10 10} 
+pack     .connect.cfg.ad.arrow.l3  -side bottom  -padx 5 -pady {10 10}
 label    .connect.cfg.ad.arrow.l2  -text "==>" -anchor w
-pack     .connect.cfg.ad.arrow.l2  -side bottom  -padx 5 -pady {10 2} 
+pack     .connect.cfg.ad.arrow.l2  -side bottom  -padx 5 -pady {10 2}
 label    .connect.cfg.ad.arrow.l1  -text "==>" -anchor w
-pack     .connect.cfg.ad.arrow.l1  -side bottom  -padx 5 -pady {10 2} 
+pack     .connect.cfg.ad.arrow.l1  -side bottom  -padx 5 -pady {10 2}
 label    .connect.cfg.ad.arrow.l0  -text "==>" -anchor w
-pack     .connect.cfg.ad.arrow.l0  -side bottom  -padx 5 -pady {10 2} 
+pack     .connect.cfg.ad.arrow.l0  -side bottom  -padx 5 -pady {10 2}
 
 frame    .connect.cfg.ad.i2c_addr
 pack     .connect.cfg.ad.i2c_addr     -side left -padx 5 -pady {0 20} -fill y
 spinbox  .connect.cfg.ad.i2c_addr.s3  -from 8 -to 119 -textvariable omsp_conf(3,cpuaddr) -width 4
-pack     .connect.cfg.ad.i2c_addr.s3  -side bottom    -padx 5 -pady {10 10} 
+pack     .connect.cfg.ad.i2c_addr.s3  -side bottom    -padx 5 -pady {10 10}
 spinbox  .connect.cfg.ad.i2c_addr.s2  -from 8 -to 119 -textvariable omsp_conf(2,cpuaddr) -width 4
-pack     .connect.cfg.ad.i2c_addr.s2  -side bottom    -padx 5 -pady {10 0} 
+pack     .connect.cfg.ad.i2c_addr.s2  -side bottom    -padx 5 -pady {10 0}
 spinbox  .connect.cfg.ad.i2c_addr.s1  -from 8 -to 119 -textvariable omsp_conf(1,cpuaddr) -width 4
-pack     .connect.cfg.ad.i2c_addr.s1  -side bottom    -padx 5 -pady {10 0} 
+pack     .connect.cfg.ad.i2c_addr.s1  -side bottom    -padx 5 -pady {10 0}
 spinbox  .connect.cfg.ad.i2c_addr.s0  -from 8 -to 119 -textvariable omsp_conf(0,cpuaddr) -width 4
-pack     .connect.cfg.ad.i2c_addr.s0  -side bottom    -padx 5 -pady {10 0} 
+pack     .connect.cfg.ad.i2c_addr.s0  -side bottom    -padx 5 -pady {10 0}
 label    .connect.cfg.ad.i2c_addr.l   -text "I2C Address" -anchor w
-pack     .connect.cfg.ad.i2c_addr.l   -side bottom    -padx 5 -pady {10 0} 
+pack     .connect.cfg.ad.i2c_addr.l   -side bottom    -padx 5 -pady {10 0}
 
 frame    .connect.cfg.ad.i2c_nr
 pack     .connect.cfg.ad.i2c_nr     -side right -padx 5 -fill y
 label    .connect.cfg.ad.i2c_nr.l   -text "Number of cores" -anchor w
-pack     .connect.cfg.ad.i2c_nr.l   -side top    -padx 50 -pady {10 0} 
+pack     .connect.cfg.ad.i2c_nr.l   -side top    -padx 50 -pady {10 0}
 spinbox  .connect.cfg.ad.i2c_nr.s   -from 1 -to 4 -textvariable omsp_nr -state readonly -width 4 -command {updateConfiguration}
-pack     .connect.cfg.ad.i2c_nr.s   -side top    -padx 50 -pady {10 10} 
+pack     .connect.cfg.ad.i2c_nr.s   -side top    -padx 50 -pady {10 10}
 
 frame       .connect.cfg.ad.i2c_nr.f   -bd 2 -relief ridge
 pack        .connect.cfg.ad.i2c_nr.f   -side top -padx 10 -pady {5 5} -fill x
 label       .connect.cfg.ad.i2c_nr.f.l2  -text "Breakpoint configuration" -anchor w
-pack        .connect.cfg.ad.i2c_nr.f.l2  -side top    -padx 0 -pady {5 10} 
+pack        .connect.cfg.ad.i2c_nr.f.l2  -side top    -padx 0 -pady {5 10}
 
 frame       .connect.cfg.ad.i2c_nr.f.soft
 pack        .connect.cfg.ad.i2c_nr.f.soft   -side top -padx 0 -fill x
 radiobutton .connect.cfg.ad.i2c_nr.f.soft.r -value "0" -text "" -state normal -variable breakSelect -command {updateSoftBreakpoints}
-pack        .connect.cfg.ad.i2c_nr.f.soft.r -side left -padx {10 0}  -pady {0 0} 
+pack        .connect.cfg.ad.i2c_nr.f.soft.r -side left -padx {10 0}  -pady {0 0}
 label       .connect.cfg.ad.i2c_nr.f.soft.l -text "Soft" -anchor w
-pack        .connect.cfg.ad.i2c_nr.f.soft.l -side left -padx {5 10} -pady {3 0} 
+pack        .connect.cfg.ad.i2c_nr.f.soft.l -side left -padx {5 10} -pady {3 0}
 button      .connect.cfg.ad.i2c_nr.f.soft.b -text "Config." -state disabled -command {configSoftBreakpoints}
 pack        .connect.cfg.ad.i2c_nr.f.soft.b -side right -padx {0 20}
 
 frame       .connect.cfg.ad.i2c_nr.f.hard
 pack        .connect.cfg.ad.i2c_nr.f.hard   -side top -padx 0 -pady {0 10} -fill x
 radiobutton .connect.cfg.ad.i2c_nr.f.hard.r -value "1" -text "" -state normal -variable breakSelect -command {updateSoftBreakpoints}
-pack        .connect.cfg.ad.i2c_nr.f.hard.r -side left -padx {10 0}  -pady {0 0} 
+pack        .connect.cfg.ad.i2c_nr.f.hard.r -side left -padx {10 0}  -pady {0 0}
 label       .connect.cfg.ad.i2c_nr.f.hard.l -text "Hard" -anchor w
-pack        .connect.cfg.ad.i2c_nr.f.hard.l -side left -padx {5 10} -pady {3 0} 
+pack        .connect.cfg.ad.i2c_nr.f.hard.l -side left -padx {5 10} -pady {3 0}
 
 # Update according to default values
 updateConfiguration
@@ -621,7 +622,7 @@ pack   .tclscript.ft.l      -side left -padx "0 10"
 entry  .tclscript.ft.file   -width 58 -relief sunken -textvariable tcl_file_name -state disabled
 pack   .tclscript.ft.file   -side left -padx 10
 button .tclscript.ft.browse -text "Browse" -state disabled -command {set tcl_file_name [tk_getOpenFile -filetypes {{{TCL Files} {.tcl}} {{All Files} *}}]}
-pack   .tclscript.ft.browse -side left -padx 5 
+pack   .tclscript.ft.browse -side left -padx 5
 frame  .tclscript.fb
 pack   .tclscript.fb        -side top -fill x
 button .tclscript.fb.read   -text "Source TCL script !" -state disabled -command {if {[file exists $tcl_file_name]} {source $tcl_file_name}}
@@ -677,65 +678,65 @@ proc configSoftBreakpoints  { } {
     frame       .omsp_sft_brk.map.r.core_nr
     pack        .omsp_sft_brk.map.r.core_nr     -side left -padx 5 -pady {0 20} -fill y
     label       .omsp_sft_brk.map.r.core_nr.l3  -text "Core 3:" -anchor w
-    pack        .omsp_sft_brk.map.r.core_nr.l3  -side bottom  -padx {25 0} -pady {10 10} 
+    pack        .omsp_sft_brk.map.r.core_nr.l3  -side bottom  -padx {25 0} -pady {10 10}
     label       .omsp_sft_brk.map.r.core_nr.l2  -text "Core 2:" -anchor w
-    pack        .omsp_sft_brk.map.r.core_nr.l2  -side bottom  -padx {25 0} -pady {10 2} 
+    pack        .omsp_sft_brk.map.r.core_nr.l2  -side bottom  -padx {25 0} -pady {10 2}
     label       .omsp_sft_brk.map.r.core_nr.l1  -text "Core 1:" -anchor w
-    pack        .omsp_sft_brk.map.r.core_nr.l1  -side bottom  -padx {25 0} -pady {10 2} 
+    pack        .omsp_sft_brk.map.r.core_nr.l1  -side bottom  -padx {25 0} -pady {10 2}
     label       .omsp_sft_brk.map.r.core_nr.l0  -text "Core 0:" -anchor w
-    pack        .omsp_sft_brk.map.r.core_nr.l0  -side bottom  -padx {25 0} -pady {10 2} 
-    
+    pack        .omsp_sft_brk.map.r.core_nr.l0  -side bottom  -padx {25 0} -pady {10 2}
+
     frame       .omsp_sft_brk.map.r.pmem0
     pack        .omsp_sft_brk.map.r.pmem0    -side left -padx 5 -pady {0 20} -fill y
     radiobutton .omsp_sft_brk.map.r.pmem0.p3 -value "0" -text "" -state normal -variable mem_mapping(3)
-    pack        .omsp_sft_brk.map.r.pmem0.p3 -side bottom  -padx 5 -pady {10 10} 
+    pack        .omsp_sft_brk.map.r.pmem0.p3 -side bottom  -padx 5 -pady {10 10}
     radiobutton .omsp_sft_brk.map.r.pmem0.p2 -value "0" -text "" -state normal -variable mem_mapping(2)
-    pack        .omsp_sft_brk.map.r.pmem0.p2 -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem0.p2 -side bottom  -padx 5 -pady {10 0}
     radiobutton .omsp_sft_brk.map.r.pmem0.p1 -value "0" -text "" -state normal -variable mem_mapping(1)
-    pack        .omsp_sft_brk.map.r.pmem0.p1 -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem0.p1 -side bottom  -padx 5 -pady {10 0}
     radiobutton .omsp_sft_brk.map.r.pmem0.p0 -value "0" -text "" -state normal -variable mem_mapping(0)
-    pack        .omsp_sft_brk.map.r.pmem0.p0 -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem0.p0 -side bottom  -padx 5 -pady {10 0}
     label       .omsp_sft_brk.map.r.pmem0.l  -text "Program\nMemory 0" -anchor w
-    pack        .omsp_sft_brk.map.r.pmem0.l  -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem0.l  -side bottom  -padx 5 -pady {10 0}
 
     frame       .omsp_sft_brk.map.r.pmem1
     pack        .omsp_sft_brk.map.r.pmem1    -side left -padx 5 -pady {0 20} -fill y
     radiobutton .omsp_sft_brk.map.r.pmem1.p3 -value "1" -text "" -state normal -variable mem_mapping(3)
-    pack        .omsp_sft_brk.map.r.pmem1.p3 -side bottom  -padx 5 -pady {10 10} 
+    pack        .omsp_sft_brk.map.r.pmem1.p3 -side bottom  -padx 5 -pady {10 10}
     radiobutton .omsp_sft_brk.map.r.pmem1.p2 -value "1" -text "" -state normal -variable mem_mapping(2)
-    pack        .omsp_sft_brk.map.r.pmem1.p2 -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem1.p2 -side bottom  -padx 5 -pady {10 0}
     radiobutton .omsp_sft_brk.map.r.pmem1.p1 -value "1" -text "" -state normal -variable mem_mapping(1)
-    pack        .omsp_sft_brk.map.r.pmem1.p1 -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem1.p1 -side bottom  -padx 5 -pady {10 0}
     radiobutton .omsp_sft_brk.map.r.pmem1.p0 -value "1" -text "" -state disable -variable mem_mapping(0)
-    pack        .omsp_sft_brk.map.r.pmem1.p0 -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem1.p0 -side bottom  -padx 5 -pady {10 0}
     label       .omsp_sft_brk.map.r.pmem1.l  -text "Program\nMemory 1" -anchor w
-    pack        .omsp_sft_brk.map.r.pmem1.l  -side bottom  -padx 5 -pady {10 0} 
-    
+    pack        .omsp_sft_brk.map.r.pmem1.l  -side bottom  -padx 5 -pady {10 0}
+
     frame       .omsp_sft_brk.map.r.pmem2
     pack        .omsp_sft_brk.map.r.pmem2    -side left -padx 5 -pady {0 20} -fill y
     radiobutton .omsp_sft_brk.map.r.pmem2.p3 -value "2" -text "" -state normal -variable mem_mapping(3)
-    pack        .omsp_sft_brk.map.r.pmem2.p3 -side bottom  -padx 5 -pady {10 10} 
+    pack        .omsp_sft_brk.map.r.pmem2.p3 -side bottom  -padx 5 -pady {10 10}
     radiobutton .omsp_sft_brk.map.r.pmem2.p2 -value "2" -text "" -state normal -variable mem_mapping(2)
-    pack        .omsp_sft_brk.map.r.pmem2.p2 -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem2.p2 -side bottom  -padx 5 -pady {10 0}
     radiobutton .omsp_sft_brk.map.r.pmem2.p1 -value "2" -text "" -state disable -variable mem_mapping(1)
-    pack        .omsp_sft_brk.map.r.pmem2.p1 -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem2.p1 -side bottom  -padx 5 -pady {10 0}
     radiobutton .omsp_sft_brk.map.r.pmem2.p0 -value "2" -text "" -state disable -variable mem_mapping(0)
-    pack        .omsp_sft_brk.map.r.pmem2.p0 -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem2.p0 -side bottom  -padx 5 -pady {10 0}
     label       .omsp_sft_brk.map.r.pmem2.l  -text "Program\nMemory 2" -anchor w
-    pack        .omsp_sft_brk.map.r.pmem2.l  -side bottom  -padx 5 -pady {10 0} 
-    
+    pack        .omsp_sft_brk.map.r.pmem2.l  -side bottom  -padx 5 -pady {10 0}
+
     frame       .omsp_sft_brk.map.r.pmem3
     pack        .omsp_sft_brk.map.r.pmem3    -side left -padx 5 -pady {0 20} -fill y
     radiobutton .omsp_sft_brk.map.r.pmem3.p3 -value "3" -text "" -state normal -variable mem_mapping(3)
-    pack        .omsp_sft_brk.map.r.pmem3.p3 -side bottom  -padx 5 -pady {10 10} 
+    pack        .omsp_sft_brk.map.r.pmem3.p3 -side bottom  -padx 5 -pady {10 10}
     radiobutton .omsp_sft_brk.map.r.pmem3.p2 -value "3" -text "" -state disable -variable mem_mapping(2)
-    pack        .omsp_sft_brk.map.r.pmem3.p2 -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem3.p2 -side bottom  -padx 5 -pady {10 0}
     radiobutton .omsp_sft_brk.map.r.pmem3.p1 -value "3" -text "" -state disable -variable mem_mapping(1)
-    pack        .omsp_sft_brk.map.r.pmem3.p1 -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem3.p1 -side bottom  -padx 5 -pady {10 0}
     radiobutton .omsp_sft_brk.map.r.pmem3.p0 -value "3" -text "" -state disable -variable mem_mapping(0)
-    pack        .omsp_sft_brk.map.r.pmem3.p0 -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem3.p0 -side bottom  -padx 5 -pady {10 0}
     label       .omsp_sft_brk.map.r.pmem3.l  -text "Program\nMemory 3" -anchor w
-    pack        .omsp_sft_brk.map.r.pmem3.l  -side bottom  -padx 5 -pady {10 0} 
+    pack        .omsp_sft_brk.map.r.pmem3.l  -side bottom  -padx 5 -pady {10 0}
 
     # Create OK button
     button .omsp_sft_brk.okay -text "OK" -font {-weight bold}  -command {destroy .omsp_sft_brk}
@@ -775,7 +776,7 @@ proc updateSoftBreakpoints  { } {
 		.omsp_sft_brk.map.r.pmem1.p2    configure -state normal
 		.omsp_sft_brk.map.r.pmem2.p2    configure -state normal
 	    }
-	    
+
 	    if {$omsp_nr < 4} {
 		.omsp_sft_brk.map.r.core_nr.l3  configure -state disabled
 		.omsp_sft_brk.map.r.pmem0.p3    configure -state disabled

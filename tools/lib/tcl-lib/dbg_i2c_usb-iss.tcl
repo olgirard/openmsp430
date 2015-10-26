@@ -21,7 +21,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------------
-# 
+#
 # File Name:   dbg_uart_i2c-iss.tcl
 #
 # Author(s):
@@ -58,7 +58,7 @@
 #         - i2c_usb-iss::ISS_MODE           (OperatingMode)
 #         - i2c_usb-iss::SETPINS            (IO1, IO2, IO3, IO4)
 #         - i2c_usb-iss::GETPINS            ()
-# 
+#
 #----------------------------------------------------------------------------------
 namespace eval i2c_usb-iss {
 
@@ -80,7 +80,7 @@ namespace eval i2c_usb-iss {
     # Result     : 0 if error, 1 otherwise.                                       #
     #=============================================================================#
     proc dbg_open {Device OperatingMode} {
-    
+
         # Open UART interface
         if {![utils::uart_open $Device 0 115200]} {
             return 0
@@ -117,7 +117,7 @@ namespace eval i2c_usb-iss {
     # Result     : 0 if error, 1 otherwise.                                       #
     #=============================================================================#
     proc dbg_connect {CpuAddr} {
-    
+
         # Make sure the Serial debug interface is still under reset
         SETPINS 0 0 0 0
         after 100
@@ -197,7 +197,7 @@ namespace eval i2c_usb-iss {
     # Result     : 0 if error, 1 otherwise.                                       #
     #=============================================================================#
     proc dbg_wr {CpuAddr RegisterName Data} {
-        
+
         # Send command frame
         set cmd [dbg_format_cmd $RegisterName WR]
 
@@ -281,7 +281,7 @@ namespace eval i2c_usb-iss {
 
 	    # Receive data
 	    set rx_data [concat $rx_data [utils::uart_rx $Format [expr $rxLength]]]
-	    
+
 	    # Remaining bytes to be received
 	    set Length [expr $Length - $rxLength]
 	}
@@ -354,7 +354,7 @@ namespace eval i2c_usb-iss {
 		puts "I2C ERROR: $response"
 		return 0
 	    }
-	    
+
 	    # Remaining bytes to be received
 	    set Length [expr $Length - $txLength]
 	}
