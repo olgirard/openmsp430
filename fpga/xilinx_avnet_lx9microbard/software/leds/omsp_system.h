@@ -233,19 +233,41 @@
 #define eint()  __eint()
 #define dint()  __dint()
 
-#define RESET_VECTOR        (0x001E)   // Vector 15  (0xFFFE) - Reset              -  [Highest Priority]
-#define NMI_VECTOR          (0x001C)   // Vector 14  (0xFFFC) - Non-maskable       -
-#define UNUSED_13_VECTOR    (0x001A)   // Vector 13  (0xFFFA) -                    -
-#define UNUSED_12_VECTOR    (0x0018)   // Vector 12  (0xFFF8) -                    -
-#define UNUSED_11_VECTOR    (0x0016)   // Vector 11  (0xFFF6) -                    -
-#define WDT_VECTOR          (0x0014)   // Vector 10  (0xFFF4) - Watchdog Timer     -
-#define TIMERA0_VECTOR      (0x0012)   // Vector  9  (0xFFF2) - Timer A CC0        -
-#define TIMERA1_VECTOR      (0x0010)   // Vector  8  (0xFFF0) - Timer A CC1-2, TA  -
-#define UNUSED_07_VECTOR    (0x000E)   // Vector  7  (0xFFEE) -                    -
-#define UNUSED_06_VECTOR    (0x000C)   // Vector  6  (0xFFEC) -                    -
-#define UNUSED_05_VECTOR    (0x000A)   // Vector  5  (0xFFEA) -                    -
-#define UNUSED_04_VECTOR    (0x0008)   // Vector  4  (0xFFE8) -                    -
-#define UNUSED_03_VECTOR    (0x0006)   // Vector  3  (0xFFE6) -                    -
-#define PORT1_VECTOR        (0x0004)   // Vector  2  (0xFFE4) - Port 1             -
-#define UNUSED_01_VECTOR    (0x0002)   // Vector  1  (0xFFE2) -                    -
-#define UNUSED_00_VECTOR    (0x0000)   // Vector  0  (0xFFE0) -                    -  [Lowest Priority]
+// Vector definition for RedHat/TI toolchain
+#ifdef PFX_MSP430_ELF
+   #define RESET_VECTOR        ("reset")   // Vector 15  (0xFFFE) - Reset              -  [Highest Priority]
+   #define NMI_VECTOR          (15)        // Vector 14  (0xFFFC) - Non-maskable       -
+   #define UNUSED_13_VECTOR    (14)        // Vector 13  (0xFFFA) -                    -
+   #define UNUSED_12_VECTOR    (13)        // Vector 12  (0xFFF8) -                    -
+   #define UNUSED_11_VECTOR    (12)        // Vector 11  (0xFFF6) -                    -
+   #define WDT_VECTOR          (11)        // Vector 10  (0xFFF4) - Watchdog Timer     -
+   #define TIMERA0_VECTOR      (10)        // Vector  9  (0xFFF2) - Timer A CC0        -
+   #define TIMERA1_VECTOR      (9)         // Vector  8  (0xFFF0) - Timer A CC1-2, TA  -
+   #define UNUSED_07_VECTOR    (8)         // Vector  7  (0xFFEE) -                    -
+   #define UNUSED_06_VECTOR    (7)         // Vector  6  (0xFFEC) -                    -
+   #define UNUSED_05_VECTOR    (6)         // Vector  5  (0xFFEA) -                    -
+   #define UNUSED_04_VECTOR    (5)         // Vector  4  (0xFFE8) -                    -
+   #define UNUSED_03_VECTOR    (4)         // Vector  3  (0xFFE6) -                    -
+   #define PORT1_VECTOR        (3)         // Vector  2  (0xFFE4) - Port 1             -
+   #define UNUSED_01_VECTOR    (2)         // Vector  1  (0xFFE2) -                    -
+   #define UNUSED_00_VECTOR    (1)         // Vector  0  (0xFFE0) -                    -  [Lowest Priority]
+
+// Vector definition for MSPGCC toolchain
+#else
+   #define RESET_VECTOR        (0x001E)    // Vector 15  (0xFFFE) - Reset              -  [Highest Priority]
+   #define NMI_VECTOR          (0x001C)    // Vector 14  (0xFFFC) - Non-maskable       -
+   #define UNUSED_13_VECTOR    (0x001A)    // Vector 13  (0xFFFA) -                    -
+   #define UNUSED_12_VECTOR    (0x0018)    // Vector 12  (0xFFF8) -                    -
+   #define UNUSED_11_VECTOR    (0x0016)    // Vector 11  (0xFFF6) -                    -
+   #define WDT_VECTOR          (0x0014)    // Vector 10  (0xFFF4) - Watchdog Timer     -
+   #define TIMERA0_VECTOR      (0x0012)    // Vector  9  (0xFFF2) - Timer A CC0        -
+   #define TIMERA1_VECTOR      (0x0010)    // Vector  8  (0xFFF0) - Timer A CC1-2, TA  -
+   #define UNUSED_07_VECTOR    (0x000E)    // Vector  7  (0xFFEE) -                    -
+   #define UNUSED_06_VECTOR    (0x000C)    // Vector  6  (0xFFEC) -                    -
+   #define UNUSED_05_VECTOR    (0x000A)    // Vector  5  (0xFFEA) -                    -
+   #define UNUSED_04_VECTOR    (0x0008)    // Vector  4  (0xFFE8) -                    -
+   #define UNUSED_03_VECTOR    (0x0006)    // Vector  3  (0xFFE6) -                    -
+   #define PORT1_VECTOR        (0x0004)    // Vector  2  (0xFFE4) - Port 1             -
+   #define UNUSED_01_VECTOR    (0x0002)    // Vector  1  (0xFFE2) -                    -
+   #define UNUSED_00_VECTOR    (0x0000)    // Vector  0  (0xFFE0) -                    -  [Lowest Priority]
+#endif

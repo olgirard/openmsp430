@@ -2,43 +2,58 @@
 NAME            = leds
 OBJECTS         = main.o 7seg.o
 
-CFLAGS          = -O2 -Wall -g -mcpu=430 -mivcnt=16 -mmpy=16     # Uniarch flags
+# Compiler performance option (-Os / -O2 / -O3)
+PORT_CFLAGS     = -O2
 
-#switch the compiler (for the internal make rules)
-CC              = msp430-gcc
+# Choose GCC toolchain prefix ('msp430' for MSPGCC / 'msp430-elf' for GCC RedHat/TI)
+#MSPGCC_PFX      = msp430-elf
+ifndef MSPGCC_PFX
+MSPGCC_PFX      = msp430
+endif
 
+# disable some warnings specific to the Dhrystone code
+WARNINGS        =  -Wall
 
-.PHONY: all FORCE clean download download-jtag download-bsl dist
+# Select flags depending on selected toolchain
+ifeq ($(MSPGCC_PFX),msp430-elf)
+INCDIR          = -I /Users/pitchu/ti/gcc/include
+CFLAGS		= -D PFX_MSP430_ELF $(INCDIR) $(PORT_CFLAGS) ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit
+else
+CFLAGS		= -D PFX_MSP430               $(PORT_CFLAGS) ${WARNINGS} -g -mcpu=430    -mmpy=16	-mivcnt=16
+endif
+
+# Toolchain executables
+CC              = ${MSPGCC_PFX}-gcc
+OBJCOPY		= ${MSPGCC_PFX}-objcopy
+OBJDUMP         = ${MSPGCC_PFX}-objdump
+OBJSIZE         = ${MSPGCC_PFX}-size
+
+.PHONY: all FORCE clean download dist
 
 #all should be the first target. it's built when make is runwithout args
-all: ${NAME}.elf ${NAME}.a43 ${NAME}.lst
+all: ${NAME}.elf ${NAME}.a43 ${NAME}.lst ${NAME}.size
 
 #confgigure the next line if you want to use the serial download
 download: download-uart
-#download: download-jtag
-#download: download-bsl
 
 #additional rules for files
 ${NAME}.elf: ${OBJECTS}
-	${CC} -Tlinker.x -o $@ ${OBJECTS}
+	${CC} ${CFLAGS} -T linker.${MSPGCC_PFX}.x -o $@ ${OBJECTS}
 
 ${NAME}.a43: ${NAME}.elf
-	msp430-objcopy -O ihex $^ $@
+	${OBJCOPY} -O ihex $^ $@
 
 ${NAME}.lst: ${NAME}.elf
-	msp430-objdump -dSt $^ >$@
+	${OBJDUMP} -dSt $^ >$@
 
-download-jtag: all
-	msp430-jtag -e ${NAME}.elf
-
-download-bsl: all
-	msp430-bsl -e ${NAME}.elf
+${NAME}.size: ${NAME}.elf
+	${OBJSIZE}  $^ >$@
 
 download-uart: all
 	openmsp430-loader.tcl -device /dev/ttyUSB0 -baudrate 115200 ${NAME}.elf
 
 clean:
-	rm -f ${NAME} ${NAME}.a43 ${NAME}.lst ${NAME}.elf *.o
+	rm -f ${NAME} ${NAME}.a43 ${NAME}.lst ${NAME}.elf $(NAME).size *.o
 
 #backup archive
 dist:

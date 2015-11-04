@@ -28,11 +28,7 @@ OBJCOPY		= ${MSPGCC_PFX}-objcopy
 OBJDUMP         = ${MSPGCC_PFX}-objdump
 OBJSIZE         = ${MSPGCC_PFX}-size
 
-# use custom linker script
-LDFLAGS         = -Tlink.ld
-
-
-.PHONY: all FORCE clean download download-jtag download-bsl dist
+.PHONY: all FORCE clean download dist
 
 #all should be the first target. it's built when make is runwithout args
 all: ${NAME}.elf $(NAME).bin ${NAME}.a43 ${NAME}.lst ${NAME}.size $(NAME).mif

@@ -8,8 +8,8 @@ void delay(unsigned int c, unsigned int d) {
   volatile int i, j;
   for (i = 0; i<c; i++) {
     for (j = 0; j<d; j++) {
-      nop();
-      nop();
+      __nop();
+      __nop();
     }
   }
 }
@@ -59,9 +59,9 @@ int main(void) {
     //IE1 |= 0x01;
     //eint();                            //enable interrupts
 
-    if (CPU_NR==0x0100) { 
+    if (CPU_NR==0x0100) {
       delay(0x000f, 0xffff);
-    } 
+    }
 
     while (1) {                         // Main loop, never ends...
 
@@ -85,4 +85,3 @@ int main(void) {
 
     }
 }
-
