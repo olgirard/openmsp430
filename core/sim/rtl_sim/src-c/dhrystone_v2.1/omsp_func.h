@@ -121,4 +121,6 @@
 // FUNCTIONS
 //=============================================================================
 
-//int putchar (int txdata);
+// Replace printf statements with custom one
+#include "mylib/cprintf.h"
+#define   printf  cprintf

@@ -1,11 +1,12 @@
 # makfile configuration
 NAME            = dhrystone_4mcu
-OBJECTS         = dhry21a.o dhry21b.o omsp_func.o copydata.o
+OBJECTS         = dhry21a.o dhry21b.o omsp_func.o mylib/copydata.o mylib/cprintf.o
 
 # Compiler performance option (-Os / -O2 / -O3)
 PORT_CFLAGS     = -O2
 
 # Choose GCC toolchain prefix ('msp430' for MSPGCC / 'msp430-elf' for GCC RedHat/TI)
+#MSPGCC_PFX      = msp430-elf
 ifndef MSPGCC_PFX
 MSPGCC_PFX      = msp430
 endif
@@ -24,11 +25,12 @@ endif
 CC              = ${MSPGCC_PFX}-gcc
 OBJCOPY		= ${MSPGCC_PFX}-objcopy
 OBJDUMP         = ${MSPGCC_PFX}-objdump
+OBJSIZE         = ${MSPGCC_PFX}-size
 
 .PHONY: all FORCE clean download dist
 
 #all should be the first target. it's built when make is runwithout args
-all: ${NAME}.elf ${NAME}.a43 ${NAME}.lst
+all: ${NAME}.elf ${NAME}.a43 ${NAME}.lst ${NAME}.size
 
 #configure the next line if you want to use the serial download
 download: download-uart
@@ -43,11 +45,14 @@ ${NAME}.a43: ${NAME}.elf
 ${NAME}.lst: ${NAME}.elf
 	${OBJDUMP} -dSt $^ >$@
 
+${NAME}.size: ${NAME}.elf
+	${OBJSIZE}  $^ >$@
+
 download-uart: all
 	openmsp430-loader.tcl -device /dev/ttyUSB0 -baudrate 115200 ${NAME}.elf
 
 clean:
-	rm -f ${NAME} ${NAME}.a43 ${NAME}.lst ${NAME}.elf *.o
+	rm -f ${NAME} ${NAME}.a43 ${NAME}.lst ${NAME}.elf ${NAME}.size *.o mylib/*.o
 
 #backup archive
 dist:
@@ -60,4 +65,5 @@ FORCE:
 dhry_21a.o: dhry_21a.c
 dhry_21b.o: dhry_21b.c
 omsp_func.o: omsp_func.c
-copydata.o: copydata.c
+mylib/copydata.o: mylib/copydata.c
+mylib/cprintf.o: mylib/cprintf.c

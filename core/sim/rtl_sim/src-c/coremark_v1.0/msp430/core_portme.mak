@@ -33,7 +33,7 @@ LFLAGS_END += -T$(PORT_DIR)/linker.${MSPGCC_PFX}.x
 
 # Flag : PORT_SRCS
 # 	Port specific source files can be added here
-PORT_SRCS = $(PORT_DIR)/core_portme.c $(PORT_DIR)/omsp_func.c $(PORT_DIR)/copydata.c
+PORT_SRCS = $(PORT_DIR)/core_portme.c $(PORT_DIR)/omsp_func.c $(PORT_DIR)/mylib/copydata.c $(PORT_DIR)/mylib/cprintf.c
 
 # Flag : LOAD
 #	For a simple port, we assume self hosted compile and run, no load needed.

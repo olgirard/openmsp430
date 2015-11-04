@@ -41,10 +41,8 @@ MEMORY {
   SFR              : ORIGIN = 0x0000, LENGTH = 0x0010
   PERIPHERAL_8BIT  : ORIGIN = 0x0010, LENGTH = 0x00F0
   PERIPHERAL_16BIT : ORIGIN = 0x0100, LENGTH = 0x0100
-/*  RAM              : ORIGIN = 0x0200, LENGTH = 0x2800       /* 10kB */
-/*  ROM (rx)         : ORIGIN = 0x4000, LENGTH = 0xC000-0x20  /* 48kB */
-  RAM              : ORIGIN = 0x0200, LENGTH = 0x1400       /*  5kB */
-  ROM (rx)         : ORIGIN = 0x2800, LENGTH = 0xD800-0x20  /* 54kB */
+  RAM              : ORIGIN = 0x0200, LENGTH = 0x2800       /* 10kB */
+  ROM (rx)         : ORIGIN = 0x4000, LENGTH = 0xC000-0x20  /* 48kB */
   VECT1            : ORIGIN = 0xFFE0, LENGTH = 0x0002
   VECT2            : ORIGIN = 0xFFE2, LENGTH = 0x0002
   VECT3            : ORIGIN = 0xFFE4, LENGTH = 0x0002

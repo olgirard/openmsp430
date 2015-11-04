@@ -39,7 +39,8 @@
 //                 putChar function                 //
 //            (Send a byte to the Port-1)           //
 //--------------------------------------------------//
-int putchar (int txdata) {
+//int putchar (int txdata) {
+int tty_putc (int txdata) {
 
   // Write the output character to the Port-1
   P1OUT  = txdata;
