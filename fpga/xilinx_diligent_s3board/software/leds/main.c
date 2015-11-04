@@ -8,8 +8,8 @@ void delay(unsigned int c, unsigned int d) {
   volatile int i, j;
   for (i = 0; i<c; i++) {
     for (j = 0; j<d; j++) {
-      nop();
-      nop();
+      __nop();
+      __nop();
     }
   }
 }
@@ -68,4 +68,3 @@ int main(void) {
         }
     }
 }
-
