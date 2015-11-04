@@ -22,9 +22,9 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #------------------------------------------------------------------------------
-# 
+#
 # File Name: rtlsim.sh
-# 
+#
 # Author(s):
 #             - Olivier Girard,    olgirard@gmail.com
 #             - Mihai M.,	   mmihai@delajii.net
@@ -73,7 +73,7 @@ fi
 if [ "${OMSP_SIMULATOR:-iverilog}" = iverilog ]; then
 
     rm -rf simv
-    
+
     NODUMP=${OMSP_NODUMP-0}
     if [ $NODUMP -eq 1 ]
       then
@@ -81,8 +81,8 @@ if [ "${OMSP_SIMULATOR:-iverilog}" = iverilog ]; then
       else
         iverilog -o simv -c $3
     fi
-    
-    if [ `uname -o` = "Cygwin" ]
+
+    if [[ $(uname -s) == CYGWIN* ]];
       then
 	    vvp.exe ./simv
       else
@@ -98,8 +98,8 @@ else
        vargs=""
     fi
 
-   case $OMSP_SIMULATOR in 
-    cver* ) 
+   case $OMSP_SIMULATOR in
+    cver* )
        vargs="$vargs +define+VXL +define+CVER" ;;
     verilog* )
        vargs="$vargs +define+VXL" ;;
@@ -122,7 +122,7 @@ else
        ./isim.exe -tclbatch isim.tcl
        exit
    esac
-   
+
    echo "Running: $OMSP_SIMULATOR -f $3 $vargs"
    exec $OMSP_SIMULATOR -f $3 $vargs
 fi

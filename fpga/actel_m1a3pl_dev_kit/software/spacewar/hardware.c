@@ -19,12 +19,12 @@ extern void reset_game(rkt_data *);
 Sets up all the hardware in the MSP430 used by the SPACEWAR game.
 Stops the watchdog timer.  Sets the internal cpu clock to a maximun.
 Sets the timer to cause an interrupt every 10ms.  Sets the SPI interface
-to talk to the dual DAC.  Sets the A to D to use an external reference 
+to talk to the dual DAC.  Sets the A to D to use an external reference
 and unipolar operation.  Finally initializes all the variable used by the game.
 */
 void init_all(rkt_data *rkt1, rkt_data *rkt2)
 {
-  
+
   WDTCTL = WDTPW + WDTHOLD;             // Stop watchdog timer
 
   BCSCTL1 = 0x08;                       // Setup DCO highest range
@@ -42,7 +42,7 @@ void init_all(rkt_data *rkt1, rkt_data *rkt2)
   CCR0 = 23500;
   TACTL = TASSEL_2 + MC_1;              // SMCLK, upmode
   _BIS_SR(GIE);                         // enable interrupts
-  
+
   // USICTL0 |= USIPE7+USIPE6+USIPE5+USIMST+USIOE; // Port, SPI master
   // USICKCTL = USIDIV_0+USISSEL_2+USICKPL;  // divide by 1 SMCLK, inactive high
   // USICTL0 &= ~USISWRST;                 // release USI for operation
@@ -55,7 +55,7 @@ void init_all(rkt_data *rkt1, rkt_data *rkt2)
   // SD16INCTL0 = SD16INCH_4;              // A4+/- start with rocket 1
   // SD16CCTL0 |= SD16SC;                  // Start A2D conversion
 
-  reset_rkts(rkt1, rkt2);               // reset rkt positons                        
+  reset_rkts(rkt1, rkt2);               // reset rkt positons
   reset_game(rkt1);
   reset_game(rkt2);
   rkt1->game = 0;
@@ -90,8 +90,8 @@ mux input.  Returns int value read from last mux input A to D.
 */
 unsigned int read_a2d(unsigned int next_mux)
 {
-  unsigned int last_a2d;  
-  
+  unsigned int last_a2d;
+
   if (next_mux==0x0002) {
     last_a2d = MY_CNTRL1;
   } else {
@@ -127,7 +127,7 @@ Start the automatic SPI transfer.  Wait until the transfer is complete.
 Finally remove the chip select.
 */
 /*
-void set_one(int set_1) 
+void set_one(int set_1)
 {
 
   USISR = set_1;                        // send value to DAC
@@ -149,7 +149,7 @@ Move DAC to position set_x, set_y.  Write the set_y value into the DAC's
 BUFFER.  Write the set_x value to DAC_x and at the same time move the BUFFER
 value to DAC_y.  This technique removes the stair steping in lines.
 */
-void set_xy(int set_x, int set_y) 
+void set_xy(int set_x, int set_y)
 {
 
   //set_one((set_y & 0x0FFF) | 0x5000);   // send y value to BUFFER

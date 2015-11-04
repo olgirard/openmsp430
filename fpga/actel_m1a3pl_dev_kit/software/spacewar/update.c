@@ -1,4 +1,3 @@
-#include "msp430x20x3.h"
 #include "spacewar.h"
 
 //************************************************************
@@ -19,7 +18,7 @@ extern int bzsin(char);
 Generates the x, y vectors for the rocket at present angle.  Checks the A to D
 passed into function for any keys pressed.  The A to D resistors are selected
 to generate values in between the ranges checked.  If you push multiple buttons
-strange results will occure.  If no keys are pressed the fire flaag clears.  
+strange results will occure.  If no keys are pressed the fire flaag clears.
 Rotate counter clockwise increments the angle variable.  Rotate clockwise
 decrements the angle variable.  If the thrust key is pressed a scaled
 value of xsize and ysize is added into the x and y velocity of the rocket
@@ -36,17 +35,17 @@ position is masked to the DAC maximum.
 void update(rkt_data *rkt, unsigned int new_a2d)
 {
   int i;
-  
+
   rkt->xsize = bzsin(rkt->ang + 64);    // this returns the cosine
   rkt->ysize = bzsin(rkt->ang);         // this returns the sine
 
   if(new_a2d > 0xD000){                 // rkt rotate CCW ?
     rkt->ang++;                         // yes
-  } 
+  }
   else {                                // no
     if(new_a2d > 0xA000){               // rkt rotate CW ?
       rkt->ang--;                       // yes
-    } 
+    }
     else {                              // no
       if(new_a2d > 0x6000) {            // is rkt thrusting
         rkt->xvel += ((long) rkt->xsize << 6);  // yes
@@ -65,7 +64,7 @@ void update(rkt_data *rkt, unsigned int new_a2d)
                 break;
               }
             }
-          } 
+          }
         } else {
           rkt->flags &= ~fire_bit;            // clear fire flag
         }
@@ -83,6 +82,3 @@ void update(rkt_data *rkt, unsigned int new_a2d)
     }
   }
 }
-
-
-
