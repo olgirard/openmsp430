@@ -1,3 +1,8 @@
+2015-10-20 [r207]  
+
+	* Simulation now works seamlessly under Linux, OS-X and Windows
+	  (Cygwin)
+
 2015-07-15 [r205]  
 
 	* Thanks again to Johan W. good feedback, the following updates are

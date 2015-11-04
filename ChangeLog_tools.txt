@@ -1,3 +1,7 @@
+2015-10-20 [r208]  
+
+	* Update tools to run with latest CPU core version.
+
 2014-10-07 [r198]  
 
 	* Update GDB-Proxy to support new GCC/GDB compiler version from
