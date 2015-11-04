@@ -14,8 +14,6 @@ endif
 # disable some warnings specific to the Dhrystone code
 WARNINGS        =  -Wall
 
-# Directories for indludes
-
 # Select flags depending on selected toolchain
 ifeq ($(MSPGCC_PFX),msp430-elf)
 INCDIR          = -I /Users/pitchu/ti/gcc/include
