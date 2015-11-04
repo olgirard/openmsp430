@@ -8,16 +8,16 @@
 //--------------------------------------------------//
 void delay(unsigned int d) {
    while(d--) {
-      nop();
-      nop();
+      __nop();
+      __nop();
    }
 }
 
 //--------------------------------------------------//
-//                 putChar function                 //
+//                 tty_putc function                 //
 //            (Send a byte to the UART)             //
 //--------------------------------------------------//
-int putchar (int txdata) {
+int tty_putc (int txdata) {
 
   // Wait until the TX buffer is not full
   while (UART_STAT & UART_TX_FULL);
@@ -41,7 +41,7 @@ wakeup interrupt (UART_RX_VECTOR) INT_uart_rx(void) {
 
   // Clear the receive pending flag
   UART_STAT = UART_RX_PND;
-  
+
   // Exit the low power mode
   LPM0_EXIT;
 }
@@ -57,7 +57,7 @@ int main(void) {
     int pos = 0;
     char buf[40];
     int led = 0;
-    
+
     WDTCTL = WDTPW | WDTHOLD;           // Init watchdog timer
 
     P3DIR  = 0xff;
@@ -70,15 +70,15 @@ int main(void) {
     //delay(65535);
 
     P3OUT  = 0x00;                      // Switch off LED
-    
-    printf("\r\n====== openMSP430 in action ======\r\n");   //say hello
-    printf("\r\nSimple Line Editor Ready\r\n");
+
+    cprintf("\r\n====== openMSP430 in action ======\r\n");   //say hello
+    cprintf("\r\nSimple Line Editor Ready\r\n");
 
     eint();                             // Enable interrupts
-    
+
     while (1) {                         //main loop, never ends...
 
-        printf("> ");                   //show prompt
+        cprintf("> ");                   //show prompt
         reading = 1;
         while (reading) {               //loop and read characters
 
@@ -94,9 +94,9 @@ int main(void) {
                 //process RETURN key
                 case '\r':
                 //case '\n':
-                    printf("\r\n");     //finish line
-                    buf[pos++] = 0;     //to use printf...
-                    printf(":%s\r\n", buf);
+                    cprintf("\r\n");    //finish line
+                    buf[pos++] = 0;     //to use cprintf...
+                    cprintf(":%s\r\n", buf);
                     reading = 0;        //exit read loop
                     pos = 0;            //reset buffer
                     break;
@@ -104,20 +104,19 @@ int main(void) {
                 case '\b':
                     if (pos > 0) {      //is there a char to delete?
                         pos--;          //remove it in buffer
-                        putchar('\b');  //go back
-                        putchar(' ');   //erase on screen
-                        putchar('\b');  //go back
+                        tty_putc('\b');  //go back
+                        tty_putc(' ');   //erase on screen
+                        tty_putc('\b');  //go back
                     }
                     break;
                 //other characters
                 default:
                     //only store characters if buffer has space
                     if (pos < sizeof(buf)) {
-                        putchar(rxdata);     //echo
+                        tty_putc(rxdata);     //echo
                         buf[pos++] = rxdata; //store
                     }
             }
         }
     }
 }
-
