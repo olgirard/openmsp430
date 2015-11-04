@@ -23,7 +23,7 @@ ccr0:                                   ;that it is used in the listing
         jmp     .Lrxdatabit             ;D5
         jmp     .Lrxdatabit             ;D6
 ;        jmp     .Lrxlastbit             ;D7 that one is following anyway
-        
+
 .Lrxlastbit:                            ;last bit, handle byte
         bit     #SCCI, &CCTL0           ;read last bit
         rrc.b   &rxshift                 ;and save it
@@ -60,9 +60,9 @@ ccr0:                                   ;that it is used in the listing
 ;this one is without interrupts and OUTMOD, because only
 ;this way P1.1 can be used. P1.1 is prefered because the
 ;BSL is on that pin too.
-.global putchar
-        .type putchar, @function
-putchar:                                ;send a byte
+.global tty_putc
+        .type tty_putc, @function
+tty_putc:                               ;send a byte
         mov     #0, &CCTL1              ;select compare mode
         mov     #10, r13                ;ten bits: Start, 8 Data, Stop
         rla     r15                     ;shift in start bit (0)

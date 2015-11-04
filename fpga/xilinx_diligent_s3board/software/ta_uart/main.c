@@ -3,6 +3,7 @@ see README.txt for details.
 
 chris <cliechti@gmx.net>
 */
+#include "omsp_system.h"
 #include "hardware.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -16,8 +17,8 @@ Delay function.
 */
 void delay(unsigned int d) {
    while(d--) {
-      nop();
-      nop();
+      __nop();
+      __nop();
    }
 }
 
@@ -30,7 +31,7 @@ int main(void) {
     int pos = 0;
     char buf[40];
     int led = 0;
-    
+
     WDTCTL = WDTCTL_INIT;               //Init watchdog timer
 
     P1OUT  = P1OUT_INIT;                //Init output data of port1
@@ -51,20 +52,20 @@ int main(void) {
     delay(10);
 //  fllInit();                          //Init FLL to desired frequency using the 32k768 cystal as reference.
     P3OUT  = 0x00;                      //switch off LED
-    
+
     TACTL  = TACTL_AFTER_FLL;           //setup timer (still stopped)
     CCTL0  = CCIE|CAP|CM_2|CCIS_1|SCS;  //select P2.2 with UART signal
     CCTL1  = 0;                         //
     CCTL2  = 0;                         //
     TACTL |= MC1;                       //start timer
-    
+
     eint();                             //enable interrupts
-    
-    printf("\r\n====== openMSP430 in action ======\r\n");   //say hello
-    printf("\r\nSimple Line Editor Ready\r\n");   //say hello
-    
+
+    cprintf("\r\n====== openMSP430 in action ======\r\n");   //say hello
+    cprintf("\r\nSimple Line Editor Ready\r\n");   //say hello
+
     while (1) {                         //main loop, never ends...
-        printf("> ");                   //show prompt
+        cprintf("> ");                   //show prompt
         reading = 1;
         while (reading) {               //loop and read characters
             LPM0;                       //sync, wakeup by irq
@@ -79,9 +80,9 @@ int main(void) {
                 //process RETURN key
                 case '\r':
                 //case '\n':
-                    printf("\r\n");     //finish line
-                    buf[pos++] = 0;     //to use printf...
-                    printf(":%s\r\n", buf);
+                    cprintf("\r\n");     //finish line
+                    buf[pos++] = 0;     //to use cprintf...
+                    cprintf(":%s\r\n", buf);
                     reading = 0;        //exit read loop
                     pos = 0;            //reset buffer
                     break;
@@ -89,16 +90,16 @@ int main(void) {
                 case '\b':
                     if (pos > 0) {      //is there a char to delete?
                         pos--;          //remove it in buffer
-                        putchar((int)'\b');  //go back
-                        putchar((int)' ');   //erase on screen
-                        putchar((int)'\b');  //go back
+                        tty_putc((int)'\b');  //go back
+                        tty_putc((int)' ');   //erase on screen
+                        tty_putc((int)'\b');  //go back
                     }
                     break;
                 //other characters
                 default:
                     //only store characters if buffer has space
                     if (pos < sizeof(buf)) {
-                        putchar(rxdata);     //echo
+                        tty_putc(rxdata);     //echo
                         buf[pos++] = (char)rxdata; //store
                     }
             }

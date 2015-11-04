@@ -1,9 +1,36 @@
 #ifndef HARDWARE_H
 #define HARDWARE_H
 
-#include <msp430.h>
-#include <legacymsp430.h>
-#include <iomacros.h>
+#define BIT0                (0x0001)
+#define BIT1                (0x0002)
+#define BIT2                (0x0004)
+#define BIT3                (0x0008)
+#define BIT4                (0x0010)
+#define BIT5                (0x0020)
+#define BIT6                (0x0040)
+#define BIT7                (0x0080)
+#define BIT8                (0x0100)
+#define BIT9                (0x0200)
+#define BITA                (0x0400)
+#define BITB                (0x0800)
+#define BITC                (0x1000)
+#define BITD                (0x2000)
+#define BITE                (0x4000)
+#define BITF                (0x8000)
+
+#define CCIS_0              (0x0000) /* Capture input select: 0 - CCIxA */
+#define CCIS_1              (0x1000) /* Capture input select: 1 - CCIxB */
+#define CCIS_2              (0x2000) /* Capture input select: 2 - GND */
+#define CCIS_3              (0x3000) /* Capture input select: 3 - Vcc */
+#define CM_0                (0x0000) /* Capture mode: 0 - disabled */
+#define CM_1                (0x4000) /* Capture mode: 1 - pos. edge */
+#define CM_2                (0x8000) /* Capture mode: 1 - neg. edge */
+#define CM_3                (0xC000) /* Capture mode: 1 - both edges */
+
+#define CCIE                (0x0010)  /* Capture/compare interrupt enable */
+#define CCI                 (0x0008)  /* Capture input signal (read) */
+#define SCS                 (0x0800)  /* Capture sychronize */
+#define CAP                 (0x0100)  /* Capture mode: 1 /Compare mode : 0 */
 
 
 //PINS
