@@ -105,7 +105,8 @@ else
        vargs="$vargs +define+VXL" ;;
     ncverilog* )
        rm -rf INCA_libs
-       vargs="$vargs +access+r +nclicq +ncinput+../bin/cov_ncverilog.tcl -covdut openMSP430 -covfile ../bin/cov_ncverilog.ccf -coverage all +define+TRN_FILE" ;;
+       #vargs="$vargs +access+r +nclicq +ncinput+../bin/cov_ncverilog.tcl -covdut openMSP430 -covfile ../bin/cov_ncverilog.ccf -coverage all +define+TRN_FILE" ;;
+       vargs="$vargs +access+r  +nclicq +define+TRN_FILE" ;;
     vcs* )
        rm -rf csrc simv*
        vargs="$vargs -R -debug_pp +vcs+lic+wait +v2k +define+VPD_FILE" ;;
@@ -117,7 +118,7 @@ else
     isim )
        # Xilinx simulator
        rm -rf fuse* isim*
-       fuse tb_openMSP430_fpga glbl -mt off -v 1 -prj $3 -o isim.exe -i ../../../bench/verilog/ -i ../../../rtl/verilog/openmsp430/ -i ../../../rtl/verilog/openmsp430/periph/
+       fuse tb_openMSP430 -prj $3 -o isim.exe -i ../../../bench/verilog/ -i ../../../rtl/verilog/ -i ../../../rtl/verilog/periph/
        echo "run all" > isim.tcl
        ./isim.exe -tclbatch isim.tcl
        exit

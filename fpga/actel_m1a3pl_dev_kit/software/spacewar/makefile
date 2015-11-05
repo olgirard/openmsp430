@@ -6,9 +6,8 @@ OBJECTS         = bzsin.o  cline.o  compar.o  explode.o  hardware.o  main.o  poi
 PORT_CFLAGS     = -O2
 
 # Choose GCC toolchain prefix ('msp430' for MSPGCC / 'msp430-elf' for GCC RedHat/TI)
-#MSPGCC_PFX      = msp430-elf
 ifndef MSPGCC_PFX
-MSPGCC_PFX      = msp430
+MSPGCC_PFX      = msp430-elf
 endif
 
 # disable some warnings specific to the Dhrystone code
@@ -16,7 +15,7 @@ WARNINGS        =  -Wall
 
 # Select flags depending on selected toolchain
 ifeq ($(MSPGCC_PFX),msp430-elf)
-INCDIR          = -I /Users/pitchu/ti/gcc/include
+INCDIR          = -I /cad/ti/gcc/include
 CFLAGS		= -D PFX_MSP430_ELF $(INCDIR) $(PORT_CFLAGS) ${WARNINGS} -g -mcpu=msp430 -mhwmult=none
 else
 CFLAGS		= -D PFX_MSP430               $(PORT_CFLAGS) ${WARNINGS} -g -mcpu=430    -mmpy=none	-mivcnt=16

@@ -53,9 +53,9 @@
 //=============================================================================
 +libext+.v
 
--y /opt/Xilinx/14.4/ISE_DS/ISE/verilog/src/unisims/
--y /opt/Xilinx/14.4/ISE_DS/ISE/verilog/src/simprims/
--y /opt/Xilinx/14.4/ISE_DS/ISE/verilog/src/XilinxCoreLib/
+-y /cad/Xilinx/14.7/ISE_DS/ISE/verilog/src/unisims/
+-y /cad/Xilinx/14.7/ISE_DS/ISE/verilog/src/simprims/
+-y /cad/Xilinx/14.7/ISE_DS/ISE/verilog/src/XilinxCoreLib/
 
 
 //=============================================================================

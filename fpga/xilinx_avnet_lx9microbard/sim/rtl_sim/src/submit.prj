@@ -8,12 +8,12 @@ verilog work ../../../bench/verilog/ram_dp.v
 verilog work ../../../bench/verilog/ram_16x1k_sp.v
 verilog work ../../../bench/verilog/ram_sp.v
 
-verilog work /opt/Xilinx/14.2/ISE_DS/ISE/verilog/src/unisims/DCM_SP.v
-verilog work /opt/Xilinx/14.2/ISE_DS/ISE/verilog/src/unisims/IBUF.v
-verilog work /opt/Xilinx/14.2/ISE_DS/ISE/verilog/src/unisims/IBUFG.v
-verilog work /opt/Xilinx/14.2/ISE_DS/ISE/verilog/src/unisims/BUFG.v
-verilog work /opt/Xilinx/14.2/ISE_DS/ISE/verilog/src/unisims/OBUF.v
-verilog work /opt/Xilinx/14.2/ISE_DS/ISE/verilog/src/unisims/IOBUF.v
+verilog work /cad/Xilinx/14.7/ISE_DS/ISE/verilog/src/unisims/DCM_SP.v
+verilog work /cad/Xilinx/14.7/ISE_DS/ISE/verilog/src/unisims/IBUF.v
+verilog work /cad/Xilinx/14.7/ISE_DS/ISE/verilog/src/unisims/IBUFG.v
+verilog work /cad/Xilinx/14.7/ISE_DS/ISE/verilog/src/unisims/BUFG.v
+verilog work /cad/Xilinx/14.7/ISE_DS/ISE/verilog/src/unisims/OBUF.v
+verilog work /cad/Xilinx/14.7/ISE_DS/ISE/verilog/src/unisims/IOBUF.v
 
 verilog work ../../../rtl/verilog/openMSP430_fpga.v
 verilog work ../../../rtl/verilog/omsp_system_0.v
@@ -44,4 +44,3 @@ verilog work ../../../rtl/verilog/openmsp430/omsp_clock_gate.v
 verilog work ../../../rtl/verilog/openmsp430/omsp_clock_mux.v
 verilog work ../../../rtl/verilog/openmsp430/periph/omsp_gpio.v
 verilog work ../../../rtl/verilog/openmsp430/periph/omsp_timerA.v
-
