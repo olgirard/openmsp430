@@ -41,13 +41,35 @@ if [ ! -e $softdir ]; then
 fi
 
 ###############################################################################
+#                           Compile program                                   #
+###############################################################################
+echo " -----------------------------------------------"
+echo "|  COMPILE PROGRAM: $1"
+echo " -----------------------------------------------"
+echo ""
+
+cd $softdir
+make clean
+make
+cd ../../synthesis/xilinx
+
+###############################################################################
 #                           Update FPGA Bitstream                             #
 ###############################################################################
+echo ""
+echo " -----------------------------------------------"
+echo "|  UPDATE FPGA BITSTREAM"
+echo " -----------------------------------------------"
+echo ""
 
 cd ./WORK
 
 # Generate memory file
-msp430-objcopy -O ihex ../$elffile ./$1.ihex
+if command -v msp430-elf-gcc >/dev/null; then
+    msp430-elf-objcopy -O ihex ../$elffile ./$1.ihex
+else
+    msp430-objcopy     -O ihex ../$elffile ./$1.ihex
+fi
 ../scripts/ihex2mem.tcl -ihex $1.ihex -out $1.mem -mem_size 4096
 
 # Update bitstream
@@ -57,3 +79,7 @@ data2mem -bm ../scripts/memory.bmm -bd $1.mem -bt openMSP430_fpga.bit -o b $1.bi
 cp -f ./$1.bit ../bitstreams
 
 cd ../
+
+echo "New bitstream generated:"
+echo "                          ./bitstreams/$1.bit"
+echo ""
