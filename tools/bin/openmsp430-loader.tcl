@@ -37,6 +37,18 @@
 global omsp_conf
 global omsp_info
 
+# Detect toolchain
+if {[catch {exec msp430-gcc --version} debug_info]} {
+    if {[catch {exec msp430-elf-gcc --version} debug_info]} {
+	puts "\nERROR: Could not detect MSP430 GCC toolchain"
+	exit 1
+    } else {
+	set TOOLCHAIN_PFX "msp430-elf"
+    }
+} else {
+    set TOOLCHAIN_PFX "msp430"
+}
+
 ###############################################################################
 #                            SOURCE LIBRARIES                                 #
 ###############################################################################
@@ -170,7 +182,7 @@ if {[string eq $fileType "elf"]} {
 }
 
 # Generate binary file
-if {[catch {exec msp430-objcopy -I $fileType -O binary $elf_file $bin_file} errMsg]} {
+if {[catch {exec ${TOOLCHAIN_PFX}-objcopy -I $fileType -O binary $elf_file $bin_file} errMsg]} {
     puts $errMsg
     exit 1
 }
@@ -184,7 +196,7 @@ for {set i 0} {$i <= $timeout} {incr i} {
     }
 }
 if {$i>=$timeout} {
-    puts "\nTimeout: ELF to BIN file conversion problem with \"msp430-objcopy\" executable"
+    puts "\nTimeout: ELF to BIN file conversion problem with \"${TOOLCHAIN_PFX}-objcopy\" executable"
     puts "$errMsg"
     exit 1
 }

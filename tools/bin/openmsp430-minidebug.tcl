@@ -82,6 +82,7 @@ global pmemIHEX
 global isPmemRead
 global brkpt
 global color
+global TOOLCHAIN_PFX
 
 # Initialize to default values
 set CpuNr                 0
@@ -126,6 +127,15 @@ for {set i 0} {$i<16} {incr i} {
 }
 for {set i 0} {$i<3} {incr i} {
     set backup($i,current_file_name) ""
+}
+
+# Detect toolchain
+set TOOLCHAIN_PFX "msp430"
+if {[catch {exec msp430-gcc --version} debug_info]} {
+    if {[catch {exec msp430-elf-gcc --version} debug_info]} {
+    } else {
+	set TOOLCHAIN_PFX "msp430-elf"
+    }
 }
 
 
@@ -456,6 +466,7 @@ proc updateCodeView {} {
     global pmemIHEX
     global brkpt
     global isPmemRead
+    global TOOLCHAIN_PFX
 
     if {($binFileName!="") | ($isPmemRead==1)} {
 
@@ -479,12 +490,12 @@ proc updateCodeView {} {
 
         set temp_elf_file  "[clock clicks].elf"
         set temp_ihex_file "[clock clicks].ihex"
-        if {[catch {exec msp430-objcopy -I $currentFileType -O elf32-msp430 $currentFileName $temp_elf_file} debug_info]} {
+        if {[catch {exec ${TOOLCHAIN_PFX}-objcopy -I $currentFileType -O elf32-msp430 $currentFileName $temp_elf_file} debug_info]} {
             .ctrl.load.info.l configure -text "$debug_info" -fg red
             return 0
         }
         if {![waitForFile $temp_elf_file]} {
-            .ctrl.load.info.l configure -text "Timeout: ELF file conversion problem with \"msp430-objcopy\" executable" -fg red
+            .ctrl.load.info.l configure -text "Timeout: ELF file conversion problem with \"${TOOLCHAIN_PFX}-objcopy\" executable" -fg red
             return 0
         }
         if {[string eq $currentFileType "ihex"]} {
@@ -501,12 +512,12 @@ proc updateCodeView {} {
                 .ctrl.cpu.brkpt.chk$i  configure -state disable
                 updateBreakpoint $i
             }
-            if {[catch {exec msp430-objcopy -I $currentFileType -O ihex $temp_elf_file $temp_ihex_file} debug_info]} {
+            if {[catch {exec ${TOOLCHAIN_PFX}-objcopy -I $currentFileType -O ihex $temp_elf_file $temp_ihex_file} debug_info]} {
                 .ctrl.load.info.l configure -text "$debug_info" -fg red
                 return 0
             }
             if {![waitForFile  $temp_ihex_file]} {
-                .ctrl.load.info.l configure -text "Timeout: IHEX file conversion problem with \"msp430-objcopy\" executable" -fg red
+                .ctrl.load.info.l configure -text "Timeout: IHEX file conversion problem with \"${TOOLCHAIN_PFX}-objcopy\" executable" -fg red
                 return 0
             }
             set fp [open $temp_ihex_file r]
@@ -519,7 +530,7 @@ proc updateCodeView {} {
             for {set i 0} {$i<3} {incr i} {
                 .ctrl.cpu.brkpt.chk$i  configure -state normal
             }
-            if {[catch {exec msp430-objdump $dumpOpt $temp_elf_file} debug_info]} {
+            if {[catch {exec ${TOOLCHAIN_PFX}-objdump $dumpOpt $temp_elf_file} debug_info]} {
                 .ctrl.load.info.l configure -text "$debug_info" -fg red
                 return 0
             }
@@ -527,7 +538,7 @@ proc updateCodeView {} {
             for {set i 0} {$i<3} {incr i} {
                 .ctrl.cpu.brkpt.chk$i  configure -state normal
             }
-            if {[catch {exec msp430-objdump $dumpOpt\S $temp_elf_file} debug_info]} {
+            if {[catch {exec ${TOOLCHAIN_PFX}-objdump $dumpOpt\S $temp_elf_file} debug_info]} {
                 .ctrl.load.info.l configure -text "$debug_info" -fg red
                 return 0
             }
@@ -626,6 +637,7 @@ proc loadProgram {load} {
     global isPmemRead
     global pmemIHEX
     global backup
+    global TOOLCHAIN_PFX
 
     # Check if the file exists
     #----------------------------------------
@@ -682,14 +694,14 @@ proc loadProgram {load} {
 
     # Generate binary file
     set bin_file "[clock clicks].bin"
-    if {[catch {exec msp430-objcopy -I $binFileType -O binary $binFileName $bin_file} errMsg]} {
+    if {[catch {exec ${TOOLCHAIN_PFX}-objcopy -I $binFileType -O binary $binFileName $bin_file} errMsg]} {
         .ctrl.load.info.l configure -text "$errMsg" -fg red
         return 0
     }
 
     # Wait until bin file is present on the filesystem
     if {![waitForFile $bin_file]} {
-        .ctrl.load.info.l configure -text "Timeout: ELF to BIN file conversion problem with \"msp430-objcopy\" executable" -fg red
+        .ctrl.load.info.l configure -text "Timeout: ELF to BIN file conversion problem with \"${TOOLCHAIN_PFX}-objcopy\" executable" -fg red
         return 0
     }
 
