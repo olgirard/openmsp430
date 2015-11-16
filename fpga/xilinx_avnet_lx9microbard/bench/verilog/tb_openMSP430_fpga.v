@@ -21,9 +21,9 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: tb_openMSP430_fpga.v
-// 
+//
 // *Module Description:
 //                      openMSP430 FPGA testbench
 //
@@ -194,7 +194,7 @@ openMSP430_fpga dut (
      //   Y1: 40 MHz, USER_CLOCK can be used as
      //              external configuration clock
      //   Y2: 66.667 MHz
-     //   Y3: 100 MHz 
+     //   Y3: 100 MHz
      //----------------------------------------------
      .USER_CLOCK      (CLK_40MHz),
      .CLOCK_Y2        (CLK_66MHz),
@@ -203,7 +203,7 @@ openMSP430_fpga dut (
      //----------------------------------------------
      // The following oscillator is not populated
      // in production but the footprint is compatible
-     // with the Maxim DS1088LU			
+     // with the Maxim DS1088LU
      //----------------------------------------------
      .BACKUP_CLK      (1'b0),
 
@@ -216,7 +216,7 @@ openMSP430_fpga dut (
      .GPIO_DIP4       (SW4),
 
      //----------------------------------------------
-     // User LEDs			
+     // User LEDs
      //----------------------------------------------
      .GPIO_LED1       (LED1),
      .GPIO_LED2       (LED2),
@@ -236,7 +236,7 @@ openMSP430_fpga dut (
      .SDA             (),
 
      //----------------------------------------------
-     // Micron MT46H32M16LFBF-5 LPDDR			
+     // Micron MT46H32M16LFBF-5 LPDDR
      //----------------------------------------------
 
      // Addresses
@@ -256,7 +256,7 @@ openMSP430_fpga dut (
      .LPDDR_BA0       (),
      .LPDDR_BA1       (),
 
-     // Data                                                                  
+     // Data
      .LPDDR_DQ0       (),
      .LPDDR_DQ1       (),
      .LPDDR_DQ2       (),
@@ -290,10 +290,10 @@ openMSP430_fpga dut (
      .LPDDR_RZQ       (),
 
      //----------------------------------------------
-     // National Semiconductor DP83848J 10/100 Ethernet PHY			
+     // National Semiconductor DP83848J 10/100 Ethernet PHY
      //   Pull-ups on RXD are necessary to set the PHY AD to 11110b.
-     //   Must keep the PHY from defaulting to PHY AD = 00000b      
-     //   because this is Isolate Mode                              
+     //   Must keep the PHY from defaulting to PHY AD = 00000b
+     //   because this is Isolate Mode
      //----------------------------------------------
      .ETH_COL         (1'b0),
      .ETH_CRS         (1'b0),
@@ -355,7 +355,7 @@ msp_debug msp_debug_omsp0 (
     .inst_short   (omsp0_inst_short),    // Currently executed instruction (short version)
 
 // INPUTs
-    .core_select  (0)                    // Core selection
+    .core_select  (1'b0)                 // Core selection
 );
 
 msp_debug msp_debug_omsp1 (
@@ -370,7 +370,7 @@ msp_debug msp_debug_omsp1 (
     .inst_short   (omsp1_inst_short),    // Currently executed instruction (short version)
 
 // INPUTs
-    .core_select  (1)                    // Core selection
+    .core_select  (1'b1)                 // Core selection
 );
 
 //
@@ -420,7 +420,7 @@ initial // Normal end of test
 	  $display("|               SIMULATION FAILED               |");
 	  $display("|     (the verilog stimulus didn't complete)    |");
        end
-     else 
+     else
        begin
 	  $display("|               SIMULATION PASSED               |");
        end

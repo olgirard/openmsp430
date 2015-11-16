@@ -1,6 +1,6 @@
 # makfile configuration
 NAME            = leds
-OBJECTS         = main.o 7seg.o
+OBJECTS         = main.o
 
 # Compiler performance option (-Os / -O2 / -O3)
 PORT_CFLAGS     = -O2
@@ -62,5 +62,4 @@ dist:
 FORCE:
 
 #project dependencies
-main.o: main.c hardware.h 7seg.h
-7seg.o: 7seg.c 7seg.h
+main.o: main.c hardware.h

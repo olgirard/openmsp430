@@ -21,9 +21,9 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //
 //----------------------------------------------------------------------------
-// 
+//
 // *File Name: openMSP430_fpga.v
-// 
+//
 // *Module Description:
 //                      openMSP430 FPGA Top-level for the Avnet LX9 Microboard
 //
@@ -58,7 +58,7 @@ module openMSP430_fpga (
      //   Y1: 40 MHz, USER_CLOCK can be used as
      //              external configuration clock
      //   Y2: 66.667 MHz
-     //   Y3: 100 MHz 
+     //   Y3: 100 MHz
      //----------------------------------------------
      USER_CLOCK,
      CLOCK_Y2,
@@ -67,7 +67,7 @@ module openMSP430_fpga (
      //----------------------------------------------
      // The following oscillator is not populated
      // in production but the footprint is compatible
-     // with the Maxim DS1088LU			
+     // with the Maxim DS1088LU
      //----------------------------------------------
      BACKUP_CLK,
 
@@ -80,7 +80,7 @@ module openMSP430_fpga (
      GPIO_DIP4,
 
      //----------------------------------------------
-     // User LEDs			
+     // User LEDs
      //----------------------------------------------
      GPIO_LED1,
      GPIO_LED2,
@@ -100,7 +100,7 @@ module openMSP430_fpga (
      SDA,
 
      //----------------------------------------------
-     // Micron MT46H32M16LFBF-5 LPDDR			
+     // Micron MT46H32M16LFBF-5 LPDDR
      //----------------------------------------------
 
      // Addresses
@@ -120,7 +120,7 @@ module openMSP430_fpga (
      LPDDR_BA0,
      LPDDR_BA1,
 
-     // Data                                                                  
+     // Data
      LPDDR_DQ0,
      LPDDR_DQ1,
      LPDDR_DQ2,
@@ -154,10 +154,10 @@ module openMSP430_fpga (
      LPDDR_RZQ,
 
      //----------------------------------------------
-     // National Semiconductor DP83848J 10/100 Ethernet PHY			
+     // National Semiconductor DP83848J 10/100 Ethernet PHY
      //   Pull-ups on RXD are necessary to set the PHY AD to 11110b.
-     //   Must keep the PHY from defaulting to PHY AD = 00000b      
-     //   because this is Isolate Mode                              
+     //   Must keep the PHY from defaulting to PHY AD = 00000b
+     //   because this is Isolate Mode
      //----------------------------------------------
      ETH_COL,
      ETH_CRS,
@@ -226,7 +226,7 @@ output   SPI_HOLDn_MISO3;
 //   Y1: 40 MHz; USER_CLOCK can be used as
 //              external configuration clock
 //   Y2: 66.667 MHz
-//   Y3: 100 MHz 
+//   Y3: 100 MHz
 //----------------------------------------------
 input    USER_CLOCK;
 input    CLOCK_Y2;
@@ -235,7 +235,7 @@ input    CLOCK_Y3;
 //----------------------------------------------
 // The following oscillator is not populated
 // in production but the footprint is compatible
-// with the Maxim DS1088LU			
+// with the Maxim DS1088LU
 //----------------------------------------------
 input    BACKUP_CLK;
 
@@ -248,7 +248,7 @@ input    GPIO_DIP3;
 input    GPIO_DIP4;
 
 //----------------------------------------------
-// User LEDs			
+// User LEDs
 //----------------------------------------------
 output   GPIO_LED1;
 output   GPIO_LED2;
@@ -268,7 +268,7 @@ output   SCL;
 inout    SDA;
 
 //----------------------------------------------
-// Micron MT46H32M16LFBF-5 LPDDR			
+// Micron MT46H32M16LFBF-5 LPDDR
 //----------------------------------------------
 
 // Addresses
@@ -288,7 +288,7 @@ output   LPDDR_A12;
 output   LPDDR_BA0;
 output   LPDDR_BA1;
 
-// Data                                                                  
+// Data
 inout    LPDDR_DQ0;
 inout    LPDDR_DQ1;
 inout    LPDDR_DQ2;
@@ -322,10 +322,10 @@ output   LPDDR_WE_n;
 inout    LPDDR_RZQ;
 
 //----------------------------------------------
-// National Semiconductor DP83848J 10/100 Ethernet PHY			
+// National Semiconductor DP83848J 10/100 Ethernet PHY
 //   Pull-ups on RXD are necessary to set the PHY AD to 11110b.
-//   Must keep the PHY from defaulting to PHY AD = 00000b      
-//   because this is Isolate Mode                              
+//   Must keep the PHY from defaulting to PHY AD = 00000b
+//   because this is Isolate Mode
 //----------------------------------------------
 input    ETH_COL;
 input    ETH_CRS;
@@ -478,14 +478,29 @@ DCM_SP #(.CLKFX_MULTIPLY(7),
 	 .CLKIN_PERIOD(25.000)) dcm_inst (
 
 // OUTPUTs
+    .CLKDV        (),
     .CLKFX        (dcm_clkfx),
-    .CLK0         (dcm_clk0),
+    .CLKFX180     (),
     .LOCKED       (dcm_locked),
+    .PSDONE       (),
+
+    .STATUS       (),
+
+    .CLK0         (dcm_clk0),
+    .CLK180       (),
+    .CLK270       (),
+    .CLK2X        (),
+    .CLK2X180     (),
+    .CLK90        (),
 
 // INPUTs
     .CLKFB        (dcm_clkfb),
     .CLKIN        (clk_40mhz),
+    .DSSEN        (1'b0),
+
+    .PSCLK        (1'b0),
     .PSEN         (1'b0),
+    .PSINCDEC     (1'b0),
     .RST          (reset_pin)
 );
 
@@ -685,7 +700,7 @@ IBUF  SW1_PIN            (.O(omsp_switch[1]),        .I(GPIO_DIP2));
 IBUF  SW0_PIN            (.O(omsp_switch[0]),        .I(GPIO_DIP1));
 
 //----------------------------------------------
-// User LEDs			
+// User LEDs
 //----------------------------------------------
 OBUF  LED3_PIN           (.I(omsp1_led[1]),          .O(GPIO_LED4));
 OBUF  LED2_PIN           (.I(omsp1_led[0]),          .O(GPIO_LED3));
@@ -705,7 +720,7 @@ IOBUF SCL_PIN            (.T(1'b0), .I(1'b1), .O(),  .IO(SCL));
 IOBUF SDA_PIN            (.T(1'b0), .I(1'b1), .O(),  .IO(SDA));
 
 //----------------------------------------------
-// Micron MT46H32M16LFBF-5 LPDDR			
+// Micron MT46H32M16LFBF-5 LPDDR
 //----------------------------------------------
 
 // Addresses
@@ -725,7 +740,7 @@ OBUF  LPDDR_A12_PIN      (.I(1'b0),                  .O(LPDDR_A12));
 OBUF  LPDDR_BA0_PIN      (.I(1'b0),                  .O(LPDDR_BA0));
 OBUF  LPDDR_BA1_PIN      (.I(1'b0),                  .O(LPDDR_BA1));
 
-// Data                                                                  
+// Data
 IOBUF LPDDR_DQ0_PIN      (.T(1'b0), .I(1'b0), .O(),  .IO(LPDDR_DQ0));
 IOBUF LPDDR_DQ1_PIN      (.T(1'b0), .I(1'b0), .O(),  .IO(LPDDR_DQ1));
 IOBUF LPDDR_DQ2_PIN      (.T(1'b0), .I(1'b0), .O(),  .IO(LPDDR_DQ2));
@@ -760,10 +775,10 @@ IOBUF LPDDR_RZQ_PIN      (.T(1'b0), .I(1'b0), .O(),  .IO(LPDDR_RZQ));
 
 
 //----------------------------------------------
-// National Semiconductor DP83848J 10/100 Ethernet PHY			
+// National Semiconductor DP83848J 10/100 Ethernet PHY
 //   Pull-ups on RXD are necessary to set the PHY AD to 11110b.
-//   Must keep the PHY from defaulting to PHY AD = 00000b      
-//   because this is Isolate Mode                              
+//   Must keep the PHY from defaulting to PHY AD = 00000b
+//   because this is Isolate Mode
 //----------------------------------------------
 IBUF  ETH_COL_PIN        (.O(),                      .I(ETH_COL));
 IBUF  ETH_CRS_PIN        (.O(),                      .I(ETH_CRS));
@@ -790,7 +805,7 @@ OBUF  ETH_TX_EN_PIN      (.I(1'b0),                  .O(ETH_TX_EN));
 //----------------------------------------------
 
 assign omsp_dbg_i2c_sda_out = omsp0_dbg_i2c_sda_out & omsp1_dbg_i2c_sda_out;
-   
+
 // Connector J5
 IOBUF PMOD1_P1_PIN       (.T(1'b0),                  .I(1'b0), .O(),                     .IO(PMOD1_P1));
 IOBUF PMOD1_P2_PIN       (.T(1'b0),                  .I(1'b0), .O(),                     .IO(PMOD1_P2));
@@ -800,7 +815,7 @@ IOBUF PMOD1_P7_PIN       (.T(1'b0),                  .I(1'b0), .O(),            
 IBUF  PMOD1_P8_PIN       (                                     .O(),                     .I (PMOD1_P8));
 IOBUF PMOD1_P9_PIN       (.T(1'b0),                  .I(1'b0), .O(),                     .IO(PMOD1_P9));
 IOBUF PMOD1_P10_PIN      (.T(1'b0),                  .I(1'b0), .O(),                     .IO(PMOD1_P10));
-   
+
 // Connector J4
 IOBUF PMOD2_P1_PIN       (.T(1'b0), .I(1'b0), .O(),  .IO(PMOD2_P1));
 IOBUF PMOD2_P2_PIN       (.T(1'b0), .I(1'b0), .O(),  .IO(PMOD2_P2));
@@ -830,7 +845,7 @@ always @ (posedge dco_clk or posedge dco_rst)
   if (dco_rst) clk_sample <=  1'b0;
   else         clk_sample <=  (div_cnt==8'h00);
 
-   
+
 // ChipScope instance
 wire        [35:0] chipscope_control;
 chipscope_ila chipscope_ila (
@@ -851,4 +866,3 @@ assign chipscope_trigger[23:3]  = 21'h00_0000;
 `endif
 
 endmodule // openMSP430_fpga
-
