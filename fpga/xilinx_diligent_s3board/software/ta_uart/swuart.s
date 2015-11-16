@@ -55,7 +55,7 @@ ccr0:                                   ;that it is used in the listing
         mov     #0xffff, r15            ;return 0xffff
         ret
 
-; void serPutc(char)
+; void tty_putc(char)
 ;use an other Capture/Compare than for receiving (full duplex).
 ;this one is without interrupts and OUTMOD, because only
 ;this way P1.1 can be used. P1.1 is prefered because the

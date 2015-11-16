@@ -19,7 +19,8 @@ This one is executed onece a second. it counts seconds, minues, hours - hey
 it shoule be a clock ;-)
 it does not count days, but i think you'll get the idea.
 */
-volatile int irq_counter, offset;
+volatile int irq_counter;
+volatile INT8U offset;
 
 wakeup interrupt (WDT_VECTOR) INT_Watchdog(void) {
 
@@ -28,7 +29,7 @@ wakeup interrupt (WDT_VECTOR) INT_Watchdog(void) {
     irq_counter = 0;
     offset = (offset+1) % 20;
   }
-  DispStr  (offset, "OPENMSP430 IN ACTION    ");
+  DispStr  (offset, (INT8U *) "OPENMSP430 IN ACTION    ");
 }
 
 
@@ -36,8 +37,10 @@ wakeup interrupt (WDT_VECTOR) INT_Watchdog(void) {
 Main function with some blinking leds
 */
 int main(void) {
-  int i;
+
+    int i;
     int o = 0;
+
     irq_counter = 0;
     offset      = 0;
 
@@ -57,14 +60,17 @@ int main(void) {
 
     WDTCTL = WDTPW | WDTTMSEL | WDTCNTCL;// | WDTIS1  | WDTIS0 ;          // Configure watchdog interrupt
 
-    IE1 |= 0x01;
+    IE1_set_wdtie();
     eint();                            //enable interrupts
 
 
-    while (1) {                         // Main loop, never ends...
+    while (1) {                        // Main loop, never ends...
+
         for (i=0; i<8; i++, o++) {
             P3OUT = (1<<i) | (0x80>>(o&7));
 	    delay(0x0007, 0xffff);
         }
     }
+
+    return 0;
 }
