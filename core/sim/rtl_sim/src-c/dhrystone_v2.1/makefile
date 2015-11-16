@@ -6,7 +6,7 @@ OBJECTS         = dhry_1.o dhry_2.o omsp_func.o mylib/copydata.o mylib/cprintf.o
 PORT_CFLAGS     = -O2
 
 # Choose GCC toolchain prefix ('msp430' for MSPGCC / 'msp430-elf' for GCC RedHat/TI)
-#MSPGCC_PFX      = msp430-elf
+MSPGCC_PFX      = msp430-elf
 ifndef MSPGCC_PFX
 MSPGCC_PFX      = msp430
 endif

@@ -3,7 +3,7 @@ NAME            = sandbox
 OBJECTS         = main.o mylib/copydata.o
 
 # Choose GCC toolchain prefix ('msp430' for MSPGCC / 'msp430-elf' for GCC RedHat/TI)
-#MSPGCC_PFX      = msp430-elf
+MSPGCC_PFX      = msp430-elf
 ifndef MSPGCC_PFX
 MSPGCC_PFX      = msp430
 endif

@@ -40,7 +40,8 @@
 //----------------------------------------------------------
 // SPECIAL FUNCTION REGISTERS
 //----------------------------------------------------------
-#define  IE1         (*(volatile unsigned char *) 0x0000)
+#define  IE1_set_wdtie()   __asm__ __volatile__ ("bis.b #0x01, &0x0000")
+//#define  IE1         (*(volatile unsigned char *) 0x0000)
 #define  IFG1        (*(volatile unsigned char *) 0x0002)
 
 #define  CPU_ID_LO   (*(volatile unsigned char *) 0x0004)
