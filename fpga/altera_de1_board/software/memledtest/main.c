@@ -84,7 +84,7 @@ int main(void) {
 
 
 
-    IE1 |= 0x01;
+    IE1_set_wdtie();
     eint();                            //enable interrupts
 
 
@@ -116,4 +116,3 @@ int main(void) {
 		do rnd_array(array1); while( --i );
 	}
 }
-
