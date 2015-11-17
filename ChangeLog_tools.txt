@@ -1,3 +1,8 @@
+2015-11-17 [r210]  
+
+	* Add support for both MSPGCC and TI/RH-GCC toolchains. Add
+	  detection of debug ports for OS-X.
+
 2015-10-20 [r208]  
 
 	* Update tools to run with latest CPU core version.

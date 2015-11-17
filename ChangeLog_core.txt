@@ -1,3 +1,9 @@
+2015-11-17 [r211]  
+
+	* Add custom printf function to reduce program memory footprint
+	  (the TI/RH GCC version is huge). Note that this function was
+	  created by DJ Delorie ( http://www.delorie.com/ )
+
 2015-10-20 [r207]  
 
 	* Simulation now works seamlessly under Linux, OS-X and Windows
