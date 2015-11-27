@@ -1,0 +1,2 @@
+Warning (10273): Verilog HDL warning at de0_nano_soc_default.v(96): extended using "x" or "z"
+Warning (10273): Verilog HDL warning at de0_nano_soc_default.v(97): extended using "x" or "z"

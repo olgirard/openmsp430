@@ -1,0 +1,17 @@
+Analysis & Synthesis Status : Successful - Fri Dec 26 09:28:44 2014
+Quartus II 64-Bit Version : 14.1.0 Build 186 12/03/2014 SJ Full Version
+Revision Name : my_first_fpga
+Top-level Entity Name : my_first_fpga
+Family : Cyclone V
+Logic utilization (in ALMs) : N/A
+Total registers : 27
+Total pins : 7
+Total virtual pins : 0
+Total block memory bits : 0
+Total DSP Blocks : 0
+Total HSSI RX PCSs : 0
+Total HSSI PMA RX Deserializers : 0
+Total HSSI TX PCSs : 0
+Total HSSI PMA TX Serializers : 0
+Total PLLs : 1
+Total DLLs : 0

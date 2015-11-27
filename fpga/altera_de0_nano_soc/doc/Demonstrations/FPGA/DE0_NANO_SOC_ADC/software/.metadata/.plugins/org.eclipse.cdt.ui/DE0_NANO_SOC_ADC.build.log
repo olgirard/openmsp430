@@ -1,0 +1,10 @@
+
+**** Build of configuration Nios II for project DE0_NANO_SOC_ADC ****
+
+make all 
+Info: Building ../DE0_NANO_SOC_ADC_bsp/
+make --no-print-directory -C ../DE0_NANO_SOC_ADC_bsp/
+[BSP build complete]
+[DE0_NANO_SOC_ADC build complete]
+
+**** Build Finished ****

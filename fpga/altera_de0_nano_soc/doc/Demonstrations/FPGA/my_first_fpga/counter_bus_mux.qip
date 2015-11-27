@@ -1,0 +1,6 @@
+set_global_assignment -name IP_TOOL_NAME "LPM_MUX"
+set_global_assignment -name IP_TOOL_VERSION "14.1"
+set_global_assignment -name IP_GENERATED_DEVICE_FAMILY "{Cyclone V}"
+set_global_assignment -name VERILOG_FILE [file join $::quartus(qip_path) "counter_bus_mux.v"]
+set_global_assignment -name MISC_FILE [file join $::quartus(qip_path) "counter_bus_mux.bsf"]
+set_global_assignment -name MISC_FILE [file join $::quartus(qip_path) "counter_bus_mux_bb.v"]

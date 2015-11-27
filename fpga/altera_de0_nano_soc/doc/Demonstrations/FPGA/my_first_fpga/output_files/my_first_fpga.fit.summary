@@ -1,0 +1,19 @@
+Fitter Status : Successful - Fri Dec 26 09:29:53 2014
+Quartus II 64-Bit Version : 14.1.0 Build 186 12/03/2014 SJ Full Version
+Revision Name : my_first_fpga
+Top-level Entity Name : my_first_fpga
+Family : Cyclone V
+Device : 5CSEMA4U23C6
+Timing Models : Final
+Logic utilization (in ALMs) : 16 / 15,880 ( < 1 % )
+Total registers : 28
+Total pins : 7 / 314 ( 2 % )
+Total virtual pins : 0
+Total block memory bits : 0 / 2,764,800 ( 0 % )
+Total DSP Blocks : 0 / 84 ( 0 % )
+Total HSSI RX PCSs : 0
+Total HSSI PMA RX Deserializers : 0
+Total HSSI TX PCSs : 0
+Total HSSI PMA TX Serializers : 0
+Total PLLs : 1 / 5 ( 20 % )
+Total DLLs : 0 / 4 ( 0 % )

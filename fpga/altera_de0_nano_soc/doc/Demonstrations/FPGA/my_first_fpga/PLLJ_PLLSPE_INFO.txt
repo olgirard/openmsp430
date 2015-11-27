@@ -1,0 +1,10 @@
+PLL_Name	pll:inst1|pll_0002:pll_inst|altera_pll:altera_pll_i|general[0].gpll~FRACTIONAL_PLL
+PLLJITTER	27
+PLLSPEmax	100
+PLLSPEmin	-100
+
+PLL_Name	pll:inst1|pll_0002:pll_inst|altera_pll:altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER
+PLLJITTER	NA
+PLLSPEmax	NA
+PLLSPEmin	NA
+

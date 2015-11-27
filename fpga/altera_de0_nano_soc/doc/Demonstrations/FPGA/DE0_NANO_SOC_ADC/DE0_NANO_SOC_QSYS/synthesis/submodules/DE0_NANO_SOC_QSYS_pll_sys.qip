@@ -1,0 +1,4 @@
+set_instance_assignment -name PLL_COMPENSATION_MODE NORMAL -to "*DE0_NANO_SOC_QSYS_pll_sys*|altera_pll:altera_pll_i*|*"
+ 
+set_instance_assignment -name PLL_AUTO_RESET OFF -to "*DE0_NANO_SOC_QSYS_pll_sys*|altera_pll:altera_pll_i*|*"
+set_instance_assignment -name PLL_BANDWIDTH_PRESET AUTO -to "*DE0_NANO_SOC_QSYS_pll_sys*|altera_pll:altera_pll_i*|*"

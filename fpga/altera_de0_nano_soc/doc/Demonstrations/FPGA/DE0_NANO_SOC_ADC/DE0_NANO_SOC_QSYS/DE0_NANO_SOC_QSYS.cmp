@@ -1,0 +1,14 @@
+	component DE0_NANO_SOC_QSYS is
+		port (
+			clk_clk                        : in  std_logic                    := 'X';             -- clk
+			reset_reset_n                  : in  std_logic                    := 'X';             -- reset_n
+			adc_ltc2308_conduit_end_CONVST : out std_logic;                                       -- CONVST
+			adc_ltc2308_conduit_end_SCK    : out std_logic;                                       -- SCK
+			adc_ltc2308_conduit_end_SDI    : out std_logic;                                       -- SDI
+			adc_ltc2308_conduit_end_SDO    : in  std_logic                    := 'X';             -- SDO
+			sw_external_connection_export  : in  std_logic_vector(9 downto 0) := (others => 'X'); -- export
+			pll_sys_locked_export          : out std_logic;                                       -- export
+			pll_sys_outclk2_clk            : out std_logic                                        -- clk
+		);
+	end component DE0_NANO_SOC_QSYS;
+

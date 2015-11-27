@@ -1,0 +1,13 @@
+!SESSION 2014-12-18 16:07:08.797 -----------------------------------------------
+eclipse.buildId=M20120208-0800
+java.version=1.6.0_23
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.cpp.product -perspective com.altera.sbtgui.ui.cPerspective
+
+!ENTRY org.eclipse.cdt.core 1 0 2014-12-18 16:09:25.338
+!MESSAGE Indexed 'DE0_NANO_SOC_ADC_bsp' (79 sources, 57 headers) in 2.37 sec: 937 declarations; 2,264 references; 113 unresolved inclusions; 5 syntax errors; 194 unresolved names (5.71%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2014-12-18 16:09:36.326
+!MESSAGE Indexed 'DE0_NANO_SOC_ADC' (1 sources, 13 headers) in 0.06 sec: 1 declarations; 1 references; 14 unresolved inclusions; 0 syntax errors; 0 unresolved names (0.00%)
