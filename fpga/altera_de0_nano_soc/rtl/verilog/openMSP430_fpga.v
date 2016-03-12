@@ -47,8 +47,8 @@ module openMSP430_fpga (
   // USER INTERFACE (FPGA)
   //-----------------------------
   input   [1:0] KEY,
-  output  [7:0] LED,
   input   [3:0] SW,
+  output  [7:0] LED,
 
   //-----------------------------
   // GPIO
@@ -78,18 +78,21 @@ module openMSP430_fpga (
 // openMSP430 Program memory bus
 wire [`PMEM_MSB:0] pmem_addr;
 wire        [15:0] pmem_din;
+wire               pmem_cen;
 wire         [1:0] pmem_wen;
 wire        [15:0] pmem_dout;
 
 // openMSP430 Data memory bus
 wire [`DMEM_MSB:0] dmem_addr;
 wire        [15:0] dmem_din;
+wire               dmem_cen;
 wire         [1:0] dmem_wen;
 wire        [15:0] dmem_dout;
 
 // openMSP430 Peripheral memory bus
 wire        [13:0] per_addr;
 wire        [15:0] per_din;
+wire               per_en;
 wire         [1:0] per_we;
 wire        [15:0] per_dout;
 
@@ -110,6 +113,7 @@ wire               dbg_uart_rxd;
 
 // openMSP430 clocks and resets
 wire               dco_clk;
+wire               lfxt_clk;
 wire               aclk_en;
 wire               smclk_en;
 wire               mclk;
@@ -126,6 +130,37 @@ wire               irq_ta0;
 wire               irq_ta1;
 wire        [15:0] per_dout_tA;
 
+// Graphic Controller
+wire               irq_gfx;
+wire        [15:0] per_dout_gfx;
+
+wire        [10:0] lut_ram_port0_addr;
+wire         [1:0] lut_ram_port0_wen;
+wire               lut_ram_port0_cen;
+wire        [15:0] lut_ram_port0_din;
+wire        [15:0] lut_ram_port0_dout;
+
+wire        [10:0] lut_ram_port1_addr;
+wire         [1:0] lut_ram_port1_wen;
+wire               lut_ram_port1_cen;
+wire        [15:0] lut_ram_port1_din;
+wire        [15:0] lut_ram_port1_dout;
+
+wire        [16:0] vid_ram_port0_addr;
+wire         [1:0] vid_ram_port0_wen;
+wire               vid_ram_port0_cen;
+wire        [15:0] vid_ram_port0_din;
+wire        [15:0] vid_ram_port0_dout;
+
+wire        [16:0] vid_ram_port1_addr;
+wire         [1:0] vid_ram_port1_wen;
+wire               vid_ram_port1_cen;
+wire        [15:0] vid_ram_port1_din;
+wire        [15:0] vid_ram_port1_dout;
+
+// Touch-Screen Controller
+wire               irq_touch;
+
 
 //=============================================================================
 // 2)  CLOCK AND RESET GENERATION
@@ -141,6 +176,14 @@ always @ (posedge dco_clk or negedge reset_in_n)
   else             reset_dly_chain <= {1'b1, reset_dly_chain[7:1]};
 
 assign reset_n = reset_dly_chain[0];
+
+// Generate a slow reference clock LFXT_CLK (10us period)
+reg [8:0] lfxt_clk_cnt;
+always @ (posedge dco_clk or negedge reset_n)
+  if (!reset_n) lfxt_clk_cnt <= 9'h000;
+  else          lfxt_clk_cnt <= lfxt_clk_cnt + 9'h001;
+
+assign lfxt_clk = lfxt_clk_cnt[8];
 
 
 //=============================================================================
@@ -191,7 +234,7 @@ openMSP430 openmsp430_0 (
     .dco_clk           (dco_clk),             // Fast oscillator (fast clock)
     .dmem_dout         (dmem_dout),           // Data Memory data output
     .irq               (irq_bus),             // Maskable interrupts
-    .lfxt_clk          (1'b0),                // Low frequency oscillator (typ 32kHz)
+    .lfxt_clk          (lfxt_clk),            // Low frequency oscillator (typ 32kHz)
     .dma_addr          (15'h0000),            // Direct Memory Access address
     .dma_din           (16'h0000),            // Direct Memory Access data input
     .dma_en            (1'b0),                // Direct Memory Access enable (high active)
@@ -215,34 +258,25 @@ openMSP430 openmsp430_0 (
 //-----------------------------
 // LED / KEY / SW interface
 //-----------------------------
-wire unconnected;
 omsp_de0_nano_soc_led_key_sw de0_nano_soc_led_key_sw_0 (
 
 // OUTPUTs
     .irq_key           (irq_key),             // Key/Button interrupt
     .irq_sw            (irq_sw),              // Switch interrupt
 
-    .led               ({LED[7:1], unconnected}),
+    .led               (LED),                 // LED output control
     .per_dout          (per_dout_led_key_sw), // Peripheral data output
 
 // INPUTs
     .mclk              (mclk),                // Main system clock
-    .key               (KEY),                 // Port 1 data input
-    .sw                (SW),                  // Port 2 data input
+    .key               (KEY),                 // key/button inputs
+    .sw                (SW),                  // switches inputs
     .per_addr          (per_addr),            // Peripheral address
     .per_din           (per_din),             // Peripheral data input
     .per_en            (per_en),              // Peripheral enable (high active)
     .per_we            (per_we),              // Peripheral write enable (high active)
     .puc_rst           (puc_rst)              // Main system reset
 );
-
-reg  [31:0] counter_out;
-always @ (posedge dco_clk or negedge reset_in_n)
-  if (!reset_in_n) counter_out <= 32'h00000000;
-  else             counter_out <= counter_out + 1;
-
-assign LED[0] = counter_out[25]; //0x400 0000 --> 1.3 sec
-
 
 //-----------------------------
 // Timer A
@@ -282,6 +316,136 @@ omsp_timerA timerA_0 (
     .taclk             (1'b0)                 // TACLK external timer clock (SLOW)
 );
 
+//-------------------------------
+// GRAPHIC CONTROLER
+// (Interfacing with LT24 board)
+//-------------------------------
+
+// Bidirectional data bus
+wire [15:0] lt24_data;
+wire [15:0] lt24_d_out;
+wire        lt24_d_out_en;
+
+io_buf io_buf_lt24_data_00 (.datain(lt24_d_out[0]),  .oe(lt24_d_out_en), .dataout(lt24_data[0]),  .dataio(GPIO_0[8]) );
+io_buf io_buf_lt24_data_01 (.datain(lt24_d_out[1]),  .oe(lt24_d_out_en), .dataout(lt24_data[1]),  .dataio(GPIO_0[7]) );
+io_buf io_buf_lt24_data_02 (.datain(lt24_d_out[2]),  .oe(lt24_d_out_en), .dataout(lt24_data[2]),  .dataio(GPIO_0[6]) );
+io_buf io_buf_lt24_data_03 (.datain(lt24_d_out[3]),  .oe(lt24_d_out_en), .dataout(lt24_data[3]),  .dataio(GPIO_0[5]) );
+io_buf io_buf_lt24_data_04 (.datain(lt24_d_out[4]),  .oe(lt24_d_out_en), .dataout(lt24_data[4]),  .dataio(GPIO_0[13]));
+io_buf io_buf_lt24_data_05 (.datain(lt24_d_out[5]),  .oe(lt24_d_out_en), .dataout(lt24_data[5]),  .dataio(GPIO_0[14]));
+io_buf io_buf_lt24_data_06 (.datain(lt24_d_out[6]),  .oe(lt24_d_out_en), .dataout(lt24_data[6]),  .dataio(GPIO_0[15]));
+io_buf io_buf_lt24_data_07 (.datain(lt24_d_out[7]),  .oe(lt24_d_out_en), .dataout(lt24_data[7]),  .dataio(GPIO_0[16]));
+io_buf io_buf_lt24_data_08 (.datain(lt24_d_out[8]),  .oe(lt24_d_out_en), .dataout(lt24_data[8]),  .dataio(GPIO_0[17]));
+io_buf io_buf_lt24_data_09 (.datain(lt24_d_out[9]),  .oe(lt24_d_out_en), .dataout(lt24_data[9]),  .dataio(GPIO_0[18]));
+io_buf io_buf_lt24_data_10 (.datain(lt24_d_out[10]), .oe(lt24_d_out_en), .dataout(lt24_data[10]), .dataio(GPIO_0[19]));
+io_buf io_buf_lt24_data_11 (.datain(lt24_d_out[11]), .oe(lt24_d_out_en), .dataout(lt24_data[11]), .dataio(GPIO_0[20]));
+io_buf io_buf_lt24_data_12 (.datain(lt24_d_out[12]), .oe(lt24_d_out_en), .dataout(lt24_data[12]), .dataio(GPIO_0[21]));
+io_buf io_buf_lt24_data_13 (.datain(lt24_d_out[13]), .oe(lt24_d_out_en), .dataout(lt24_data[13]), .dataio(GPIO_0[22]));
+io_buf io_buf_lt24_data_14 (.datain(lt24_d_out[14]), .oe(lt24_d_out_en), .dataout(lt24_data[14]), .dataio(GPIO_0[23]));
+io_buf io_buf_lt24_data_15 (.datain(lt24_d_out[15]), .oe(lt24_d_out_en), .dataout(lt24_data[15]), .dataio(GPIO_0[24]));
+
+
+
+omsp_gfx_controller omsp_gfx_controller_0 (
+
+// OUTPUTs
+    .irq_gfx_o             (irq_gfx),                 // Graphic Controller interrupt
+
+    .lt24_cs_n_o           (GPIO_0[25]),              // LT24 Chip select (Active low)
+    .lt24_rd_n_o           (GPIO_0[10]),              // LT24 Read strobe (Active low)
+    .lt24_wr_n_o           (GPIO_0[11]),              // LT24 Write strobe (Active low)
+    .lt24_rs_o             (GPIO_0[12]),              // LT24 Command/Param selection (Cmd=0/Param=1)
+    .lt24_d_o              (lt24_d_out),              // LT24 Data output
+    .lt24_d_en_o           (lt24_d_out_en),           // LT24 Data output enable
+    .lt24_reset_n_o        (GPIO_0[33]),              // LT24 Reset (Active Low)
+    .lt24_on_o             (GPIO_0[35]),              // LT24 on/off
+
+    .per_dout_o            (per_dout_gfx),            // Peripheral data output
+
+    .lut_ram_port0_addr_o  (lut_ram_port0_addr),      // LUT-RAM port 0 address
+    .lut_ram_port0_wen_o   (lut_ram_port0_wen ),      // LUT-RAM port 0 write enable (active low)
+    .lut_ram_port0_cen_o   (lut_ram_port0_cen ),      // LUT-RAM port 0 enable (active low)
+    .lut_ram_port0_din_o   (lut_ram_port0_din ),      // LUT-RAM port 0 data input
+
+    .lut_ram_port1_addr_o  (lut_ram_port1_addr),      // LUT-RAM port 1 address
+    .lut_ram_port1_wen_o   (lut_ram_port1_wen ),      // LUT-RAM port 1 write enable (active low)
+    .lut_ram_port1_cen_o   (lut_ram_port1_cen ),      // LUT-RAM port 1 enable (active low)
+    .lut_ram_port1_din_o   (lut_ram_port1_din ),      // LUT-RAM port 1 data input
+
+    .vid_ram_port0_addr_o  (vid_ram_port0_addr),      // Video-RAM port 0 address
+    .vid_ram_port0_wen_o   (vid_ram_port0_wen ),      // Video-RAM port 0 write enable (active low)
+    .vid_ram_port0_cen_o   (vid_ram_port0_cen ),      // Video-RAM port 0 enable (active low)
+    .vid_ram_port0_din_o   (vid_ram_port0_din ),      // Video-RAM port 0 data input
+
+    .vid_ram_port1_addr_o  (vid_ram_port1_addr),      // Video-RAM port 1 address
+    .vid_ram_port1_wen_o   (vid_ram_port1_wen ),      // Video-RAM port 1 write enable (active low)
+    .vid_ram_port1_cen_o   (vid_ram_port1_cen ),      // Video-RAM port 1 enable (active low)
+    .vid_ram_port1_din_o   (vid_ram_port1_din ),      // Video-RAM port 1 data input
+
+// INPUTs
+
+    .mclk                  (mclk),                    // Main system clock
+    .per_addr_i            (per_addr),                // Peripheral address
+    .per_din_i             (per_din),                 // Peripheral data input
+    .per_en_i              (per_en),                  // Peripheral enable (high active)
+    .per_we_i              (per_we),                  // Peripheral write enable (high active)
+    .puc_rst               (puc_rst),                 // Main system reset
+
+    .lt24_d_i              (lt24_data),               // LT24 Data input
+
+    .lut_ram_port0_dout_i  (lut_ram_port0_dout),      // LUT-RAM port 0 data output
+    .lut_ram_port1_dout_i  (lut_ram_port1_dout),      // LUT-RAM port 1 data output
+
+    .vid_ram_port0_dout_i  (vid_ram_port0_dout),      // Video-RAM port 0 data output
+    .vid_ram_port1_dout_i  (vid_ram_port1_dout)       // Video-RAM port 1 data output
+);
+
+// Video dual port memory
+ram_16x75k_dp vid_ram_16x75k_dp_0 (
+
+    .address_a         ( vid_ram_port0_addr),     // RAM port 0
+    .byteena_a         (~vid_ram_port0_wen),
+    .enable_a          (~vid_ram_port0_cen),
+    .clock_a           ( mclk),
+    .data_a            ( vid_ram_port0_din),
+    .wren_a            (~(&vid_ram_port0_wen)),
+    .q_a               ( vid_ram_port0_dout),
+
+    .address_b         ( vid_ram_port1_addr),     // RAM port 1
+    .byteena_b         (~vid_ram_port1_wen),
+    .enable_b          (~vid_ram_port1_cen),
+    .clock_b           ( mclk),
+    .data_b            ( vid_ram_port1_din),
+    .wren_b            (~(&vid_ram_port1_wen)),
+    .q_b               ( vid_ram_port1_dout)
+);
+
+// LUT dual port memory
+ram_16x1302_dp lut_ram_16x1302_dp_0 (
+
+    .address_a         ( lut_ram_port0_addr),     // RAM port 0
+    .byteena_a         (~lut_ram_port0_wen),
+    .enable_a          (~lut_ram_port0_cen),
+    .clock_a           ( mclk),
+    .data_a            ( lut_ram_port0_din),
+    .wren_a            (~(&lut_ram_port0_wen)),
+    .q_a               ( lut_ram_port0_dout),
+
+    .address_b         ( lut_ram_port1_addr),     // RAM port 1
+    .byteena_b         (~lut_ram_port1_wen),
+    .enable_b          (~lut_ram_port1_cen),
+    .clock_b           ( mclk),
+    .data_b            ( lut_ram_port1_din),
+    .wren_b            (~(&lut_ram_port1_wen)),
+    .q_b               ( lut_ram_port1_dout)
+);
+
+assign GPIO_0[34] = 1'b1; //    .adc_cs_n          (GPIO_0[34]),          // ADC Chip select (Active low)
+assign GPIO_0[4]  = 1'b0; //    .adc_dclk          (GPIO_0[4]),           // ADC Clock
+assign GPIO_0[3]  = 1'b0; //    .adc_din           (GPIO_0[3]),           // ADC Data input
+assign irq_touch  = 1'b0; //
+//    .adc_busy          (GPIO_0[2]),           // ADC Busy output
+//    .adc_dount         (GPIO_0[1]),           // ADC Data output
+//    .adc_penirq_n      (GPIO_0[0]),           // Pen IRQ from touch controller
 
 //-----------------------------
 // Combine peripheral
@@ -289,7 +453,8 @@ omsp_timerA timerA_0 (
 //-----------------------------
 
 assign per_dout = per_dout_led_key_sw |
-                  per_dout_tA;
+                  per_dout_tA         |
+                  per_dout_gfx;
 
 
 //-----------------------------
@@ -304,8 +469,8 @@ assign irq_bus  = {1'b0,         // Vector 13  (0xFFFA)
                    irq_ta0,      // Vector  9  (0xFFF2)
                    irq_ta1,      // Vector  8  (0xFFF0)
                    1'b0,         // Vector  7  (0xFFEE)
-                   1'b0,         // Vector  6  (0xFFEC)
-                   1'b0,         // Vector  5  (0xFFEA)
+                   irq_gfx,      // Vector  6  (0xFFEC)
+                   irq_touch,    // Vector  5  (0xFFEA)
                    1'b0,         // Vector  4  (0xFFE8)
                    irq_key,      // Vector  3  (0xFFE6)
                    irq_sw,       // Vector  2  (0xFFE4)
@@ -317,35 +482,43 @@ assign irq_bus  = {1'b0,         // Vector 13  (0xFFFA)
 // 5)  PROGRAM AND DATA MEMORIES
 //=============================================================================
 
-ram16x512 ram (
-    .address           ( dmem_addr[8:0]),
-    .clken             (~dmem_cen),
-    .clock             ( mclk),
-    .data              ( dmem_din[15:0]),
-    .q                 ( dmem_dout[15:0]),
-    .wren              (~(&dmem_wen[1:0])),
-    .byteena           (~dmem_wen[1:0])
+ram_16x16k pmem_0 (
+    .address   ( pmem_addr),
+    .byteena   (~pmem_wen),
+    .clken     (~pmem_cen),
+    .clock     ( mclk),
+    .data      ( pmem_din),
+    .wren      (~(&pmem_wen)),
+    .q         ( pmem_dout)
 );
 
-
-rom16x2048 rom_0 (
-    .clock             (dco_clk),
-    .clken             (~pmem_cen),
-    .address           ( pmem_addr[10:0]),
-    .q                 ( pmem_dout )
+ram_16x8k dmem_0 (
+    .address   ( dmem_addr),
+    .byteena   (~dmem_wen),
+    .clken     (~dmem_cen),
+    .clock     ( mclk),
+    .data      ( dmem_din),
+    .wren      (~(&dmem_wen)),
+    .q         ( dmem_dout)
 );
-
 
 //=============================================================================
 // 6)  DEBUG INTERFACE
 //=============================================================================
 
-assign  dbg_i2c_addr       =  7'h00;
-assign  dbg_i2c_broadcast  =  7'h00;
-assign  dbg_i2c_scl        =  1'b1;
-assign  dbg_i2c_sda_in     =  1'b1;
+assign  dbg_i2c_addr       =  7'd50;
+assign  dbg_i2c_broadcast  =  7'd49;
+assign  dbg_i2c_scl        =  ARDUINO_IO[15];
+io_buf io_buf_sda_0 (.datain(1'b0), .oe(~dbg_i2c_sda_out), .dataout(dbg_i2c_sda_in), .dataio(ARDUINO_IO[14]));
 assign  dbg_uart_rxd       =  1'b0;
 
-
+// Unused stuff
+assign  GPIO_0             =  36'hzzzzzzzzz;
+assign  GPIO_1             =  36'hzzzzzzzzz;
+assign  ARDUINO_IO[13:0]   =  14'hzzzz;
+assign  ARDUINO_RESET_N    =   1'hz;
+assign  ADC_CONVST         =   1'hz;
+assign  ADC_SCK            =   1'hz;
+assign  ADC_SDI            =   1'hz;
 
 endmodule
