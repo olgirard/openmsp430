@@ -630,7 +630,14 @@ pack   .tclscript.fb.read   -side left -padx 20  -pady {0 10} -fill x
 
 wm resizable . 0 0
 
-
+# Close the window
+wm protocol . WM_DELETE_WINDOW {
+    if {[tk_messageBox -message "Quit?" -type yesno] eq "yes"} {
+	stopAllServers
+	utils::uart_close
+	exit
+    }
+}
 
 #####################################
 #  Breakpoint configuration window  #

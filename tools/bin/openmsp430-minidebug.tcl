@@ -1661,6 +1661,15 @@ pack      .code.text    -side left   -fill both -expand true
 .code.text tag config highlightBRK2_DIS -background $color(Brk2_disabled)
 
 
+# Close the window
+wm protocol . WM_DELETE_WINDOW {
+    if {[tk_messageBox -message "Quit?" -type yesno] eq "yes"} {
+	clearBreakpoints
+	utils::uart_close
+	exit
+    }
+}
+
 #######################################
 #  PERIODICALLY CHECK THE CPU STATUS  #
 #######################################
