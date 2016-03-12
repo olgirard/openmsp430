@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# Enable/Disable waveform dumping
+OMSP_NODUMP=0
+export OMSP_NODUMP
+
+# Choose simulator:
+#                   - iverilog  : Icarus Verilog  (default)
+#                   - cver      : CVer
+#                   - verilog   : Verilog-XL
+#                   - ncverilog : NC-Verilog
+#                   - vcs       : VCS
+#                   - vsim      : Modelsim
+#                   - isim      : Xilinx simulator
+OMSP_SIMULATOR=ncverilog
+export OMSP_SIMULATOR
+
+#
+# Parameter Check
+#
+EXPECTED_ARGS=1
+if [ $# -ne $EXPECTED_ARGS ]; then
+    echo ""
+    echo "ERROR          : wrong number of arguments"
+    echo "USAGE          : ./run <test name>"
+    echo "EXAMPLE	 : ./run    leds"
+    echo ""
+    echo "AVAILABLE TESTS:"
+    for fullfile in ../src/*.v ; do
+	filename=$(basename "$fullfile")
+	filename="${filename%.*}"
+	echo "                  - $filename"
+    done
+    echo ""
+  exit 1
+fi
+
+# Start simulation
+../bin/msp430sim $1
