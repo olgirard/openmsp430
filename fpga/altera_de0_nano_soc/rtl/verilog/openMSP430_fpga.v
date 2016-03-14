@@ -134,13 +134,13 @@ wire        [15:0] per_dout_tA;
 wire               irq_gfx;
 wire        [15:0] per_dout_gfx;
 
-wire        [10:0] lut_ram_port0_addr;
+wire         [8:0] lut_ram_port0_addr;
 wire         [1:0] lut_ram_port0_wen;
 wire               lut_ram_port0_cen;
 wire        [15:0] lut_ram_port0_din;
 wire        [15:0] lut_ram_port0_dout;
 
-wire        [10:0] lut_ram_port1_addr;
+wire         [8:0] lut_ram_port1_addr;
 wire         [1:0] lut_ram_port1_wen;
 wire               lut_ram_port1_cen;
 wire        [15:0] lut_ram_port1_din;
@@ -420,7 +420,7 @@ ram_16x75k_dp vid_ram_16x75k_dp_0 (
 );
 
 // LUT dual port memory
-ram_16x1302_dp lut_ram_16x1302_dp_0 (
+ram_16x512_dp lut_ram_16x512_dp_0 (
 
     .address_a         ( lut_ram_port0_addr),     // RAM port 0
     .byteena_a         (~lut_ram_port0_wen),

@@ -35,6 +35,10 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
+`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`else
+`include "omsp_gfx_controller_defines.v"
+`endif
 
 module  omsp_gfx_reg (
 
@@ -66,6 +70,7 @@ module  omsp_gfx_reg (
     per_dout_o,                              // Peripheral data output
 
     refresh_frame_addr_o,                    // Refresh frame base address
+    refresh_lut_select_o,                    // Refresh LUT bank selection
 
     lut_ram_addr_o,                          // LUT-RAM address
     lut_ram_din_o,                           // LUT-RAM data
@@ -93,57 +98,58 @@ module  omsp_gfx_reg (
 
 // OUTPUTs
 //=========
-output             irq_gfx_o;                // Graphic Controller interrupt
+output               irq_gfx_o;                // Graphic Controller interrupt
 
-output             lt24_reset_n_o;           // LT24 Reset (Active Low)
-output             lt24_on_o;                // LT24 on/off
-output       [2:0] lt24_cfg_clk_o;           // LT24 Interface clock configuration
-output      [11:0] lt24_cfg_refr_o;          // LT24 Interface refresh configuration
-output             lt24_cfg_refr_sync_en_o;  // LT24 Interface refresh sync configuration
-output       [9:0] lt24_cfg_refr_sync_val_o; // LT24 Interface refresh sync value configuration
-output             lt24_cmd_refr_o;          // LT24 Interface refresh command
-output       [7:0] lt24_cmd_val_o;           // LT24 Generic command value
-output             lt24_cmd_has_param_o;     // LT24 Generic command has parameters
-output      [15:0] lt24_cmd_param_o;         // LT24 Generic command parameter value
-output             lt24_cmd_param_rdy_o;     // LT24 Generic command trigger
-output      [15:0] lt24_cmd_dfill_o;         // LT24 Data fill value
-output             lt24_cmd_dfill_wr_o;      // LT24 Data fill trigger
+output               lt24_reset_n_o;           // LT24 Reset (Active Low)
+output               lt24_on_o;                // LT24 on/off
+output         [2:0] lt24_cfg_clk_o;           // LT24 Interface clock configuration
+output        [11:0] lt24_cfg_refr_o;          // LT24 Interface refresh configuration
+output               lt24_cfg_refr_sync_en_o;  // LT24 Interface refresh sync configuration
+output         [9:0] lt24_cfg_refr_sync_val_o; // LT24 Interface refresh sync value configuration
+output               lt24_cmd_refr_o;          // LT24 Interface refresh command
+output         [7:0] lt24_cmd_val_o;           // LT24 Generic command value
+output               lt24_cmd_has_param_o;     // LT24 Generic command has parameters
+output        [15:0] lt24_cmd_param_o;         // LT24 Generic command parameter value
+output               lt24_cmd_param_rdy_o;     // LT24 Generic command trigger
+output        [15:0] lt24_cmd_dfill_o;         // LT24 Data fill value
+output               lt24_cmd_dfill_wr_o;      // LT24 Data fill trigger
 
-output      [15:0] display_width_o;          // Display width
-output      [15:0] display_height_o;         // Display height
-output      [31:0] display_size_o;           // Display size (number of pixels)
-output             display_y_swap_o;         // Display configuration: swap Y axis (horizontal symmetry)
-output             display_x_swap_o;         // Display configuration: swap X axis (vertical symmetry)
-output             display_cl_swap_o;        // Display configuration: swap column/lines
-output       [2:0] gfx_mode_o;               // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
+output [`LPIX_MSB:0] display_width_o;          // Display width
+output [`LPIX_MSB:0] display_height_o;         // Display height
+output [`SPIX_MSB:0] display_size_o;           // Display size (number of pixels)
+output               display_y_swap_o;         // Display configuration: swap Y axis (horizontal symmetry)
+output               display_x_swap_o;         // Display configuration: swap X axis (vertical symmetry)
+output               display_cl_swap_o;        // Display configuration: swap column/lines
+output         [2:0] gfx_mode_o;               // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
-output      [15:0] per_dout_o;               // Peripheral data output
+output        [15:0] per_dout_o;               // Peripheral data output
 
-output      [31:0] refresh_frame_addr_o;     // Refresh frame base address
+output [`VRAM_MSB:0] refresh_frame_addr_o;     // Refresh frame base address
+output               refresh_lut_select_o;     // Refresh LUT bank selection
 
-output      [31:0] lut_ram_addr_o;           // LUT-RAM address
-output      [15:0] lut_ram_din_o;            // LUT-RAM data
-output       [1:0] lut_ram_wen_o;            // LUT-RAM write strobe (active low)
-output             lut_ram_cen_o;            // LUT-RAM chip enable (active low)
+output [`LRAM_MSB:0] lut_ram_addr_o;           // LUT-RAM address
+output        [15:0] lut_ram_din_o;            // LUT-RAM data
+output         [1:0] lut_ram_wen_o;            // LUT-RAM write strobe (active low)
+output               lut_ram_cen_o;            // LUT-RAM chip enable (active low)
 
-output      [31:0] vid_ram_addr_o;           // Video-RAM address
-output      [15:0] vid_ram_din_o;            // Video-RAM data
-output       [1:0] vid_ram_wen_o;            // Video-RAM write strobe (active low)
-output             vid_ram_cen_o;            // Video-RAM chip enable (active low)
+output [`VRAM_MSB:0] vid_ram_addr_o;           // Video-RAM address
+output        [15:0] vid_ram_din_o;            // Video-RAM data
+output         [1:0] vid_ram_wen_o;            // Video-RAM write strobe (active low)
+output               vid_ram_cen_o;            // Video-RAM chip enable (active low)
 
 // INPUTs
 //=========
-input        [4:0] lt24_status_i;            // LT24 FSM Status
-input              lt24_start_evt_i;         // LT24 FSM is starting
-input              lt24_done_evt_i;          // LT24 FSM is done
-input              mclk;                     // Main system clock
-input       [13:0] per_addr_i;               // Peripheral address
-input       [15:0] per_din_i;                // Peripheral data input
-input              per_en_i;                 // Peripheral enable (high active)
-input        [1:0] per_we_i;                 // Peripheral write enable (high active)
-input              puc_rst;                  // Main system reset
-input       [15:0] lut_ram_dout_i;           // LUT-RAM data input
-input       [15:0] vid_ram_dout_i;           // Video-RAM data input
+input          [4:0] lt24_status_i;            // LT24 FSM Status
+input                lt24_start_evt_i;         // LT24 FSM is starting
+input                lt24_done_evt_i;          // LT24 FSM is done
+input                mclk;                     // Main system clock
+input         [13:0] per_addr_i;               // Peripheral address
+input         [15:0] per_din_i;                // Peripheral data input
+input                per_en_i;                 // Peripheral enable (high active)
+input          [1:0] per_we_i;                 // Peripheral write enable (high active)
+input                puc_rst;                  // Main system reset
+input         [15:0] lut_ram_dout_i;           // LUT-RAM data input
+input         [15:0] vid_ram_dout_i;           // Video-RAM data input
 
 
 //=============================================================================
@@ -175,9 +181,8 @@ parameter [DEC_WD-1:0] GFX_CTRL            = 'h00,  // General control/status/ir
                        LT24_CMD_DFILL      = 'h2A,
                        LT24_STATUS         = 'h2C,
 
-                       LUT_RAM_ADDR_HI     = 'h30,  // LUT Memory Access Gate
-                       LUT_RAM_ADDR_LO     = 'h32,
-                       LUT_RAM_DATA        = 'h34,
+                       LUT_RAM_ADDR        = 'h30,  // LUT Memory Access Gate
+                       LUT_RAM_DATA        = 'h32,
 
                        FRAME_SELECT        = 'h3E,  // Frame pointers and selection
                        FRAME0_PTR_HI       = 'h40,
@@ -233,8 +238,7 @@ parameter [DEC_SZ-1:0] GFX_CTRL_D          = (BASE_REG << GFX_CTRL          ),
                        LT24_CMD_DFILL_D    = (BASE_REG << LT24_CMD_DFILL    ),
                        LT24_STATUS_D       = (BASE_REG << LT24_STATUS       ),
 
-                       LUT_RAM_ADDR_HI_D   = (BASE_REG << LUT_RAM_ADDR_HI   ),
-                       LUT_RAM_ADDR_LO_D   = (BASE_REG << LUT_RAM_ADDR_LO   ),
+                       LUT_RAM_ADDR_D      = (BASE_REG << LUT_RAM_ADDR      ),
                        LUT_RAM_DATA_D      = (BASE_REG << LUT_RAM_DATA      ),
 
                        FRAME_SELECT_D      = (BASE_REG << FRAME_SELECT      ),
@@ -273,79 +277,87 @@ parameter [DEC_SZ-1:0] GFX_CTRL_D          = (BASE_REG << GFX_CTRL          ),
 //============================================================================
 
 // Local register selection
-wire              reg_sel   =  per_en_i & (per_addr_i[13:DEC_WD-1]==BASE_ADDR[14:DEC_WD]);
+wire               reg_sel   =  per_en_i & (per_addr_i[13:DEC_WD-1]==BASE_ADDR[14:DEC_WD]);
 
 // Register local address
-wire [DEC_WD-1:0] reg_addr  =  {per_addr_i[DEC_WD-2:0], 1'b0};
+wire  [DEC_WD-1:0] reg_addr  =  {per_addr_i[DEC_WD-2:0], 1'b0};
 
 // Register address decode
-wire [DEC_SZ-1:0] reg_dec   =  (GFX_CTRL_D          &  {DEC_SZ{(reg_addr == GFX_CTRL          )}})  |
-                               (GFX_STATUS_D        &  {DEC_SZ{(reg_addr == GFX_STATUS        )}})  |
-                               (GFX_IRQ_D           &  {DEC_SZ{(reg_addr == GFX_IRQ           )}})  |
+wire  [DEC_SZ-1:0] reg_dec   =  (GFX_CTRL_D          &  {DEC_SZ{(reg_addr == GFX_CTRL          )}})  |
+                                (GFX_STATUS_D        &  {DEC_SZ{(reg_addr == GFX_STATUS        )}})  |
+                                (GFX_IRQ_D           &  {DEC_SZ{(reg_addr == GFX_IRQ           )}})  |
 
-                               (DISPLAY_WIDTH_D     &  {DEC_SZ{(reg_addr == DISPLAY_WIDTH     )}})  |
-                               (DISPLAY_HEIGHT_D    &  {DEC_SZ{(reg_addr == DISPLAY_HEIGHT    )}})  |
-                               (DISPLAY_SIZE_HI_D   &  {DEC_SZ{(reg_addr == DISPLAY_SIZE_HI   )}})  |
-                               (DISPLAY_SIZE_LO_D   &  {DEC_SZ{(reg_addr == DISPLAY_SIZE_LO   )}})  |
-                               (DISPLAY_CFG_D       &  {DEC_SZ{(reg_addr == DISPLAY_CFG       )}})  |
+                                (DISPLAY_WIDTH_D     &  {DEC_SZ{(reg_addr == DISPLAY_WIDTH     )}})  |
+                                (DISPLAY_HEIGHT_D    &  {DEC_SZ{(reg_addr == DISPLAY_HEIGHT    )}})  |
+                                (DISPLAY_SIZE_HI_D   &  {DEC_SZ{(reg_addr == DISPLAY_SIZE_HI   )}})  |
+                                (DISPLAY_SIZE_LO_D   &  {DEC_SZ{(reg_addr == DISPLAY_SIZE_LO   )}})  |
+                                (DISPLAY_CFG_D       &  {DEC_SZ{(reg_addr == DISPLAY_CFG       )}})  |
 
-                               (LT24_CFG_D          &  {DEC_SZ{(reg_addr == LT24_CFG          )}})  |
-                               (LT24_REFRESH_D      &  {DEC_SZ{(reg_addr == LT24_REFRESH      )}})  |
-                               (LT24_REFRESH_SYNC_D &  {DEC_SZ{(reg_addr == LT24_REFRESH_SYNC )}})  |
-                               (LT24_CMD_D          &  {DEC_SZ{(reg_addr == LT24_CMD          )}})  |
-                               (LT24_CMD_PARAM_D    &  {DEC_SZ{(reg_addr == LT24_CMD_PARAM    )}})  |
-                               (LT24_CMD_DFILL_D    &  {DEC_SZ{(reg_addr == LT24_CMD_DFILL    )}})  |
-                               (LT24_STATUS_D       &  {DEC_SZ{(reg_addr == LT24_STATUS       )}})  |
+                                (LT24_CFG_D          &  {DEC_SZ{(reg_addr == LT24_CFG          )}})  |
+                                (LT24_REFRESH_D      &  {DEC_SZ{(reg_addr == LT24_REFRESH      )}})  |
+                                (LT24_REFRESH_SYNC_D &  {DEC_SZ{(reg_addr == LT24_REFRESH_SYNC )}})  |
+                                (LT24_CMD_D          &  {DEC_SZ{(reg_addr == LT24_CMD          )}})  |
+                                (LT24_CMD_PARAM_D    &  {DEC_SZ{(reg_addr == LT24_CMD_PARAM    )}})  |
+                                (LT24_CMD_DFILL_D    &  {DEC_SZ{(reg_addr == LT24_CMD_DFILL    )}})  |
+                                (LT24_STATUS_D       &  {DEC_SZ{(reg_addr == LT24_STATUS       )}})  |
 
-                               (LUT_RAM_ADDR_HI_D   &  {DEC_SZ{(reg_addr == LUT_RAM_ADDR_HI   )}})  |
-                               (LUT_RAM_ADDR_LO_D   &  {DEC_SZ{(reg_addr == LUT_RAM_ADDR_LO   )}})  |
-                               (LUT_RAM_DATA_D      &  {DEC_SZ{(reg_addr == LUT_RAM_DATA      )}})  |
+                                (LUT_RAM_ADDR_D      &  {DEC_SZ{(reg_addr == LUT_RAM_ADDR      )}})  |
+                                (LUT_RAM_DATA_D      &  {DEC_SZ{(reg_addr == LUT_RAM_DATA      )}})  |
 
-                               (FRAME_SELECT_D      &  {DEC_SZ{(reg_addr == FRAME_SELECT      )}})  |
-                               (FRAME0_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME0_PTR_HI     )}})  |
-                               (FRAME0_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME0_PTR_LO     )}})  |
-                               (FRAME1_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME1_PTR_HI     )}})  |
-                               (FRAME1_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME1_PTR_LO     )}})  |
-                               (FRAME2_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME2_PTR_HI     )}})  |
-                               (FRAME2_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME2_PTR_LO     )}})  |
-                               (FRAME3_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME3_PTR_HI     )}})  |
-                               (FRAME3_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME3_PTR_LO     )}})  |
+                                (FRAME_SELECT_D      &  {DEC_SZ{(reg_addr == FRAME_SELECT      )}})  |
+                                (FRAME0_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME0_PTR_HI     )}})  |
+                                (FRAME0_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME0_PTR_LO     )}})  |
+                                (FRAME1_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME1_PTR_HI     )}})  |
+                                (FRAME1_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME1_PTR_LO     )}})  |
+                                (FRAME2_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME2_PTR_HI     )}})  |
+                                (FRAME2_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME2_PTR_LO     )}})  |
+                                (FRAME3_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME3_PTR_HI     )}})  |
+                                (FRAME3_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME3_PTR_LO     )}})  |
 
-                               (VID_RAM0_ADDR_HI_D  &  {DEC_SZ{(reg_addr == VID_RAM0_ADDR_HI  )}})  |
-                               (VID_RAM0_ADDR_LO_D  &  {DEC_SZ{(reg_addr == VID_RAM0_ADDR_LO  )}})  |
-                               (VID_RAM0_DATA_D     &  {DEC_SZ{(reg_addr == VID_RAM0_DATA     )}})  |
+                                (VID_RAM0_ADDR_HI_D  &  {DEC_SZ{(reg_addr == VID_RAM0_ADDR_HI  )}})  |
+                                (VID_RAM0_ADDR_LO_D  &  {DEC_SZ{(reg_addr == VID_RAM0_ADDR_LO  )}})  |
+                                (VID_RAM0_DATA_D     &  {DEC_SZ{(reg_addr == VID_RAM0_DATA     )}})  |
 
-                               (VID_RAM1_ADDR_HI_D  &  {DEC_SZ{(reg_addr == VID_RAM1_ADDR_HI  )}})  |
-                               (VID_RAM1_ADDR_LO_D  &  {DEC_SZ{(reg_addr == VID_RAM1_ADDR_LO  )}})  |
-                               (VID_RAM1_DATA_D     &  {DEC_SZ{(reg_addr == VID_RAM1_DATA     )}})  |
+                                (VID_RAM1_ADDR_HI_D  &  {DEC_SZ{(reg_addr == VID_RAM1_ADDR_HI  )}})  |
+                                (VID_RAM1_ADDR_LO_D  &  {DEC_SZ{(reg_addr == VID_RAM1_ADDR_LO  )}})  |
+                                (VID_RAM1_DATA_D     &  {DEC_SZ{(reg_addr == VID_RAM1_DATA     )}})  |
 
-                               (PIX0_WIDTH_D        &  {DEC_SZ{(reg_addr == PIX0_WIDTH        )}})  |
-                               (PIX0_HEIGHT_D       &  {DEC_SZ{(reg_addr == PIX0_HEIGHT       )}})  |
-                               (PIX0_X_D            &  {DEC_SZ{(reg_addr == PIX0_X            )}})  |
-                               (PIX0_Y_D            &  {DEC_SZ{(reg_addr == PIX0_Y            )}})  |
-                               (PIX0_DATA_D         &  {DEC_SZ{(reg_addr == PIX0_DATA         )}})  |
+                                (PIX0_WIDTH_D        &  {DEC_SZ{(reg_addr == PIX0_WIDTH        )}})  |
+                                (PIX0_HEIGHT_D       &  {DEC_SZ{(reg_addr == PIX0_HEIGHT       )}})  |
+                                (PIX0_X_D            &  {DEC_SZ{(reg_addr == PIX0_X            )}})  |
+                                (PIX0_Y_D            &  {DEC_SZ{(reg_addr == PIX0_Y            )}})  |
+                                (PIX0_DATA_D         &  {DEC_SZ{(reg_addr == PIX0_DATA         )}})  |
 
-                               (PIX1_WIDTH_D        &  {DEC_SZ{(reg_addr == PIX1_WIDTH        )}})  |
-                               (PIX1_HEIGHT_D       &  {DEC_SZ{(reg_addr == PIX1_HEIGHT       )}})  |
-                               (PIX1_X_D            &  {DEC_SZ{(reg_addr == PIX1_X            )}})  |
-                               (PIX1_Y_D            &  {DEC_SZ{(reg_addr == PIX1_Y            )}})  |
-                               (PIX1_DATA_D         &  {DEC_SZ{(reg_addr == PIX1_DATA         )}});
+                                (PIX1_WIDTH_D        &  {DEC_SZ{(reg_addr == PIX1_WIDTH        )}})  |
+                                (PIX1_HEIGHT_D       &  {DEC_SZ{(reg_addr == PIX1_HEIGHT       )}})  |
+                                (PIX1_X_D            &  {DEC_SZ{(reg_addr == PIX1_X            )}})  |
+                                (PIX1_Y_D            &  {DEC_SZ{(reg_addr == PIX1_Y            )}})  |
+                                (PIX1_DATA_D         &  {DEC_SZ{(reg_addr == PIX1_DATA         )}});
 
 // Read/Write probes
-wire              reg_write =  |per_we_i & reg_sel;
-wire              reg_read  = ~|per_we_i & reg_sel;
+wire               reg_write =  |per_we_i & reg_sel;
+wire               reg_read  = ~|per_we_i & reg_sel;
 
 // Read/Write vectors
-wire [DEC_SZ-1:0] reg_wr    = reg_dec & {DEC_SZ{reg_write}};
-wire [DEC_SZ-1:0] reg_rd    = reg_dec & {DEC_SZ{reg_read}};
+wire  [DEC_SZ-1:0] reg_wr    = reg_dec & {DEC_SZ{reg_write}};
+wire  [DEC_SZ-1:0] reg_rd    = reg_dec & {DEC_SZ{reg_read}};
 
 // Other wire declarations
-wire       [31:0] frame0_ptr;
-wire       [31:0] frame1_ptr;
-wire       [31:0] frame2_ptr;
-wire       [31:0] frame3_ptr;
-wire       [31:0] vid_ram0_base_addr;
-wire       [31:0] vid_ram1_base_addr;
+wire [`VRAM_MSB:0] frame0_ptr;
+`ifdef WITH_FRAME1_POINTER
+wire [`VRAM_MSB:0] frame1_ptr;
+`endif
+`ifdef WITH_FRAME2_POINTER
+wire [`VRAM_MSB:0] frame2_ptr;
+`endif
+`ifdef WITH_FRAME3_POINTER
+wire [`VRAM_MSB:0] frame3_ptr;
+`endif
+wire [`VRAM_MSB:0] vid_ram0_base_addr;
+wire [`VRAM_MSB:0] vid_ram1_base_addr;
+`ifdef WITH_EXTRA_LUT_BANK
+reg                lut_frame_select;
+`endif
 
 //============================================================================
 // 3) REGISTERS
@@ -413,48 +425,66 @@ assign  irq_gfx_o = (gfx_irq_screen_done  & gfx_irq_done_en) |
 //------------------------------------------------
 // DISPLAY_WIDTH Register
 //------------------------------------------------
-reg  [15:0] display_width_o;
+reg  [`LPIX_MSB:0] display_width_o;
 
-wire        display_width_wr = reg_wr[DISPLAY_WIDTH];
+wire               display_width_wr = reg_wr[DISPLAY_WIDTH];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)               display_width_o <=  16'h0000;
-  else if (display_width_wr) display_width_o <=  per_din_i;
+  if (puc_rst)               display_width_o <=  {`LPIX_MSB+1{1'b0}};
+  else if (display_width_wr) display_width_o <=  per_din_i[`LPIX_MSB:0];
+
+wire [16:0] display_width_tmp = {{16-`LPIX_MSB{1'b0}}, display_width_o};
+wire [15:0] display_width_rd  = display_width_tmp[15:0];
 
 //------------------------------------------------
 // DISPLAY_HEIGHT Register
 //------------------------------------------------
-reg  [15:0] display_height_o;
+reg  [`LPIX_MSB:0] display_height_o;
 
-wire        display_height_wr = reg_wr[DISPLAY_HEIGHT];
+wire               display_height_wr = reg_wr[DISPLAY_HEIGHT];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                display_height_o <=  16'h0000;
-  else if (display_height_wr) display_height_o <=  per_din_i;
+  if (puc_rst)                display_height_o <=  {`LPIX_MSB+1{1'b0}};
+  else if (display_height_wr) display_height_o <=  per_din_i[`LPIX_MSB:0];
+
+wire [16:0] display_height_tmp = {{16-`LPIX_MSB{1'b0}}, display_height_o};
+wire [15:0] display_height_rd  = display_height_tmp[15:0];
 
 //------------------------------------------------
 // DISPLAY_SIZE_HI Register
 //------------------------------------------------
-reg  [15:0] display_size_hi;
+`ifdef WITH_DISPLAY_SIZE_HI
+reg  [`SPIX_HI_MSB:0] display_size_hi;
 
-wire        display_size_hi_wr = reg_wr[DISPLAY_SIZE_HI];
+wire                  display_size_hi_wr = reg_wr[DISPLAY_SIZE_HI];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                 display_size_hi <=  16'h0000;
-  else if (display_size_hi_wr) display_size_hi <=  per_din_i;
+  if (puc_rst)                 display_size_hi <=  {`SPIX_HI_MSB+1{1'h0}};
+  else if (display_size_hi_wr) display_size_hi <=  per_din_i[`SPIX_HI_MSB:0];
+
+wire  [16:0] display_size_hi_tmp = {{16-`SPIX_HI_MSB{1'h0}}, display_size_hi};
+wire  [15:0] display_size_hi_rd  = display_size_hi_tmp[15:0];
+`endif
 
 //------------------------------------------------
 // DISPLAY_SIZE_LO Register
 //------------------------------------------------
-reg  [15:0] display_size_lo;
+reg  [`SPIX_LO_MSB:0] display_size_lo;
 
-wire        display_size_lo_wr = reg_wr[DISPLAY_SIZE_LO];
+wire                  display_size_lo_wr = reg_wr[DISPLAY_SIZE_LO];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                 display_size_lo <=  16'h0000;
-  else if (display_size_lo_wr) display_size_lo <=  per_din_i;
+  if (puc_rst)                 display_size_lo <=  {`SPIX_LO_MSB+1{1'h0}};
+  else if (display_size_lo_wr) display_size_lo <=  per_din_i[`SPIX_LO_MSB:0];
 
+wire  [16:0] display_size_lo_tmp = {{16-`SPIX_LO_MSB{1'h0}}, display_size_lo};
+wire  [15:0] display_size_lo_rd  = display_size_lo_tmp[15:0];
+
+`ifdef WITH_DISPLAY_SIZE_HI
 assign display_size_o = {display_size_hi, display_size_lo};
+`else
+assign display_size_o =  display_size_lo;
+`endif
 
 //------------------------------------------------
 // DISPLAY_CFG Register
@@ -594,43 +624,28 @@ assign       lt24_status[15:5] = 11'h000;
 
 
 //------------------------------------------------
-// LUT_RAM_ADDR_HI Register
+// LUT_RAM_ADDR Register
 //------------------------------------------------
-// LUT RAM size:
-//                - Text-Mode (8x8 per char) : 1024 x 16-bit
-//                - 16 bits-per-pixel        :    0 x 16-bit
-//                -  8 bits-per-pixel        :  256 x 16-bit
-//                -  4 bits-per-pixel        :                16 x 16-bit
-//                -  2 bits-per-pixel        :                 4 x 16-bit
-//                -  1 bits-per-pixel        :                 2 x 16-bit
-//                                            ----------------------------
-//                                             1280 x 16-bit
 
-reg  [15:0] lut_ram_addr_hi;
-wire [31:0] lut_ram_addr_inc;
-wire        lut_ram_addr_inc_wr;
+reg  [7:0] lut_ram_addr;
+wire [7:0] lut_ram_addr_inc;
+wire       lut_ram_addr_inc_wr;
 
-wire        lut_ram_addr_hi_wr = reg_wr[LUT_RAM_ADDR_HI];
+wire       lut_ram_addr_wr = reg_wr[LUT_RAM_ADDR];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                  lut_ram_addr_hi <=  16'h0000;
-  else if (lut_ram_addr_hi_wr)  lut_ram_addr_hi <=  per_din_i;
-  else if (lut_ram_addr_inc_wr) lut_ram_addr_hi <=  lut_ram_addr_inc[31:16];
+  if (puc_rst)                  lut_ram_addr <=  8'h00;
+  else if (lut_ram_addr_wr)     lut_ram_addr <=  per_din_i[7:0];
+  else if (lut_ram_addr_inc_wr) lut_ram_addr <=  lut_ram_addr_inc;
 
-//------------------------------------------------
-// LUT_RAM_ADDR_LO Register
-//------------------------------------------------
-reg  [15:0] lut_ram_addr_lo;
+assign      lut_ram_addr_inc = lut_ram_addr + 8'h01;
+wire [15:0] lut_ram_addr_rd  = {8'h00, lut_ram_addr};
 
-wire        lut_ram_addr_lo_wr = reg_wr[LUT_RAM_ADDR_LO];
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                  lut_ram_addr_lo <=  16'h0000;
-  else if (lut_ram_addr_lo_wr)  lut_ram_addr_lo <=  per_din_i;
-  else if (lut_ram_addr_inc_wr) lut_ram_addr_lo <=  lut_ram_addr_inc[15:0];
-
-assign lut_ram_addr_o      = {lut_ram_addr_hi, lut_ram_addr_lo};
-assign lut_ram_addr_inc    = lut_ram_addr_o + 32'h00000001;
+`ifdef WITH_EXTRA_LUT_BANK
+   assign lut_ram_addr_o = {lut_frame_select, lut_ram_addr};
+`else
+   assign lut_ram_addr_o = lut_ram_addr;
+`endif
 
 //------------------------------------------------
 // LUT_RAM_DATA Register
@@ -656,12 +671,12 @@ assign lut_ram_din_o       =   per_din_i & {16{lut_ram_data_wr}};
 assign lut_ram_wen_o       = ~(per_we_i  & { 2{lut_ram_data_wr}});
 
 // Trigger a LUT-RAM read access immediately after:
-//   - a LUT-RAM_ADDR_LO register write access
+//   - a LUT-RAM_ADDR register write access
 //   - a LUT-RAM_DATA register read access
-reg lut_ram_addr_lo_wr_dly;
+reg lut_ram_addr_wr_dly;
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst) lut_ram_addr_lo_wr_dly <= 1'b0;
-  else         lut_ram_addr_lo_wr_dly <= lut_ram_addr_lo_wr;
+  if (puc_rst) lut_ram_addr_wr_dly <= 1'b0;
+  else         lut_ram_addr_wr_dly <= lut_ram_addr_wr;
 
 reg  lut_ram_data_rd_dly;
 always @ (posedge mclk or posedge puc_rst)
@@ -671,9 +686,9 @@ always @ (posedge mclk or posedge puc_rst)
 // Chip enable.
 // Note: we perform a data read access:
 //       - one cycle after a VID_RAM_DATA register read access (so that the address has been incremented)
-//       - one cycle after a VID_RAM_ADDR_LO register write
-assign lut_ram_cen_o = ~(lut_ram_addr_lo_wr_dly | lut_ram_data_rd_dly | // Read access
-                         lut_ram_data_wr);                              // Write access
+//       - one cycle after a VID_RAM_ADDR register write
+assign lut_ram_cen_o = ~(lut_ram_addr_wr_dly | lut_ram_data_rd_dly | // Read access
+                         lut_ram_data_wr);                           // Write access
 
 // Update the VRAM_DATA register one cycle after each memory access
 always @ (posedge mclk or posedge puc_rst)
@@ -683,155 +698,319 @@ always @ (posedge mclk or posedge puc_rst)
 //------------------------------------------------
 // FRAME_SELECT Register
 //------------------------------------------------
-reg  [15:0] frame_select;
 
-wire        frame_select_wr = reg_wr[FRAME_SELECT];
+wire  frame_select_wr = reg_wr[FRAME_SELECT];
 
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)              frame_select <=  16'h0000;
-  else if (frame_select_wr) frame_select <=  per_din_i;
+`ifdef WITH_EXTRA_LUT_BANK
+  reg        refresh_lut_select_o;
+
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)
+      begin
+	 refresh_lut_select_o <=  1'b0;
+	 lut_frame_select     <=  1'b0;
+      end
+    else if (frame_select_wr)
+      begin
+	 refresh_lut_select_o <=  per_din_i[3];
+	 lut_frame_select     <=  per_din_i[15];
+      end
+`else
+  assign refresh_lut_select_o  =  1'b0;
+  wire   lut_frame_select      =  1'b0;
+`endif
+
+`ifdef WITH_FRAME1_POINTER
+  `ifdef WITH_FRAME2_POINTER
+  reg  [1:0] refresh_frame_select;
+  reg  [1:0] vid_ram0_frame_select;
+  reg  [1:0] vid_ram1_frame_select;
+
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)
+      begin
+  	 refresh_frame_select  <= 2'h0;
+	 vid_ram0_frame_select <= 2'h0;
+	 vid_ram1_frame_select <= 2'h0;
+      end
+    else if (frame_select_wr)
+      begin
+  	 refresh_frame_select  <= per_din_i[1:0];
+	 vid_ram0_frame_select <= per_din_i[5:4];
+	 vid_ram1_frame_select <= per_din_i[7:6];
+      end
+
+  wire [15:0] frame_select = {lut_frame_select, 7'h00, vid_ram1_frame_select, vid_ram0_frame_select, refresh_lut_select_o, 1'b0, refresh_frame_select};
+  `else
+  reg        refresh_frame_select;
+  reg        vid_ram0_frame_select;
+  reg        vid_ram1_frame_select;
+
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)
+      begin
+  	 refresh_frame_select  <= 1'h0;
+	 vid_ram0_frame_select <= 1'h0;
+	 vid_ram1_frame_select <= 1'h0;
+      end
+    else if (frame_select_wr)
+      begin
+  	 refresh_frame_select  <= per_din_i[0];
+	 vid_ram0_frame_select <= per_din_i[4];
+	 vid_ram1_frame_select <= per_din_i[6];
+      end
+
+  wire [15:0] frame_select = {lut_frame_select, 7'h00, 1'h0, vid_ram1_frame_select, 1'h0, vid_ram0_frame_select, refresh_lut_select_o, 2'h0, refresh_frame_select};
+  `endif
+`else
+  wire [15:0] frame_select = {lut_frame_select, 11'h000, refresh_lut_select_o, 3'h0};
+`endif
 
 // Frame pointer selections
-assign refresh_frame_addr_o  = (frame_select[1:0]==0) ? frame0_ptr :
-                               (frame_select[1:0]==1) ? frame1_ptr :
-                               (frame_select[1:0]==2) ? frame2_ptr :
-                                                        frame3_ptr;
+`ifdef WITH_FRAME1_POINTER
+assign refresh_frame_addr_o  = (refresh_frame_select==0)  ? frame0_ptr :
+                           `ifdef WITH_FRAME2_POINTER
+			       (refresh_frame_select==1)  ? frame1_ptr :
+                             `ifdef WITH_FRAME3_POINTER
+			       (refresh_frame_select==2)  ? frame2_ptr :
+                                                            frame3_ptr ;
+                             `else
+                                                            frame2_ptr ;
+                             `endif
+                           `else
+                                                            frame1_ptr ;
+                           `endif
 
-assign vid_ram0_base_addr    = (frame_select[5:4]==0) ? frame0_ptr :
-                               (frame_select[5:4]==1) ? frame1_ptr :
-                               (frame_select[5:4]==2) ? frame2_ptr :
-                                                        frame3_ptr;
+assign vid_ram0_base_addr    = (vid_ram0_frame_select==0) ? frame0_ptr :
+                           `ifdef WITH_FRAME2_POINTER
+			       (vid_ram0_frame_select==1) ? frame1_ptr :
+                             `ifdef WITH_FRAME3_POINTER
+			       (vid_ram0_frame_select==2) ? frame2_ptr :
+                                                            frame3_ptr ;
+                             `else
+                                                            frame2_ptr ;
+                             `endif
+                           `else
+                                                            frame1_ptr ;
+                           `endif
 
-assign vid_ram1_base_addr    = (frame_select[7:6]==0) ? frame0_ptr :
-                               (frame_select[7:6]==1) ? frame1_ptr :
-                               (frame_select[7:6]==2) ? frame2_ptr :
-                                                        frame3_ptr;
+assign vid_ram1_base_addr    = (vid_ram1_frame_select==0) ? frame0_ptr :
+                           `ifdef WITH_FRAME2_POINTER
+			       (vid_ram1_frame_select==1) ? frame1_ptr :
+                             `ifdef WITH_FRAME3_POINTER
+			       (vid_ram1_frame_select==2) ? frame2_ptr :
+                                                            frame3_ptr ;
+                             `else
+                                                            frame2_ptr ;
+                             `endif
+                           `else
+                                                            frame1_ptr ;
+                           `endif
+
+`else
+assign refresh_frame_addr_o  = frame0_ptr;
+assign vid_ram0_base_addr    = frame0_ptr;
+assign vid_ram1_base_addr    = frame0_ptr;
+`endif
 
 //------------------------------------------------
 // FRAME0_PTR_HI Register
 //------------------------------------------------
-reg  [15:0] frame0_ptr_hi;
+`ifdef VRAM_BIGGER_64_KW
+reg [`VRAM_HI_MSB:0] frame0_ptr_hi;
 
-wire        frame0_ptr_hi_wr = reg_wr[FRAME0_PTR_HI];
+wire                 frame0_ptr_hi_wr = reg_wr[FRAME0_PTR_HI];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)               frame0_ptr_hi <=  16'h0000;
-  else if (frame0_ptr_hi_wr) frame0_ptr_hi <=  per_din_i;
+  if (puc_rst)               frame0_ptr_hi <=  {`VRAM_HI_MSB+1{1'b0}};
+  else if (frame0_ptr_hi_wr) frame0_ptr_hi <=  per_din_i[`VRAM_HI_MSB:0];
+
+wire [16:0] frame0_ptr_hi_tmp = {{16-`VRAM_HI_MSB{1'b0}}, frame0_ptr_hi};
+wire [15:0] frame0_ptr_hi_rd  = frame0_ptr_hi_tmp[15:0];
+`endif
 
 //------------------------------------------------
 // FRAME0_PTR_LO Register
 //------------------------------------------------
-reg  [15:0] frame0_ptr_lo;
+reg  [`VRAM_LO_MSB:0] frame0_ptr_lo;
 
-wire        frame0_ptr_lo_wr = reg_wr[FRAME0_PTR_LO];
+wire                  frame0_ptr_lo_wr = reg_wr[FRAME0_PTR_LO];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)               frame0_ptr_lo <=  16'h0000;
-  else if (frame0_ptr_lo_wr) frame0_ptr_lo <=  per_din_i;
+  if (puc_rst)               frame0_ptr_lo <=  {`VRAM_LO_MSB+1{1'b0}};
+  else if (frame0_ptr_lo_wr) frame0_ptr_lo <=  per_din_i[`VRAM_LO_MSB:0];
 
-assign frame0_ptr = {frame0_ptr_hi, frame0_ptr_lo};
+`ifdef VRAM_BIGGER_64_KW
+assign      frame0_ptr	      = {frame0_ptr_hi[`VRAM_HI_MSB:0], frame0_ptr_lo};
+wire [15:0] frame0_ptr_lo_rd  = frame0_ptr_lo;
+`else
+assign	    frame0_ptr	      = {frame0_ptr_lo[`VRAM_LO_MSB:0]};
+wire [16:0] frame0_ptr_lo_tmp = {{16-`VRAM_LO_MSB{1'b0}}, frame0_ptr_lo};
+wire [15:0] frame0_ptr_lo_rd  = frame0_ptr_lo_tmp[15:0];
+`endif
 
 //------------------------------------------------
 // FRAME1_PTR_HI Register
 //------------------------------------------------
-reg  [15:0] frame1_ptr_hi;
+`ifdef WITH_FRAME1_POINTER
+  `ifdef VRAM_BIGGER_64_KW
+  reg [`VRAM_HI_MSB:0] frame1_ptr_hi;
 
-wire        frame1_ptr_hi_wr = reg_wr[FRAME1_PTR_HI];
+  wire                 frame1_ptr_hi_wr = reg_wr[FRAME1_PTR_HI];
 
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)               frame1_ptr_hi <=  16'h0000;
-  else if (frame1_ptr_hi_wr) frame1_ptr_hi <=  per_din_i;
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)               frame1_ptr_hi <=  {`VRAM_HI_MSB+1{1'b0}};
+    else if (frame1_ptr_hi_wr) frame1_ptr_hi <=  per_din_i[`VRAM_HI_MSB:0];
+
+  wire [16:0] frame1_ptr_hi_tmp = {{16-`VRAM_HI_MSB{1'b0}}, frame1_ptr_hi};
+  wire [15:0] frame1_ptr_hi_rd  = frame1_ptr_hi_tmp[15:0];
+  `endif
+`endif
 
 //------------------------------------------------
 // FRAME1_PTR_LO Register
 //------------------------------------------------
-reg  [15:0] frame1_ptr_lo;
+`ifdef WITH_FRAME1_POINTER
+  reg  [`VRAM_LO_MSB:0] frame1_ptr_lo;
 
-wire        frame1_ptr_lo_wr = reg_wr[FRAME1_PTR_LO];
+  wire                  frame1_ptr_lo_wr = reg_wr[FRAME1_PTR_LO];
 
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)               frame1_ptr_lo <=  16'h0000;
-  else if (frame1_ptr_lo_wr) frame1_ptr_lo <=  per_din_i;
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)               frame1_ptr_lo <=  {`VRAM_LO_MSB+1{1'b0}};
+    else if (frame1_ptr_lo_wr) frame1_ptr_lo <=  per_din_i[`VRAM_LO_MSB:0];
 
-assign frame1_ptr = {frame1_ptr_hi, frame1_ptr_lo};
+  `ifdef VRAM_BIGGER_64_KW
+  assign      frame1_ptr        = {frame1_ptr_hi[`VRAM_HI_MSB:0], frame1_ptr_lo};
+  wire [15:0] frame1_ptr_lo_rd  = frame1_ptr_lo;
+  `else
+  assign      frame1_ptr        = {frame1_ptr_lo[`VRAM_LO_MSB:0]};
+  wire [16:0] frame1_ptr_lo_tmp = {{16-`VRAM_LO_MSB{1'b0}}, frame1_ptr_lo};
+  wire [15:0] frame1_ptr_lo_rd  = frame1_ptr_lo_tmp[15:0];
+  `endif
+`endif
 
 //------------------------------------------------
 // FRAME2_PTR_HI Register
 //------------------------------------------------
-reg  [15:0] frame2_ptr_hi;
+`ifdef WITH_FRAME2_POINTER
+  `ifdef VRAM_BIGGER_64_KW
+  reg [`VRAM_HI_MSB:0] frame2_ptr_hi;
 
-wire        frame2_ptr_hi_wr = reg_wr[FRAME2_PTR_HI];
+  wire                 frame2_ptr_hi_wr = reg_wr[FRAME2_PTR_HI];
 
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)               frame2_ptr_hi <=  16'h0000;
-  else if (frame2_ptr_hi_wr) frame2_ptr_hi <=  per_din_i;
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)               frame2_ptr_hi <=  {`VRAM_HI_MSB+1{1'b0}};
+    else if (frame2_ptr_hi_wr) frame2_ptr_hi <=  per_din_i[`VRAM_HI_MSB:0];
+
+  wire [16:0] frame2_ptr_hi_tmp = {{16-`VRAM_HI_MSB{1'b0}}, frame2_ptr_hi};
+  wire [15:0] frame2_ptr_hi_rd  = frame2_ptr_hi_tmp[15:0];
+  `endif
+`endif
 
 //------------------------------------------------
 // FRAME2_PTR_LO Register
 //------------------------------------------------
-reg  [15:0] frame2_ptr_lo;
+`ifdef WITH_FRAME2_POINTER
+  reg  [`VRAM_LO_MSB:0] frame2_ptr_lo;
 
-wire        frame2_ptr_lo_wr = reg_wr[FRAME2_PTR_LO];
+  wire			frame2_ptr_lo_wr = reg_wr[FRAME2_PTR_LO];
 
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)               frame2_ptr_lo <=  16'h0000;
-  else if (frame2_ptr_lo_wr) frame2_ptr_lo <=  per_din_i;
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)	       frame2_ptr_lo <=	 {`VRAM_LO_MSB+1{1'b0}};
+    else if (frame2_ptr_lo_wr) frame2_ptr_lo <=	 per_din_i[`VRAM_LO_MSB:0];
 
-assign frame2_ptr = {frame2_ptr_hi, frame2_ptr_lo};
+  `ifdef VRAM_BIGGER_64_KW
+  assign      frame2_ptr        = {frame2_ptr_hi[`VRAM_HI_MSB:0], frame2_ptr_lo};
+  wire [15:0] frame2_ptr_lo_rd	= frame2_ptr_lo;
+  `else
+  assign      frame2_ptr        = {frame2_ptr_lo[`VRAM_LO_MSB:0]};
+  wire [16:0] frame2_ptr_lo_tmp = {{16-`VRAM_LO_MSB{1'b0}}, frame2_ptr_lo};
+  wire [15:0] frame2_ptr_lo_rd	= frame2_ptr_lo_tmp[15:0];
+  `endif
+`endif
 
 //------------------------------------------------
 // FRAME3_PTR_HI Register
 //------------------------------------------------
-reg  [15:0] frame3_ptr_hi;
+`ifdef WITH_FRAME3_POINTER
+  `ifdef VRAM_BIGGER_64_KW
+  reg [`VRAM_HI_MSB:0] frame3_ptr_hi;
 
-wire        frame3_ptr_hi_wr = reg_wr[FRAME3_PTR_HI];
+  wire		       frame3_ptr_hi_wr = reg_wr[FRAME3_PTR_HI];
 
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)               frame3_ptr_hi <=  16'h0000;
-  else if (frame3_ptr_hi_wr) frame3_ptr_hi <=  per_din_i;
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)	       frame3_ptr_hi <=	 {`VRAM_HI_MSB+1{1'b0}};
+    else if (frame3_ptr_hi_wr) frame3_ptr_hi <=	 per_din_i[`VRAM_HI_MSB:0];
+
+  wire [16:0] frame3_ptr_hi_tmp = {{16-`VRAM_HI_MSB{1'b0}},frame3_ptr_hi};
+  wire [15:0] frame3_ptr_hi_rd	= frame3_ptr_hi_tmp[15:0];
+  `endif
+`endif
 
 //------------------------------------------------
 // FRAME3_PTR_LO Register
 //------------------------------------------------
-reg  [15:0] frame3_ptr_lo;
+`ifdef WITH_FRAME3_POINTER
+  reg  [`VRAM_LO_MSB:0] frame3_ptr_lo;
 
-wire        frame3_ptr_lo_wr = reg_wr[FRAME3_PTR_LO];
+  wire                  frame3_ptr_lo_wr = reg_wr[FRAME3_PTR_LO];
 
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)               frame3_ptr_lo <=  16'h0000;
-  else if (frame3_ptr_lo_wr) frame3_ptr_lo <=  per_din_i;
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)               frame3_ptr_lo <=  {`VRAM_LO_MSB+1{1'b0}};
+    else if (frame3_ptr_lo_wr) frame3_ptr_lo <=  per_din_i[`VRAM_LO_MSB:0];
 
-assign frame3_ptr = {frame3_ptr_hi, frame3_ptr_lo};
+  `ifdef VRAM_BIGGER_64_KW
+  assign      frame3_ptr        = {frame3_ptr_hi[`VRAM_HI_MSB:0], frame3_ptr_lo};
+  wire [15:0] frame3_ptr_lo_rd  = frame3_ptr_lo;
+  `else
+  assign      frame3_ptr        = {frame3_ptr_lo[`VRAM_LO_MSB:0]};
+  wire [16:0] frame3_ptr_lo_tmp = {{16-`VRAM_LO_MSB{1'b0}}, frame3_ptr_lo};
+  wire [15:0] frame3_ptr_lo_rd  = frame3_ptr_lo_tmp[15:0];
+  `endif
+`endif
 
 //------------------------------------------------
 // VID_RAM0_ADDR_HI Register
 //------------------------------------------------
-reg  [15:0] vid_ram0_addr_hi;
-wire [31:0] vid_ram0_addr;
-wire [31:0] vid_ram0_addr_inc;
-wire        vid_ram0_addr_inc_wr;
+wire   [`VRAM_MSB:0] vid_ram0_addr;
+wire   [`VRAM_MSB:0] vid_ram0_addr_inc;
+wire                 vid_ram0_addr_inc_wr;
 
-wire        vid_ram0_addr_hi_wr = reg_wr[VID_RAM0_ADDR_HI];
+`ifdef VRAM_BIGGER_64_KW
+reg [`VRAM_HI_MSB:0] vid_ram0_addr_hi;
+
+wire                 vid_ram0_addr_hi_wr = reg_wr[VID_RAM0_ADDR_HI];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                   vid_ram0_addr_hi <=  16'h0000;
-  else if (vid_ram0_addr_hi_wr)  vid_ram0_addr_hi <=  per_din_i;
-  else if (vid_ram0_addr_inc_wr) vid_ram0_addr_hi <=  vid_ram0_addr_inc[31:16];
+  if (puc_rst)                   vid_ram0_addr_hi <=  {`VRAM_HI_MSB+1{1'b0}};
+  else if (vid_ram0_addr_hi_wr)  vid_ram0_addr_hi <=  per_din_i[`VRAM_HI_MSB:0];
+  else if (vid_ram0_addr_inc_wr) vid_ram0_addr_hi <=  vid_ram0_addr_inc[`VRAM_MSB:16];
+
+wire [16:0] vid_ram0_addr_hi_tmp = {{16-`VRAM_HI_MSB{1'b0}},vid_ram0_addr_hi};
+wire [15:0] vid_ram0_addr_hi_rd  = vid_ram0_addr_hi_tmp[15:0];
+`endif
 
 //------------------------------------------------
 // VID_RAM0_ADDR_LO Register
 //------------------------------------------------
-reg  [15:0] vid_ram0_addr_lo;
+reg [`VRAM_LO_MSB:0] vid_ram0_addr_lo;
 
-wire        vid_ram0_addr_lo_wr = reg_wr[VID_RAM0_ADDR_LO];
+wire                 vid_ram0_addr_lo_wr = reg_wr[VID_RAM0_ADDR_LO];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                   vid_ram0_addr_lo <=  16'h0000;
-  else if (vid_ram0_addr_lo_wr)  vid_ram0_addr_lo <=  per_din_i;
-  else if (vid_ram0_addr_inc_wr) vid_ram0_addr_lo <=  vid_ram0_addr_inc[15:0];
+  if (puc_rst)                   vid_ram0_addr_lo <=  {`VRAM_LO_MSB+1{1'b0}};
+  else if (vid_ram0_addr_lo_wr)  vid_ram0_addr_lo <=  per_din_i[`VRAM_LO_MSB:0];
+  else if (vid_ram0_addr_inc_wr) vid_ram0_addr_lo <=  vid_ram0_addr_inc[`VRAM_LO_MSB:0];
 
-assign vid_ram0_addr        = {vid_ram0_addr_hi, vid_ram0_addr_lo};
-assign vid_ram0_addr_inc    = vid_ram0_addr + 32'h00000001;
+`ifdef VRAM_BIGGER_64_KW
+assign      vid_ram0_addr        = {vid_ram0_addr_hi[`VRAM_HI_MSB:0], vid_ram0_addr_lo};
+wire [15:0] vid_ram0_addr_lo_rd  = vid_ram0_addr_lo;
+`else
+assign      vid_ram0_addr        = {vid_ram0_addr_lo[`VRAM_LO_MSB:0]};
+wire [16:0] vid_ram0_addr_lo_tmp = {{16-`VRAM_LO_MSB{1'b0}},vid_ram0_addr_lo};
+wire [15:0] vid_ram0_addr_lo_rd  = vid_ram0_addr_lo_tmp[15:0];
+`endif
+assign      vid_ram0_addr_inc    = vid_ram0_addr + {{`VRAM_MSB{1'b0}},1'b1};
 
 //------------------------------------------------
 // VID_RAM0_DATA Register
@@ -852,32 +1031,45 @@ always @ (posedge mclk or posedge puc_rst)
 //------------------------------------------------
 // VID_RAM1_ADDR_HI Register
 //------------------------------------------------
-reg  [15:0] vid_ram1_addr_hi;
-wire [31:0] vid_ram1_addr;
-wire [31:0] vid_ram1_addr_inc;
-wire        vid_ram1_addr_inc_wr;
+wire   [`VRAM_MSB:0] vid_ram1_addr;
+wire   [`VRAM_MSB:0] vid_ram1_addr_inc;
+wire                 vid_ram1_addr_inc_wr;
 
-wire        vid_ram1_addr_hi_wr = reg_wr[VID_RAM1_ADDR_HI];
+`ifdef VRAM_BIGGER_64_KW
+reg [`VRAM_HI_MSB:0] vid_ram1_addr_hi;
+
+wire                 vid_ram1_addr_hi_wr = reg_wr[VID_RAM1_ADDR_HI];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                   vid_ram1_addr_hi <=  16'h0000;
-  else if (vid_ram1_addr_hi_wr)  vid_ram1_addr_hi <=  per_din_i;
-  else if (vid_ram1_addr_inc_wr) vid_ram1_addr_hi <=  vid_ram1_addr_inc[31:16];
+  if (puc_rst)                   vid_ram1_addr_hi <=  {`VRAM_HI_MSB+1{1'b0}};
+  else if (vid_ram1_addr_hi_wr)  vid_ram1_addr_hi <=  per_din_i[`VRAM_HI_MSB:0];
+  else if (vid_ram1_addr_inc_wr) vid_ram1_addr_hi <=  vid_ram1_addr_inc[`VRAM_MSB:16];
+
+wire [16:0] vid_ram1_addr_hi_tmp = {{16-`VRAM_HI_MSB{1'b0}},vid_ram1_addr_hi};
+wire [15:0] vid_ram1_addr_hi_rd  = vid_ram1_addr_hi_tmp[15:0];
+`endif
 
 //------------------------------------------------
 // VID_RAM1_ADDR_LO Register
 //------------------------------------------------
-reg  [15:0] vid_ram1_addr_lo;
+reg [`VRAM_LO_MSB:0] vid_ram1_addr_lo;
 
-wire        vid_ram1_addr_lo_wr = reg_wr[VID_RAM1_ADDR_LO];
+wire                 vid_ram1_addr_lo_wr = reg_wr[VID_RAM1_ADDR_LO];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                   vid_ram1_addr_lo <=  16'h0000;
-  else if (vid_ram1_addr_lo_wr)  vid_ram1_addr_lo <=  per_din_i;
-  else if (vid_ram1_addr_inc_wr) vid_ram1_addr_lo <=  vid_ram1_addr_inc[15:0];
+  if (puc_rst)                   vid_ram1_addr_lo <=  {`VRAM_LO_MSB+1{1'b0}};
+  else if (vid_ram1_addr_lo_wr)  vid_ram1_addr_lo <=  per_din_i[`VRAM_LO_MSB:0];
+  else if (vid_ram1_addr_inc_wr) vid_ram1_addr_lo <=  vid_ram1_addr_inc[`VRAM_LO_MSB:0];
 
-assign vid_ram1_addr        = {vid_ram1_addr_hi, vid_ram1_addr_lo};
-assign vid_ram1_addr_inc    = vid_ram1_addr + 32'h00000001;
+`ifdef VRAM_BIGGER_64_KW
+assign      vid_ram1_addr        = {vid_ram1_addr_hi[`VRAM_HI_MSB:0], vid_ram1_addr_lo};
+wire [15:0] vid_ram1_addr_lo_rd  = vid_ram1_addr_lo;
+`else
+assign      vid_ram1_addr        = {vid_ram1_addr_lo[`VRAM_LO_MSB:0]};
+wire [16:0] vid_ram1_addr_lo_tmp = {{16-`VRAM_LO_MSB{1'b0}},vid_ram1_addr_lo};
+wire [15:0] vid_ram1_addr_lo_rd  = vid_ram1_addr_lo_tmp[15:0];
+`endif
+assign      vid_ram1_addr_inc    = vid_ram1_addr + {{`VRAM_MSB{1'b0}},1'b1};
 
 //------------------------------------------------
 // VID_RAM1_DATA Register
@@ -1011,57 +1203,75 @@ always @ (posedge mclk or posedge puc_rst)
 //============================================================================
 
 // Data output mux
-wire [15:0] gfx_ctrl_read          = gfx_ctrl          & {16{reg_rd[GFX_CTRL          ]}};
-wire [15:0] gfx_status_read        = gfx_status        & {16{reg_rd[GFX_STATUS        ]}};
-wire [15:0] gfx_irq_read           = gfx_irq           & {16{reg_rd[GFX_IRQ           ]}};
+wire [15:0] gfx_ctrl_read          = gfx_ctrl             & {16{reg_rd[GFX_CTRL          ]}};
+wire [15:0] gfx_status_read        = gfx_status           & {16{reg_rd[GFX_STATUS        ]}};
+wire [15:0] gfx_irq_read           = gfx_irq              & {16{reg_rd[GFX_IRQ           ]}};
 
-wire [15:0] display_width_read     = display_width_o   & {16{reg_rd[DISPLAY_WIDTH     ]}};
-wire [15:0] display_height_read    = display_height_o  & {16{reg_rd[DISPLAY_HEIGHT    ]}};
-wire [15:0] display_size_hi_read   = display_size_hi   & {16{reg_rd[DISPLAY_SIZE_HI   ]}};
-wire [15:0] display_size_lo_read   = display_size_lo   & {16{reg_rd[DISPLAY_SIZE_LO   ]}};
-wire [15:0] display_cfg_read       = display_cfg       & {16{reg_rd[DISPLAY_CFG       ]}};
+wire [15:0] display_width_read     = display_width_rd     & {16{reg_rd[DISPLAY_WIDTH     ]}};
+wire [15:0] display_height_read    = display_height_rd    & {16{reg_rd[DISPLAY_HEIGHT    ]}};
+`ifdef WITH_DISPLAY_SIZE_HI
+wire [15:0] display_size_hi_read   = display_size_hi_rd   & {16{reg_rd[DISPLAY_SIZE_HI   ]}};
+`endif
+wire [15:0] display_size_lo_read   = display_size_lo_rd   & {16{reg_rd[DISPLAY_SIZE_LO   ]}};
+wire [15:0] display_cfg_read       = display_cfg          & {16{reg_rd[DISPLAY_CFG       ]}};
 
-wire [15:0] lt24_cfg_read          = lt24_cfg          & {16{reg_rd[LT24_CFG          ]}};
-wire [15:0] lt24_refresh_read      = lt24_refresh      & {16{reg_rd[LT24_REFRESH      ]}};
-wire [15:0] lt24_refresh_sync_read = lt24_refresh_sync & {16{reg_rd[LT24_REFRESH_SYNC ]}};
-wire [15:0] lt24_cmd_read          = lt24_cmd          & {16{reg_rd[LT24_CMD          ]}};
-wire [15:0] lt24_cmd_param_read    = lt24_cmd_param_o  & {16{reg_rd[LT24_CMD_PARAM    ]}};
-wire [15:0] lt24_cmd_dfill_read    = lt24_cmd_dfill_o  & {16{reg_rd[LT24_CMD_DFILL    ]}};
-wire [15:0] lt24_status_read       = lt24_status       & {16{reg_rd[LT24_STATUS       ]}};
+wire [15:0] lt24_cfg_read          = lt24_cfg             & {16{reg_rd[LT24_CFG          ]}};
+wire [15:0] lt24_refresh_read      = lt24_refresh         & {16{reg_rd[LT24_REFRESH      ]}};
+wire [15:0] lt24_refresh_sync_read = lt24_refresh_sync    & {16{reg_rd[LT24_REFRESH_SYNC ]}};
+wire [15:0] lt24_cmd_read          = lt24_cmd             & {16{reg_rd[LT24_CMD          ]}};
+wire [15:0] lt24_cmd_param_read    = lt24_cmd_param_o     & {16{reg_rd[LT24_CMD_PARAM    ]}};
+wire [15:0] lt24_cmd_dfill_read    = lt24_cmd_dfill_o     & {16{reg_rd[LT24_CMD_DFILL    ]}};
+wire [15:0] lt24_status_read       = lt24_status          & {16{reg_rd[LT24_STATUS       ]}};
 
-wire [15:0] lut_ram_addr_hi_read   = lut_ram_addr_hi   & {16{reg_rd[LUT_RAM_ADDR_HI   ]}};
-wire [15:0] lut_ram_addr_lo_read   = lut_ram_addr_lo   & {16{reg_rd[LUT_RAM_ADDR_LO   ]}};
-wire [15:0] lut_ram_data_read      = lut_ram_data      & {16{reg_rd[LUT_RAM_DATA      ]}};
+wire [15:0] lut_ram_addr_read      = lut_ram_addr_rd      & {16{reg_rd[LUT_RAM_ADDR      ]}};
+wire [15:0] lut_ram_data_read      = lut_ram_data         & {16{reg_rd[LUT_RAM_DATA      ]}};
 
-wire [15:0] frame_select_read      = frame_select      & {16{reg_rd[FRAME_SELECT      ]}};
-wire [15:0] frame0_ptr_hi_read     = frame0_ptr_hi     & {16{reg_rd[FRAME0_PTR_HI     ]}};
-wire [15:0] frame0_ptr_lo_read     = frame0_ptr_lo     & {16{reg_rd[FRAME0_PTR_LO     ]}};
-wire [15:0] frame1_ptr_hi_read     = frame1_ptr_hi     & {16{reg_rd[FRAME1_PTR_HI     ]}};
-wire [15:0] frame1_ptr_lo_read     = frame1_ptr_lo     & {16{reg_rd[FRAME1_PTR_LO     ]}};
-wire [15:0] frame2_ptr_hi_read     = frame2_ptr_hi     & {16{reg_rd[FRAME2_PTR_HI     ]}};
-wire [15:0] frame2_ptr_lo_read     = frame2_ptr_lo     & {16{reg_rd[FRAME2_PTR_LO     ]}};
-wire [15:0] frame3_ptr_hi_read     = frame3_ptr_hi     & {16{reg_rd[FRAME3_PTR_HI     ]}};
-wire [15:0] frame3_ptr_lo_read     = frame3_ptr_lo     & {16{reg_rd[FRAME3_PTR_LO     ]}};
+wire [15:0] frame_select_read      = frame_select         & {16{reg_rd[FRAME_SELECT      ]}};
+`ifdef VRAM_BIGGER_64_KW
+wire [15:0] frame0_ptr_hi_read     = frame0_ptr_hi_rd     & {16{reg_rd[FRAME0_PTR_HI     ]}};
+`endif
+wire [15:0] frame0_ptr_lo_read     = frame0_ptr_lo_rd     & {16{reg_rd[FRAME0_PTR_LO     ]}};
+`ifdef WITH_FRAME1_POINTER
+  `ifdef VRAM_BIGGER_64_KW
+  wire [15:0] frame1_ptr_hi_read   = frame1_ptr_hi_rd     & {16{reg_rd[FRAME1_PTR_HI     ]}};
+  `endif
+  wire [15:0] frame1_ptr_lo_read   = frame1_ptr_lo_rd     & {16{reg_rd[FRAME1_PTR_LO     ]}};
+`endif
+`ifdef WITH_FRAME2_POINTER
+  `ifdef VRAM_BIGGER_64_KW
+  wire [15:0] frame2_ptr_hi_read   = frame2_ptr_hi_rd     & {16{reg_rd[FRAME2_PTR_HI     ]}};
+  `endif
+  wire [15:0] frame2_ptr_lo_read   = frame2_ptr_lo_rd     & {16{reg_rd[FRAME2_PTR_LO     ]}};
+`endif
+`ifdef WITH_FRAME3_POINTER
+  `ifdef VRAM_BIGGER_64_KW
+  wire [15:0] frame3_ptr_hi_read   = frame3_ptr_hi_rd     & {16{reg_rd[FRAME3_PTR_HI     ]}};
+  `endif
+  wire [15:0] frame3_ptr_lo_read   = frame3_ptr_lo_rd     & {16{reg_rd[FRAME3_PTR_LO     ]}};
+`endif
+`ifdef VRAM_BIGGER_64_KW
+wire [15:0] vid_ram0_addr_hi_read  = vid_ram0_addr_hi_rd  & {16{reg_rd[VID_RAM0_ADDR_HI  ]}};
+`endif
+wire [15:0] vid_ram0_addr_lo_read  = vid_ram0_addr_lo_rd  & {16{reg_rd[VID_RAM0_ADDR_LO  ]}};
+wire [15:0] vid_ram0_data_read     = vid_ram0_data        & {16{reg_rd[VID_RAM0_DATA     ]}};
 
-wire [15:0] vid_ram0_addr_hi_read  = vid_ram0_addr_hi  & {16{reg_rd[VID_RAM0_ADDR_HI  ]}};
-wire [15:0] vid_ram0_addr_lo_read  = vid_ram0_addr_lo  & {16{reg_rd[VID_RAM0_ADDR_LO  ]}};
-wire [15:0] vid_ram0_data_read     = vid_ram0_data     & {16{reg_rd[VID_RAM0_DATA     ]}};
+`ifdef VRAM_BIGGER_64_KW
+wire [15:0] vid_ram1_addr_hi_read  = vid_ram1_addr_hi_rd  & {16{reg_rd[VID_RAM1_ADDR_HI  ]}};
+`endif
+wire [15:0] vid_ram1_addr_lo_read  = vid_ram1_addr_lo_rd  & {16{reg_rd[VID_RAM1_ADDR_LO  ]}};
+wire [15:0] vid_ram1_data_read     = vid_ram1_data        & {16{reg_rd[VID_RAM1_DATA     ]}};
 
-wire [15:0] vid_ram1_addr_hi_read  = vid_ram1_addr_hi  & {16{reg_rd[VID_RAM1_ADDR_HI  ]}};
-wire [15:0] vid_ram1_addr_lo_read  = vid_ram1_addr_lo  & {16{reg_rd[VID_RAM1_ADDR_LO  ]}};
-wire [15:0] vid_ram1_data_read     = vid_ram1_data     & {16{reg_rd[VID_RAM1_DATA     ]}};
+wire [15:0] pix0_width_read        = pix0_width           & {16{reg_rd[PIX0_WIDTH        ]}};
+wire [15:0] pix0_height_read       = pix0_height          & {16{reg_rd[PIX0_HEIGHT       ]}};
+wire [15:0] pix0_x_read            = pix0_x               & {16{reg_rd[PIX0_X            ]}};
+wire [15:0] pix0_y_read            = pix0_y               & {16{reg_rd[PIX0_Y            ]}};
+wire [15:0] pix0_data_read         = pix0_data            & {16{reg_rd[PIX0_DATA         ]}};
 
-wire [15:0] pix0_width_read        = pix0_width        & {16{reg_rd[PIX0_WIDTH        ]}};
-wire [15:0] pix0_height_read       = pix0_height       & {16{reg_rd[PIX0_HEIGHT       ]}};
-wire [15:0] pix0_x_read            = pix0_x            & {16{reg_rd[PIX0_X            ]}};
-wire [15:0] pix0_y_read            = pix0_y            & {16{reg_rd[PIX0_Y            ]}};
-wire [15:0] pix0_data_read         = pix0_data         & {16{reg_rd[PIX0_DATA         ]}};
-
-wire [15:0] pix1_width_read        = pix1_width        & {16{reg_rd[PIX1_WIDTH        ]}};
-wire [15:0] pix1_height_read       = pix1_height       & {16{reg_rd[PIX1_HEIGHT       ]}};
-wire [15:0] pix1_x_read            = pix1_x            & {16{reg_rd[PIX1_X            ]}};
-wire [15:0] pix1_y_read            = pix1_y            & {16{reg_rd[PIX1_Y            ]}};
-wire [15:0] pix1_data_read         = pix1_data         & {16{reg_rd[PIX1_DATA         ]}};
+wire [15:0] pix1_width_read        = pix1_width           & {16{reg_rd[PIX1_WIDTH        ]}};
+wire [15:0] pix1_height_read       = pix1_height          & {16{reg_rd[PIX1_HEIGHT       ]}};
+wire [15:0] pix1_x_read            = pix1_x               & {16{reg_rd[PIX1_X            ]}};
+wire [15:0] pix1_y_read            = pix1_y               & {16{reg_rd[PIX1_Y            ]}};
+wire [15:0] pix1_data_read         = pix1_data            & {16{reg_rd[PIX1_DATA         ]}};
 
 wire [15:0] per_dout_o             = gfx_ctrl_read          |
                                      gfx_status_read        |
@@ -1069,7 +1279,9 @@ wire [15:0] per_dout_o             = gfx_ctrl_read          |
 
                                      display_width_read     |
                                      display_height_read    |
+                                  `ifdef WITH_DISPLAY_SIZE_HI
                                      display_size_hi_read   |
+                                  `endif
                                      display_size_lo_read   |
                                      display_cfg_read       |
 
@@ -1081,25 +1293,41 @@ wire [15:0] per_dout_o             = gfx_ctrl_read          |
                                      lt24_cmd_dfill_read    |
                                      lt24_status_read       |
 
-                                     lut_ram_addr_hi_read   |
-                                     lut_ram_addr_lo_read   |
+                                     lut_ram_addr_read      |
                                      lut_ram_data_read      |
 
                                      frame_select_read      |
+                                  `ifdef VRAM_BIGGER_64_KW
                                      frame0_ptr_hi_read     |
+                                  `endif
                                      frame0_ptr_lo_read     |
+                                `ifdef WITH_FRAME1_POINTER
+                                  `ifdef VRAM_BIGGER_64_KW
                                      frame1_ptr_hi_read     |
+                                  `endif
                                      frame1_ptr_lo_read     |
+                                `endif
+                                `ifdef WITH_FRAME2_POINTER
+                                  `ifdef VRAM_BIGGER_64_KW
                                      frame2_ptr_hi_read     |
+                                  `endif
                                      frame2_ptr_lo_read     |
+                                `endif
+                                `ifdef WITH_FRAME3_POINTER
+                                  `ifdef VRAM_BIGGER_64_KW
                                      frame3_ptr_hi_read     |
+                                  `endif
                                      frame3_ptr_lo_read     |
-
+                                `endif
+                                  `ifdef VRAM_BIGGER_64_KW
                                      vid_ram0_addr_hi_read  |
+                                  `endif
                                      vid_ram0_addr_lo_read  |
                                      vid_ram0_data_read     |
 
+                                  `ifdef VRAM_BIGGER_64_KW
                                      vid_ram1_addr_hi_read  |
+                                  `endif
                                      vid_ram1_addr_lo_read  |
                                      vid_ram1_data_read     |
 
@@ -1216,17 +1444,17 @@ assign vid_ram1_dout_rdy = vid_ram1_ce[1];
 //------------------------------------------------
 
 // Add frame pointer offset
-wire [31:0] vid_ram0_addr_offset = vid_ram0_base_addr + vid_ram0_addr;
-wire [31:0] vid_ram1_addr_offset = vid_ram1_base_addr + vid_ram1_addr;
+wire [`VRAM_MSB:0] vid_ram0_addr_offset = vid_ram0_base_addr + vid_ram0_addr;
+wire [`VRAM_MSB:0] vid_ram1_addr_offset = vid_ram1_base_addr + vid_ram1_addr;
 
 // Detect memory accesses for ADDR update
-wire        vid_ram0_access   = vid_ram0_data_wr | vid_ram0_data_rd_dly | vid_ram0_addr_lo_wr_dly;
-wire        vid_ram1_access   = vid_ram1_data_wr | vid_ram1_data_rd_dly | vid_ram1_addr_lo_wr_dly;
+wire               vid_ram0_access      = vid_ram0_data_wr | vid_ram0_data_rd_dly | vid_ram0_addr_lo_wr_dly;
+wire               vid_ram1_access      = vid_ram1_data_wr | vid_ram1_data_rd_dly | vid_ram1_addr_lo_wr_dly;
 
 // Generate Video RAM address
-reg [31:0] vid_ram_addr_o;
+reg [`VRAM_MSB:0] vid_ram_addr_o;
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)              vid_ram_addr_o <= {32{1'b0}};
+  if (puc_rst)              vid_ram_addr_o <= {`VRAM_AWIDTH{1'b0}};
   else if (vid_ram0_access) vid_ram_addr_o <= vid_ram0_addr_offset;
   else if (vid_ram1_access) vid_ram_addr_o <= vid_ram1_addr_offset;
 
@@ -1237,4 +1465,9 @@ assign vid_ram0_addr_inc_wr = (|vid_ram0_data_wr_dly) | vid_ram0_data_rd;
 assign vid_ram1_addr_inc_wr = (|vid_ram1_data_wr_dly) | vid_ram1_data_rd;
 
 
-endmodule
+endmodule // omsp_gfx_reg
+
+`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`else
+`include "omsp_gfx_controller_undefines.v"
+`endif

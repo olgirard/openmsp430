@@ -47,7 +47,7 @@
 `include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_backend_lut_fifo.v"
 `include "../../../rtl/verilog/sync_debouncer_10ms.v"
 `include "../../../rtl/verilog/mega/ram_16x75k_dp.v"
-`include "../../../rtl/verilog/mega/ram_16x1302_dp.v"
+`include "../../../rtl/verilog/mega/ram_16x512_dp.v"
 `include "../../../rtl/verilog/mega/ram_16x16k.v"
 `include "../../../rtl/verilog/mega/ram_16x8k.v"
 `include "../../../rtl/verilog/mega/io_buf.v"

@@ -35,69 +35,73 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
+`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`else
+`include "omsp_gfx_controller_defines.v"
+`endif
 
 module  omsp_gfx_backend_frame_fifo (
 
 // OUTPUTs
-    frame_data_o,                         // Frame data
-    frame_data_needs_lut_o,               // Frame data needs LUT
-    frame_data_ready_o,                   // Frame data ready
+    frame_data_o,                               // Frame data
+    frame_data_needs_lut_o,                     // Frame data needs LUT
+    frame_data_ready_o,                         // Frame data ready
 
-    vid_ram_addr_o,                       // Video-RAM address
-    vid_ram_cen_o,                        // Video-RAM enable (active low)
+    vid_ram_addr_o,                             // Video-RAM address
+    vid_ram_cen_o,                              // Video-RAM enable (active low)
 
 // INPUTs
-    mclk,                                 // Main system clock
-    puc_rst,                              // Main system reset
+    mclk,                                       // Main system clock
+    puc_rst,                                    // Main system reset
 
-    display_width_i,                      // Display width
-    display_height_i,                     // Display height
-    display_size_i,                       // Display size (number of pixels)
-    display_y_swap_i,                     // Display configuration: swap Y axis (horizontal symmetry)
-    display_x_swap_i,                     // Display configuration: swap X axis (vertical symmetry)
-    display_cl_swap_i,                    // Display configuration: swap column/lines
+    display_width_i,                            // Display width
+    display_height_i,                           // Display height
+    display_size_i,                             // Display size (number of pixels)
+    display_y_swap_i,                           // Display configuration: swap Y axis (horizontal symmetry)
+    display_x_swap_i,                           // Display configuration: swap X axis (vertical symmetry)
+    display_cl_swap_i,                          // Display configuration: swap column/lines
 
-    frame_data_request_i,                 // Request for next frame data
+    frame_data_request_i,                       // Request for next frame data
 
-    gfx_mode_i,                           // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
+    gfx_mode_i,                                 // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
-    vid_ram_dout_i,                       // Video-RAM data output
-    vid_ram_dout_rdy_nxt_i,               // Video-RAM data output ready during next cycle
+    vid_ram_dout_i,                             // Video-RAM data output
+    vid_ram_dout_rdy_nxt_i,                     // Video-RAM data output ready during next cycle
 
-    refresh_active_i,                     // Display refresh on going
-    refresh_frame_base_addr_i             // Refresh frame base address
+    refresh_active_i,                           // Display refresh on going
+    refresh_frame_base_addr_i                   // Refresh frame base address
 );
 
 // OUTPUTs
 //=========
-output [15:0] frame_data_o;               // Frame data
-output        frame_data_needs_lut_o;     // Frame data needs LUT
-output        frame_data_ready_o;         // Frame data ready
+output       [15:0] frame_data_o;               // Frame data
+output              frame_data_needs_lut_o;     // Frame data needs LUT
+output              frame_data_ready_o;         // Frame data ready
 
-output [16:0] vid_ram_addr_o;             // Video-RAM address
-output        vid_ram_cen_o;              // Video-RAM enable (active low)
+output[`VRAM_MSB:0] vid_ram_addr_o;             // Video-RAM address
+output              vid_ram_cen_o;              // Video-RAM enable (active low)
 
 // INPUTs
 //=========
-input         mclk;                       // Main system clock
-input         puc_rst;                    // Main system reset
+input               mclk;                       // Main system clock
+input               puc_rst;                    // Main system reset
 
-input  [15:0] display_width_i;            // Display width
-input  [15:0] display_height_i;           // Display height
-input  [31:0] display_size_i;             // Display size (number of pixels)
-input         display_y_swap_i;           // Display configuration: swap Y axis (horizontal symmetry)
-input         display_x_swap_i;           // Display configuration: swap X axis (vertical symmetry)
-input         display_cl_swap_i;          // Display configuration: swap column/lines
+input [`LPIX_MSB:0] display_width_i;            // Display width
+input [`LPIX_MSB:0] display_height_i;           // Display height
+input [`SPIX_MSB:0] display_size_i;             // Display size (number of pixels)
+input               display_y_swap_i;           // Display configuration: swap Y axis (horizontal symmetry)
+input               display_x_swap_i;           // Display configuration: swap X axis (vertical symmetry)
+input               display_cl_swap_i;          // Display configuration: swap column/lines
 
-input         frame_data_request_i;       // Request for next frame data
+input               frame_data_request_i;       // Request for next frame data
 
-input   [2:0] gfx_mode_i;                 // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
+input         [2:0] gfx_mode_i;                 // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
-input  [15:0] vid_ram_dout_i;             // Video-RAM data output
-input         vid_ram_dout_rdy_nxt_i;     // Video-RAM data output ready during next cycle
+input        [15:0] vid_ram_dout_i;             // Video-RAM data output
+input               vid_ram_dout_rdy_nxt_i;     // Video-RAM data output ready during next cycle
 
-input         refresh_active_i;           // Display refresh on going
-input  [16:0] refresh_frame_base_addr_i;  // Refresh frame base address
+input               refresh_active_i;           // Display refresh on going
+input [`VRAM_MSB:0] refresh_frame_base_addr_i;  // Refresh frame base address
 
 
 //=============================================================================
@@ -105,16 +109,16 @@ input  [16:0] refresh_frame_base_addr_i;  // Refresh frame base address
 //=============================================================================
 
 // Some parameter(s)
-parameter   FIFO_EMPTY        =	 2'h0,
-	    FIFO_FULL	      =	 2'h3;
+parameter   FIFO_EMPTY        =  2'h0,
+            FIFO_FULL         =  2'h3;
 
 // Video modes decoding
-wire	    gfx_mode_1_bpp    =	 (gfx_mode_i == 3'b000);
-wire	    gfx_mode_2_bpp    =	 (gfx_mode_i == 3'b001);
-wire	    gfx_mode_4_bpp    =	 (gfx_mode_i == 3'b010);
-wire	    gfx_mode_8_bpp    =	 (gfx_mode_i == 3'b011);
-wire	    gfx_mode_16_bpp   = ~(gfx_mode_8_bpp | gfx_mode_4_bpp |
-				  gfx_mode_2_bpp | gfx_mode_1_bpp);
+wire        gfx_mode_1_bpp    =  (gfx_mode_i == 3'b000);
+wire        gfx_mode_2_bpp    =  (gfx_mode_i == 3'b001);
+wire        gfx_mode_4_bpp    =  (gfx_mode_i == 3'b010);
+wire        gfx_mode_8_bpp    =  (gfx_mode_i == 3'b011);
+wire        gfx_mode_16_bpp   = ~(gfx_mode_8_bpp | gfx_mode_4_bpp |
+                                  gfx_mode_2_bpp | gfx_mode_1_bpp);
 
 // Others
 reg   [1:0] fifo_counter;
@@ -142,21 +146,21 @@ wire  fifo_data_request_nxt = refresh_active_i                  &
 
 always @(posedge mclk or posedge puc_rst)
   if (puc_rst)  fifo_data_request  <= 1'h0;
-  else		fifo_data_request  <= fifo_data_request_nxt;
+  else          fifo_data_request  <= fifo_data_request_nxt;
 
 //--------------------------------
 // Video RAM Address generation
 //--------------------------------
-reg    [16+4:0] vid_ram_current_addr;
-reg    [16+4:0] vid_ram_current_line_addr;
-reg      [15:0] vid_ram_column_count;
+reg  [`VRAM_MSB+4:0] vid_ram_current_addr;
+reg  [`VRAM_MSB+4:0] vid_ram_current_line_addr;
+reg    [`LPIX_MSB:0] vid_ram_column_count;
 
 // Shift the refresh base address depending on the color mode
-wire [16+4:0] refresh_base_addr_adjust = ({16+4{gfx_mode_1_bpp }} & {	      refresh_frame_base_addr_i, 4'b0000}) |
-					 ({16+4{gfx_mode_2_bpp }} & {1'b0,    refresh_frame_base_addr_i, 3'b000 }) |
-					 ({16+4{gfx_mode_4_bpp }} & {2'b00,   refresh_frame_base_addr_i, 2'b00  }) |
-					 ({16+4{gfx_mode_8_bpp }} & {3'b000,  refresh_frame_base_addr_i, 1'b0   }) |
-                                         ({16+4{gfx_mode_16_bpp}} & {4'b0000, refresh_frame_base_addr_i         }) ;
+wire [`VRAM_MSB+4:0] refresh_base_addr_adjust = ({`VRAM_MSB+1+4{gfx_mode_1_bpp }} & {         refresh_frame_base_addr_i, 4'b0000}) |
+                                                ({`VRAM_MSB+1+4{gfx_mode_2_bpp }} & {1'b0,    refresh_frame_base_addr_i, 3'b000 }) |
+                                                ({`VRAM_MSB+1+4{gfx_mode_4_bpp }} & {2'b00,   refresh_frame_base_addr_i, 2'b00  }) |
+                                                ({`VRAM_MSB+1+4{gfx_mode_8_bpp }} & {3'b000,  refresh_frame_base_addr_i, 1'b0   }) |
+                                                ({`VRAM_MSB+1+4{gfx_mode_16_bpp}} & {4'b0000, refresh_frame_base_addr_i         }) ;
 
 // Based on the display configuration (i.e. X-Swap / Y-Swap / CL-Swap)
 // the screen is not going to be refreshed in the same way.
@@ -170,67 +174,69 @@ wire [16+4:0] refresh_base_addr_adjust = ({16+4{gfx_mode_1_bpp }} & {	      refr
 //        addr = LAST  - WIDTH+1 - WIDTH*l_idx + c_idx // Y-Swap
 //        addr = LAST  -    0    - WIDTH*l_idx - c_idx // X/Y-Swap
 //
-wire [16+4:0] vid_ram_start_addr     = refresh_base_addr_adjust  + ({4'h0,  display_size_i[16:0]} & {17+4{ display_y_swap_i}})
-                                                                 + ({5'h00, display_width_i}      & {17+4{ display_x_swap_i}})
-                                                                 - ({5'h00, display_width_i}      & {17+4{ display_y_swap_i}})
-                                                                 - ({{16+4{1'b0}}, 1'b1}          & {17+4{ display_x_swap_i}})
-                                                                 + ({{16+4{1'b0}}, 1'b1}          & {17+4{ display_y_swap_i}});
+wire [`VRAM_MSB*3:0] display_size_norm      = {{`VRAM_MSB*3-`SPIX_MSB{1'b0}}, display_size_i};  // Zero extention for LINT cleanup
+wire [`VRAM_MSB*3:0] display_width_norm     = {{`VRAM_MSB*3-`LPIX_MSB{1'b0}}, display_width_i};	// Zero extention for LINT cleanup
+wire [`VRAM_MSB+4:0] vid_ram_start_addr     = refresh_base_addr_adjust  + (display_size_norm[`VRAM_MSB+4:0]  & {`VRAM_MSB+1+4{ display_y_swap_i}})
+									+ (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{ display_x_swap_i}})
+									- (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{ display_y_swap_i}})
+                                                                        - ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{ display_x_swap_i}})
+                                                                        + ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{ display_y_swap_i}});
 
-wire [16+4:0] vid_ram_next_line_addr = vid_ram_current_line_addr + ({5'h00, display_width_i}      & {17+4{~display_y_swap_i & ~display_cl_swap_i}})
-                                                                 - ({5'h00, display_width_i}      & {17+4{ display_y_swap_i & ~display_cl_swap_i}})
-                                                                 + ({{16+4{1'b0}}, 1'b1}          & {17+4{~display_x_swap_i &  display_cl_swap_i}})
-                                                                 - ({{16+4{1'b0}}, 1'b1}          & {17+4{ display_x_swap_i &  display_cl_swap_i}});
+wire [`VRAM_MSB+4:0] vid_ram_next_line_addr = vid_ram_current_line_addr + (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{~display_y_swap_i & ~display_cl_swap_i}})
+									- (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{ display_y_swap_i & ~display_cl_swap_i}})
+                                                                        + ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{~display_x_swap_i &  display_cl_swap_i}})
+                                                                        - ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{ display_x_swap_i &  display_cl_swap_i}});
 
-wire [16+4:0] vid_ram_next_addr      = vid_ram_current_addr      + ({{16+4{1'b0}}, 1'b1}          & {17+4{~display_x_swap_i & ~display_cl_swap_i}})
-                                                                 - ({{16+4{1'b0}}, 1'b1}          & {17+4{ display_x_swap_i & ~display_cl_swap_i}})
-                                                                 + ({5'h00, display_width_i}      & {17+4{~display_y_swap_i &  display_cl_swap_i}})
-                                                                 - ({5'h00, display_width_i}      & {17+4{ display_y_swap_i &  display_cl_swap_i}});
+wire [`VRAM_MSB+4:0] vid_ram_next_addr      = vid_ram_current_addr      + ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{~display_x_swap_i & ~display_cl_swap_i}})
+                                                                        - ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{ display_x_swap_i & ~display_cl_swap_i}})
+                                                                        + (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{~display_y_swap_i &  display_cl_swap_i}})
+									- (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{ display_y_swap_i &  display_cl_swap_i}});
 
 
 // Detect when the fifo is done reading the current pixel data
-wire          vid_ram_current_pixel_done = fifo_data_request & fifo_data_ready;
+wire                 vid_ram_current_pixel_done = fifo_data_request & fifo_data_ready;
 
 // Detect when the current line refresh is done
-wire   [16:0] line_length                = display_cl_swap_i ? {1'h0, display_height_i} : {1'h0, display_width_i};
-wire          vid_ram_current_line_done  = vid_ram_current_pixel_done & (vid_ram_column_count==(line_length-{{16{1'b0}}, 1'b1}));
+wire   [`LPIX_MSB:0] line_length                = display_cl_swap_i ? display_height_i : display_width_i;
+wire                 vid_ram_current_line_done  = vid_ram_current_pixel_done & (vid_ram_column_count==(line_length-{{`LPIX_MSB{1'b0}}, 1'b1}));
 
 // Start RAM address of currentely refreshed line
 always @(posedge mclk or posedge puc_rst)
-  if (puc_rst)                         vid_ram_current_line_addr  <=  {17+4{1'b0}};
+  if (puc_rst)                         vid_ram_current_line_addr  <=  {`VRAM_MSB+1+4{1'b0}};
   else if (~refresh_active_i)          vid_ram_current_line_addr  <=  vid_ram_start_addr;
   else if (vid_ram_current_line_done)  vid_ram_current_line_addr  <=  vid_ram_next_line_addr;
 
 // Current RAM address of the currentely refreshed pixel
-wire [16+4:0] vid_ram_current_addr_nxt = ~refresh_active_i           ?  vid_ram_start_addr     :
-                                          vid_ram_current_line_done  ?  vid_ram_next_line_addr :
-                                          vid_ram_current_pixel_done ?  vid_ram_next_addr      :
-	                                                                vid_ram_current_addr   ;
+wire [`VRAM_MSB+4:0] vid_ram_current_addr_nxt = ~refresh_active_i           ?  vid_ram_start_addr     :
+                                                 vid_ram_current_line_done  ?  vid_ram_next_line_addr :
+                                                 vid_ram_current_pixel_done ?  vid_ram_next_addr      :
+                                                                               vid_ram_current_addr   ;
 always @(posedge mclk or posedge puc_rst)
-  if (puc_rst)                         vid_ram_current_addr       <=  {17+4{1'b0}};
+  if (puc_rst)                         vid_ram_current_addr       <=  {`VRAM_MSB+1+4{1'b0}};
   else                                 vid_ram_current_addr       <=  vid_ram_current_addr_nxt;
 
 // Count the pixel number in the current line
 // (used to detec the end of a line)
 always @(posedge mclk or posedge puc_rst)
-  if (puc_rst)                         vid_ram_column_count       <=  16'h0000;
-  else if (~refresh_active_i)          vid_ram_column_count       <=  16'h0000;
-  else if (vid_ram_current_line_done)  vid_ram_column_count       <=  16'h0000;
-  else if (vid_ram_current_pixel_done) vid_ram_column_count       <=  vid_ram_column_count + 16'h0001;
+  if (puc_rst)                         vid_ram_column_count       <=  {`LPIX_MSB+1{1'b0}};
+  else if (~refresh_active_i)          vid_ram_column_count       <=  {`LPIX_MSB+1{1'b0}};
+  else if (vid_ram_current_line_done)  vid_ram_column_count       <=  {`LPIX_MSB+1{1'b0}};
+  else if (vid_ram_current_pixel_done) vid_ram_column_count       <=  vid_ram_column_count + {{`LPIX_MSB{1'b0}}, 1'b1};
 
 // Depending on the color mode, format the address for doing the RAM
 // accesses.
-assign      vid_ram_addr_o   = ({17{gfx_mode_1_bpp }} & vid_ram_current_addr[20:4]) |
-			       ({17{gfx_mode_2_bpp }} & vid_ram_current_addr[19:3]) |
-			       ({17{gfx_mode_4_bpp }} & vid_ram_current_addr[18:2]) |
-			       ({17{gfx_mode_8_bpp }} & vid_ram_current_addr[17:1]) |
-                               ({17{gfx_mode_16_bpp}} & vid_ram_current_addr[16:0]) ;
+assign      vid_ram_addr_o   = ({`VRAM_MSB{gfx_mode_1_bpp }} & vid_ram_current_addr[`VRAM_MSB+4:4]) |
+                               ({`VRAM_MSB{gfx_mode_2_bpp }} & vid_ram_current_addr[`VRAM_MSB+3:3]) |
+                               ({`VRAM_MSB{gfx_mode_4_bpp }} & vid_ram_current_addr[`VRAM_MSB+2:2]) |
+                               ({`VRAM_MSB{gfx_mode_8_bpp }} & vid_ram_current_addr[`VRAM_MSB+1:1]) |
+                               ({`VRAM_MSB{gfx_mode_16_bpp}} & vid_ram_current_addr[`VRAM_MSB+0:0]) ;
 
 // Compute the next RAM address to detect when a new address is generated
-wire [16:0] vid_ram_addr_nxt = ({17{gfx_mode_1_bpp }} & vid_ram_current_addr_nxt[20:4]) |
-			       ({17{gfx_mode_2_bpp }} & vid_ram_current_addr_nxt[19:3]) |
-			       ({17{gfx_mode_4_bpp }} & vid_ram_current_addr_nxt[18:2]) |
-			       ({17{gfx_mode_8_bpp }} &	vid_ram_current_addr_nxt[17:1]) |
-			       ({17{gfx_mode_16_bpp}} & vid_ram_current_addr_nxt[16:0]) ;
+wire [16:0] vid_ram_addr_nxt = ({`VRAM_MSB{gfx_mode_1_bpp }} & vid_ram_current_addr_nxt[`VRAM_MSB+4:4]) |
+                               ({`VRAM_MSB{gfx_mode_2_bpp }} & vid_ram_current_addr_nxt[`VRAM_MSB+3:3]) |
+                               ({`VRAM_MSB{gfx_mode_4_bpp }} & vid_ram_current_addr_nxt[`VRAM_MSB+2:2]) |
+                               ({`VRAM_MSB{gfx_mode_8_bpp }} & vid_ram_current_addr_nxt[`VRAM_MSB+1:1]) |
+                               ({`VRAM_MSB{gfx_mode_16_bpp}} & vid_ram_current_addr_nxt[`VRAM_MSB+0:0]) ;
 
 // Detect when a new word needs to be fetched from the memory
 // (i.e. detect when the RAM address is updated)
@@ -396,7 +402,13 @@ assign    frame_data_ready_o       = frame_data_init_nxt & (fifo_counter != FIFO
 
 // Read from FIFO command
 assign    read_from_fifo = ~refresh_active_i |
-	                   ~frame_data_init  |
+                           ~frame_data_init  |
                             ((fifo_counter != FIFO_EMPTY) & frame_data_request_i);
 
-endmodule
+
+endmodule // omsp_gfx_backend_frame_fifo
+
+`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`else
+`include "omsp_gfx_controller_undefines.v"
+`endif

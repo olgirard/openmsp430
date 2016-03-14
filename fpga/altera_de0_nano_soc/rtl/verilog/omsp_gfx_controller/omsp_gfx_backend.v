@@ -39,78 +39,84 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
+`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`else
+`include "omsp_gfx_controller_defines.v"
+`endif
 
 module  omsp_gfx_backend (
 
 // OUTPUTs
-    refresh_data_o,                          // Display refresh data
-    refresh_data_ready_o,                    // Display refresh new data is ready
+    refresh_data_o,                               // Display refresh data
+    refresh_data_ready_o,                         // Display refresh new data is ready
 
-    vid_ram_addr_o,                          // Video-RAM refresh address
-    vid_ram_cen_o,                           // Video-RAM refresh enable (active low)
+    vid_ram_addr_o,                               // Video-RAM refresh address
+    vid_ram_cen_o,                                // Video-RAM refresh enable (active low)
 
-    lut_ram_addr_o,                          // LUT-RAM refresh address
-    lut_ram_cen_o,                           // LUT-RAM refresh enable (active low)
+    lut_ram_addr_o,                               // LUT-RAM refresh address
+    lut_ram_cen_o,                                // LUT-RAM refresh enable (active low)
 
 // INPUTs
-    mclk,                                    // Main system clock
-    puc_rst,                                 // Main system reset
+    mclk,                                         // Main system clock
+    puc_rst,                                      // Main system reset
 
-    display_width_i,                         // Display width
-    display_height_i,                        // Display height
-    display_size_i,                          // Display size (number of pixels)
-    display_y_swap_i,                        // Display configuration: swap Y axis (horizontal symmetry)
-    display_x_swap_i,                        // Display configuration: swap X axis (vertical symmetry)
-    display_cl_swap_i,                       // Display configuration: swap column/lines
+    display_width_i,                              // Display width
+    display_height_i,                             // Display height
+    display_size_i,                               // Display size (number of pixels)
+    display_y_swap_i,                             // Display configuration: swap Y axis (horizontal symmetry)
+    display_x_swap_i,                             // Display configuration: swap X axis (vertical symmetry)
+    display_cl_swap_i,                            // Display configuration: swap column/lines
 
-    gfx_mode_i,                              // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
+    gfx_mode_i,                                   // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
-    lut_ram_dout_i,                          // LUT-RAM data output
-    lut_ram_dout_rdy_nxt_i,                  // LUT-RAM data output ready during next cycle
+    lut_ram_dout_i,                               // LUT-RAM data output
+    lut_ram_dout_rdy_nxt_i,                       // LUT-RAM data output ready during next cycle
 
-    vid_ram_dout_i,                          // Video-RAM data output
-    vid_ram_dout_rdy_nxt_i,                  // Video-RAM data output ready during next cycle
+    vid_ram_dout_i,                               // Video-RAM data output
+    vid_ram_dout_rdy_nxt_i,                       // Video-RAM data output ready during next cycle
 
-    refresh_active_i,                        // Display refresh on going
-    refresh_data_request_i,                  // Display refresh new data request
-    refresh_frame_base_addr_i                // Refresh frame base address
+    refresh_active_i,                             // Display refresh on going
+    refresh_data_request_i,                       // Display refresh new data request
+    refresh_frame_base_addr_i,                    // Refresh frame base address
+    refresh_lut_select_i                          // Refresh LUT bank selection
 );
 
 // OUTPUTs
 //=========
-output [15:0] refresh_data_o;                // Display refresh data
-output        refresh_data_ready_o;          // Display refresh new data is ready
+output        [15:0] refresh_data_o;              // Display refresh data
+output               refresh_data_ready_o;        // Display refresh new data is ready
 
-output [16:0] vid_ram_addr_o;                // Video-RAM refresh address
-output        vid_ram_cen_o;                 // Video-RAM refresh enable (active low)
+output [`VRAM_MSB:0] vid_ram_addr_o;              // Video-RAM refresh address
+output               vid_ram_cen_o;               // Video-RAM refresh enable (active low)
 
-output [10:0] lut_ram_addr_o;                // LUT-RAM refresh address
-output        lut_ram_cen_o;                 // LUT-RAM refresh enable (active low)
+output [`LRAM_MSB:0] lut_ram_addr_o;              // LUT-RAM refresh address
+output               lut_ram_cen_o;               // LUT-RAM refresh enable (active low)
 
 
 // INPUTs
 //=========
-input         mclk;                          // Main system clock
-input         puc_rst;                       // Main system reset
+input                mclk;                        // Main system clock
+input                puc_rst;                     // Main system reset
 
-input  [15:0] display_width_i;               // Display width
-input  [15:0] display_height_i;              // Display height
-input  [31:0] display_size_i;                // Display size (number of pixels)
-input         display_y_swap_i;              // Display configuration: swap Y axis (horizontal symmetry)
-input         display_x_swap_i;              // Display configuration: swap X axis (vertical symmetry)
-input         display_cl_swap_i;             // Display configuration: swap column/lines
+input  [`LPIX_MSB:0] display_width_i;             // Display width
+input  [`LPIX_MSB:0] display_height_i;            // Display height
+input  [`SPIX_MSB:0] display_size_i;              // Display size (number of pixels)
+input                display_y_swap_i;            // Display configuration: swap Y axis (horizontal symmetry)
+input                display_x_swap_i;            // Display configuration: swap X axis (vertical symmetry)
+input                display_cl_swap_i;           // Display configuration: swap column/lines
 
-input   [2:0] gfx_mode_i;                    // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
+input          [2:0] gfx_mode_i;                  // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
-input  [15:0] lut_ram_dout_i;                // LUT-RAM data output
-input         lut_ram_dout_rdy_nxt_i;        // LUT-RAM data output ready during next cycle
+input         [15:0] lut_ram_dout_i;              // LUT-RAM data output
+input                lut_ram_dout_rdy_nxt_i;      // LUT-RAM data output ready during next cycle
 
-input  [15:0] vid_ram_dout_i;                // Video-RAM data output
-input         vid_ram_dout_rdy_nxt_i;        // Video-RAM data output ready during next cycle
+input         [15:0] vid_ram_dout_i;              // Video-RAM data output
+input                vid_ram_dout_rdy_nxt_i;      // Video-RAM data output ready during next cycle
 
-input         refresh_active_i;              // Display refresh on going
-input         refresh_data_request_i;        // Display refresh new data request
-input  [16:0] refresh_frame_base_addr_i;     // Refresh frame base address
+input                refresh_active_i;            // Display refresh on going
+input                refresh_data_request_i;      // Display refresh new data request
+input  [`VRAM_MSB:0] refresh_frame_base_addr_i;   // Refresh frame base address
+input                refresh_lut_select_i;        // Refresh LUT bank selection
 
 
 //=============================================================================
@@ -184,13 +190,18 @@ omsp_gfx_backend_lut_fifo  omsp_gfx_backend_lut_fifo_inst (
     .frame_data_needs_lut_i        ( frame_data_needs_lut      ),  // Frame data needs LUT
     .frame_data_ready_i            ( frame_data_ready          ),  // Frame data ready
 
+    .refresh_active_i              ( refresh_active_i          ),  // Display refresh on going
     .refresh_data_request_i        ( refresh_data_request_i    ),  // Request for next refresh data
+    .refresh_lut_select_i          ( refresh_lut_select_i      ),  // Refresh LUT bank selection
 
     .lut_ram_dout_i                ( lut_ram_dout_i            ),  // LUT-RAM data output
-    .lut_ram_dout_rdy_nxt_i        ( lut_ram_dout_rdy_nxt_i    ),  // LUT-RAM data output ready during next cycle
-
-    .refresh_active_i              ( refresh_active_i          )   // Display refresh on going
+    .lut_ram_dout_rdy_nxt_i        ( lut_ram_dout_rdy_nxt_i    )   // LUT-RAM data output ready during next cycle
 );
 
 
-endmodule
+endmodule // omsp_gfx_backend
+
+`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`else
+`include "omsp_gfx_controller_undefines.v"
+`endif

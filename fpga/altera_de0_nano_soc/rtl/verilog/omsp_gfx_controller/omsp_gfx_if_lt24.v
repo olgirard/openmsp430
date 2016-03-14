@@ -35,93 +35,97 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
+`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`else
+`include "omsp_gfx_controller_defines.v"
+`endif
 
 module  omsp_gfx_if_lt24 (
 
 // OUTPUTs
-    event_fsm_done_o,                        // Event  - FSM is done
-    event_fsm_start_o,                       // Event  - FSM is starting
+    event_fsm_done_o,                              // Event  - FSM is done
+    event_fsm_start_o,                             // Event  - FSM is starting
 
-    lt24_cs_n_o,                             // LT24 Chip select (Active low)
-    lt24_d_o,                                // LT24 Data output
-    lt24_d_en_o,                             // LT24 Data output enable
-    lt24_rd_n_o,                             // LT24 Read strobe (Active low)
-    lt24_rs_o,                               // LT24 Command/Param selection (Cmd=0/Param=1)
-    lt24_wr_n_o,                             // LT24 Write strobe (Active low)
+    lt24_cs_n_o,                                   // LT24 Chip select (Active low)
+    lt24_d_o,                                      // LT24 Data output
+    lt24_d_en_o,                                   // LT24 Data output enable
+    lt24_rd_n_o,                                   // LT24 Read strobe (Active low)
+    lt24_rs_o,                                     // LT24 Command/Param selection (Cmd=0/Param=1)
+    lt24_wr_n_o,                                   // LT24 Write strobe (Active low)
 
-    refresh_active_o,                        // Display refresh on going
-    refresh_data_request_o,                  // Display refresh new data request
+    refresh_active_o,                              // Display refresh on going
+    refresh_data_request_o,                        // Display refresh new data request
 
-    status_o,                                // Status - FSM
+    status_o,                                      // Status - FSM
 
 // INPUTs
-    mclk,                                    // Main system clock
-    puc_rst,                                 // Main system reset
+    mclk,                                          // Main system clock
+    puc_rst,                                       // Main system reset
 
-    cfg_lt24_clk_div_i,                      // Clock Divider configuration for LT24 interface
-    cfg_lt24_display_size_i,                 // Display size (number of pixels)
-    cfg_lt24_refresh_i,                      // Refresh rate configuration for LT24 interface
-    cfg_lt24_refresh_sync_en_i,              // Refresh sync enable configuration for LT24 interface
-    cfg_lt24_refresh_sync_val_i,             // Refresh sync value configuration for LT24 interface
+    cfg_lt24_clk_div_i,                            // Clock Divider configuration for LT24 interface
+    cfg_lt24_display_size_i,                       // Display size (number of pixels)
+    cfg_lt24_refresh_i,                            // Refresh rate configuration for LT24 interface
+    cfg_lt24_refresh_sync_en_i,                    // Refresh sync enable configuration for LT24 interface
+    cfg_lt24_refresh_sync_val_i,                   // Refresh sync value configuration for LT24 interface
 
-    cmd_dfill_i,                             // Display refresh data
-    cmd_dfill_trig_i,                        // Trigger a full display refresh
+    cmd_dfill_i,                                   // Display refresh data
+    cmd_dfill_trig_i,                              // Trigger a full display refresh
 
-    cmd_generic_cmd_val_i,                   // Generic command value
-    cmd_generic_has_param_i,                 // Generic command to be sent has parameter(s)
-    cmd_generic_param_val_i,                 // Generic command parameter value
-    cmd_generic_trig_i,                      // Trigger generic command transmit (or new parameter available)
+    cmd_generic_cmd_val_i,                         // Generic command value
+    cmd_generic_has_param_i,                       // Generic command to be sent has parameter(s)
+    cmd_generic_param_val_i,                       // Generic command parameter value
+    cmd_generic_trig_i,                            // Trigger generic command transmit (or new parameter available)
 
-    cmd_refresh_i,                           // Display refresh command
+    cmd_refresh_i,                                 // Display refresh command
 
-    lt24_d_i,                                // LT24 Data input
+    lt24_d_i,                                      // LT24 Data input
 
-    refresh_data_i,                          // Display refresh data
-    refresh_data_ready_i                     // Display refresh new data is ready
+    refresh_data_i,                                // Display refresh data
+    refresh_data_ready_i                           // Display refresh new data is ready
 );
 
 // OUTPUTs
 //=========
-output        event_fsm_done_o;              // LT24 FSM done event
-output        event_fsm_start_o;             // LT24 FSM start event
+output              event_fsm_done_o;              // LT24 FSM done event
+output              event_fsm_start_o;             // LT24 FSM start event
 
-output        lt24_cs_n_o;                   // LT24 Chip select (Active low)
-output [15:0] lt24_d_o;                      // LT24 Data output
-output        lt24_d_en_o;                   // LT24 Data output enable
-output        lt24_rd_n_o;                   // LT24 Read strobe (Active low)
-output        lt24_rs_o;                     // LT24 Command/Param selection (Cmd=0/Param=1)
-output        lt24_wr_n_o;                   // LT24 Write strobe (Active low)
+output              lt24_cs_n_o;                   // LT24 Chip select (Active low)
+output       [15:0] lt24_d_o;                      // LT24 Data output
+output              lt24_d_en_o;                   // LT24 Data output enable
+output              lt24_rd_n_o;                   // LT24 Read strobe (Active low)
+output              lt24_rs_o;                     // LT24 Command/Param selection (Cmd=0/Param=1)
+output              lt24_wr_n_o;                   // LT24 Write strobe (Active low)
 
-output        refresh_active_o;              // Display refresh on going
-output        refresh_data_request_o;        // Display refresh new data request
+output              refresh_active_o;              // Display refresh on going
+output              refresh_data_request_o;        // Display refresh new data request
 
-output  [4:0] status_o;                      // LT24 FSM Status
+output        [4:0] status_o;                      // LT24 FSM Status
 
 // INPUTs
 //=========
-input         mclk;                          // Main system clock
-input         puc_rst;                       // Main system reset
+input               mclk;                          // Main system clock
+input               puc_rst;                       // Main system reset
 
-input   [2:0] cfg_lt24_clk_div_i;            // Clock Divider configuration for LT24 interface
-input  [31:0] cfg_lt24_display_size_i;       // Display size (number of pixels)
-input  [11:0] cfg_lt24_refresh_i;            // Refresh rate configuration for LT24 interface
-input         cfg_lt24_refresh_sync_en_i;    // Refresh sync enable configuration for LT24 interface
-input   [9:0] cfg_lt24_refresh_sync_val_i;   // Refresh sync value configuration for LT24 interface
+input         [2:0] cfg_lt24_clk_div_i;            // Clock Divider configuration for LT24 interface
+input [`SPIX_MSB:0] cfg_lt24_display_size_i;       // Display size (number of pixels)
+input        [11:0] cfg_lt24_refresh_i;            // Refresh rate configuration for LT24 interface
+input               cfg_lt24_refresh_sync_en_i;    // Refresh sync enable configuration for LT24 interface
+input         [9:0] cfg_lt24_refresh_sync_val_i;   // Refresh sync value configuration for LT24 interface
 
-input  [15:0] cmd_dfill_i;                   // Display refresh data
-input         cmd_dfill_trig_i;              // Trigger a full display refresh
+input        [15:0] cmd_dfill_i;                   // Display refresh data
+input               cmd_dfill_trig_i;              // Trigger a full display refresh
 
-input   [7:0] cmd_generic_cmd_val_i;         // Generic command value
-input         cmd_generic_has_param_i;       // Generic command to be sent has parameter(s)
-input  [15:0] cmd_generic_param_val_i;       // Generic command parameter value
-input         cmd_generic_trig_i;            // Trigger generic command transmit (or new parameter available)
+input         [7:0] cmd_generic_cmd_val_i;         // Generic command value
+input               cmd_generic_has_param_i;       // Generic command to be sent has parameter(s)
+input        [15:0] cmd_generic_param_val_i;       // Generic command parameter value
+input               cmd_generic_trig_i;            // Trigger generic command transmit (or new parameter available)
 
-input         cmd_refresh_i;                 // Display refresh command
+input               cmd_refresh_i;                 // Display refresh command
 
-input  [15:0] lt24_d_i;                      // LT24 Data input
+input        [15:0] lt24_d_i;                      // LT24 Data input
 
-input  [15:0] refresh_data_i;                // Display refresh data
-input         refresh_data_ready_i;          // Display refresh new data is ready
+input        [15:0] refresh_data_i;                // Display refresh data
+input               refresh_data_ready_i;          // Display refresh new data is ready
 
 
 //=============================================================================
@@ -198,23 +202,23 @@ always @(posedge mclk or posedge puc_rst)
 //--------------------------------
 // Pixel counter
 //--------------------------------
-reg [31:0] lt24_pixel_cnt;
+reg [`SPIX_MSB:0] lt24_pixel_cnt;
 
-wire       lt24_pixel_cnt_run  = (lt24_state==STATE_RAMWR_INIT_DATA_HI) |
-                                 (lt24_state==STATE_RAMWR_REFR_DATA_HI);
+wire              lt24_pixel_cnt_run  = (lt24_state==STATE_RAMWR_INIT_DATA_HI) |
+                                        (lt24_state==STATE_RAMWR_REFR_DATA_HI);
 
-wire       lt24_pixel_cnt_done = (lt24_pixel_cnt==cfg_lt24_display_size_i);
+wire              lt24_pixel_cnt_done = (lt24_pixel_cnt==cfg_lt24_display_size_i);
 
-wire       lt24_pixel_cnt_init = (lt24_state==STATE_RAMWR_INIT_CMD_HI) |
-                                 (lt24_state==STATE_RAMWR_REFR_CMD_HI) |
-                                 (lt24_pixel_cnt_done & lt24_pixel_cnt_run);
+wire              lt24_pixel_cnt_init = (lt24_state==STATE_RAMWR_INIT_CMD_HI) |
+                                        (lt24_state==STATE_RAMWR_REFR_CMD_HI) |
+                                        (lt24_pixel_cnt_done & lt24_pixel_cnt_run);
 
 always @(posedge mclk or posedge puc_rst)
-  if (puc_rst)                      lt24_pixel_cnt <= 32'h00000000;
+  if (puc_rst)                      lt24_pixel_cnt <= {`SPIX_MSB+1{1'h0}};
   else if (lt24_timer_init)
     begin
-       if (lt24_pixel_cnt_init)     lt24_pixel_cnt <= 32'h00000000;
-       else if (lt24_pixel_cnt_run) lt24_pixel_cnt <= lt24_pixel_cnt+32'h00000001;
+       if (lt24_pixel_cnt_init)     lt24_pixel_cnt <= {`SPIX_MSB+1{1'h0}};
+       else if (lt24_pixel_cnt_run) lt24_pixel_cnt <= lt24_pixel_cnt+{{`SPIX_MSB{1'h0}},1'b1};
     end
 
 
@@ -459,4 +463,9 @@ always @(posedge mclk or posedge puc_rst)
   else if (refresh_trigger_set) refresh_trigger <= 1'b1;
   else if (refresh_trigger_clr) refresh_trigger <= 1'b0;
 
-endmodule
+endmodule // omsp_gfx_if_lt24
+
+`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`else
+`include "omsp_gfx_controller_undefines.v"
+`endif
