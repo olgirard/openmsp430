@@ -170,6 +170,9 @@ void start_lt24(void);
 #define  REFRESH_FRAME2_SELECT     0x0002
 #define  REFRESH_FRAME3_SELECT     0x0003
 
+#define  REFRESH_LUT0_SELECT       0x0000
+#define  REFRESH_LUT1_SELECT       0x0008
+
 #define  VID_RAM0_FRAME0_SELECT    0x0000
 #define  VID_RAM0_FRAME1_SELECT    0x0010
 #define  VID_RAM0_FRAME2_SELECT    0x0020
@@ -179,5 +182,8 @@ void start_lt24(void);
 #define  VID_RAM1_FRAME1_SELECT    0x0040
 #define  VID_RAM1_FRAME2_SELECT    0x0080
 #define  VID_RAM1_FRAME3_SELECT    0x00C0
+
+#define  LUT_BANK0_SELECT          0x0000
+#define  LUT_BANK1_SELECT          0x8000
 
 #endif
