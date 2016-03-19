@@ -36,18 +36,22 @@ void init_lt24(void) {
   #define LT24_DISPLAY_Y        0       // Y Coordinate
   #define LT24_DISPLAY_WIDTH    8 -1    // Display width
   #define LT24_DISPLAY_HEIGHT   5 -1    // Display height
+  #define LT24_DISPLAY_SIZE_HI  0       // 76800>>16
+  #define LT24_DISPLAY_SIZE_LO  40      // 76800-2^16-1
 #else
   #define LT24_DISPLAY_X        0       // X Coordinate
   #define LT24_DISPLAY_Y        0       // Y Coordinate
   #define LT24_DISPLAY_WIDTH    320 -1  // Display width
   #define LT24_DISPLAY_HEIGHT   240 -1  // Display height
+  #define LT24_DISPLAY_SIZE_HI  0x0001  // 76800>>16
+  #define LT24_DISPLAY_SIZE_LO  0x2C00  // 76800-2^16-1
 #endif
 
   // Global configuration registers
   DISPLAY_WIDTH   = LT24_DISPLAY_WIDTH+1;
   DISPLAY_HEIGHT  = LT24_DISPLAY_HEIGHT+1;
-  DISPLAY_SIZE_HI = ((((LT24_DISPLAY_WIDTH+1)*(LT24_DISPLAY_HEIGHT+1))-1) & 0xFFFF0000)>>16;
-  DISPLAY_SIZE_LO = ((((LT24_DISPLAY_WIDTH+1)*(LT24_DISPLAY_HEIGHT+1))-1) & 0x0000FFFF);
+  DISPLAY_SIZE_HI  = LT24_DISPLAY_SIZE_HI;
+  DISPLAY_SIZE_LO  = LT24_DISPLAY_SIZE_LO;
 
   DISPLAY_CFG = DISPLAY_NO_X_SWAP | DISPLAY_NO_Y_SWAP | DISPLAY_NO_CL_SWAP;
 
@@ -76,8 +80,8 @@ void init_lt24(void) {
   LT24_CMD       = 0x0000;
 
   // Initialize the LT24 display memory
-  LT24_CMD_DFILL = 0x1234;
-  while((LT24_STATUS & LT24_STATUS_DFILL_BUSY)!=0);
+//  LT24_CMD_DFILL = 0x1234;
+//  while((LT24_STATUS & LT24_STATUS_DFILL_BUSY)!=0);
 
   // Display on
   LT24_CMD       = 0x0029 | LT24_CMD_NO_PARAM;

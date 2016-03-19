@@ -42,9 +42,8 @@ void init_lt24(void);
 #define  LT24_CMD_DFILL    (*(volatile unsigned int  *) 0x022A)
 #define  LT24_STATUS       (*(volatile unsigned int  *) 0x022C)
 
-#define  LUT_RAM_ADDR_HI   (*(volatile unsigned int  *) 0x0230)
-#define  LUT_RAM_ADDR_LO   (*(volatile unsigned int  *) 0x0232)
-#define  LUT_RAM_DATA      (*(volatile unsigned int  *) 0x0234)
+#define  LUT_RAM_ADDR      (*(volatile unsigned int  *) 0x0230)
+#define  LUT_RAM_DATA      (*(volatile unsigned int  *) 0x0232)
 
 #define  FRAME_SELECT      (*(volatile unsigned int  *) 0x023E)
 #define  FRAME0_PTR_HI     (*(volatile unsigned int  *) 0x0240)
@@ -154,6 +153,11 @@ void init_lt24(void);
 #define  REFRESH_FRAME1_SELECT     0x0001
 #define  REFRESH_FRAME2_SELECT     0x0002
 #define  REFRESH_FRAME3_SELECT     0x0003
+
+#define  REFRESH_SW_LUT_DISABLE    0x0000
+#define  REFRESH_SW_LUT_ENABLE     0x0004
+#define  REFRESH_SW_LUT0_SELECT    0x0000
+#define  REFRESH_SW_LUT1_SELECT    0x0008
 
 #define  VID_RAM0_FRAME0_SELECT    0x0000
 #define  VID_RAM0_FRAME1_SELECT    0x0010

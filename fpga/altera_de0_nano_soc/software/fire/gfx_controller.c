@@ -80,7 +80,12 @@ void init_lt24 (uint16_t lt24_clk_div) {
   // (MADCTL command: see pages 127 and 209 of the ILI9341 spec)
 #ifdef LT24_ROTATE
   LT24_CMD       = 0x0036 | LT24_CMD_HAS_PARAM;
-  LT24_CMD_PARAM = 0x0020;
+  LT24_CMD_PARAM = 0x0028;
+  while((LT24_STATUS & LT24_STATUS_WAIT_PARAM)==0);
+  LT24_CMD       = 0x0000;
+#else
+  LT24_CMD       = 0x0036 | LT24_CMD_HAS_PARAM;
+  LT24_CMD_PARAM = 0x0008;
   while((LT24_STATUS & LT24_STATUS_WAIT_PARAM)==0);
   LT24_CMD       = 0x0000;
 #endif

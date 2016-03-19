@@ -159,15 +159,14 @@ int main(void) {
   temp4           = VID_RAM1_DATA;
 
   //
-  LUT_RAM_ADDR_HI = 0x0000;
-  LUT_RAM_ADDR_LO = 0x0234;
+  LUT_RAM_ADDR    = 0x0234;
 
   LUT_RAM_DATA    = 0x5555;
   LUT_RAM_DATA    = 0x6666;
   LUT_RAM_DATA    = 0x7777;
   LUT_RAM_DATA    = 0x8888;
 
-  LUT_RAM_ADDR_LO = 0x0234;
+  LUT_RAM_ADDR    = 0x0234;
   __nop();
   temp1           = LUT_RAM_DATA;
   temp2           = LUT_RAM_DATA;
@@ -175,8 +174,7 @@ int main(void) {
   temp4           = LUT_RAM_DATA;
 
   // Update LUT
-  LUT_RAM_ADDR_HI = 0x0000;
-  LUT_RAM_ADDR_LO = 0x0000;
+  LUT_RAM_ADDR = 0x0000;
   for( idx = 0; idx < 256; idx = idx + 1 ) {
     LUT_RAM_DATA    = idx<<8;
   }
