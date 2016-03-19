@@ -44,7 +44,6 @@ module  omsp_gfx_backend_frame_fifo (
 
 // OUTPUTs
     frame_data_o,                               // Frame data
-    frame_data_needs_lut_o,                     // Frame data needs LUT
     frame_data_ready_o,                         // Frame data ready
 
     vid_ram_addr_o,                             // Video-RAM address
@@ -75,7 +74,6 @@ module  omsp_gfx_backend_frame_fifo (
 // OUTPUTs
 //=========
 output       [15:0] frame_data_o;               // Frame data
-output              frame_data_needs_lut_o;     // Frame data needs LUT
 output              frame_data_ready_o;         // Frame data ready
 
 output[`VRAM_MSB:0] vid_ram_addr_o;             // Video-RAM address
@@ -151,9 +149,16 @@ always @(posedge mclk or posedge puc_rst)
 //--------------------------------
 // Video RAM Address generation
 //--------------------------------
-reg  [`VRAM_MSB+4:0] vid_ram_current_addr;
-reg  [`VRAM_MSB+4:0] vid_ram_current_line_addr;
+reg  [`VRAM_MSB+4:0] vid_ram_pixel_addr;
+reg  [`VRAM_MSB+4:0] vid_ram_line_addr;
 reg    [`LPIX_MSB:0] vid_ram_column_count;
+
+// Detect when the fifo is done reading the current pixel data
+wire                 vid_ram_pixel_done = fifo_data_request & fifo_data_ready;
+
+// Detect when the current line refresh is done
+wire   [`LPIX_MSB:0] line_length        = display_cl_swap_i ? display_height_i : display_width_i;
+wire                 vid_ram_line_done  = vid_ram_pixel_done & (vid_ram_column_count==(line_length-{{`LPIX_MSB{1'b0}}, 1'b1}));
 
 // Shift the refresh base address depending on the color mode
 wire [`VRAM_MSB+4:0] refresh_base_addr_adjust = ({`VRAM_MSB+1+4{gfx_mode_1_bpp }} & {         refresh_frame_base_addr_i, 4'b0000}) |
@@ -161,6 +166,10 @@ wire [`VRAM_MSB+4:0] refresh_base_addr_adjust = ({`VRAM_MSB+1+4{gfx_mode_1_bpp }
                                                 ({`VRAM_MSB+1+4{gfx_mode_4_bpp }} & {2'b00,   refresh_frame_base_addr_i, 2'b00  }) |
                                                 ({`VRAM_MSB+1+4{gfx_mode_8_bpp }} & {3'b000,  refresh_frame_base_addr_i, 1'b0   }) |
                                                 ({`VRAM_MSB+1+4{gfx_mode_16_bpp}} & {4'b0000, refresh_frame_base_addr_i         }) ;
+
+// Zero extension for LINT cleanup
+wire [`VRAM_MSB*3:0] display_size_norm  =  {{`VRAM_MSB*3-`SPIX_MSB{1'b0}}, display_size_i};
+wire [`VRAM_MSB*3:0] display_width_norm =  {{`VRAM_MSB*3-`LPIX_MSB{1'b0}}, display_width_i};
 
 // Based on the display configuration (i.e. X-Swap / Y-Swap / CL-Swap)
 // the screen is not going to be refreshed in the same way.
@@ -174,78 +183,63 @@ wire [`VRAM_MSB+4:0] refresh_base_addr_adjust = ({`VRAM_MSB+1+4{gfx_mode_1_bpp }
 //        addr = LAST  - WIDTH+1 - WIDTH*l_idx + c_idx // Y-Swap
 //        addr = LAST  -    0    - WIDTH*l_idx - c_idx // X/Y-Swap
 //
-wire [`VRAM_MSB*3:0] display_size_norm      = {{`VRAM_MSB*3-`SPIX_MSB{1'b0}}, display_size_i};  // Zero extention for LINT cleanup
-wire [`VRAM_MSB*3:0] display_width_norm     = {{`VRAM_MSB*3-`LPIX_MSB{1'b0}}, display_width_i};	// Zero extention for LINT cleanup
-wire [`VRAM_MSB+4:0] vid_ram_start_addr     = refresh_base_addr_adjust  + (display_size_norm[`VRAM_MSB+4:0]  & {`VRAM_MSB+1+4{ display_y_swap_i}})
-									+ (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{ display_x_swap_i}})
-									- (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{ display_y_swap_i}})
-                                                                        - ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{ display_x_swap_i}})
-                                                                        + ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{ display_y_swap_i}});
 
-wire [`VRAM_MSB+4:0] vid_ram_next_line_addr = vid_ram_current_line_addr + (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{~display_y_swap_i & ~display_cl_swap_i}})
-									- (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{ display_y_swap_i & ~display_cl_swap_i}})
-                                                                        + ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{~display_x_swap_i &  display_cl_swap_i}})
-                                                                        - ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{ display_x_swap_i &  display_cl_swap_i}});
+wire [`VRAM_MSB+4:0] next_base_addr     =  ~refresh_active_i  ? refresh_base_addr_adjust :
+                                            vid_ram_line_done ? vid_ram_line_addr        :
+                                                                vid_ram_pixel_addr       ;
 
-wire [`VRAM_MSB+4:0] vid_ram_next_addr      = vid_ram_current_addr      + ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{~display_x_swap_i & ~display_cl_swap_i}})
-                                                                        - ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{ display_x_swap_i & ~display_cl_swap_i}})
-                                                                        + (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{~display_y_swap_i &  display_cl_swap_i}})
-									- (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{ display_y_swap_i &  display_cl_swap_i}});
+wire [`VRAM_MSB+4:0] next_addr          =   next_base_addr
+                                          + (display_size_norm[`VRAM_MSB+4:0]  & {`VRAM_MSB+1+4{refresh_active_i ?  1'b0                                                          : display_y_swap_i}})
+                                          + (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{refresh_active_i ? (~display_y_swap_i &  (display_cl_swap_i ^ vid_ram_line_done)) : display_x_swap_i}})
+                                          - (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{refresh_active_i ? ( display_y_swap_i &  (display_cl_swap_i ^ vid_ram_line_done)) : display_y_swap_i}})
+                                          + ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{refresh_active_i ? (~display_x_swap_i & ~(display_cl_swap_i ^ vid_ram_line_done)) : 1'b0            }})
+                                          - ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{refresh_active_i ? ( display_x_swap_i & ~(display_cl_swap_i ^ vid_ram_line_done)) : display_x_swap_i}});
 
-
-// Detect when the fifo is done reading the current pixel data
-wire                 vid_ram_current_pixel_done = fifo_data_request & fifo_data_ready;
-
-// Detect when the current line refresh is done
-wire   [`LPIX_MSB:0] line_length                = display_cl_swap_i ? display_height_i : display_width_i;
-wire                 vid_ram_current_line_done  = vid_ram_current_pixel_done & (vid_ram_column_count==(line_length-{{`LPIX_MSB{1'b0}}, 1'b1}));
+wire                 update_line_addr   =  ~refresh_active_i | vid_ram_line_done;
+wire                 update_pixel_addr  =   update_line_addr | vid_ram_pixel_done;
 
 // Start RAM address of currentely refreshed line
 always @(posedge mclk or posedge puc_rst)
-  if (puc_rst)                         vid_ram_current_line_addr  <=  {`VRAM_MSB+1+4{1'b0}};
-  else if (~refresh_active_i)          vid_ram_current_line_addr  <=  vid_ram_start_addr;
-  else if (vid_ram_current_line_done)  vid_ram_current_line_addr  <=  vid_ram_next_line_addr;
+  if (puc_rst)               vid_ram_line_addr  <=  {`VRAM_MSB+1+4{1'b0}};
+  else if (update_line_addr) vid_ram_line_addr  <=  next_addr;
 
 // Current RAM address of the currentely refreshed pixel
-wire [`VRAM_MSB+4:0] vid_ram_current_addr_nxt = ~refresh_active_i           ?  vid_ram_start_addr     :
-                                                 vid_ram_current_line_done  ?  vid_ram_next_line_addr :
-                                                 vid_ram_current_pixel_done ?  vid_ram_next_addr      :
-                                                                               vid_ram_current_addr   ;
+wire [`VRAM_MSB+4:0] vid_ram_pixel_addr_nxt = update_pixel_addr ? next_addr : vid_ram_pixel_addr;
+
 always @(posedge mclk or posedge puc_rst)
-  if (puc_rst)                         vid_ram_current_addr       <=  {`VRAM_MSB+1+4{1'b0}};
-  else                                 vid_ram_current_addr       <=  vid_ram_current_addr_nxt;
+  if (puc_rst) vid_ram_pixel_addr  <=  {`VRAM_MSB+1+4{1'b0}};
+  else         vid_ram_pixel_addr  <=  vid_ram_pixel_addr_nxt;
 
 // Count the pixel number in the current line
 // (used to detec the end of a line)
 always @(posedge mclk or posedge puc_rst)
-  if (puc_rst)                         vid_ram_column_count       <=  {`LPIX_MSB+1{1'b0}};
-  else if (~refresh_active_i)          vid_ram_column_count       <=  {`LPIX_MSB+1{1'b0}};
-  else if (vid_ram_current_line_done)  vid_ram_column_count       <=  {`LPIX_MSB+1{1'b0}};
-  else if (vid_ram_current_pixel_done) vid_ram_column_count       <=  vid_ram_column_count + {{`LPIX_MSB{1'b0}}, 1'b1};
+  if (puc_rst)                 vid_ram_column_count  <=  {`LPIX_MSB+1{1'b0}};
+  else if (~refresh_active_i)  vid_ram_column_count  <=  {`LPIX_MSB+1{1'b0}};
+  else if (vid_ram_line_done)  vid_ram_column_count  <=  {`LPIX_MSB+1{1'b0}};
+  else if (vid_ram_pixel_done) vid_ram_column_count  <=  vid_ram_column_count + {{`LPIX_MSB{1'b0}}, 1'b1};
 
-// Depending on the color mode, format the address for doing the RAM
-// accesses.
-assign      vid_ram_addr_o   = ({`VRAM_MSB{gfx_mode_1_bpp }} & vid_ram_current_addr[`VRAM_MSB+4:4]) |
-                               ({`VRAM_MSB{gfx_mode_2_bpp }} & vid_ram_current_addr[`VRAM_MSB+3:3]) |
-                               ({`VRAM_MSB{gfx_mode_4_bpp }} & vid_ram_current_addr[`VRAM_MSB+2:2]) |
-                               ({`VRAM_MSB{gfx_mode_8_bpp }} & vid_ram_current_addr[`VRAM_MSB+1:1]) |
-                               ({`VRAM_MSB{gfx_mode_16_bpp}} & vid_ram_current_addr[`VRAM_MSB+0:0]) ;
+// Depending on the color mode, format the address for doing the RAM accesses.
+assign      vid_ram_addr_o   = ({`VRAM_MSB+1{gfx_mode_1_bpp }} & vid_ram_pixel_addr[`VRAM_MSB+4:4]) |
+                               ({`VRAM_MSB+1{gfx_mode_2_bpp }} & vid_ram_pixel_addr[`VRAM_MSB+3:3]) |
+                               ({`VRAM_MSB+1{gfx_mode_4_bpp }} & vid_ram_pixel_addr[`VRAM_MSB+2:2]) |
+                               ({`VRAM_MSB+1{gfx_mode_8_bpp }} & vid_ram_pixel_addr[`VRAM_MSB+1:1]) |
+                               ({`VRAM_MSB+1{gfx_mode_16_bpp}} & vid_ram_pixel_addr[`VRAM_MSB+0:0]) ;
 
 // Compute the next RAM address to detect when a new address is generated
-wire [16:0] vid_ram_addr_nxt = ({`VRAM_MSB{gfx_mode_1_bpp }} & vid_ram_current_addr_nxt[`VRAM_MSB+4:4]) |
-                               ({`VRAM_MSB{gfx_mode_2_bpp }} & vid_ram_current_addr_nxt[`VRAM_MSB+3:3]) |
-                               ({`VRAM_MSB{gfx_mode_4_bpp }} & vid_ram_current_addr_nxt[`VRAM_MSB+2:2]) |
-                               ({`VRAM_MSB{gfx_mode_8_bpp }} & vid_ram_current_addr_nxt[`VRAM_MSB+1:1]) |
-                               ({`VRAM_MSB{gfx_mode_16_bpp}} & vid_ram_current_addr_nxt[`VRAM_MSB+0:0]) ;
+wire [16:0] vid_ram_addr_nxt = ({`VRAM_MSB+1{gfx_mode_1_bpp }} & vid_ram_pixel_addr_nxt[`VRAM_MSB+4:4]) |
+                               ({`VRAM_MSB+1{gfx_mode_2_bpp }} & vid_ram_pixel_addr_nxt[`VRAM_MSB+3:3]) |
+                               ({`VRAM_MSB+1{gfx_mode_4_bpp }} & vid_ram_pixel_addr_nxt[`VRAM_MSB+2:2]) |
+                               ({`VRAM_MSB+1{gfx_mode_8_bpp }} & vid_ram_pixel_addr_nxt[`VRAM_MSB+1:1]) |
+                               ({`VRAM_MSB+1{gfx_mode_16_bpp}} & vid_ram_pixel_addr_nxt[`VRAM_MSB+0:0]) ;
 
 // Detect when a new word needs to be fetched from the memory
 // (i.e. detect when the RAM address is updated)
 reg  vid_ram_addr_update;
 wire vid_ram_addr_update_nxt = (vid_ram_addr_o != vid_ram_addr_nxt);
 always @(posedge mclk or posedge puc_rst)
-  if (puc_rst)                         vid_ram_addr_update  <=  1'h0;
-  else if (~refresh_active_i)          vid_ram_addr_update  <=  1'h1;
-  else if (vid_ram_current_pixel_done) vid_ram_addr_update  <=  vid_ram_addr_update_nxt;
+  if (puc_rst)                 vid_ram_addr_update  <=  1'h0;
+  else if (~refresh_active_i)  vid_ram_addr_update  <=  1'h1;
+  else if (vid_ram_pixel_done) vid_ram_addr_update  <=  vid_ram_addr_update_nxt;
 
 
 // Disable RAM access if there is no need to fetch a new word
@@ -279,25 +273,25 @@ wire [15:0] vid_ram_dout_mux = vid_ram_dout_ready ? vid_ram_dout_i : vid_ram_dou
 //--------------------------------
 // Depending on the mode, the address LSBs are used to select which bits
 // of the current data word need to be put in the FIFO
-wire [3:0] vid_ram_data_sel_nxt    = ({4{gfx_mode_1_bpp}} & {vid_ram_current_addr[3:0]         }) |
-                                     ({4{gfx_mode_2_bpp}} & {vid_ram_current_addr[2:0], 1'b0   }) |
-                                     ({4{gfx_mode_4_bpp}} & {vid_ram_current_addr[1:0], 2'b00  }) |
-                                     ({4{gfx_mode_8_bpp}} & {vid_ram_current_addr[0],   3'b000 }) ;
+wire [3:0] vid_ram_data_sel_nxt    = ({4{gfx_mode_1_bpp}} & {vid_ram_pixel_addr[3:0]         }) |
+                                     ({4{gfx_mode_2_bpp}} & {vid_ram_pixel_addr[2:0], 1'b0   }) |
+                                     ({4{gfx_mode_4_bpp}} & {vid_ram_pixel_addr[1:0], 2'b00  }) |
+                                     ({4{gfx_mode_8_bpp}} & {vid_ram_pixel_addr[0],   3'b000 }) ;
 
 reg  [3:0] vid_ram_data_sel;
 always @(posedge mclk or posedge puc_rst)
-  if (puc_rst)                         vid_ram_data_sel <=  4'h0;
-  else if (vid_ram_current_pixel_done) vid_ram_data_sel <=  vid_ram_data_sel_nxt;
+  if (puc_rst)                 vid_ram_data_sel <=  4'h0;
+  else if (vid_ram_pixel_done) vid_ram_data_sel <=  vid_ram_data_sel_nxt;
 
 
 wire [15:0] vid_ram_dout_shifted   = (vid_ram_dout_mux >> vid_ram_data_sel);
 
 // Format data output for LUT processing
 // (8 bit LSBs are used to address the LUT memory, MSBs are ignored)
-assign      vid_ram_dout_processed = ({16{gfx_mode_1_bpp }} & {8'h00, vid_ram_dout_shifted[0],   7'b0000000}) |
-                                     ({16{gfx_mode_2_bpp }} & {8'h00, vid_ram_dout_shifted[1:0], 6'b000000 }) |
-                                     ({16{gfx_mode_4_bpp }} & {8'h00, vid_ram_dout_shifted[3:0], 4'b0000   }) |
-                                     ({16{gfx_mode_8_bpp }} & {8'h00, vid_ram_dout_shifted[7:0]            }) |
+assign      vid_ram_dout_processed = ({16{gfx_mode_1_bpp }} & {8'h00, 7'b0000000, vid_ram_dout_shifted[0]  }) |
+                                     ({16{gfx_mode_2_bpp }} & {8'h00, 6'b000000 , vid_ram_dout_shifted[1:0]}) |
+                                     ({16{gfx_mode_4_bpp }} & {8'h00, 4'b0000   , vid_ram_dout_shifted[3:0]}) |
+                                     ({16{gfx_mode_8_bpp }} & {8'h00,             vid_ram_dout_shifted[7:0]}) |
                                      ({16{gfx_mode_16_bpp}} & {       vid_ram_dout_shifted[15:0]           }) ;
 
 //--------------------------------
@@ -393,9 +387,6 @@ reg [15:0] frame_data_o;
 always @(posedge mclk or posedge puc_rst)
   if (puc_rst)       frame_data_o    <= 16'h0000;
   else if (fifo_pop) frame_data_o    <= fifo_mem[rd_ptr];
-
-// LUT is needed for all modes except 16bpp
-assign    frame_data_needs_lut_o   = ~gfx_mode_16_bpp;
 
 // Data is ready
 assign    frame_data_ready_o       = frame_data_init_nxt & (fifo_counter != FIFO_EMPTY);

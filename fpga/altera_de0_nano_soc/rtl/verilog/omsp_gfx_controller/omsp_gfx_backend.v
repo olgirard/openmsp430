@@ -53,8 +53,10 @@ module  omsp_gfx_backend (
     vid_ram_addr_o,                               // Video-RAM refresh address
     vid_ram_cen_o,                                // Video-RAM refresh enable (active low)
 
+`ifdef WITH_PROGRAMMABLE_LUT
     lut_ram_addr_o,                               // LUT-RAM refresh address
     lut_ram_cen_o,                                // LUT-RAM refresh enable (active low)
+`endif
 
 // INPUTs
     mclk,                                         // Main system clock
@@ -69,8 +71,10 @@ module  omsp_gfx_backend (
 
     gfx_mode_i,                                   // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
+`ifdef WITH_PROGRAMMABLE_LUT
     lut_ram_dout_i,                               // LUT-RAM data output
     lut_ram_dout_rdy_nxt_i,                       // LUT-RAM data output ready during next cycle
+`endif
 
     vid_ram_dout_i,                               // Video-RAM data output
     vid_ram_dout_rdy_nxt_i,                       // Video-RAM data output ready during next cycle
@@ -89,9 +93,10 @@ output               refresh_data_ready_o;        // Display refresh new data is
 output [`VRAM_MSB:0] vid_ram_addr_o;              // Video-RAM refresh address
 output               vid_ram_cen_o;               // Video-RAM refresh enable (active low)
 
+`ifdef WITH_PROGRAMMABLE_LUT
 output [`LRAM_MSB:0] lut_ram_addr_o;              // LUT-RAM refresh address
 output               lut_ram_cen_o;               // LUT-RAM refresh enable (active low)
-
+`endif
 
 // INPUTs
 //=========
@@ -107,8 +112,10 @@ input                display_cl_swap_i;           // Display configuration: swap
 
 input          [2:0] gfx_mode_i;                  // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
+`ifdef WITH_PROGRAMMABLE_LUT
 input         [15:0] lut_ram_dout_i;              // LUT-RAM data output
 input                lut_ram_dout_rdy_nxt_i;      // LUT-RAM data output ready during next cycle
+`endif
 
 input         [15:0] vid_ram_dout_i;              // Video-RAM data output
 input                vid_ram_dout_rdy_nxt_i;      // Video-RAM data output ready during next cycle
@@ -116,7 +123,7 @@ input                vid_ram_dout_rdy_nxt_i;      // Video-RAM data output ready
 input                refresh_active_i;            // Display refresh on going
 input                refresh_data_request_i;      // Display refresh new data request
 input  [`VRAM_MSB:0] refresh_frame_base_addr_i;   // Refresh frame base address
-input                refresh_lut_select_i;        // Refresh LUT bank selection
+input          [1:0] refresh_lut_select_i;        // Refresh LUT bank selection
 
 
 //=============================================================================
@@ -125,7 +132,6 @@ input                refresh_lut_select_i;        // Refresh LUT bank selection
 
 // Wires
 wire  [15:0] frame_data;
-wire         frame_data_needs_lut;
 wire         frame_data_ready;
 wire         frame_data_request;
 
@@ -138,7 +144,6 @@ omsp_gfx_backend_frame_fifo  omsp_gfx_backend_frame_fifo_inst (
 
 // OUTPUTs
     .frame_data_o                  ( frame_data                ),  // Frame data
-    .frame_data_needs_lut_o        ( frame_data_needs_lut      ),  // Frame data needs LUT
     .frame_data_ready_o            ( frame_data_ready          ),  // Frame data ready
 
     .vid_ram_addr_o                ( vid_ram_addr_o            ),  // Video-RAM address
@@ -179,23 +184,28 @@ omsp_gfx_backend_lut_fifo  omsp_gfx_backend_lut_fifo_inst (
     .refresh_data_o                ( refresh_data_o            ),  // Display Refresh data
     .refresh_data_ready_o          ( refresh_data_ready_o      ),  // Display Refresh data ready
 
+`ifdef WITH_PROGRAMMABLE_LUT
     .lut_ram_addr_o                ( lut_ram_addr_o            ),  // LUT-RAM address
     .lut_ram_cen_o                 ( lut_ram_cen_o             ),  // LUT-RAM enable (active low)
+`endif
 
 // INPUTs
     .mclk                          ( mclk                      ),  // Main system clock
     .puc_rst                       ( puc_rst                   ),  // Main system reset
 
     .frame_data_i                  ( frame_data                ),  // Frame data
-    .frame_data_needs_lut_i        ( frame_data_needs_lut      ),  // Frame data needs LUT
     .frame_data_ready_i            ( frame_data_ready          ),  // Frame data ready
+
+    .gfx_mode_i                    ( gfx_mode_i                ),  // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
+
+`ifdef WITH_PROGRAMMABLE_LUT
+    .lut_ram_dout_i                ( lut_ram_dout_i            ),  // LUT-RAM data output
+    .lut_ram_dout_rdy_nxt_i        ( lut_ram_dout_rdy_nxt_i    ),  // LUT-RAM data output ready during next cycle
+`endif
 
     .refresh_active_i              ( refresh_active_i          ),  // Display refresh on going
     .refresh_data_request_i        ( refresh_data_request_i    ),  // Request for next refresh data
-    .refresh_lut_select_i          ( refresh_lut_select_i      ),  // Refresh LUT bank selection
-
-    .lut_ram_dout_i                ( lut_ram_dout_i            ),  // LUT-RAM data output
-    .lut_ram_dout_rdy_nxt_i        ( lut_ram_dout_rdy_nxt_i    )   // LUT-RAM data output ready during next cycle
+    .refresh_lut_select_i          ( refresh_lut_select_i      )   // Refresh LUT bank selection
 );
 
 

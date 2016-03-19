@@ -72,10 +72,12 @@ module  omsp_gfx_reg (
     refresh_frame_addr_o,                      // Refresh frame base address
     refresh_lut_select_o,                      // Refresh LUT bank selection
 
+`ifdef WITH_PROGRAMMABLE_LUT
     lut_ram_addr_o,                            // LUT-RAM address
     lut_ram_din_o,                             // LUT-RAM data
     lut_ram_wen_o,                             // LUT-RAM write strobe (active low)
     lut_ram_cen_o,                             // LUT-RAM chip enable (active low)
+`endif
 
     vid_ram_addr_o,                            // Video-RAM address
     vid_ram_din_o,                             // Video-RAM data
@@ -92,7 +94,9 @@ module  omsp_gfx_reg (
     per_en_i,                                  // Peripheral enable (high active)
     per_we_i,                                  // Peripheral write enable (high active)
     puc_rst,                                   // Main system reset
+`ifdef WITH_PROGRAMMABLE_LUT
     lut_ram_dout_i,                            // LUT-RAM data input
+`endif
     vid_ram_dout_i                             // Video-RAM data input
 );
 
@@ -125,12 +129,14 @@ output         [2:0] gfx_mode_o;               // Video mode (1xx:16bpp / 011:8b
 output        [15:0] per_dout_o;               // Peripheral data output
 
 output [`VRAM_MSB:0] refresh_frame_addr_o;     // Refresh frame base address
-output               refresh_lut_select_o;     // Refresh LUT bank selection
+output         [1:0] refresh_lut_select_o;     // Refresh LUT bank selection
 
+`ifdef WITH_PROGRAMMABLE_LUT
 output [`LRAM_MSB:0] lut_ram_addr_o;           // LUT-RAM address
 output        [15:0] lut_ram_din_o;            // LUT-RAM data
 output         [1:0] lut_ram_wen_o;            // LUT-RAM write strobe (active low)
 output               lut_ram_cen_o;            // LUT-RAM chip enable (active low)
+`endif
 
 output [`VRAM_MSB:0] vid_ram_addr_o;           // Video-RAM address
 output        [15:0] vid_ram_din_o;            // Video-RAM data
@@ -148,7 +154,9 @@ input         [15:0] per_din_i;                // Peripheral data input
 input                per_en_i;                 // Peripheral enable (high active)
 input          [1:0] per_we_i;                 // Peripheral write enable (high active)
 input                puc_rst;                  // Main system reset
+`ifdef WITH_PROGRAMMABLE_LUT
 input         [15:0] lut_ram_dout_i;           // LUT-RAM data input
+`endif
 input         [15:0] vid_ram_dout_i;           // Video-RAM data input
 
 
@@ -626,6 +634,7 @@ assign       lt24_status[15:5] = 11'h000;
 //------------------------------------------------
 // LUT_RAM_ADDR Register
 //------------------------------------------------
+`ifdef WITH_PROGRAMMABLE_LUT
 
 reg  [7:0] lut_ram_addr;
 wire [7:0] lut_ram_addr_inc;
@@ -641,15 +650,20 @@ always @ (posedge mclk or posedge puc_rst)
 assign      lut_ram_addr_inc = lut_ram_addr + 8'h01;
 wire [15:0] lut_ram_addr_rd  = {8'h00, lut_ram_addr};
 
-`ifdef WITH_EXTRA_LUT_BANK
+ `ifdef WITH_EXTRA_LUT_BANK
    assign lut_ram_addr_o = {lut_bank_select, lut_ram_addr};
-`else
+ `else
    assign lut_ram_addr_o = lut_ram_addr;
+ `endif
+
+`else
+wire [15:0] lut_ram_addr_rd  = 16'h0000;
 `endif
 
 //------------------------------------------------
 // LUT_RAM_DATA Register
 //------------------------------------------------
+`ifdef WITH_PROGRAMMABLE_LUT
 
 // Update the LUT_RAM_DATA register with regular register write access
 wire        lut_ram_data_wr  = reg_wr[LUT_RAM_DATA];
@@ -695,30 +709,45 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst) lut_ram_dout_rdy <= 1'b0;
   else         lut_ram_dout_rdy <= ~lut_ram_cen_o;
 
+`else
+wire [15:0] lut_ram_data  = 16'h0000;
+`endif
+
 //------------------------------------------------
 // FRAME_SELECT Register
 //------------------------------------------------
 
 wire  frame_select_wr = reg_wr[FRAME_SELECT];
 
+`ifdef WITH_PROGRAMMABLE_LUT
+  reg        refresh_sw_lut_enable;
+
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)              refresh_sw_lut_enable  <=  1'b0;
+    else if (frame_select_wr) refresh_sw_lut_enable  <=  per_din_i[2];
+`else
+  wire       refresh_sw_lut_enable = 1'b0;
+`endif
+
 `ifdef WITH_EXTRA_LUT_BANK
-  reg        refresh_lut_select_o;
+  reg        refresh_sw_lut_select;
 
   always @ (posedge mclk or posedge puc_rst)
     if (puc_rst)
       begin
-         refresh_lut_select_o <=  1'b0;
-         lut_bank_select      <=  1'b0;
+         refresh_sw_lut_select <=  1'b0;
+         lut_bank_select       <=  1'b0;
       end
     else if (frame_select_wr)
       begin
-         refresh_lut_select_o <=  per_din_i[3];
-         lut_bank_select      <=  per_din_i[15];
+         refresh_sw_lut_select <=  per_din_i[3];
+         lut_bank_select       <=  per_din_i[15];
       end
 `else
-  assign refresh_lut_select_o  =  1'b0;
-  wire   lut_bank_select       =  1'b0;
+  assign refresh_sw_lut_select  =  1'b0;
+  wire   lut_bank_select        =  1'b0;
 `endif
+  wire [1:0] refresh_lut_select_o = {refresh_sw_lut_select, refresh_sw_lut_enable};
 
 `ifdef WITH_FRAME1_POINTER
   `ifdef WITH_FRAME2_POINTER
@@ -740,7 +769,7 @@ wire  frame_select_wr = reg_wr[FRAME_SELECT];
          vid_ram1_frame_select <= per_din_i[7:6];
       end
 
-  wire [15:0] frame_select = {lut_bank_select, 7'h00, vid_ram1_frame_select, vid_ram0_frame_select, refresh_lut_select_o, 1'b0, refresh_frame_select};
+  wire [15:0] frame_select = {lut_bank_select, 7'h00, vid_ram1_frame_select, vid_ram0_frame_select, refresh_lut_select_o, refresh_frame_select};
   `else
   reg        refresh_frame_select;
   reg        vid_ram0_frame_select;
@@ -760,10 +789,10 @@ wire  frame_select_wr = reg_wr[FRAME_SELECT];
          vid_ram1_frame_select <= per_din_i[6];
       end
 
-  wire [15:0] frame_select = {lut_bank_select, 7'h00, 1'h0, vid_ram1_frame_select, 1'h0, vid_ram0_frame_select, refresh_lut_select_o, 2'h0, refresh_frame_select};
+  wire [15:0] frame_select = {lut_bank_select, 7'h00, 1'h0, vid_ram1_frame_select, 1'h0, vid_ram0_frame_select, refresh_lut_select_o, 1'h0, refresh_frame_select};
   `endif
 `else
-  wire [15:0] frame_select = {lut_bank_select, 11'h000, refresh_lut_select_o, 3'h0};
+  wire [15:0] frame_select = {lut_bank_select, 11'h000, refresh_lut_select_o, 2'h0};
 `endif
 
 // Frame pointer selections

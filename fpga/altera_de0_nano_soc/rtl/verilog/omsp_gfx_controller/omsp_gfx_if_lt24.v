@@ -207,7 +207,7 @@ reg [`SPIX_MSB:0] lt24_pixel_cnt;
 wire              lt24_pixel_cnt_run  = (lt24_state==STATE_RAMWR_INIT_DATA_HI) |
                                         (lt24_state==STATE_RAMWR_REFR_DATA_HI);
 
-wire              lt24_pixel_cnt_done = (lt24_pixel_cnt==cfg_lt24_display_size_i);
+wire              lt24_pixel_cnt_done = (lt24_pixel_cnt==1) | (lt24_pixel_cnt==0);
 
 wire              lt24_pixel_cnt_init = (lt24_state==STATE_RAMWR_INIT_CMD_HI) |
                                         (lt24_state==STATE_RAMWR_REFR_CMD_HI) |
@@ -217,8 +217,8 @@ always @(posedge mclk or posedge puc_rst)
   if (puc_rst)                      lt24_pixel_cnt <= {`SPIX_MSB+1{1'h0}};
   else if (lt24_timer_init)
     begin
-       if (lt24_pixel_cnt_init)     lt24_pixel_cnt <= {`SPIX_MSB+1{1'h0}};
-       else if (lt24_pixel_cnt_run) lt24_pixel_cnt <= lt24_pixel_cnt+{{`SPIX_MSB{1'h0}},1'b1};
+       if (lt24_pixel_cnt_init)     lt24_pixel_cnt <= cfg_lt24_display_size_i;
+       else if (lt24_pixel_cnt_run) lt24_pixel_cnt <= lt24_pixel_cnt-{{`SPIX_MSB{1'h0}},1'b1};
     end
 
 
