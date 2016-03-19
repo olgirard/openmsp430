@@ -243,7 +243,13 @@ assign frame_data_request_o = (lut_state == STATE_FRAME_DATA);
 
 `ifdef WITH_PROGRAMMABLE_LUT
   `ifdef WITH_EXTRA_LUT_BANK
-    assign lut_ram_addr_o = {refresh_lut_select_i[1], frame_data_i[7:0]} & {9{~lut_ram_cen_o}};
+    // Allow LUT bank switching only when the refresh is not on going
+    reg refresh_lut_bank_select_sync;
+    always @(posedge mclk or posedge puc_rst)
+      if (puc_rst)                refresh_lut_bank_select_sync  <=  1'b0;
+      else if (~refresh_active_i) refresh_lut_bank_select_sync  <=  refresh_lut_select_i[1];
+
+    assign lut_ram_addr_o = {refresh_lut_bank_select_sync, frame_data_i[7:0]} & {9{~lut_ram_cen_o}};
   `else
     assign lut_ram_addr_o = frame_data_i[7:0] & {8{~lut_ram_cen_o}};
   `endif
