@@ -1,6 +1,6 @@
 # makfile configuration
 NAME            = leds
-OBJECTS         = main.o timerA.o
+OBJECTS         = main.o ../../libs/tA/timerA.o
 
 # Compiler performance option (-Os / -O2 / -O3)
 PORT_CFLAGS     = -O2
@@ -15,7 +15,7 @@ WARNINGS        =  -Wall
 
 # Select flags depending on selected toolchain
 ifeq ($(MSPGCC_PFX),msp430-elf)
-INCDIR          = -I /cad/ti/gcc/include
+INCDIR          = -I /cad/ti/gcc/include -I ../../libs -I ../../libs/tA  -I ../../libs/gfx
 CFLAGS		= -D PFX_MSP430_ELF $(INCDIR) $(PORT_CFLAGS) ${WARNINGS} -g -mcpu=msp430 -mhwmult=16bit
 else
 CFLAGS		= -D PFX_MSP430               $(PORT_CFLAGS) ${WARNINGS} -g -mcpu=430    -mmpy=16	-mivcnt=16
@@ -37,7 +37,7 @@ download: download-uart
 
 #additional rules for files
 ${NAME}.elf: ${OBJECTS}
-	${CC} ${CFLAGS} -T linker.${MSPGCC_PFX}.x -o $@ ${OBJECTS}
+	${CC} ${CFLAGS} -T ../../ldscripts/linker.${MSPGCC_PFX}.x -o $@ ${OBJECTS}
 
 ${NAME}.a43: ${NAME}.elf
 	${OBJCOPY} -O ihex $^ $@
@@ -63,4 +63,4 @@ FORCE:
 
 #project dependencies
 main.o: main.c
-timerA.o: timerA.c
+../../libs/tA/timerA.o: ../../libs/tA/timerA.c

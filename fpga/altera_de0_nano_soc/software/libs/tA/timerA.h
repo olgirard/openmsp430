@@ -7,7 +7,8 @@
 // AVAILABLE FUNCTIONS
 //----------------------------------------------------------
 
-void wait_time(unsigned int);
+void ta_wait_no_lpm(unsigned int);
+void ta_wait(unsigned int);
 
 // Base clock period definitions (in ns)
 //#define VERILOG_SIMULATION
