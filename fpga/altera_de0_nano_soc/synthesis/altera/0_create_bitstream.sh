@@ -15,7 +15,7 @@ if [ $# -ne $EXPECTED_ARGS ]; then
     echo "EXAMPLE	 : ./0_create_bitstream.sh    leds"
     echo ""
     echo "AVAILABLE TESTS:"
-    for fullfile in ../../software/* ; do
+    for fullfile in ../../software/apps/* ; do
 	filename=$(basename "$fullfile")
 	filename="${filename%.*}"
 	echo "                  - $filename"
@@ -27,8 +27,8 @@ fi
 ###############################################################################
 #                     Check if the required files exist                       #
 ###############################################################################
-softdir=../../software/$1;
-elffile=../../software/$1/$1.elf;
+softdir=../../software/apps/$1;
+elffile=../../software/apps/$1/$1.elf;
 
 if [ ! -e $softdir ]; then
     echo "Software directory doesn't exist: $softdir"
@@ -46,7 +46,7 @@ echo ""
 cd $softdir
 make clean
 make
-cd ../../synthesis/altera
+cd ../../../synthesis/altera
 
 ###############################################################################
 #                           Generate MIF file                                 #

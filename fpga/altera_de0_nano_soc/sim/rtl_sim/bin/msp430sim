@@ -61,8 +61,8 @@ fi
 ###############################################################################
 #                     Check if the required files exist                       #
 ###############################################################################
-softdir=../../../software/$1;
-elffile=../../../software/$1/$1.elf;
+softdir=../../../software/apps/$1;
+elffile=../../../software/apps/$1/$1.elf;
 verfile=../src/$1.v;
 submitfile=../src/submit.f;
 if [ $OMSP_SIMULATOR == "isim" ]; then
@@ -133,7 +133,7 @@ source   pmem.sh
 cd $softdir
 make clean
 make
-cd ../../sim/rtl_sim/run/
+cd ../../../sim/rtl_sim/run/
 
 # Create links
 if [[ $(uname -s) == CYGWIN* ]];
