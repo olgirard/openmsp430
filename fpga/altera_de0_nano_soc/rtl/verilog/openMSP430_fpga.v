@@ -345,7 +345,7 @@ io_buf io_buf_lt24_data_15 (.datain(lt24_d_out[15]), .oe(lt24_d_out_en), .dataou
 
 
 
-omsp_gfx_controller omsp_gfx_controller_0 (
+openGFX430 openGFX430_0 (
 
 // OUTPUTs
     .irq_gfx_o             (irq_gfx),                 // Graphic Controller interrupt

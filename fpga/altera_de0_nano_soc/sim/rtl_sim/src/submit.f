@@ -57,16 +57,8 @@
 //=============================================================================
 
 +incdir+../../../rtl/verilog/
-+incdir+../../../rtl/verilog/omsp_gfx_controller/
 ../../../rtl/verilog/openMSP430_fpga.v
 ../../../rtl/verilog/omsp_de0_nano_soc_led_key_sw.v
-../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_controller.v
-../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_reg.v
-../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_reg_vram_addr.v
-../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_if_lt24.v
-../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_backend.v
-../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_backend_frame_fifo.v
-../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_backend_lut_fifo.v
 ../../../rtl/verilog/sync_debouncer_10ms.v
 ../../../rtl/verilog/mega/ram_16x75k_dp.v
 ../../../rtl/verilog/mega/ram_16x512_dp.v
@@ -74,7 +66,6 @@
 ../../../rtl/verilog/mega/ram_16x8k.v
 ../../../rtl/verilog/mega/io_buf.v
 ../../../rtl/verilog/mega/in_buf.v
-
 
 //=============================================================================
 // openMSP430
@@ -106,3 +97,17 @@
 ../../../rtl/verilog/openmsp430/omsp_clock_mux.v
 
 ../../../rtl/verilog/openmsp430/periph/omsp_timerA.v
+
+//=============================================================================
+// openGFX430
+//=============================================================================
+
++incdir+../../../rtl/verilog/opengfx430/
+
+../../../rtl/verilog/opengfx430/openGFX430.v
+../../../rtl/verilog/opengfx430/ogfx_reg.v
+../../../rtl/verilog/opengfx430/ogfx_reg_vram_addr.v
+../../../rtl/verilog/opengfx430/ogfx_if_lt24.v
+../../../rtl/verilog/opengfx430/ogfx_backend.v
+../../../rtl/verilog/opengfx430/ogfx_backend_frame_fifo.v
+../../../rtl/verilog/opengfx430/ogfx_backend_lut_fifo.v
