@@ -26,7 +26,7 @@ void init_gfx_ctrl (uint16_t gfx_mode, uint16_t refresh_rate) {
   GFX_CTRL          = gfx_mode | GFX_REFR_START_IRQ_DIS | GFX_REFR_DONE_IRQ_DIS;
 
   // Configure Refresh Rate
-  LT24_REFRESH_SYNC = LT24_REFR_NO_SYNC | 0x0000;
+  LT24_REFRESH_SYNC = LT24_REFR_SYNC | 0x0000;
   LT24_REFRESH      = refresh_rate;
 
   // Global configuration registers
@@ -64,11 +64,11 @@ void init_lt24 (uint16_t lt24_clk_div) {
 
   // Enable LCD, generate a reset and set LCD clock
   LT24_CFG       = 0x0000;
-  wait_time(WT_1MS);
+  ta_wait_no_lpm(WT_1MS);
   LT24_CFG       = LT24_ON | lt24_clk_div | LT24_RESET;
-  wait_time(WT_1MS);
+  ta_wait_no_lpm(WT_1MS);
   LT24_CFG       = LT24_ON | lt24_clk_div;
-  wait_time(WT_500MS+WT_20MS);
+  ta_wait_no_lpm(WT_500MS+WT_20MS);
 
   // Set color mode to 16bits/pixel
   LT24_CMD       = 0x003A | LT24_CMD_HAS_PARAM;
@@ -130,15 +130,15 @@ void init_lt24 (uint16_t lt24_clk_div) {
   while((LT24_STATUS & LT24_STATUS_WAIT_PARAM)==0);
   LT24_CMD       = 0x0000;
 
+  // Initialize the LT24 display memory
+#ifndef VERILOG_SIMULATION
+  LT24_CMD_DFILL = 0x0000;
+  while((LT24_STATUS & LT24_STATUS_DFILL_BUSY)!=0);
+#endif
+
   // Display on
   LT24_CMD       = 0x0035 | LT24_CMD_NO_PARAM;
   LT24_CMD_PARAM = 0x0000;
-
-  // Initialize the LT24 display memory
-#ifndef VERILOG_SIMULATION
-  LT24_CMD_DFILL = 0x00000;
-  while((LT24_STATUS & LT24_STATUS_DFILL_BUSY)!=0);
-#endif
 
   return;
 }
@@ -151,12 +151,12 @@ void start_lt24(void) {
   // Display on
   LT24_CMD       = 0x0029 | LT24_CMD_NO_PARAM;
   LT24_CMD_PARAM = 0x0000;
-  wait_time(WT_10MS);
+  ta_wait_no_lpm(WT_10MS);
 
   // Go out of SLEEP
   LT24_CMD       = 0x0011 | LT24_CMD_NO_PARAM;
   LT24_CMD_PARAM = 0x0000;
-  wait_time(WT_100MS);
+  ta_wait_no_lpm(WT_100MS);
 
   return;
 }

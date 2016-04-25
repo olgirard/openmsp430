@@ -70,25 +70,17 @@ void start_lt24(void);
 #define  FRAME3_PTR_HI     (*(volatile unsigned int  *) 0x024C)
 #define  FRAME3_PTR_LO     (*(volatile unsigned int  *) 0x024E)
 
-#define  VID_RAM0_ADDR_HI  (*(volatile unsigned int  *) 0x0250)
-#define  VID_RAM0_ADDR_LO  (*(volatile unsigned int  *) 0x0252)
-#define  VID_RAM0_DATA     (*(volatile unsigned int  *) 0x0254)
+#define  VID_RAM0_CFG      (*(volatile unsigned int  *) 0x0250)
+#define  VID_RAM0_WIDTH    (*(volatile unsigned int  *) 0x0252)
+#define  VID_RAM0_ADDR_HI  (*(volatile unsigned int  *) 0x0254)
+#define  VID_RAM0_ADDR_LO  (*(volatile unsigned int  *) 0x0256)
+#define  VID_RAM0_DATA     (*(volatile unsigned int  *) 0x0258)
 
-#define  VID_RAM1_ADDR_HI  (*(volatile unsigned int  *) 0x0258)
-#define  VID_RAM1_ADDR_LO  (*(volatile unsigned int  *) 0x025A)
-#define  VID_RAM1_DATA     (*(volatile unsigned int  *) 0x025C)
-
-#define  PIX0_WIDTH        (*(volatile unsigned int  *) 0x0260)
-#define  PIX0_HEIGHT       (*(volatile unsigned int  *) 0x0262)
-#define  PIX0_X            (*(volatile unsigned int  *) 0x0264)
-#define  PIX0_Y            (*(volatile unsigned int  *) 0x0266)
-#define  PIX0_DATA         (*(volatile unsigned int  *) 0x0268)
-
-#define  PIX1_WIDTH        (*(volatile unsigned int  *) 0x0270)
-#define  PIX1_HEIGHT       (*(volatile unsigned int  *) 0x0272)
-#define  PIX1_X            (*(volatile unsigned int  *) 0x0274)
-#define  PIX1_Y            (*(volatile unsigned int  *) 0x0276)
-#define  PIX1_DATA         (*(volatile unsigned int  *) 0x0278)
+#define  VID_RAM1_CFG      (*(volatile unsigned int  *) 0x0260)
+#define  VID_RAM1_WIDTH    (*(volatile unsigned int  *) 0x0262)
+#define  VID_RAM1_ADDR_HI  (*(volatile unsigned int  *) 0x0264)
+#define  VID_RAM1_ADDR_LO  (*(volatile unsigned int  *) 0x0266)
+#define  VID_RAM1_DATA     (*(volatile unsigned int  *) 0x0268)
 
 //----------------------------------------------------------
 // GRAPHIC CONTROLLER REGISTER FIELD MAPPING
@@ -186,5 +178,19 @@ void start_lt24(void);
 
 #define  LUT_BANK0_SELECT          0x0000
 #define  LUT_BANK1_SELECT          0x8000
+
+// VID_RAMx_CFG Register
+#define  VID_RAM_NO_RMW_MODE       0x0000
+#define  VID_RAM_RMW_MODE          0x0001
+#define  VID_RAM_NO_WIN_MODE       0x0000
+#define  VID_RAM_WIN_MODE          0x0002
+
+#define  VID_RAM_WIN_NO_X_SWAP     0x0000
+#define  VID_RAM_WIN_X_SWAP        0x0010
+#define  VID_RAM_WIN_NO_Y_SWAP     0x0000
+#define  VID_RAM_WIN_Y_SWAP        0x0020
+#define  VID_RAM_WIN_NO_CL_SWAP    0x0000
+#define  VID_RAM_WIN_CL_SWAP       0x0040
+
 
 #endif

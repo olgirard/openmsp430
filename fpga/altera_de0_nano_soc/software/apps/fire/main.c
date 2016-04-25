@@ -15,8 +15,8 @@ int main(void) {
 
   WDTCTL = WDTPW | WDTHOLD;   // Disable watchdog timer
 
-  init_gfx_ctrl(GFX_8_BPP, LT24_REFR_MANUAL); // Initialize Graphic controller
-  //init_gfx_ctrl(GFX_16_BPP, LT24_REFR_MANUAL); // Initialize Graphic controller
+  //init_gfx_ctrl(GFX_8_BPP, LT24_REFR_MANUAL); // Initialize Graphic controller
+  init_gfx_ctrl(GFX_16_BPP, LT24_REFR_MANUAL); // Initialize Graphic controller
   //init_gfx_ctrl(GFX_16_BPP, LT24_REFR_24MS); // Initialize Graphic controller
 
   // Initialize palette
@@ -43,8 +43,8 @@ int main(void) {
 
   LT24_REFRESH_SYNC = LT24_REFR_SYNC | 0x0000;
 
-  //display_f_16bpp();
-  display_8bpp();
+  display_f_16bpp();
+  //display_8bpp();
 
   while(1);
 }
@@ -81,7 +81,7 @@ int display_8bpp(void) {
     GFX_IRQ = GFX_IRQ_REFRESH_DONE;
     while((GFX_IRQ & GFX_IRQ_REFRESH_DONE)==0);
 
-    wait_time(WT_20MS);
+    ta_wait_no_lpm(WT_20MS);
   }
   return 0;
 };
