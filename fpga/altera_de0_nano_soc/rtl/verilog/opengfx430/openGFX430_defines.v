@@ -27,7 +27,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: omsp_gfx_controller_defines.v
+// *File Name: openGFX430_defines.v
 //
 // *Module Description:
 //                      oMSP Graphic Controller Configuration file
@@ -40,10 +40,10 @@
 // $LastChangedBy: olivier.girard $
 // $LastChangedDate: 2011-03-05 15:44:48 +0100 (Sat, 05 Mar 2011) $
 //----------------------------------------------------------------------------
-//`define OMSP_GFX_CONTROLLER_NO_INCLUDE
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+//`define OGFX_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_undefines.v"
+`include "openGFX430_undefines.v"
 `endif
 
 //============================================================================

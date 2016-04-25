@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: omsp_gfx_if_lt24.v
+// *File Name: ogfx_if_lt24.v
 //
 // *Module Description:
 //                      Interface to the LT24 LCD display.
@@ -35,12 +35,12 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_defines.v"
+`include "openGFX430_defines.v"
 `endif
 
-module  omsp_gfx_if_lt24 (
+module  ogfx_if_lt24 (
 
 // OUTPUTs
     event_fsm_done_o,                              // Event  - FSM is done
@@ -463,9 +463,9 @@ always @(posedge mclk or posedge puc_rst)
   else if (refresh_trigger_set) refresh_trigger <= 1'b1;
   else if (refresh_trigger_clr) refresh_trigger <= 1'b0;
 
-endmodule // omsp_gfx_if_lt24
+endmodule // ogfx_if_lt24
 
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_undefines.v"
+`include "openGFX430_undefines.v"
 `endif

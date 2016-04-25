@@ -27,7 +27,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: omsp_gfx_controller_undefines.v
+// *File Name: openGFX430_undefines.v
 //
 // *Module Description:
 //                      oMSP Graphic Controller Verilog `undef file

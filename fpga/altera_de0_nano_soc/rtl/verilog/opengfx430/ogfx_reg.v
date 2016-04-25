@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: omsp_gfx_reg.v
+// *File Name: ogfx_reg.v
 //
 // *Module Description:
 //                      Registers for oMSP programming.
@@ -35,12 +35,12 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_defines.v"
+`include "openGFX430_defines.v"
 `endif
 
-module  omsp_gfx_reg (
+module  ogfx_reg (
 
 // OUTPUTs
     irq_gfx_o,                                 // Graphic Controller interrupt
@@ -1077,7 +1077,7 @@ wire [15:0] vid_ram0_addr_lo_rd  = vid_ram0_addr_lo_tmp[15:0];
 `endif
 
 // Compute the next address
-omsp_gfx_reg_vram_addr omsp_gfx_reg_vram0_addr_inst (
+ogfx_reg_vram_addr ogfx_reg_vram0_addr_inst (
 
 // OUTPUTs
     .vid_ram_addr_nxt_o      ( vid_ram0_addr_inc       ),   // Next Video-RAM address
@@ -1205,7 +1205,7 @@ wire [15:0] vid_ram1_addr_lo_rd  = vid_ram1_addr_lo_tmp[15:0];
 `endif
 
 // Compute the next address
-omsp_gfx_reg_vram_addr omsp_gfx_reg_vram1_addr_inst (
+ogfx_reg_vram_addr ogfx_reg_vram1_addr_inst (
 
 // OUTPUTs
     .vid_ram_addr_nxt_o      ( vid_ram1_addr_inc       ),   // Next Video-RAM address
@@ -1519,9 +1519,9 @@ assign vid_ram0_addr_inc_wr = vid_ram0_addr_lo_wr_dly | (|vid_ram0_data_wr_dly) 
 assign vid_ram1_addr_inc_wr = vid_ram1_addr_lo_wr_dly | (|vid_ram1_data_wr_dly) | (vid_ram1_data_rd & ~dbg_freeze_i & ~vid_ram1_rmw_mode);
 
 
-endmodule // omsp_gfx_reg
+endmodule // ogfx_reg
 
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_undefines.v"
+`include "openGFX430_undefines.v"
 `endif

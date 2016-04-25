@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------
-// Copyright (C) 2001 Authors
+// Copyright (C) 2016 Authors
 //
 // This source file may be used and distributed without restriction provided
 // that this copyright statement is not removed from the file and that any
@@ -22,11 +22,10 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: omsp_gfx_controller.v
+// *File Name: openGFX430.v
 //
 // *Module Description:
-//                      This is a basic video controller letting the
-//                      openMSP430 display some nice things.
+//                      This is a basic video controller for the openMSP430.
 //
 //                      It is currently supporting the LT24 LCD Board but
 //                      can be extended to anything.
@@ -39,12 +38,12 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_defines.v"
+`include "openGFX430_defines.v"
 `endif
 
-module  omsp_gfx_controller (
+module  openGFX430 (
 
 // OUTPUTs
     irq_gfx_o,                            // Graphic Controller interrupt
@@ -205,7 +204,7 @@ wire         [1:0] refresh_lut_select;
 // 2)  REGISTERS
 //============================================================================
 
-omsp_gfx_reg  omsp_gfx_reg_inst (
+ogfx_reg  ogfx_reg_inst (
 
 // OUTPUTs
     .irq_gfx_o                     ( irq_gfx_o                ),       // Graphic Controller interrupt
@@ -273,7 +272,7 @@ omsp_gfx_reg  omsp_gfx_reg_inst (
 // 3) LT24 INTERFACE
 //============================================================================
 
-omsp_gfx_if_lt24  omsp_gfx_if_lt24_inst (
+ogfx_if_lt24  ogfx_if_lt24_inst (
 
 // OUTPUTs
     .event_fsm_done_o              ( lt24_done_evt          ),    // LT24 FSM done event
@@ -330,7 +329,7 @@ assign    lut_ram_port1_din_o  = 16'h0000;
 `endif
 
 // Video Backend
-omsp_gfx_backend  omsp_gfx_backend_inst (
+ogfx_backend  ogfx_backend_inst (
 
 // OUTPUTs
     .refresh_data_o                ( refresh_data               ),    // Display refresh data
@@ -431,9 +430,9 @@ omsp_gfx_backend  omsp_gfx_backend_inst (
  `endif
 `endif
 
-endmodule // omsp_gfx_controller
+endmodule // openGFX430
 
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_undefines.v"
+`include "openGFX430_undefines.v"
 `endif

@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: omsp_gfx_backend_lut_fifo.v
+// *File Name: ogfx_backend_lut_fifo.v
 //
 // *Module Description:
 //                      Mini-cache memory for the LUT memory accesses.
@@ -35,12 +35,12 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_defines.v"
+`include "openGFX430_defines.v"
 `endif
 
-module  omsp_gfx_backend_lut_fifo (
+module  ogfx_backend_lut_fifo (
 
 // OUTPUTs
     frame_data_request_o,                        // Request for next frame data
@@ -355,9 +355,9 @@ always @(posedge mclk or posedge puc_rst)
   else if (fifo_pop)          refresh_data_o <= fifo_mem[rd_ptr];
 
 
-endmodule // omsp_gfx_backend_lut_fifo
+endmodule // ogfx_backend_lut_fifo
 
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_undefines.v"
+`include "openGFX430_undefines.v"
 `endif

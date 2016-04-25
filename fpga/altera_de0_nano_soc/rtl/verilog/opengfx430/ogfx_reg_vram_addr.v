@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: omsp_gfx_reg_vram_addr.v
+// *File Name: ogfx_reg_vram_addr.v
 //
 // *Module Description:
 //                      Compute Video-Ram address for software accesses
@@ -35,12 +35,12 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_defines.v"
+`include "openGFX430_defines.v"
 `endif
 
-module  omsp_gfx_reg_vram_addr (
+module  ogfx_reg_vram_addr (
 
 // OUTPUTs
     vid_ram_addr_nxt_o,                     // Next Video-RAM address
@@ -120,9 +120,9 @@ always @(posedge mclk or posedge puc_rst)
   else if (vid_ram_addr_step_i)  vid_ram_column_count  <=  vid_ram_column_count + {{`LPIX_MSB{1'b0}}, 1'b1};
 
 
-endmodule // omsp_gfx_reg_vram_addr
+endmodule // ogfx_reg_vram_addr
 
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_undefines.v"
+`include "openGFX430_undefines.v"
 `endif

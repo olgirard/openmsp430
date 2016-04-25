@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: omsp_gfx_backend.v
+// *File Name: ogfx_backend.v
 //
 // *Module Description:
 //                      Backend module of the graphic controller.
@@ -39,12 +39,12 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_defines.v"
+`include "openGFX430_defines.v"
 `endif
 
-module  omsp_gfx_backend (
+module  ogfx_backend (
 
 // OUTPUTs
     refresh_data_o,                               // Display refresh data
@@ -140,7 +140,7 @@ wire         frame_data_request;
 // 2) FRAME MEMORY ACCESS
 //============================================================================
 
-omsp_gfx_backend_frame_fifo  omsp_gfx_backend_frame_fifo_inst (
+ogfx_backend_frame_fifo  ogfx_backend_frame_fifo_inst (
 
 // OUTPUTs
     .frame_data_o                  ( frame_data                ),  // Frame data
@@ -176,7 +176,7 @@ omsp_gfx_backend_frame_fifo  omsp_gfx_backend_frame_fifo_inst (
 // 3) LUT MEMORY ACCESS
 //============================================================================
 
-omsp_gfx_backend_lut_fifo  omsp_gfx_backend_lut_fifo_inst (
+ogfx_backend_lut_fifo  ogfx_backend_lut_fifo_inst (
 
 // OUTPUTs
     .frame_data_request_o          ( frame_data_request        ),  // Request for next frame data
@@ -209,9 +209,9 @@ omsp_gfx_backend_lut_fifo  omsp_gfx_backend_lut_fifo_inst (
 );
 
 
-endmodule // omsp_gfx_backend
+endmodule // ogfx_backend
 
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_undefines.v"
+`include "openGFX430_undefines.v"
 `endif

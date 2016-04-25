@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: omsp_gfx_backend_frame_fifo.v
+// *File Name: ogfx_backend_frame_fifo.v
 //
 // *Module Description:
 //                      Mini-cache memory for frame memory access.
@@ -35,12 +35,12 @@
 // $LastChangedBy$
 // $LastChangedDate$
 //----------------------------------------------------------------------------
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_defines.v"
+`include "openGFX430_defines.v"
 `endif
 
-module  omsp_gfx_backend_frame_fifo (
+module  ogfx_backend_frame_fifo (
 
 // OUTPUTs
     frame_data_o,                               // Frame data
@@ -397,9 +397,9 @@ assign    read_from_fifo = ~refresh_active_i |
                             ((fifo_counter != FIFO_EMPTY) & frame_data_request_i);
 
 
-endmodule // omsp_gfx_backend_frame_fifo
+endmodule // ogfx_backend_frame_fifo
 
-`ifdef OMSP_GFX_CONTROLLER_NO_INCLUDE
+`ifdef OGFX_NO_INCLUDE
 `else
-`include "omsp_gfx_controller_undefines.v"
+`include "openGFX430_undefines.v"
 `endif
