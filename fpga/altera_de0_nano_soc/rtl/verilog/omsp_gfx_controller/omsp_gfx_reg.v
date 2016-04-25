@@ -85,6 +85,7 @@ module  omsp_gfx_reg (
     vid_ram_cen_o,                             // Video-RAM chip enable (active low)
 
 // INPUTs
+    dbg_freeze_i,                              // Freeze address auto-incr on read
     lt24_status_i,                             // LT24 FSM Status
     lt24_start_evt_i,                          // LT24 FSM is starting
     lt24_done_evt_i,                           // LT24 FSM is done
@@ -145,6 +146,7 @@ output               vid_ram_cen_o;            // Video-RAM chip enable (active 
 
 // INPUTs
 //=========
+input                dbg_freeze_i;             // Freeze address auto-incr on read
 input          [4:0] lt24_status_i;            // LT24 FSM Status
 input                lt24_start_evt_i;         // LT24 FSM is starting
 input                lt24_done_evt_i;          // LT24 FSM is done
@@ -202,25 +204,20 @@ parameter [DEC_WD-1:0] GFX_CTRL            = 'h00,  // General control/status/ir
                        FRAME3_PTR_HI       = 'h4C,
                        FRAME3_PTR_LO       = 'h4E,
 
-                       VID_RAM0_ADDR_HI    = 'h50,  // First Video Memory Access Gate
-                       VID_RAM0_ADDR_LO    = 'h52,
-                       VID_RAM0_DATA       = 'h54,
+                       VID_RAM0_CFG        = 'h50,  // First Video Memory Access Gate
+                       VID_RAM0_WIDTH      = 'h52,
+                       VID_RAM0_ADDR_HI    = 'h54,
+                       VID_RAM0_ADDR_LO    = 'h56,
+                       VID_RAM0_DATA       = 'h58,
 
-                       VID_RAM1_ADDR_HI    = 'h58,  // Second Video Memory Access Gate
-                       VID_RAM1_ADDR_LO    = 'h5A,
-                       VID_RAM1_DATA       = 'h5C,
+                       VID_RAM1_CFG        = 'h60,  // Second Video Memory Access Gate
+                       VID_RAM1_WIDTH      = 'h62,
+                       VID_RAM1_ADDR_HI    = 'h64,
+                       VID_RAM1_ADDR_LO    = 'h66,
+                       VID_RAM1_DATA       = 'h68,
 
-                       PIX0_WIDTH          = 'h60,  // First Pixel Access Gate to Video memory
-                       PIX0_HEIGHT         = 'h62,
-                       PIX0_X              = 'h64,
-                       PIX0_Y              = 'h66,
-                       PIX0_DATA           = 'h68,
-
-                       PIX1_WIDTH          = 'h70,  // Second Pixel Access Gate to Video memory
-                       PIX1_HEIGHT         = 'h72,
-                       PIX1_X              = 'h74,
-                       PIX1_Y              = 'h76,
-                       PIX1_DATA           = 'h78;
+                       GPU_CMD             = 'h70,  // Graphic Processing Unit
+                       GPU_STAT            = 'h72;
 
 
 // Register one-hot decoder utilities
@@ -259,25 +256,20 @@ parameter [DEC_SZ-1:0] GFX_CTRL_D          = (BASE_REG << GFX_CTRL          ),
                        FRAME3_PTR_HI_D     = (BASE_REG << FRAME3_PTR_HI     ),
                        FRAME3_PTR_LO_D     = (BASE_REG << FRAME3_PTR_LO     ),
 
+                       VID_RAM0_CFG_D      = (BASE_REG << VID_RAM0_CFG      ),
+                       VID_RAM0_WIDTH_D    = (BASE_REG << VID_RAM0_WIDTH    ),
                        VID_RAM0_ADDR_HI_D  = (BASE_REG << VID_RAM0_ADDR_HI  ),
                        VID_RAM0_ADDR_LO_D  = (BASE_REG << VID_RAM0_ADDR_LO  ),
                        VID_RAM0_DATA_D     = (BASE_REG << VID_RAM0_DATA     ),
 
+                       VID_RAM1_CFG_D      = (BASE_REG << VID_RAM1_CFG      ),
+                       VID_RAM1_WIDTH_D    = (BASE_REG << VID_RAM1_WIDTH    ),
                        VID_RAM1_ADDR_HI_D  = (BASE_REG << VID_RAM1_ADDR_HI  ),
                        VID_RAM1_ADDR_LO_D  = (BASE_REG << VID_RAM1_ADDR_LO  ),
                        VID_RAM1_DATA_D     = (BASE_REG << VID_RAM1_DATA     ),
 
-                       PIX0_WIDTH_D        = (BASE_REG << PIX0_WIDTH        ),
-                       PIX0_HEIGHT_D       = (BASE_REG << PIX0_HEIGHT       ),
-                       PIX0_X_D            = (BASE_REG << PIX0_X            ),
-                       PIX0_Y_D            = (BASE_REG << PIX0_Y            ),
-                       PIX0_DATA_D         = (BASE_REG << PIX0_DATA         ),
-
-                       PIX1_WIDTH_D        = (BASE_REG << PIX1_WIDTH        ),
-                       PIX1_HEIGHT_D       = (BASE_REG << PIX1_HEIGHT       ),
-                       PIX1_X_D            = (BASE_REG << PIX1_X            ),
-                       PIX1_Y_D            = (BASE_REG << PIX1_Y            ),
-                       PIX1_DATA_D         = (BASE_REG << PIX1_DATA         );
+                       GPU_CMD_D           = (BASE_REG << GPU_CMD           ),
+                       GPU_STAT_D          = (BASE_REG << GPU_STAT          );
 
 
 //============================================================================
@@ -322,25 +314,20 @@ wire  [DEC_SZ-1:0] reg_dec   =  (GFX_CTRL_D          &  {DEC_SZ{(reg_addr == GFX
                                 (FRAME3_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME3_PTR_HI     )}})  |
                                 (FRAME3_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME3_PTR_LO     )}})  |
 
+                                (VID_RAM0_CFG_D      &  {DEC_SZ{(reg_addr == VID_RAM0_CFG      )}})  |
+                                (VID_RAM0_WIDTH_D    &  {DEC_SZ{(reg_addr == VID_RAM0_WIDTH    )}})  |
                                 (VID_RAM0_ADDR_HI_D  &  {DEC_SZ{(reg_addr == VID_RAM0_ADDR_HI  )}})  |
                                 (VID_RAM0_ADDR_LO_D  &  {DEC_SZ{(reg_addr == VID_RAM0_ADDR_LO  )}})  |
                                 (VID_RAM0_DATA_D     &  {DEC_SZ{(reg_addr == VID_RAM0_DATA     )}})  |
 
+                                (VID_RAM1_CFG_D      &  {DEC_SZ{(reg_addr == VID_RAM1_CFG      )}})  |
+                                (VID_RAM1_WIDTH_D    &  {DEC_SZ{(reg_addr == VID_RAM1_WIDTH    )}})  |
                                 (VID_RAM1_ADDR_HI_D  &  {DEC_SZ{(reg_addr == VID_RAM1_ADDR_HI  )}})  |
                                 (VID_RAM1_ADDR_LO_D  &  {DEC_SZ{(reg_addr == VID_RAM1_ADDR_LO  )}})  |
                                 (VID_RAM1_DATA_D     &  {DEC_SZ{(reg_addr == VID_RAM1_DATA     )}})  |
 
-                                (PIX0_WIDTH_D        &  {DEC_SZ{(reg_addr == PIX0_WIDTH        )}})  |
-                                (PIX0_HEIGHT_D       &  {DEC_SZ{(reg_addr == PIX0_HEIGHT       )}})  |
-                                (PIX0_X_D            &  {DEC_SZ{(reg_addr == PIX0_X            )}})  |
-                                (PIX0_Y_D            &  {DEC_SZ{(reg_addr == PIX0_Y            )}})  |
-                                (PIX0_DATA_D         &  {DEC_SZ{(reg_addr == PIX0_DATA         )}})  |
-
-                                (PIX1_WIDTH_D        &  {DEC_SZ{(reg_addr == PIX1_WIDTH        )}})  |
-                                (PIX1_HEIGHT_D       &  {DEC_SZ{(reg_addr == PIX1_HEIGHT       )}})  |
-                                (PIX1_X_D            &  {DEC_SZ{(reg_addr == PIX1_X            )}})  |
-                                (PIX1_Y_D            &  {DEC_SZ{(reg_addr == PIX1_Y            )}})  |
-                                (PIX1_DATA_D         &  {DEC_SZ{(reg_addr == PIX1_DATA         )}});
+                                (GPU_CMD_D           &  {DEC_SZ{(reg_addr == GPU_CMD           )}})  |
+                                (GPU_STAT_D          &  {DEC_SZ{(reg_addr == GPU_STAT          )}});
 
 // Read/Write probes
 wire               reg_write =  |per_we_i & reg_sel;
@@ -366,6 +353,9 @@ wire [`VRAM_MSB:0] vid_ram1_base_addr;
 `ifdef WITH_EXTRA_LUT_BANK
 reg                lut_bank_select;
 `endif
+reg                vid_ram0_addr_lo_wr_dly;
+reg                vid_ram1_addr_lo_wr_dly;
+
 
 //============================================================================
 // 3) REGISTERS
@@ -999,6 +989,52 @@ wire [15:0] frame0_ptr_lo_rd  = frame0_ptr_lo_tmp[15:0];
 `endif
 
 //------------------------------------------------
+// VID_RAM0_CFG Register
+//------------------------------------------------
+reg                vid_ram0_rmw_mode;
+reg                vid_ram0_win_mode;
+reg                vid_ram0_win_x_swap;
+reg                vid_ram0_win_y_swap;
+reg                vid_ram0_win_cl_swap;
+
+wire               vid_ram0_cfg_wr = reg_wr[VID_RAM0_CFG];
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)
+    begin
+       vid_ram0_rmw_mode     <=  1'b0;
+       vid_ram0_win_mode     <=  1'b0;
+       vid_ram0_win_x_swap   <=  1'b0;
+       vid_ram0_win_y_swap   <=  1'b0;
+       vid_ram0_win_cl_swap  <=  1'b0;
+    end
+  else if (vid_ram0_cfg_wr)
+    begin
+       vid_ram0_rmw_mode     <=  per_din_i[0];
+       vid_ram0_win_mode     <=  per_din_i[1];
+       vid_ram0_win_x_swap   <=  per_din_i[4];
+       vid_ram0_win_y_swap   <=  per_din_i[5];
+       vid_ram0_win_cl_swap  <=  per_din_i[6];
+    end
+
+wire [15:0] vid_ram0_cfg  = {8'h00, 1'b0,  vid_ram0_win_cl_swap, vid_ram0_win_y_swap, vid_ram0_win_x_swap,
+                                    1'b0,  1'b0,                 vid_ram0_win_mode,   vid_ram0_rmw_mode};
+
+//------------------------------------------------
+// VID_RAM0_WIDTH Register
+//------------------------------------------------
+reg  [`LPIX_MSB:0] vid_ram0_width;
+
+wire               vid_ram0_width_wr = reg_wr[VID_RAM0_WIDTH];
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)                vid_ram0_width   <=  {`LPIX_MSB+1{1'b0}};
+  else if (vid_ram0_width_wr) vid_ram0_width   <=  per_din_i[`LPIX_MSB:0];
+
+wire [16:0] vid_ram0_width_tmp = {{16-`LPIX_MSB{1'b0}}, vid_ram0_width};
+wire [15:0] vid_ram0_width_rd  = vid_ram0_width_tmp[15:0];
+
+//------------------------------------------------
 // VID_RAM0_ADDR_HI Register
 //------------------------------------------------
 wire   [`VRAM_MSB:0] vid_ram0_addr;
@@ -1039,7 +1075,26 @@ assign      vid_ram0_addr        = {vid_ram0_addr_lo[`VRAM_LO_MSB:0]};
 wire [16:0] vid_ram0_addr_lo_tmp = {{16-`VRAM_LO_MSB{1'b0}},vid_ram0_addr_lo};
 wire [15:0] vid_ram0_addr_lo_rd  = vid_ram0_addr_lo_tmp[15:0];
 `endif
-assign      vid_ram0_addr_inc    = vid_ram0_addr + {{`VRAM_MSB{1'b0}},1'b1};
+
+// Compute the next address
+omsp_gfx_reg_vram_addr omsp_gfx_reg_vram0_addr_inst (
+
+// OUTPUTs
+    .vid_ram_addr_nxt_o      ( vid_ram0_addr_inc       ),   // Next Video-RAM address
+
+// INPUTs
+    .mclk                    ( mclk                    ),   // Main system clock
+    .puc_rst                 ( puc_rst                 ),   // Main system reset
+    .display_width_i         ( display_width_o         ),   // Display width
+    .vid_ram_addr_i          ( vid_ram0_addr           ),   // Video-RAM address
+    .vid_ram_addr_init_i     ( vid_ram0_addr_lo_wr_dly ),   // Video-RAM address initialization
+    .vid_ram_addr_step_i     ( vid_ram0_addr_inc_wr    ),   // Video-RAM address step
+    .vid_ram_width_i         ( vid_ram0_width          ),   // Video-RAM width
+    .vid_ram_win_mode_i      ( vid_ram0_win_mode       ),   // Video-RAM Windows mode enable
+    .vid_ram_win_x_swap_i    ( vid_ram0_win_x_swap     ),   // Video-RAM X-Swap configuration
+    .vid_ram_win_y_swap_i    ( vid_ram0_win_y_swap     ),   // Video-RAM Y-Swap configuration
+    .vid_ram_win_cl_swap_i   ( vid_ram0_win_cl_swap    )    // Video-RAM CL-Swap configuration
+);
 
 //------------------------------------------------
 // VID_RAM0_DATA Register
@@ -1056,6 +1111,56 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)                vid_ram0_data <=  16'h0000;
   else if (vid_ram0_data_wr)  vid_ram0_data <=  per_din_i;
   else if (vid_ram0_dout_rdy) vid_ram0_data <=  vid_ram_dout_i;
+
+// Make value available in case of early read
+wire [15:0] vid_ram0_data_mux = vid_ram0_dout_rdy ? vid_ram_dout_i : vid_ram0_data;
+
+
+//------------------------------------------------
+// VID_RAM1_CFG Register
+//------------------------------------------------
+reg                vid_ram1_rmw_mode;
+reg                vid_ram1_win_mode;
+reg                vid_ram1_win_x_swap;
+reg                vid_ram1_win_y_swap;
+reg                vid_ram1_win_cl_swap;
+
+wire               vid_ram1_cfg_wr = reg_wr[VID_RAM1_CFG];
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)
+    begin
+       vid_ram1_rmw_mode     <=  1'b0;
+       vid_ram1_win_mode     <=  1'b0;
+       vid_ram1_win_x_swap   <=  1'b0;
+       vid_ram1_win_y_swap   <=  1'b0;
+       vid_ram1_win_cl_swap  <=  1'b0;
+    end
+  else if (vid_ram1_cfg_wr)
+    begin
+       vid_ram1_rmw_mode     <=  per_din_i[0];
+       vid_ram1_win_mode     <=  per_din_i[1];
+       vid_ram1_win_x_swap   <=  per_din_i[4];
+       vid_ram1_win_y_swap   <=  per_din_i[5];
+       vid_ram1_win_cl_swap  <=  per_din_i[6];
+    end
+
+wire [15:0] vid_ram1_cfg  = {8'h00, 1'b0,  vid_ram1_win_cl_swap, vid_ram1_win_y_swap, vid_ram1_win_x_swap,
+                                    1'b0,  1'b0,                 vid_ram1_win_mode,   vid_ram1_rmw_mode};
+
+//------------------------------------------------
+// VID_RAM1_WIDTH Register
+//------------------------------------------------
+reg  [`LPIX_MSB:0] vid_ram1_width;
+
+wire               vid_ram1_width_wr = reg_wr[VID_RAM1_WIDTH];
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)                vid_ram1_width   <=  {`LPIX_MSB+1{1'b0}};
+  else if (vid_ram1_width_wr) vid_ram1_width   <=  per_din_i[`LPIX_MSB:0];
+
+wire [16:0] vid_ram1_width_tmp = {{16-`LPIX_MSB{1'b0}}, vid_ram1_width};
+wire [15:0] vid_ram1_width_rd  = vid_ram1_width_tmp[15:0];
 
 //------------------------------------------------
 // VID_RAM1_ADDR_HI Register
@@ -1098,13 +1203,32 @@ assign      vid_ram1_addr        = {vid_ram1_addr_lo[`VRAM_LO_MSB:0]};
 wire [16:0] vid_ram1_addr_lo_tmp = {{16-`VRAM_LO_MSB{1'b0}},vid_ram1_addr_lo};
 wire [15:0] vid_ram1_addr_lo_rd  = vid_ram1_addr_lo_tmp[15:0];
 `endif
-assign      vid_ram1_addr_inc    = vid_ram1_addr + {{`VRAM_MSB{1'b0}},1'b1};
+
+// Compute the next address
+omsp_gfx_reg_vram_addr omsp_gfx_reg_vram1_addr_inst (
+
+// OUTPUTs
+    .vid_ram_addr_nxt_o      ( vid_ram1_addr_inc       ),   // Next Video-RAM address
+
+// INPUTs
+    .mclk                    ( mclk                    ),   // Main system clock
+    .puc_rst                 ( puc_rst                 ),   // Main system reset
+    .display_width_i         ( display_width_o         ),   // Display width
+    .vid_ram_addr_i          ( vid_ram1_addr           ),   // Video-RAM address
+    .vid_ram_addr_init_i     ( vid_ram1_addr_lo_wr_dly ),   // Video-RAM address initialization
+    .vid_ram_addr_step_i     ( vid_ram1_addr_inc_wr    ),   // Video-RAM address step
+    .vid_ram_width_i         ( vid_ram1_width          ),   // Video-RAM width
+    .vid_ram_win_mode_i      ( vid_ram1_win_mode       ),   // Video-RAM Windows mode enable
+    .vid_ram_win_x_swap_i    ( vid_ram1_win_x_swap     ),   // Video-RAM X-Swap configuration
+    .vid_ram_win_y_swap_i    ( vid_ram1_win_y_swap     ),   // Video-RAM Y-Swap configuration
+    .vid_ram_win_cl_swap_i   ( vid_ram1_win_cl_swap    )    // Video-RAM CL-Swap configuration
+);
 
 //------------------------------------------------
 // VID_RAM1_DATA Register
 //------------------------------------------------
 
-// Update the VID_RAM0_DATA register with regular register write access
+// Update the VID_RAM1_DATA register with regular register write access
 wire        vid_ram1_data_wr  = reg_wr[VID_RAM1_DATA];
 wire        vid_ram1_data_rd  = reg_rd[VID_RAM1_DATA];
 wire        vid_ram1_dout_rdy;
@@ -1116,115 +1240,20 @@ always @ (posedge mclk or posedge puc_rst)
   else if (vid_ram1_data_wr)   vid_ram1_data <=  per_din_i;
   else if (vid_ram1_dout_rdy)  vid_ram1_data <=  vid_ram_dout_i;
 
-//------------------------------------------------
-// PIX0_WIDTH Register
-//------------------------------------------------
-reg  [15:0] pix0_width;
+// Make value available in case of early read
+wire [15:0] vid_ram1_data_mux = vid_ram1_dout_rdy ? vid_ram_dout_i : vid_ram1_data;
 
-wire        pix0_width_wr = reg_wr[PIX0_WIDTH];
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)            pix0_width <=  16'h0000;
-  else if (pix0_width_wr) pix0_width <=  per_din_i;
 
 //------------------------------------------------
-// PIX0_HEIGHT Register
+// GPU Interface (GPU_CMD/GPU_STAT) Registers
 //------------------------------------------------
-reg  [15:0] pix0_height;
 
-wire        pix0_height_wr = reg_wr[PIX0_HEIGHT];
+// Write strobe to the GPU fifo
+wire  gpu_cmd_wr = reg_wr[GPU_CMD];
 
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)             pix0_height <=  16'h0000;
-  else if (pix0_height_wr) pix0_height <=  per_din_i;
 
-//------------------------------------------------
-// PIX0_X Register
-//------------------------------------------------
-reg  [15:0] pix0_x;
 
-wire        pix0_x_wr = reg_wr[PIX0_X];
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)        pix0_x <=  16'h0000;
-  else if (pix0_x_wr) pix0_x <=  per_din_i;
-
-//------------------------------------------------
-// PIX0_Y Register
-//------------------------------------------------
-reg  [15:0] pix0_y;
-
-wire        pix0_y_wr = reg_wr[PIX0_Y];
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)        pix0_y <=  16'h0000;
-  else if (pix0_y_wr) pix0_y <=  per_din_i;
-
-//------------------------------------------------
-// PIX0_DATA Register
-//------------------------------------------------
-reg  [15:0] pix0_data;
-
-wire        pix0_data_wr = reg_wr[PIX0_DATA];
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)           pix0_data <=  16'h0000;
-  else if (pix0_data_wr) pix0_data <=  per_din_i;
-
-//------------------------------------------------
-// PIX1_WIDTH Register
-//------------------------------------------------
-reg  [15:0] pix1_width;
-
-wire        pix1_width_wr = reg_wr[PIX1_WIDTH];
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)            pix1_width <=  16'h0000;
-  else if (pix1_width_wr) pix1_width <=  per_din_i;
-
-//------------------------------------------------
-// PIX1_HEIGHT Register
-//------------------------------------------------
-reg  [15:0] pix1_height;
-
-wire        pix1_height_wr = reg_wr[PIX1_HEIGHT];
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)             pix1_height <=  16'h0000;
-  else if (pix1_height_wr) pix1_height <=  per_din_i;
-
-//------------------------------------------------
-// PIX1_X Register
-//------------------------------------------------
-reg  [15:0] pix1_x;
-
-wire        pix1_x_wr = reg_wr[PIX1_X];
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)        pix1_x <=  16'h0000;
-  else if (pix1_x_wr) pix1_x <=  per_din_i;
-
-//------------------------------------------------
-// PIX1_Y Register
-//------------------------------------------------
-reg  [15:0] pix1_y;
-
-wire        pix1_y_wr = reg_wr[PIX1_Y];
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)        pix1_y <=  16'h0000;
-  else if (pix1_y_wr) pix1_y <=  per_din_i;
-
-//------------------------------------------------
-// PIX1_DATA Register
-//------------------------------------------------
-reg  [15:0] pix1_data;
-
-wire        pix1_data_wr = reg_wr[PIX1_DATA];
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)           pix1_data <=  16'h0000;
-  else if (pix1_data_wr) pix1_data <=  per_din_i;
+wire [15:0] gpu_stat = 16'h0000;
 
 
 //============================================================================
@@ -1278,29 +1307,24 @@ wire [15:0] frame0_ptr_lo_read     = frame0_ptr_lo_rd     & {16{reg_rd[FRAME0_PT
   `endif
   wire [15:0] frame3_ptr_lo_read   = frame3_ptr_lo_rd     & {16{reg_rd[FRAME3_PTR_LO     ]}};
 `endif
+wire [15:0] vid_ram0_cfg_read      = vid_ram0_cfg         & {16{reg_rd[VID_RAM0_CFG      ]}};
+wire [15:0] vid_ram0_width_read    = vid_ram0_width_rd    & {16{reg_rd[VID_RAM0_WIDTH    ]}};
 `ifdef VRAM_BIGGER_64_KW
 wire [15:0] vid_ram0_addr_hi_read  = vid_ram0_addr_hi_rd  & {16{reg_rd[VID_RAM0_ADDR_HI  ]}};
 `endif
 wire [15:0] vid_ram0_addr_lo_read  = vid_ram0_addr_lo_rd  & {16{reg_rd[VID_RAM0_ADDR_LO  ]}};
-wire [15:0] vid_ram0_data_read     = vid_ram0_data        & {16{reg_rd[VID_RAM0_DATA     ]}};
+wire [15:0] vid_ram0_data_read     = vid_ram0_data_mux    & {16{reg_rd[VID_RAM0_DATA     ]}};
 
+wire [15:0] vid_ram1_cfg_read      = vid_ram1_cfg         & {16{reg_rd[VID_RAM1_CFG      ]}};
+wire [15:0] vid_ram1_width_read    = vid_ram1_width_rd    & {16{reg_rd[VID_RAM1_WIDTH    ]}};
 `ifdef VRAM_BIGGER_64_KW
 wire [15:0] vid_ram1_addr_hi_read  = vid_ram1_addr_hi_rd  & {16{reg_rd[VID_RAM1_ADDR_HI  ]}};
 `endif
 wire [15:0] vid_ram1_addr_lo_read  = vid_ram1_addr_lo_rd  & {16{reg_rd[VID_RAM1_ADDR_LO  ]}};
-wire [15:0] vid_ram1_data_read     = vid_ram1_data        & {16{reg_rd[VID_RAM1_DATA     ]}};
+wire [15:0] vid_ram1_data_read     = vid_ram1_data_mux    & {16{reg_rd[VID_RAM1_DATA     ]}};
+wire [15:0] gpu_cmd_read           = 16'h0000             & {16{reg_rd[GPU_CMD           ]}};
+wire [15:0] gpu_stat_read          = gpu_stat             & {16{reg_rd[GPU_STAT          ]}};
 
-wire [15:0] pix0_width_read        = pix0_width           & {16{reg_rd[PIX0_WIDTH        ]}};
-wire [15:0] pix0_height_read       = pix0_height          & {16{reg_rd[PIX0_HEIGHT       ]}};
-wire [15:0] pix0_x_read            = pix0_x               & {16{reg_rd[PIX0_X            ]}};
-wire [15:0] pix0_y_read            = pix0_y               & {16{reg_rd[PIX0_Y            ]}};
-wire [15:0] pix0_data_read         = pix0_data            & {16{reg_rd[PIX0_DATA         ]}};
-
-wire [15:0] pix1_width_read        = pix1_width           & {16{reg_rd[PIX1_WIDTH        ]}};
-wire [15:0] pix1_height_read       = pix1_height          & {16{reg_rd[PIX1_HEIGHT       ]}};
-wire [15:0] pix1_x_read            = pix1_x               & {16{reg_rd[PIX1_X            ]}};
-wire [15:0] pix1_y_read            = pix1_y               & {16{reg_rd[PIX1_Y            ]}};
-wire [15:0] pix1_data_read         = pix1_data            & {16{reg_rd[PIX1_DATA         ]}};
 
 wire [15:0] per_dout_o             = gfx_ctrl_read          |
                                      gfx_status_read        |
@@ -1348,29 +1372,23 @@ wire [15:0] per_dout_o             = gfx_ctrl_read          |
                                   `endif
                                      frame3_ptr_lo_read     |
                                 `endif
+                                     vid_ram0_cfg_read      |
+                                     vid_ram0_width_read    |
                                   `ifdef VRAM_BIGGER_64_KW
                                      vid_ram0_addr_hi_read  |
                                   `endif
                                      vid_ram0_addr_lo_read  |
                                      vid_ram0_data_read     |
 
+                                     vid_ram1_cfg_read      |
+                                     vid_ram1_width_read    |
                                   `ifdef VRAM_BIGGER_64_KW
                                      vid_ram1_addr_hi_read  |
                                   `endif
                                      vid_ram1_addr_lo_read  |
                                      vid_ram1_data_read     |
-
-                                     pix0_width_read        |
-                                     pix0_height_read       |
-                                     pix0_x_read            |
-                                     pix0_y_read            |
-                                     pix0_data_read         |
-
-                                     pix1_width_read        |
-                                     pix1_height_read       |
-                                     pix1_x_read            |
-                                     pix1_y_read            |
-                                     pix1_data_read;
+                                     gpu_cmd_read           |
+                                     gpu_stat_read;
 
 
 //============================================================================
@@ -1390,7 +1408,6 @@ wire [15:0] per_dout_o             = gfx_ctrl_read          |
 //--------------------------------------------------
 
 // Strobe writing to VID_RAMx_ADDR_LO register
-reg        vid_ram0_addr_lo_wr_dly;
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst) vid_ram0_addr_lo_wr_dly <= 1'b0;
   else         vid_ram0_addr_lo_wr_dly <= vid_ram0_addr_lo_wr;
@@ -1413,7 +1430,6 @@ always @ (posedge mclk or posedge puc_rst)
 //--------------------------------------------------
 
 // Strobe writing to VID_RAMx_ADDR_LO register
-reg        vid_ram1_addr_lo_wr_dly;
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst) vid_ram1_addr_lo_wr_dly <= 1'b0;
   else         vid_ram1_addr_lo_wr_dly <= vid_ram1_addr_lo_wr;
@@ -1443,11 +1459,11 @@ assign vid_ram_wen_o  = ~(vid_ram0_data_wr_dly | vid_ram1_data_wr_dly);
 // Note: we perform a data read access:
 //       - one cycle after a VID_RAM_DATA register read access (so that the address has been incremented)
 //       - one cycle after a VID_RAM_ADDR_LO register write
-wire    vid_ram0_ce_early = (vid_ram0_addr_lo_wr_dly | vid_ram0_data_rd_dly | // Read access
-                             vid_ram0_data_wr);                               // Write access
+wire    vid_ram0_ce_early = (vid_ram0_addr_lo_wr | vid_ram0_data_rd_dly | // Read access
+                             vid_ram0_data_wr);                           // Write access
 
-wire    vid_ram1_ce_early = (vid_ram1_addr_lo_wr_dly | vid_ram1_data_rd_dly | // Read access
-                             vid_ram1_data_wr);                               // Write access
+wire    vid_ram1_ce_early = (vid_ram1_addr_lo_wr | vid_ram1_data_rd_dly | // Read access
+                             vid_ram1_data_wr);                           // Write access
 
 reg [1:0] vid_ram0_ce;
 always @ (posedge mclk or posedge puc_rst)
@@ -1472,13 +1488,22 @@ assign vid_ram1_dout_rdy = vid_ram1_ce[1];
 // Compute VIDEO-RAM Address
 //------------------------------------------------
 
+// Mux ram address for early read access when ADDR_LO is updated
+`ifdef VRAM_BIGGER_64_KW
+wire [`VRAM_MSB:0] vid_ram0_addr_mux = vid_ram0_addr_lo_wr ? {vid_ram0_addr[`VRAM_MSB:16], per_din_i} : vid_ram0_addr;
+wire [`VRAM_MSB:0] vid_ram1_addr_mux = vid_ram1_addr_lo_wr ? {vid_ram1_addr[`VRAM_MSB:16], per_din_i} : vid_ram1_addr;
+`else
+wire [`VRAM_MSB:0] vid_ram0_addr_mux = vid_ram0_addr_lo_wr ? {per_din_i[`VRAM_LO_MSB:0]}              : vid_ram0_addr;
+wire [`VRAM_MSB:0] vid_ram1_addr_mux = vid_ram1_addr_lo_wr ? {per_din_i[`VRAM_LO_MSB:0]}              : vid_ram1_addr;
+`endif
+
 // Add frame pointer offset
-wire [`VRAM_MSB:0] vid_ram0_addr_offset = vid_ram0_base_addr + vid_ram0_addr;
-wire [`VRAM_MSB:0] vid_ram1_addr_offset = vid_ram1_base_addr + vid_ram1_addr;
+wire [`VRAM_MSB:0] vid_ram0_addr_offset = vid_ram0_base_addr + vid_ram0_addr_mux;
+wire [`VRAM_MSB:0] vid_ram1_addr_offset = vid_ram1_base_addr + vid_ram1_addr_mux;
 
 // Detect memory accesses for ADDR update
-wire               vid_ram0_access      = vid_ram0_data_wr | vid_ram0_data_rd_dly | vid_ram0_addr_lo_wr_dly;
-wire               vid_ram1_access      = vid_ram1_data_wr | vid_ram1_data_rd_dly | vid_ram1_addr_lo_wr_dly;
+wire               vid_ram0_access      = vid_ram0_data_wr | vid_ram0_data_rd_dly | vid_ram0_addr_lo_wr;
+wire               vid_ram1_access      = vid_ram1_data_wr | vid_ram1_data_rd_dly | vid_ram1_addr_lo_wr;
 
 // Generate Video RAM address
 reg [`VRAM_MSB:0] vid_ram_addr_o;
@@ -1490,8 +1515,8 @@ always @ (posedge mclk or posedge puc_rst)
 // Increment the address when accessing the VID_RAMx_DATA register:
 // - one clock cycle after a write access
 // - with the read access
-assign vid_ram0_addr_inc_wr = (|vid_ram0_data_wr_dly) | vid_ram0_data_rd;
-assign vid_ram1_addr_inc_wr = (|vid_ram1_data_wr_dly) | vid_ram1_data_rd;
+assign vid_ram0_addr_inc_wr = vid_ram0_addr_lo_wr_dly | (|vid_ram0_data_wr_dly) | (vid_ram0_data_rd & ~dbg_freeze_i & ~vid_ram0_rmw_mode);
+assign vid_ram1_addr_inc_wr = vid_ram1_addr_lo_wr_dly | (|vid_ram1_data_wr_dly) | (vid_ram1_data_rd & ~dbg_freeze_i & ~vid_ram1_rmw_mode);
 
 
 endmodule // omsp_gfx_reg

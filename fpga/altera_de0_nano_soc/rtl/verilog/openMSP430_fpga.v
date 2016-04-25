@@ -382,7 +382,7 @@ omsp_gfx_controller omsp_gfx_controller_0 (
     .vid_ram_port1_din_o   (vid_ram_port1_din ),      // Video-RAM port 1 data input
 
 // INPUTs
-
+    .dbg_freeze_i          (dbg_freeze),              // Freeze address auto-incr on read
     .mclk                  (mclk),                    // Main system clock
     .per_addr_i            (per_addr),                // Peripheral address
     .per_din_i             (per_din),                 // Peripheral data input

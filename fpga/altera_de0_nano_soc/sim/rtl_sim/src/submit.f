@@ -62,6 +62,7 @@
 ../../../rtl/verilog/omsp_de0_nano_soc_led_key_sw.v
 ../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_controller.v
 ../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_reg.v
+../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_reg_vram_addr.v
 ../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_if_lt24.v
 ../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_backend.v
 ../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_backend_frame_fifo.v

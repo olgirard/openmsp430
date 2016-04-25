@@ -83,6 +83,7 @@ module  omsp_gfx_controller (
     vid_ram_port1_din_o,                  // Video-RAM port 1 data input
 
 // INPUTs
+    dbg_freeze_i,                         // Freeze address auto-incr on read
     mclk,                                 // Main system clock
     per_addr_i,                           // Peripheral address
     per_din_i,                            // Peripheral data input
@@ -140,6 +141,7 @@ output        [15:0] vid_ram_port1_din_o;   // Video-RAM port 1 data input
 
 // INPUTs
 //=========
+input                dbg_freeze_i;          // Freeze address auto-incr on read
 input                mclk;                  // Main system clock
 input         [13:0] per_addr_i;            // Peripheral address
 input         [15:0] per_din_i;             // Peripheral data input
@@ -249,6 +251,7 @@ omsp_gfx_reg  omsp_gfx_reg_inst (
     .vid_ram_cen_o                 ( vid_ram_port0_cen_o      ),       // Video-RAM chip enable (active low)
 
 // INPUTs
+    .dbg_freeze_i                  ( dbg_freeze_i             ),       // Freeze address auto-incr on read
     .lt24_status_i                 ( lt24_status              ),       // LT24 FSM Status
     .lt24_start_evt_i              ( lt24_start_evt           ),       // LT24 FSM start event
     .lt24_done_evt_i               ( lt24_done_evt            ),       // LT24 FSM done event

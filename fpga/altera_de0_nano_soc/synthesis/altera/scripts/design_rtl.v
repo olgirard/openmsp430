@@ -41,6 +41,7 @@
 `include "../../../rtl/verilog/omsp_de0_nano_soc_led_key_sw.v"
 `include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_controller.v"
 `include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_reg.v"
+`include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_reg_vram_addr.v"
 `include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_if_lt24.v"
 `include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_backend.v"
 `include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_backend_frame_fifo.v"

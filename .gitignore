@@ -4,3 +4,8 @@ simv
 stimulus.v
 *.vcd
 log
+*.o
+*.a43
+*.elf
+*.lst
+*.size
