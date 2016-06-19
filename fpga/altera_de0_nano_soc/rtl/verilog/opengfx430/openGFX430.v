@@ -60,26 +60,16 @@ module  openGFX430 (
     per_dout_o,                           // Peripheral data output
 
 `ifdef WITH_PROGRAMMABLE_LUT
-    lut_ram_port0_addr_o,                 // LUT-RAM port 0 address
-    lut_ram_port0_wen_o,                  // LUT-RAM port 0 write enable (active low)
-    lut_ram_port0_cen_o,                  // LUT-RAM port 0 enable (active low)
-    lut_ram_port0_din_o,                  // LUT-RAM port 0 data input
-
-    lut_ram_port1_addr_o,                 // LUT-RAM port 1 address
-    lut_ram_port1_wen_o,                  // LUT-RAM port 1 write enable (active low)
-    lut_ram_port1_cen_o,                  // LUT-RAM port 1 enable (active low)
-    lut_ram_port1_din_o,                  // LUT-RAM port 1 data input
+    lut_ram_addr_o,                       // LUT-RAM address
+    lut_ram_wen_o,                        // LUT-RAM write enable (active low)
+    lut_ram_cen_o,                        // LUT-RAM enable (active low)
+    lut_ram_din_o,                        // LUT-RAM data input
 `endif
 
-    vid_ram_port0_addr_o,                 // Video-RAM port 0 address
-    vid_ram_port0_wen_o,                  // Video-RAM port 0 write enable (active low)
-    vid_ram_port0_cen_o,                  // Video-RAM port 0 enable (active low)
-    vid_ram_port0_din_o,                  // Video-RAM port 0 data input
-
-    vid_ram_port1_addr_o,                 // Video-RAM port 1 address
-    vid_ram_port1_wen_o,                  // Video-RAM port 1 write enable (active low)
-    vid_ram_port1_cen_o,                  // Video-RAM port 1 enable (active low)
-    vid_ram_port1_din_o,                  // Video-RAM port 1 data input
+    vid_ram_addr_o,                       // Video-RAM address
+    vid_ram_wen_o,                        // Video-RAM write enable (active low)
+    vid_ram_cen_o,                        // Video-RAM enable (active low)
+    vid_ram_din_o,                        // Video-RAM data input
 
 // INPUTs
     dbg_freeze_i,                         // Freeze address auto-incr on read
@@ -93,70 +83,54 @@ module  openGFX430 (
     lt24_d_i,                             // LT24 Data input
 
 `ifdef WITH_PROGRAMMABLE_LUT
-    lut_ram_port0_dout_i,                 // LUT-RAM port 0 data output
-    lut_ram_port1_dout_i,                 // LUT-RAM port 1 data output
+    lut_ram_dout_i,                       // LUT-RAM data output
 `endif
-
-    vid_ram_port0_dout_i,                 // Video-RAM port 0 data output
-    vid_ram_port1_dout_i                  // Video-RAM port 1 data output
+    vid_ram_dout_i                        // Video-RAM data output
 );
 
 // OUTPUTs
 //=========
-output               irq_gfx_o;             // Graphic Controller interrupt
+output               irq_gfx_o;           // Graphic Controller interrupt
 
-output               lt24_cs_n_o;           // LT24 Chip select (Active low)
-output               lt24_rd_n_o;           // LT24 Read strobe (Active low)
-output               lt24_wr_n_o;           // LT24 Write strobe (Active low)
-output               lt24_rs_o;             // LT24 Command/Param selection (Cmd=0/Param=1)
-output        [15:0] lt24_d_o;              // LT24 Data output
-output               lt24_d_en_o;           // LT24 Data output enable
-output               lt24_reset_n_o;        // LT24 Reset (Active Low)
-output               lt24_on_o;             // LT24 on/off
+output               lt24_cs_n_o;         // LT24 Chip select (Active low)
+output               lt24_rd_n_o;         // LT24 Read strobe (Active low)
+output               lt24_wr_n_o;         // LT24 Write strobe (Active low)
+output               lt24_rs_o;           // LT24 Command/Param selection (Cmd=0/Param=1)
+output        [15:0] lt24_d_o;            // LT24 Data output
+output               lt24_d_en_o;         // LT24 Data output enable
+output               lt24_reset_n_o;      // LT24 Reset (Active Low)
+output               lt24_on_o;           // LT24 on/off
 
-output        [15:0] per_dout_o;            // Peripheral data output
+output        [15:0] per_dout_o;          // Peripheral data output
 
 `ifdef WITH_PROGRAMMABLE_LUT
-output [`LRAM_MSB:0] lut_ram_port0_addr_o;  // LUT-RAM port 0 address
-output         [1:0] lut_ram_port0_wen_o;   // LUT-RAM port 0 write enable (active low)
-output               lut_ram_port0_cen_o;   // LUT-RAM port 0 enable (active low)
-output        [15:0] lut_ram_port0_din_o;   // LUT-RAM port 0 data input
-
-output [`LRAM_MSB:0] lut_ram_port1_addr_o;  // LUT-RAM port 1 address
-output         [1:0] lut_ram_port1_wen_o;   // LUT-RAM port 1 write enable (active low)
-output               lut_ram_port1_cen_o;   // LUT-RAM port 1 enable (active low)
-output        [15:0] lut_ram_port1_din_o;   // LUT-RAM port 1 data input
+output [`LRAM_MSB:0] lut_ram_addr_o;      // LUT-RAM address
+output         [1:0] lut_ram_wen_o;       // LUT-RAM write enable (active low)
+output               lut_ram_cen_o;       // LUT-RAM enable (active low)
+output        [15:0] lut_ram_din_o;       // LUT-RAM data input
 `endif
 
-output [`VRAM_MSB:0] vid_ram_port0_addr_o;  // Video-RAM port 0 address
-output         [1:0] vid_ram_port0_wen_o;   // Video-RAM port 0 write enable (active low)
-output               vid_ram_port0_cen_o;   // Video-RAM port 0 enable (active low)
-output        [15:0] vid_ram_port0_din_o;   // Video-RAM port 0 data input
-
-output [`VRAM_MSB:0] vid_ram_port1_addr_o;  // Video-RAM port 1 address
-output         [1:0] vid_ram_port1_wen_o;   // Video-RAM port 1 write enable (active low)
-output               vid_ram_port1_cen_o;   // Video-RAM port 1 enable (active low)
-output        [15:0] vid_ram_port1_din_o;   // Video-RAM port 1 data input
+output [`VRAM_MSB:0] vid_ram_addr_o;      // Video-RAM address
+output         [1:0] vid_ram_wen_o;       // Video-RAM write enable (active low)
+output               vid_ram_cen_o;       // Video-RAM enable (active low)
+output        [15:0] vid_ram_din_o;       // Video-RAM data input
 
 // INPUTs
 //=========
-input                dbg_freeze_i;          // Freeze address auto-incr on read
-input                mclk;                  // Main system clock
-input         [13:0] per_addr_i;            // Peripheral address
-input         [15:0] per_din_i;             // Peripheral data input
-input                per_en_i;              // Peripheral enable (high active)
-input          [1:0] per_we_i;              // Peripheral write enable (high active)
-input                puc_rst;               // Main system reset
+input                dbg_freeze_i;        // Freeze address auto-incr on read
+input                mclk;                // Main system clock
+input         [13:0] per_addr_i;          // Peripheral address
+input         [15:0] per_din_i;           // Peripheral data input
+input                per_en_i;            // Peripheral enable (high active)
+input          [1:0] per_we_i;            // Peripheral write enable (high active)
+input                puc_rst;             // Main system reset
 
-input         [15:0] lt24_d_i;              // LT24 Data input
+input         [15:0] lt24_d_i;            // LT24 Data input
 
 `ifdef WITH_PROGRAMMABLE_LUT
-input         [15:0] lut_ram_port0_dout_i;  // LUT-RAM port 0 data output
-input         [15:0] lut_ram_port1_dout_i;  // LUT-RAM port 1 data output
+input         [15:0] lut_ram_dout_i;      // LUT-RAM data output
 `endif
-
-input         [15:0] vid_ram_port0_dout_i;  // Video-RAM port 0 data output
-input         [15:0] vid_ram_port1_dout_i;  // Video-RAM port 1 data output
+input         [15:0] vid_ram_dout_i;      // Video-RAM data output
 
 
 //=============================================================================
@@ -188,9 +162,31 @@ wire               lt24_done_evt;
 wire               lt24_start_evt;
 
 `ifdef WITH_PROGRAMMABLE_LUT
-wire               lut_ram_port1_dout_rdy_nxt;
+wire [`LRAM_MSB:0] lut_ram_sw_addr;
+wire        [15:0] lut_ram_sw_din;
+wire         [1:0] lut_ram_sw_wen;
+wire               lut_ram_sw_cen;
+wire        [15:0] lut_ram_sw_dout;
+wire [`LRAM_MSB:0] lut_ram_refr_addr;
+wire               lut_ram_refr_cen;
+wire        [15:0] lut_ram_refr_dout;
+wire               lut_ram_refr_dout_rdy_nxt;
 `endif
-wire               vid_ram_port1_dout_rdy_nxt;
+wire [`VRAM_MSB:0] vid_ram_sw_addr;
+wire        [15:0] vid_ram_sw_din;
+wire         [1:0] vid_ram_sw_wen;
+wire               vid_ram_sw_cen;
+wire        [15:0] vid_ram_sw_dout;
+wire [`VRAM_MSB:0] vid_ram_gpu_addr;
+wire        [15:0] vid_ram_gpu_din;
+wire         [1:0] vid_ram_gpu_wen;
+wire               vid_ram_gpu_cen;
+wire        [15:0] vid_ram_gpu_dout;
+wire               vid_ram_gpu_dout_rdy_nxt;
+wire [`VRAM_MSB:0] vid_ram_refr_addr;
+wire               vid_ram_refr_cen;
+wire        [15:0] vid_ram_refr_dout;
+wire               vid_ram_refr_dout_rdy_nxt;
 
 wire               refresh_active;
 wire        [15:0] refresh_data;
@@ -198,6 +194,13 @@ wire               refresh_data_ready;
 wire               refresh_data_request;
 wire [`VRAM_MSB:0] refresh_frame_addr;
 wire         [1:0] refresh_lut_select;
+
+wire               gpu_cmd_done_evt;
+wire               gpu_cmd_error_evt;
+wire               gpu_get_data;
+wire        [15:0] gpu_data;
+wire               gpu_data_avail;
+wire               gpu_enable;
 
 
 //============================================================================
@@ -208,6 +211,10 @@ ogfx_reg  ogfx_reg_inst (
 
 // OUTPUTs
     .irq_gfx_o                     ( irq_gfx_o                ),       // Graphic Controller interrupt
+
+    .gpu_data_o                    ( gpu_data                 ),       // GPU data
+    .gpu_data_avail_o              ( gpu_data_avail           ),       // GPU data available
+    .gpu_enable_o                  ( gpu_enable               ),       // GPU enable
 
     .lt24_reset_n_o                ( lt24_reset_n_o           ),       // LT24 Reset (Active Low)
     .lt24_on_o                     ( lt24_on_o                ),       // LT24 on/off
@@ -227,8 +234,8 @@ ogfx_reg  ogfx_reg_inst (
     .display_height_o              ( display_height           ),       // Display height
     .display_size_o                ( display_size             ),       // Display size (number of pixels)
     .display_y_swap_o              ( display_y_swap           ),       // Display configuration: swap Y axis (horizontal symmetry)
-    .display_x_swap_o		   ( display_x_swap  	      ),       // Display configuration: swap X axis (vertical symmetry)
-    .display_cl_swap_o	           ( display_cl_swap          ),       // Display configuration: swap column/lines
+    .display_x_swap_o              ( display_x_swap           ),       // Display configuration: swap X axis (vertical symmetry)
+    .display_cl_swap_o             ( display_cl_swap          ),       // Display configuration: swap column/lines
 
     .gfx_mode_o                    ( gfx_mode                 ),       // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
@@ -238,19 +245,22 @@ ogfx_reg  ogfx_reg_inst (
     .refresh_lut_select_o          ( refresh_lut_select       ),       // Refresh LUT bank selection
 
 `ifdef WITH_PROGRAMMABLE_LUT
-    .lut_ram_addr_o                ( lut_ram_port0_addr_o     ),       // LUT-RAM address
-    .lut_ram_din_o                 ( lut_ram_port0_din_o      ),       // LUT-RAM data
-    .lut_ram_wen_o                 ( lut_ram_port0_wen_o      ),       // LUT-RAM write strobe (active low)
-    .lut_ram_cen_o                 ( lut_ram_port0_cen_o      ),       // LUT-RAM chip enable (active low)
+    .lut_ram_addr_o                ( lut_ram_sw_addr          ),       // LUT-RAM address
+    .lut_ram_din_o                 ( lut_ram_sw_din           ),       // LUT-RAM data
+    .lut_ram_wen_o                 ( lut_ram_sw_wen           ),       // LUT-RAM write strobe (active low)
+    .lut_ram_cen_o                 ( lut_ram_sw_cen           ),       // LUT-RAM chip enable (active low)
 `endif
 
-    .vid_ram_addr_o                ( vid_ram_port0_addr_o     ),       // Video-RAM address
-    .vid_ram_din_o                 ( vid_ram_port0_din_o      ),       // Video-RAM data
-    .vid_ram_wen_o                 ( vid_ram_port0_wen_o      ),       // Video-RAM write strobe (active low)
-    .vid_ram_cen_o                 ( vid_ram_port0_cen_o      ),       // Video-RAM chip enable (active low)
+    .vid_ram_addr_o                ( vid_ram_sw_addr          ),       // Video-RAM address
+    .vid_ram_din_o                 ( vid_ram_sw_din           ),       // Video-RAM data
+    .vid_ram_wen_o                 ( vid_ram_sw_wen           ),       // Video-RAM write strobe (active low)
+    .vid_ram_cen_o                 ( vid_ram_sw_cen           ),       // Video-RAM chip enable (active low)
 
 // INPUTs
     .dbg_freeze_i                  ( dbg_freeze_i             ),       // Freeze address auto-incr on read
+    .gpu_cmd_done_evt_i            ( gpu_cmd_done_evt         ),       // GPU command done event
+    .gpu_cmd_error_evt_i           ( gpu_cmd_error_evt        ),       // GPU command error event
+    .gpu_get_data_i                ( gpu_get_data             ),       // GPU get next data
     .lt24_status_i                 ( lt24_status              ),       // LT24 FSM Status
     .lt24_start_evt_i              ( lt24_start_evt           ),       // LT24 FSM start event
     .lt24_done_evt_i               ( lt24_done_evt            ),       // LT24 FSM done event
@@ -262,14 +272,48 @@ ogfx_reg  ogfx_reg_inst (
     .puc_rst                       ( puc_rst                  ),       // Main system reset
 
 `ifdef WITH_PROGRAMMABLE_LUT
-    .lut_ram_dout_i                ( lut_ram_port0_dout_i     ),       // LUT-RAM data input
+    .lut_ram_dout_i                ( lut_ram_sw_dout          ),       // LUT-RAM data input
 `endif
-    .vid_ram_dout_i                ( vid_ram_port0_dout_i     )        // Video-RAM data input
+    .vid_ram_dout_i                ( vid_ram_sw_dout          )        // Video-RAM data input
 );
 
 
 //============================================================================
-// 3) LT24 INTERFACE
+// 3)  GPU
+//============================================================================
+
+ogfx_gpu  ogfx_gpu_inst (
+
+// OUTPUTs
+    .gpu_cmd_done_evt_o            ( gpu_cmd_done_evt         ),       // GPU command done event
+    .gpu_cmd_error_evt_o           ( gpu_cmd_error_evt        ),       // GPU command error event
+    .gpu_get_data_o                ( gpu_get_data             ),       // GPU get next data
+
+    .vid_ram_addr_o                ( vid_ram_gpu_addr         ),       // Video-RAM address
+    .vid_ram_din_o                 ( vid_ram_gpu_din          ),       // Video-RAM data
+    .vid_ram_wen_o                 ( vid_ram_gpu_wen          ),       // Video-RAM write strobe (active low)
+    .vid_ram_cen_o                 ( vid_ram_gpu_cen          ),       // Video-RAM chip enable (active low)
+
+// INPUTs
+    .mclk                          ( mclk                     ),       // Main system clock
+    .puc_rst                       ( puc_rst                  ),       // Main system reset
+
+    .display_width_i               ( display_width            ),       // Display width
+    .display_height_i              ( display_height           ),       // Display height
+
+    .gfx_mode_i                    ( gfx_mode                 ),       // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
+
+    .gpu_data_i                    ( gpu_data                 ),       // GPU data
+    .gpu_data_avail_i              ( gpu_data_avail           ),       // GPU data available
+    .gpu_enable_i                  ( gpu_enable               ),       // GPU enable
+
+    .vid_ram_dout_i                ( vid_ram_gpu_dout         ),       // Video-RAM data input
+    .vid_ram_dout_rdy_nxt_i        ( vid_ram_gpu_dout_rdy_nxt )        // Video-RAM data output ready during next cycle
+);
+
+
+//============================================================================
+// 4) LT24 INTERFACE
 //============================================================================
 
 ogfx_if_lt24  ogfx_if_lt24_inst (
@@ -317,16 +361,8 @@ ogfx_if_lt24  ogfx_if_lt24_inst (
 );
 
 //============================================================================
-// 4) VIDEO BACKEND
+// 5) VIDEO BACKEND
 //============================================================================
-
-// Refresh-interface used in read only
-assign    vid_ram_port1_wen_o  =  2'h3;
-assign    vid_ram_port1_din_o  = 16'h0000;
-`ifdef WITH_PROGRAMMABLE_LUT
-assign    lut_ram_port1_wen_o  =  2'h3;
-assign    lut_ram_port1_din_o  = 16'h0000;
-`endif
 
 // Video Backend
 ogfx_backend  ogfx_backend_inst (
@@ -335,12 +371,12 @@ ogfx_backend  ogfx_backend_inst (
     .refresh_data_o                ( refresh_data               ),    // Display refresh data
     .refresh_data_ready_o          ( refresh_data_ready         ),    // Display refresh new data is ready
 
-    .vid_ram_addr_o                ( vid_ram_port1_addr_o       ),    // Video-RAM refresh address
-    .vid_ram_cen_o                 ( vid_ram_port1_cen_o        ),    // Video-RAM refresh enable (active low)
+    .vid_ram_addr_o                ( vid_ram_refr_addr          ),    // Video-RAM address
+    .vid_ram_cen_o                 ( vid_ram_refr_cen           ),    // Video-RAM enable (active low)
 
 `ifdef WITH_PROGRAMMABLE_LUT
-    .lut_ram_addr_o                ( lut_ram_port1_addr_o       ),    // LUT-RAM refresh address
-    .lut_ram_cen_o                 ( lut_ram_port1_cen_o        ),    // LUT-RAM refresh enable (active low)
+    .lut_ram_addr_o                ( lut_ram_refr_addr          ),    // LUT-RAM address
+    .lut_ram_cen_o                 ( lut_ram_refr_cen           ),    // LUT-RAM enable (active low)
 `endif
 
 // INPUTs
@@ -357,12 +393,12 @@ ogfx_backend  ogfx_backend_inst (
     .gfx_mode_i                    ( gfx_mode                   ),    // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
 `ifdef WITH_PROGRAMMABLE_LUT
-    .lut_ram_dout_i                ( lut_ram_port1_dout_i       ),    // LUT-RAM data output
-    .lut_ram_dout_rdy_nxt_i        ( lut_ram_port1_dout_rdy_nxt ),    // Video-RAM data output ready during next cycle
+    .lut_ram_dout_i                ( lut_ram_refr_dout          ),    // LUT-RAM data output
+    .lut_ram_dout_rdy_nxt_i        ( lut_ram_refr_dout_rdy_nxt  ),    // LUT-RAM data output ready during next cycle
 `endif
 
-    .vid_ram_dout_i                ( vid_ram_port1_dout_i       ),    // Video-RAM data output
-    .vid_ram_dout_rdy_nxt_i        ( vid_ram_port1_dout_rdy_nxt ),    // Video-RAM data output ready during next cycle
+    .vid_ram_dout_i                ( vid_ram_refr_dout          ),    // Video-RAM data output
+    .vid_ram_dout_rdy_nxt_i        ( vid_ram_refr_dout_rdy_nxt  ),    // Video-RAM data output ready during next cycle
 
     .refresh_active_i              ( refresh_active             ),    // Display refresh on going
     .refresh_data_request_i        ( refresh_data_request       ),    // Display refresh new data request
@@ -370,65 +406,74 @@ ogfx_backend  ogfx_backend_inst (
     .refresh_lut_select_i          ( refresh_lut_select         )     // Refresh LUT bank selection
 );
 
-//`define RAND_DLY_VID
-//`define RAND_DLY_LUT
-`ifdef  RAND_DLY_VID
+//============================================================================
+// 6) ARBITER FOR VIDEO AND LUT MEMORIES
+//============================================================================
 
-   // Random delay
-   integer    rand_delay_vid;
-   initial
-     begin
-        forever
-          begin
-             @(negedge mclk);
-             //rand_delay_vid  =  $urandom_range(47,37);
-             rand_delay_vid  =  $urandom_range(7,1);
-          end
-     end
+ogfx_ram_arbiter  ogfx_ram_arbiter_inst (
 
-   integer rand_counter_vid;
-   always @(posedge mclk or posedge puc_rst)
-     if (puc_rst)                   rand_counter_vid  <=  0;
-     else if (vid_ram_port1_cen_o)  rand_counter_vid  <=  0;
-     else if (rand_counter_vid==0)  rand_counter_vid  <=  rand_delay_vid;
-     else if (rand_counter_vid!=0)  rand_counter_vid  <=  rand_counter_vid-1;
+    .mclk                          ( mclk                       ),    // Main system clock
+    .puc_rst                       ( puc_rst                    ),    // Main system reset
 
-   // Read data ready
-   assign vid_ram_port1_dout_rdy_nxt =  (rand_counter_vid==1);
+   //------------------------------------------------------------
 
-`else
-   // Read data ready
-   assign vid_ram_port1_dout_rdy_nxt =  ~vid_ram_port1_cen_o;
-`endif
-`ifdef  RAND_DLY_LUT
- `ifdef WITH_PROGRAMMABLE_LUT
-   // Random delay
-   integer    rand_delay_lut;
-   initial
-     begin
-        forever
-          begin
-             @(negedge mclk);
-             rand_delay_lut  =  $urandom_range(7,1);
-          end
-     end
+   // SW interface, fixed highest priority
+    .lut_ram_sw_addr_i             ( lut_ram_sw_addr            ),    // LUT-RAM Software address
+    .lut_ram_sw_din_i              ( lut_ram_sw_din             ),    // LUT-RAM Software data
+    .lut_ram_sw_wen_i              ( lut_ram_sw_wen             ),    // LUT-RAM Software write strobe (active low)
+    .lut_ram_sw_cen_i              ( lut_ram_sw_cen             ),    // LUT-RAM Software chip enable (active low)
+    .lut_ram_sw_dout_o             ( lut_ram_sw_dout            ),    // LUT-RAM Software data input
 
-   integer rand_counter_lut;
-   always @(posedge mclk or posedge puc_rst)
-     if (puc_rst)                   rand_counter_lut  <=  0;
-     else if (lut_ram_port1_cen_o)       rand_counter_lut  <=  0;
-     else if (rand_counter_lut==0)       rand_counter_lut  <=  rand_delay_lut;
-     else if (rand_counter_lut!=0)       rand_counter_lut  <=  rand_counter_lut-1;
+   // Refresh-backend, fixed lowest priority
+    .lut_ram_refr_addr_i           ( lut_ram_refr_addr          ),    // LUT-RAM Refresh address
+    .lut_ram_refr_din_i            ( 16'h0000                   ),    // LUT-RAM Refresh data
+    .lut_ram_refr_wen_i            ( 2'h3                       ),    // LUT-RAM Refresh write strobe (active low)
+    .lut_ram_refr_cen_i            ( lut_ram_refr_cen           ),    // LUT-RAM Refresh enable (active low)
+    .lut_ram_refr_dout_o           ( lut_ram_refr_dout          ),    // LUT-RAM Refresh data output
+    .lut_ram_refr_dout_rdy_nxt_o   ( lut_ram_refr_dout_rdy_nxt  ),    // LUT-RAM Refresh data output ready during next cycle
 
-   // Read data ready
-   assign lut_ram_port1_dout_rdy_nxt =  (rand_counter_lut==1);
- `endif
-`else
- `ifdef WITH_PROGRAMMABLE_LUT
-   // Read data ready
-   assign lut_ram_port1_dout_rdy_nxt =  ~lut_ram_port1_cen_o;
- `endif
-`endif
+   // LUT Memory interface
+    .lut_ram_addr_o                ( lut_ram_addr_o             ),    // LUT-RAM address
+    .lut_ram_din_o                 ( lut_ram_din_o              ),    // LUT-RAM data
+    .lut_ram_wen_o                 ( lut_ram_wen_o              ),    // LUT-RAM write strobe (active low)
+    .lut_ram_cen_o                 ( lut_ram_cen_o              ),    // LUT-RAM chip enable (active low)
+    .lut_ram_dout_i                ( lut_ram_dout_i             ),    // LUT-RAM data input
+
+   //------------------------------------------------------------
+
+   // SW interface, fixed highest priority
+    .vid_ram_sw_addr_i             ( vid_ram_sw_addr            ),    // Video-RAM Software address
+    .vid_ram_sw_din_i              ( vid_ram_sw_din             ),    // Video-RAM Software data
+    .vid_ram_sw_wen_i              ( vid_ram_sw_wen             ),    // Video-RAM Software write strobe (active low)
+    .vid_ram_sw_cen_i              ( vid_ram_sw_cen             ),    // Video-RAM Software chip enable (active low)
+    .vid_ram_sw_dout_o             ( vid_ram_sw_dout            ),    // Video-RAM Software data input
+
+   // GPU interface (round-robin with refresh-backend)
+    .vid_ram_gpu_addr_i            ( vid_ram_gpu_addr           ),    // Video-RAM GPU address
+    .vid_ram_gpu_din_i             ( vid_ram_gpu_din            ),    // Video-RAM GPU data
+    .vid_ram_gpu_wen_i             ( vid_ram_gpu_wen            ),    // Video-RAM GPU write strobe (active low)
+    .vid_ram_gpu_cen_i             ( vid_ram_gpu_cen            ),    // Video-RAM GPU chip enable (active low)
+    .vid_ram_gpu_dout_o            ( vid_ram_gpu_dout           ),    // Video-RAM GPU data input
+    .vid_ram_gpu_dout_rdy_nxt_o    ( vid_ram_gpu_dout_rdy_nxt   ),    // Video-RAM GPU data output ready during next cycle
+
+   // Refresh-backend (round-robin with GPU interface)
+    .vid_ram_refr_addr_i           ( vid_ram_refr_addr          ),    // Video-RAM Refresh address
+    .vid_ram_refr_din_i            ( 16'h0000                   ),    // Video-RAM Refresh data
+    .vid_ram_refr_wen_i            ( 2'h3                       ),    // Video-RAM Refresh write strobe (active low)
+    .vid_ram_refr_cen_i            ( vid_ram_refr_cen           ),    // Video-RAM Refresh enable (active low)
+    .vid_ram_refr_dout_o           ( vid_ram_refr_dout          ),    // Video-RAM Refresh data output
+    .vid_ram_refr_dout_rdy_nxt_o   ( vid_ram_refr_dout_rdy_nxt  ),    // Video-RAM Refresh data output ready during next cycle
+
+   // Video Memory interface
+    .vid_ram_addr_o                ( vid_ram_addr_o             ),    // Video-RAM address
+    .vid_ram_din_o                 ( vid_ram_din_o              ),    // Video-RAM data
+    .vid_ram_wen_o                 ( vid_ram_wen_o              ),    // Video-RAM write strobe (active low)
+    .vid_ram_cen_o                 ( vid_ram_cen_o              ),    // Video-RAM chip enable (active low)
+    .vid_ram_dout_i                ( vid_ram_dout_i             )     // Video-RAM data input
+
+   //------------------------------------------------------------
+);
+
 
 endmodule // openGFX430
 

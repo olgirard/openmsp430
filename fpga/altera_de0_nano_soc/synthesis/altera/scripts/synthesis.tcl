@@ -27,7 +27,7 @@ set_global_assignment -name DEVICE 5CSEMA4U23C6
 set_global_assignment -name VERILOG_FILE             ../scripts/design_rtl.v
 set_global_assignment -name SEARCH_PATH              ../../../rtl/verilog/openmsp430/
 set_global_assignment -name SEARCH_PATH              ../../../rtl/verilog/openmsp430/periph/
-set_global_assignment -name SEARCH_PATH              ../../../rtl/verilog/omsp_gfx_controller/
+set_global_assignment -name SEARCH_PATH              ../../../rtl/verilog/opengfx430/
 set_global_assignment -name TOP_LEVEL_ENTITY         openMSP430_fpga
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 

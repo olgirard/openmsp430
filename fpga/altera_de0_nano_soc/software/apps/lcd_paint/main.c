@@ -360,6 +360,27 @@ int main(void) {
   LT24_REFRESH_SYNC = LT24_REFR_SYNC  | 0x0000;
   LT24_REFRESH      = LT24_REFR_START | LT24_REFR_1MS;
 
+  // Try GPU
+  GFX_CTRL = GFX_CTRL | GFX_GPU_EN;
+
+  GPU_CMD  = 0x1234;
+  GPU_CMD  = 0x5678;
+  GPU_CMD  = 0x9ABC;
+  GPU_CMD  = 0xDEF0;
+  GPU_CMD  = 0xDEAD;
+  GPU_CMD  = 0xBEEF;
+  GPU_CMD  = 0xC001;
+  GPU_CMD  = 0xFEED;
+  GPU_CMD  = 0x1234;
+  GPU_CMD  = 0x5678;
+  GPU_CMD  = 0x9ABC;
+  GPU_CMD  = 0xDEF0;
+  GPU_CMD  = 0xDEAD;
+  GPU_CMD  = 0xBEEF;
+  GPU_CMD  = 0xC001;
+  GPU_CMD  = 0xFEED;
+  GPU_CMD  = 0xFEED;
+
   return 0;
 }
 

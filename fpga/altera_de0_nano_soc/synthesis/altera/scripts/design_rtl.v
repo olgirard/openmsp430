@@ -39,16 +39,9 @@
 
 `include "../../../rtl/verilog/openMSP430_fpga.v"
 `include "../../../rtl/verilog/omsp_de0_nano_soc_led_key_sw.v"
-`include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_controller.v"
-`include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_reg.v"
-`include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_reg_vram_addr.v"
-`include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_if_lt24.v"
-`include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_backend.v"
-`include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_backend_frame_fifo.v"
-`include "../../../rtl/verilog/omsp_gfx_controller/omsp_gfx_backend_lut_fifo.v"
 `include "../../../rtl/verilog/sync_debouncer_10ms.v"
-`include "../../../rtl/verilog/mega/ram_16x75k_dp.v"
-`include "../../../rtl/verilog/mega/ram_16x512_dp.v"
+`include "../../../rtl/verilog/mega/ram_16x75k.v"
+`include "../../../rtl/verilog/mega/ram_16x512.v"
 `include "../../../rtl/verilog/mega/ram_16x16k.v"
 `include "../../../rtl/verilog/mega/ram_16x8k.v"
 `include "../../../rtl/verilog/mega/io_buf.v"
@@ -81,3 +74,20 @@
 `include "../../../rtl/verilog/openmsp430/omsp_clock_mux.v"
 
 `include "../../../rtl/verilog/openmsp430/periph/omsp_timerA.v"
+
+//=============================================================================
+// openMSP430
+//=============================================================================
+
+`include "../../../rtl/verilog/opengfx430/openGFX430.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_reg.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_reg_fifo.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_reg_vram_addr.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_if_lt24.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_backend.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_backend_frame_fifo.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_backend_lut_fifo.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_gpu.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_gpu_dma.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_gpu_reg.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_ram_arbiter.v"

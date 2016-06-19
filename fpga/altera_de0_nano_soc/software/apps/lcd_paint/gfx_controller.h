@@ -67,6 +67,9 @@ void init_lt24(void);
 #define  VID_RAM1_ADDR_LO  (*(volatile unsigned int  *) 0x0266)
 #define  VID_RAM1_DATA     (*(volatile unsigned int  *) 0x0268)
 
+#define  GPU_CMD           (*(volatile unsigned int  *) 0x0270)
+#define  GPU_STAT          (*(volatile unsigned int  *) 0x0272)
+
 //----------------------------------------------------------
 // GRAPHIC CONTROLLER REGISTER FIELD MAPPING
 //----------------------------------------------------------
@@ -76,11 +79,21 @@ void init_lt24(void);
 #define  GFX_REFR_DONE_IRQ_DIS     0x0000
 #define  GFX_REFR_START_IRQ_EN     0x0002
 #define  GFX_REFR_START_IRQ_DIS    0x0000
+#define  GFX_GPU_FIFO_DONE_IRQ_EN  0x0010
+#define  GFX_GPU_FIFO_DONE_IRQ_DIS 0x0000
+#define  GFX_GPU_FIFO_OVFL_IRQ_EN  0x0020
+#define  GFX_GPU_FIFO_OVFL_IRQ_DIS 0x0000
+#define  GFX_GPU_CMD_DONE_IRQ_EN   0x0040
+#define  GFX_GPU_CMD_DONE_IRQ_DIS  0x0000
+#define  GFX_GPU_CMD_ERROR_IRQ_EN  0x0080
+#define  GFX_GPU_CMD_ERROR_IRQ_DIS 0x0000
 #define  GFX_16_BPP                0x0400
 #define  GFX_8_BPP                 0x0300
 #define  GFX_4_BPP                 0x0200
 #define  GFX_2_BPP                 0x0100
 #define  GFX_1_BPP                 0x0000
+#define  GFX_GPU_EN                0x1000
+#define  GFX_GPU_DIS               0x0000
 
 // GFX_STATUS Register
 #define  STATUS_REFRESH_BUSY       0x0001
@@ -88,6 +101,10 @@ void init_lt24(void);
 // GFX_IRQ Register
 #define  GFX_IRQ_REFRESH_DONE      0x0001
 #define  GFX_IRQ_REFRESH_START     0x0002
+#define  GFX_IRQ_GPU_FIFO_DONE     0x0010
+#define  GFX_IRQ_GPU_FIFO_OFVL     0x0020
+#define  GFX_IRQ_GPU_CMD_DONE      0x0040
+#define  GFX_IRQ_GPU_CMD_ERROR     0x0080
 
 // DISPLAY_CFG Register
 #define  DISPLAY_X_SWAP            0x0001
@@ -173,6 +190,14 @@ void init_lt24(void);
 #define  VID_RAM_WIN_Y_SWAP        0x0020
 #define  VID_RAM_NO_WIN_CL_SWAP    0x0000
 #define  VID_RAM_WIN_CL_SWAP       0x0040
+
+// GPU_CMD Register
+
+
+// GPU_STAT Register
+#define  GPU_STAT_FIFO_CNT         0x000F
+#define  GPU_STAT_FIFO_EMPTY       0x0010
+#define  GPU_STAT_FIFO_FULL        0x0020
 
 
 #endif

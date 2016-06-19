@@ -45,6 +45,10 @@ module  ogfx_reg (
 // OUTPUTs
     irq_gfx_o,                                 // Graphic Controller interrupt
 
+    gpu_data_o,                                // GPU data
+    gpu_data_avail_o,                          // GPU data available
+    gpu_enable_o,                              // GPU enable
+
     lt24_reset_n_o,                            // LT24 Reset (Active Low)
     lt24_on_o,                                 // LT24 on/off
     lt24_cfg_clk_o,                            // LT24 Interface clock configuration
@@ -86,6 +90,9 @@ module  ogfx_reg (
 
 // INPUTs
     dbg_freeze_i,                              // Freeze address auto-incr on read
+    gpu_cmd_done_evt_i,                        // GPU command done event
+    gpu_cmd_error_evt_i,                       // GPU command error event
+    gpu_get_data_i,                            // GPU get next data
     lt24_status_i,                             // LT24 FSM Status
     lt24_start_evt_i,                          // LT24 FSM is starting
     lt24_done_evt_i,                           // LT24 FSM is done
@@ -104,6 +111,10 @@ module  ogfx_reg (
 // OUTPUTs
 //=========
 output               irq_gfx_o;                // Graphic Controller interrupt
+
+output        [15:0] gpu_data_o;               // GPU data
+output               gpu_data_avail_o;         // GPU data available
+output               gpu_enable_o;             // GPU enable
 
 output               lt24_reset_n_o;           // LT24 Reset (Active Low)
 output               lt24_on_o;                // LT24 on/off
@@ -147,6 +158,9 @@ output               vid_ram_cen_o;            // Video-RAM chip enable (active 
 // INPUTs
 //=========
 input                dbg_freeze_i;             // Freeze address auto-incr on read
+input                gpu_cmd_done_evt_i;       // GPU command done event
+input                gpu_cmd_error_evt_i;      // GPU command error event
+input                gpu_get_data_i;           // GPU get next data
 input          [4:0] lt24_status_i;            // LT24 FSM Status
 input                lt24_start_evt_i;         // LT24 FSM is starting
 input                lt24_done_evt_i;          // LT24 FSM is done
@@ -355,6 +369,8 @@ reg                lut_bank_select;
 `endif
 reg                vid_ram0_addr_lo_wr_dly;
 reg                vid_ram1_addr_lo_wr_dly;
+wire               gpu_fifo_done_evt;
+wire               gpu_fifo_ovfl_evt;
 
 
 //============================================================================
@@ -373,13 +389,18 @@ always @ (posedge mclk or posedge puc_rst)
   else if (gfx_ctrl_wr) gfx_ctrl <=  per_din_i;
 
 // Bitfield assignments
-wire        gfx_irq_done_en  =  gfx_ctrl[0];
-wire        gfx_irq_start_en =  gfx_ctrl[0];
-assign      gfx_mode_o       =  gfx_ctrl[10:8]; // 1xx: 16 bits-per-pixel
-                                                // 011:  8 bits-per-pixel
-                                                // 010:  4 bits-per-pixel
-                                                // 001:  2 bits-per-pixel
-                                                // 000:  1 bits-per-pixel
+wire        gfx_irq_refr_done_en     =  gfx_ctrl[0];
+wire        gfx_irq_refr_start_en    =  gfx_ctrl[1];
+wire        gfx_irq_gpu_fifo_done_en =  gfx_ctrl[4];
+wire        gfx_irq_gpu_fifo_ovfl_en =  gfx_ctrl[5];
+wire        gfx_irq_gpu_cmd_done_en  =  gfx_ctrl[6];
+wire        gfx_irq_gpu_cmd_error_en =  gfx_ctrl[7];
+assign      gfx_mode_o               =  gfx_ctrl[10:8]; // 1xx: 16 bits-per-pixel
+                                                        // 011:  8 bits-per-pixel
+                                                        // 010:  4 bits-per-pixel
+                                                        // 001:  2 bits-per-pixel
+                                                        // 000:  1 bits-per-pixel
+wire        gpu_enable_o             =  gfx_ctrl[12];
 
 //------------------------------------------------
 // GFX_STATUS Register
@@ -395,30 +416,60 @@ assign       gfx_status[15:1] = 15'h0000;
 wire [15:0] gfx_irq;
 
 // Clear IRQ when 1 is written. Set IRQ when FSM is done
-wire        gfx_irq_screen_done_clr   = per_din_i[0] & reg_wr[GFX_IRQ];
-wire        gfx_irq_screen_done_set   = lt24_done_evt_i;
+wire        gfx_irq_refr_done_clr     = per_din_i[0] & reg_wr[GFX_IRQ];
+wire        gfx_irq_refr_done_set     = lt24_done_evt_i;
 
-wire        gfx_irq_screen_start_clr  = per_din_i[1] & reg_wr[GFX_IRQ];
-wire        gfx_irq_screen_start_set  = lt24_start_evt_i;
+wire        gfx_irq_refr_start_clr    = per_din_i[1] & reg_wr[GFX_IRQ];
+wire        gfx_irq_refr_start_set    = lt24_start_evt_i;
 
-reg         gfx_irq_screen_done;
-reg         gfx_irq_screen_start;
+wire        gfx_irq_gpu_fifo_done_clr = per_din_i[4] & reg_wr[GFX_IRQ];
+wire        gfx_irq_gpu_fifo_done_set = gpu_fifo_done_evt;
+
+wire        gfx_irq_gpu_fifo_ovfl_clr = per_din_i[5] & reg_wr[GFX_IRQ];
+wire        gfx_irq_gpu_fifo_ovfl_set = gpu_fifo_ovfl_evt;
+
+wire        gfx_irq_gpu_cmd_done_clr  = per_din_i[6] & reg_wr[GFX_IRQ];
+wire        gfx_irq_gpu_cmd_done_set  = gpu_cmd_done_evt_i;
+
+wire        gfx_irq_gpu_cmd_error_clr = per_din_i[7] & reg_wr[GFX_IRQ];
+wire        gfx_irq_gpu_cmd_error_set = gpu_cmd_error_evt_i;
+
+reg         gfx_irq_refr_done;
+reg         gfx_irq_refr_start;
+reg         gfx_irq_gpu_fifo_done;
+reg         gfx_irq_gpu_fifo_ovfl;
+reg         gfx_irq_gpu_cmd_done;
+reg         gfx_irq_gpu_cmd_error;
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)
     begin
-       gfx_irq_screen_done  <=  1'b0;
-       gfx_irq_screen_start <=  1'b0;
+       gfx_irq_refr_done     <=  1'b0;
+       gfx_irq_refr_start    <=  1'b0;
+       gfx_irq_gpu_fifo_done <=  1'b0;
+       gfx_irq_gpu_fifo_ovfl <=  1'b0;
+       gfx_irq_gpu_cmd_done  <=  1'b0;
+       gfx_irq_gpu_cmd_error <=  1'b0;
     end
   else
     begin
-       gfx_irq_screen_done  <=  (gfx_irq_screen_done_set  | (~gfx_irq_screen_done_clr  & gfx_irq_screen_done)) ; // IRQ set has priority over clear
-       gfx_irq_screen_start <=  (gfx_irq_screen_start_set | (~gfx_irq_screen_start_clr & gfx_irq_screen_start)); // IRQ set has priority over clear
+       gfx_irq_refr_done     <=  (gfx_irq_refr_done_set     | (~gfx_irq_refr_done_clr     & gfx_irq_refr_done    )); // IRQ set has priority over clear
+       gfx_irq_refr_start    <=  (gfx_irq_refr_start_set    | (~gfx_irq_refr_start_clr    & gfx_irq_refr_start   )); // IRQ set has priority over clear
+       gfx_irq_gpu_fifo_done <=  (gfx_irq_gpu_fifo_done_set | (~gfx_irq_gpu_fifo_done_clr & gfx_irq_gpu_fifo_done)); // IRQ set has priority over clear
+       gfx_irq_gpu_fifo_ovfl <=  (gfx_irq_gpu_fifo_ovfl_set | (~gfx_irq_gpu_fifo_ovfl_clr & gfx_irq_gpu_fifo_ovfl)); // IRQ set has priority over clear
+       gfx_irq_gpu_cmd_done  <=  (gfx_irq_gpu_cmd_done_set  | (~gfx_irq_gpu_cmd_done_clr  & gfx_irq_gpu_cmd_done )); // IRQ set has priority over clear
+       gfx_irq_gpu_cmd_error <=  (gfx_irq_gpu_cmd_error_set | (~gfx_irq_gpu_cmd_error_clr & gfx_irq_gpu_cmd_error)); // IRQ set has priority over clear
     end
 
-assign  gfx_irq   = {14'h0000, gfx_irq_screen_start, gfx_irq_screen_done};
+assign  gfx_irq   = {8'h00,
+                     gfx_irq_gpu_cmd_error, gfx_irq_gpu_cmd_done, gfx_irq_gpu_fifo_ovfl, gfx_irq_gpu_fifo_done,
+                     2'h0, gfx_irq_refr_start, gfx_irq_refr_done};
 
-assign  irq_gfx_o = (gfx_irq_screen_done  & gfx_irq_done_en) |
-                    (gfx_irq_screen_start & gfx_irq_start_en);    // Graphic Controller interrupt
+assign  irq_gfx_o = (gfx_irq_refr_done     & gfx_irq_refr_done_en)     |
+                    (gfx_irq_refr_start    & gfx_irq_refr_start_en)    |
+                    (gfx_irq_gpu_cmd_error & gfx_irq_gpu_cmd_error_en) |
+                    (gfx_irq_gpu_cmd_done  & gfx_irq_gpu_cmd_done_en)  |
+                    (gfx_irq_gpu_fifo_ovfl & gfx_irq_gpu_fifo_ovfl_en) |
+                    (gfx_irq_gpu_fifo_done & gfx_irq_gpu_fifo_done_en);  // Graphic Controller interrupt
 
 //------------------------------------------------
 // DISPLAY_WIDTH Register
@@ -1248,12 +1299,33 @@ wire [15:0] vid_ram1_data_mux = vid_ram1_dout_rdy ? vid_ram_dout_i : vid_ram1_da
 // GPU Interface (GPU_CMD/GPU_STAT) Registers
 //------------------------------------------------
 
-// Write strobe to the GPU fifo
-wire  gpu_cmd_wr = reg_wr[GPU_CMD];
+wire [3:0] gpu_stat_fifo_cnt;
+wire       gpu_stat_fifo_empty;
+wire       gpu_stat_fifo_full;
 
+ogfx_reg_fifo ogfx_reg_fifo_gpu_inst (
 
+// OUTPUTs
+    .fifo_cnt_o      (gpu_stat_fifo_cnt),   // Fifo counter
+    .fifo_data_o     (gpu_data_o),          // Read data output
+    .fifo_done_evt_o (gpu_fifo_done_evt),   // Fifo has been emptied
+    .fifo_empty_o    (gpu_stat_fifo_empty), // Fifo is currentely empty
+    .fifo_full_o     (gpu_stat_fifo_full),  // Fifo is currentely full
+    .fifo_ovfl_evt_o (gpu_fifo_ovfl_evt),   // Fifo overflow event
 
-wire [15:0] gpu_stat = 16'h0000;
+// INPUTs
+    .mclk            (mclk),                // Main system clock
+    .puc_rst         (puc_rst),             // Main system reset
+
+    .fifo_data_i     (per_din_i),           // Read data input
+    .fifo_enable_i   (gpu_enable_o),        // Enable fifo (flushed when disabled)
+    .fifo_pop_i      (gpu_get_data_i),      // Pop data from the fifo
+    .fifo_push_i     (reg_wr[GPU_CMD])      // Push new data to the fifo
+);
+
+assign      gpu_data_avail_o = ~gpu_stat_fifo_empty;
+
+wire [15:0] gpu_stat         = {10'h000, gpu_stat_fifo_full, gpu_stat_fifo_empty, gpu_stat_fifo_cnt};
 
 
 //============================================================================

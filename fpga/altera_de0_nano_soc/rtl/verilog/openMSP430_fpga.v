@@ -134,29 +134,17 @@ wire        [15:0] per_dout_tA;
 wire               irq_gfx;
 wire        [15:0] per_dout_gfx;
 
-wire         [8:0] lut_ram_port0_addr;
-wire         [1:0] lut_ram_port0_wen;
-wire               lut_ram_port0_cen;
-wire        [15:0] lut_ram_port0_din;
-wire        [15:0] lut_ram_port0_dout;
+wire         [8:0] lut_ram_addr;
+wire         [1:0] lut_ram_wen;
+wire               lut_ram_cen;
+wire        [15:0] lut_ram_din;
+wire        [15:0] lut_ram_dout;
 
-wire         [8:0] lut_ram_port1_addr;
-wire         [1:0] lut_ram_port1_wen;
-wire               lut_ram_port1_cen;
-wire        [15:0] lut_ram_port1_din;
-wire        [15:0] lut_ram_port1_dout;
-
-wire        [16:0] vid_ram_port0_addr;
-wire         [1:0] vid_ram_port0_wen;
-wire               vid_ram_port0_cen;
-wire        [15:0] vid_ram_port0_din;
-wire        [15:0] vid_ram_port0_dout;
-
-wire        [16:0] vid_ram_port1_addr;
-wire         [1:0] vid_ram_port1_wen;
-wire               vid_ram_port1_cen;
-wire        [15:0] vid_ram_port1_din;
-wire        [15:0] vid_ram_port1_dout;
+wire        [16:0] vid_ram_addr;
+wire         [1:0] vid_ram_wen;
+wire               vid_ram_cen;
+wire        [15:0] vid_ram_din;
+wire        [15:0] vid_ram_dout;
 
 // Touch-Screen Controller
 wire               irq_touch;
@@ -345,7 +333,7 @@ io_buf io_buf_lt24_data_15 (.datain(lt24_d_out[15]), .oe(lt24_d_out_en), .dataou
 
 
 
-openGFX430 openGFX430_0 (
+openGFX430 opengfx430_0 (
 
 // OUTPUTs
     .irq_gfx_o             (irq_gfx),                 // Graphic Controller interrupt
@@ -361,25 +349,15 @@ openGFX430 openGFX430_0 (
 
     .per_dout_o            (per_dout_gfx),            // Peripheral data output
 
-    .lut_ram_port0_addr_o  (lut_ram_port0_addr),      // LUT-RAM port 0 address
-    .lut_ram_port0_wen_o   (lut_ram_port0_wen ),      // LUT-RAM port 0 write enable (active low)
-    .lut_ram_port0_cen_o   (lut_ram_port0_cen ),      // LUT-RAM port 0 enable (active low)
-    .lut_ram_port0_din_o   (lut_ram_port0_din ),      // LUT-RAM port 0 data input
+    .lut_ram_addr_o        (lut_ram_addr),            // LUT-RAM address
+    .lut_ram_wen_o         (lut_ram_wen ),            // LUT-RAM write enable (active low)
+    .lut_ram_cen_o         (lut_ram_cen ),            // LUT-RAM enable (active low)
+    .lut_ram_din_o         (lut_ram_din ),            // LUT-RAM data input
 
-    .lut_ram_port1_addr_o  (lut_ram_port1_addr),      // LUT-RAM port 1 address
-    .lut_ram_port1_wen_o   (lut_ram_port1_wen ),      // LUT-RAM port 1 write enable (active low)
-    .lut_ram_port1_cen_o   (lut_ram_port1_cen ),      // LUT-RAM port 1 enable (active low)
-    .lut_ram_port1_din_o   (lut_ram_port1_din ),      // LUT-RAM port 1 data input
-
-    .vid_ram_port0_addr_o  (vid_ram_port0_addr),      // Video-RAM port 0 address
-    .vid_ram_port0_wen_o   (vid_ram_port0_wen ),      // Video-RAM port 0 write enable (active low)
-    .vid_ram_port0_cen_o   (vid_ram_port0_cen ),      // Video-RAM port 0 enable (active low)
-    .vid_ram_port0_din_o   (vid_ram_port0_din ),      // Video-RAM port 0 data input
-
-    .vid_ram_port1_addr_o  (vid_ram_port1_addr),      // Video-RAM port 1 address
-    .vid_ram_port1_wen_o   (vid_ram_port1_wen ),      // Video-RAM port 1 write enable (active low)
-    .vid_ram_port1_cen_o   (vid_ram_port1_cen ),      // Video-RAM port 1 enable (active low)
-    .vid_ram_port1_din_o   (vid_ram_port1_din ),      // Video-RAM port 1 data input
+    .vid_ram_addr_o        (vid_ram_addr),            // Video-RAM address
+    .vid_ram_wen_o         (vid_ram_wen ),            // Video-RAM write enable (active low)
+    .vid_ram_cen_o         (vid_ram_cen ),            // Video-RAM enable (active low)
+    .vid_ram_din_o         (vid_ram_din ),            // Video-RAM data input
 
 // INPUTs
     .dbg_freeze_i          (dbg_freeze),              // Freeze address auto-incr on read
@@ -392,51 +370,32 @@ openGFX430 openGFX430_0 (
 
     .lt24_d_i              (lt24_data),               // LT24 Data input
 
-    .lut_ram_port0_dout_i  (lut_ram_port0_dout),      // LUT-RAM port 0 data output
-    .lut_ram_port1_dout_i  (lut_ram_port1_dout),      // LUT-RAM port 1 data output
-
-    .vid_ram_port0_dout_i  (vid_ram_port0_dout),      // Video-RAM port 0 data output
-    .vid_ram_port1_dout_i  (vid_ram_port1_dout)       // Video-RAM port 1 data output
+    .lut_ram_dout_i        (lut_ram_dout),            // LUT-RAM data output
+    .vid_ram_dout_i        (vid_ram_dout)             // Video-RAM  data output
 );
 
-// Video dual port memory
-ram_16x75k_dp vid_ram_16x75k_dp_0 (
+// Video memory
+ram_16x75k vid_ram_16x75k_0 (
 
-    .address_a         ( vid_ram_port0_addr),     // RAM port 0
-    .byteena_a         (~vid_ram_port0_wen),
-    .enable_a          (~vid_ram_port0_cen),
-    .clock_a           ( mclk),
-    .data_a            ( vid_ram_port0_din),
-    .wren_a            (~(&vid_ram_port0_wen)),
-    .q_a               ( vid_ram_port0_dout),
-
-    .address_b         ( vid_ram_port1_addr),     // RAM port 1
-    .byteena_b         (~vid_ram_port1_wen),
-    .enable_b          (~vid_ram_port1_cen),
-    .clock_b           ( mclk),
-    .data_b            ( vid_ram_port1_din),
-    .wren_b            (~(&vid_ram_port1_wen)),
-    .q_b               ( vid_ram_port1_dout)
+    .address           ( vid_ram_addr),
+    .byteena	       (~vid_ram_wen),
+    .clken	       (~vid_ram_cen),
+    .clock             ( mclk),
+    .data              ( vid_ram_din),
+    .wren              (~(&vid_ram_wen)),
+    .q	               ( vid_ram_dout)
 );
 
-// LUT dual port memory
-ram_16x512_dp lut_ram_16x512_dp_0 (
+// LUT memory
+ram_16x512 lut_ram_16x512_0 (
 
-    .address_a         ( lut_ram_port0_addr),     // RAM port 0
-    .byteena_a         (~lut_ram_port0_wen),
-    .enable_a          (~lut_ram_port0_cen),
-    .clock_a           ( mclk),
-    .data_a            ( lut_ram_port0_din),
-    .wren_a            (~(&lut_ram_port0_wen)),
-    .q_a               ( lut_ram_port0_dout),
-
-    .address_b         ( lut_ram_port1_addr),     // RAM port 1
-    .byteena_b         (~lut_ram_port1_wen),
-    .enable_b          (~lut_ram_port1_cen),
-    .clock_b           ( mclk),
-    .data_b            ( lut_ram_port1_din),
-    .wren_b            (~(&lut_ram_port1_wen)),
-    .q_b               ( lut_ram_port1_dout)
+    .address           ( lut_ram_addr),
+    .byteena           (~lut_ram_wen),
+    .clken             (~lut_ram_cen),
+    .clock             ( mclk),
+    .data              ( lut_ram_din),
+    .wren              (~(&lut_ram_wen)),
+    .q	               ( lut_ram_dout)
 );
 
 assign GPIO_0[34] = 1'b1; //    .adc_cs_n          (GPIO_0[34]),          // ADC Chip select (Active low)

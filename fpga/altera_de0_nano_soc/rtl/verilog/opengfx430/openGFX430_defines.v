@@ -154,6 +154,31 @@
 `endif
 `define LRAM_MSB  (`LRAM_AWIDTH-1)
 
+// Opcodes for GPU commands
+`define OP_EXEC_FILL         2'b00
+`define OP_EXEC_COPY         2'b01
+`define OP_EXEC_COPY_TRANS   2'b10
+`define OP_REC_WIDTH         4'b1100
+`define OP_REC_HEIGHT        4'b1101
+`define OP_SRC_ADDR          8'b11110000
+`define OP_DST_ADDR          8'b11110001
+`define OP_OF0_ADDR          8'b11111000
+`define OP_OF1_ADDR          8'b11111001
+`define OP_OF2_ADDR          8'b11111010
+`define OP_OF3_ADDR          8'b11111011
+`define OP_SET_TRANSPARENT  16'b1111111111111111
+
+// Bit possitions of the GPU Command
+`define SRC_OFFSET          13:12
+`define SRC_X_SWAP          11
+`define SRC_Y_SWAP          10
+`define SRC_CL_SWAP          9
+`define PX_OP                8:5
+`define DST_OFFSET           4:3
+`define DST_X_SWAP           2
+`define DST_Y_SWAP           1
+`define DST_CL_SWAP          0
+
 
 //----------------------------------
 // Configuration checkers

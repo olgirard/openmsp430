@@ -1,5 +1,5 @@
 //=============================================================================
-// Copyright (C) 2001 Authors
+// Copyright (C) 2016 Authors
 //
 // This source file may be used and distributed without restriction provided
 // that this copyright statement is not removed from the file and that any
@@ -60,8 +60,8 @@
 ../../../rtl/verilog/openMSP430_fpga.v
 ../../../rtl/verilog/omsp_de0_nano_soc_led_key_sw.v
 ../../../rtl/verilog/sync_debouncer_10ms.v
-../../../rtl/verilog/mega/ram_16x75k_dp.v
-../../../rtl/verilog/mega/ram_16x512_dp.v
+../../../rtl/verilog/mega/ram_16x75k.v
+../../../rtl/verilog/mega/ram_16x512.v
 ../../../rtl/verilog/mega/ram_16x16k.v
 ../../../rtl/verilog/mega/ram_16x8k.v
 ../../../rtl/verilog/mega/io_buf.v
@@ -106,8 +106,13 @@
 
 ../../../rtl/verilog/opengfx430/openGFX430.v
 ../../../rtl/verilog/opengfx430/ogfx_reg.v
+../../../rtl/verilog/opengfx430/ogfx_reg_fifo.v
 ../../../rtl/verilog/opengfx430/ogfx_reg_vram_addr.v
 ../../../rtl/verilog/opengfx430/ogfx_if_lt24.v
 ../../../rtl/verilog/opengfx430/ogfx_backend.v
 ../../../rtl/verilog/opengfx430/ogfx_backend_frame_fifo.v
 ../../../rtl/verilog/opengfx430/ogfx_backend_lut_fifo.v
+../../../rtl/verilog/opengfx430/ogfx_gpu.v
+../../../rtl/verilog/opengfx430/ogfx_gpu_reg.v
+../../../rtl/verilog/opengfx430/ogfx_gpu_dma.v
+../../../rtl/verilog/opengfx430/ogfx_ram_arbiter.v
