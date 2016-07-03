@@ -22,7 +22,7 @@
 //
 //----------------------------------------------------------------------------
 //
-// *File Name: ogfx_calc_vram_addr.v
+// *File Name: ogfx_gpu_dma_addr.v
 //
 // *Module Description:
 //                      Compute next Video-Ram address
@@ -40,7 +40,7 @@
 `include "openGFX430_defines.v"
 `endif
 
-module  ogfx_reg_vram_addr (
+module  ogfx_gpu_dma_addr (
 
 // OUTPUTs
     vid_ram_addr_nxt_o,                     // Next Video-RAM address
@@ -52,8 +52,8 @@ module  ogfx_reg_vram_addr (
     vid_ram_addr_i,                         // Video-RAM address
     vid_ram_addr_init_i,                    // Video-RAM address initialization
     vid_ram_addr_step_i,                    // Video-RAM address step
+    vid_ram_height_i,                       // Video-RAM height
     vid_ram_width_i,                        // Video-RAM width
-    vid_ram_win_mode_i,                     // Video-RAM Windows mode enable
     vid_ram_win_x_swap_i,                   // Video-RAM X-Swap configuration
     vid_ram_win_y_swap_i,                   // Video-RAM Y-Swap configuration
     vid_ram_win_cl_swap_i                   // Video-RAM CL-Swap configuration
@@ -71,37 +71,41 @@ input  [`LPIX_MSB:0] display_width_i;       // Display width
 input  [`VRAM_MSB:0] vid_ram_addr_i;        // Video-RAM address
 input                vid_ram_addr_init_i;   // Video-RAM address initialization
 input                vid_ram_addr_step_i;   // Video-RAM address step
+input  [`LPIX_MSB:0] vid_ram_height_i;      // Video-RAM height
 input  [`LPIX_MSB:0] vid_ram_width_i;       // Video-RAM width
-input                vid_ram_win_mode_i;    // Video-RAM Windows mode enable
 input                vid_ram_win_x_swap_i;  // Video-RAM X-Swap configuration
 input                vid_ram_win_y_swap_i;  // Video-RAM Y-Swap configuration
 input                vid_ram_win_cl_swap_i; // Video-RAM CL-Swap configuration
 
 
 //=============================================================================
-// 1)  PARAMETER DECLARATION
+// 1)  COMPUTE NEXT MEMORY ACCESS
 //=============================================================================
 reg    [`VRAM_MSB:0] vid_ram_line_addr;
 reg    [`LPIX_MSB:0] vid_ram_column_count;
 
+// Swap Width and Height if required
+wire   [`LPIX_MSB:0] vid_ram_length      = vid_ram_win_cl_swap_i ? vid_ram_height_i : vid_ram_width_i;
+
+
 // Detect when the current line refresh is done
-wire                 vid_ram_line_done  = vid_ram_addr_step_i & (vid_ram_column_count==(vid_ram_width_i-{{`LPIX_MSB{1'b0}}, 1'b1}));
+wire                 vid_ram_line_done   = vid_ram_addr_step_i & (vid_ram_column_count==(vid_ram_length-{{`LPIX_MSB{1'b0}}, 1'b1}));
 
 // Zero extension for LINT cleanup
-wire [`VRAM_MSB*3:0] vid_ram_width_norm =  vid_ram_addr_init_i ? {{`VRAM_MSB*3-`LPIX_MSB{1'b0}}, vid_ram_width_i} :
-                                                                 {{`VRAM_MSB*3-`LPIX_MSB{1'b0}}, display_width_i} ;
+wire [`VRAM_MSB*3:0] vid_ram_length_norm =  vid_ram_addr_init_i ? {{`VRAM_MSB*3-`LPIX_MSB{1'b0}}, vid_ram_length} :
+                                                                  {{`VRAM_MSB*3-`LPIX_MSB{1'b0}}, display_width_i} ;
 
-wire   [`VRAM_MSB:0] next_base_addr     =  (vid_ram_addr_init_i | ~vid_ram_line_done | ~vid_ram_win_mode_i) ? vid_ram_addr_i    :
-                                                                                                              vid_ram_line_addr ;
+wire   [`VRAM_MSB:0] next_base_addr      =  (vid_ram_addr_init_i | ~vid_ram_line_done) ? vid_ram_addr_i    :
+                                                                                         vid_ram_line_addr ;
 
-wire   [`VRAM_MSB:0] next_addr          =   next_base_addr
-                                          + (vid_ram_width_norm[`VRAM_MSB:0] & {`VRAM_MSB+1{(~vid_ram_addr_init_i & vid_ram_win_mode_i) ? (~vid_ram_win_y_swap_i &  (vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}})
-                                          - (vid_ram_width_norm[`VRAM_MSB:0] & {`VRAM_MSB+1{(~vid_ram_addr_init_i & vid_ram_win_mode_i) ? ( vid_ram_win_y_swap_i &  (vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}})
-                                          + ({{`VRAM_MSB{1'b0}}, 1'b1}       & {`VRAM_MSB+1{(~vid_ram_addr_init_i & vid_ram_win_mode_i) ? (~vid_ram_win_x_swap_i & ~(vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : (~vid_ram_win_mode_i & ~vid_ram_addr_init_i)}})
-                                          - ({{`VRAM_MSB{1'b0}}, 1'b1}       & {`VRAM_MSB+1{(~vid_ram_addr_init_i & vid_ram_win_mode_i) ? ( vid_ram_win_x_swap_i & ~(vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}});
+wire   [`VRAM_MSB:0] next_addr           =   next_base_addr
+                                           + (vid_ram_length_norm[`VRAM_MSB:0] & {`VRAM_MSB+1{~vid_ram_addr_init_i ? (~vid_ram_win_y_swap_i &  (vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}})
+                                           - (vid_ram_length_norm[`VRAM_MSB:0] & {`VRAM_MSB+1{~vid_ram_addr_init_i ? ( vid_ram_win_y_swap_i &  (vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}})
+                                           + ({{`VRAM_MSB{1'b0}}, 1'b1}        & {`VRAM_MSB+1{~vid_ram_addr_init_i ? (~vid_ram_win_x_swap_i & ~(vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}})
+                                           - ({{`VRAM_MSB{1'b0}}, 1'b1}        & {`VRAM_MSB+1{~vid_ram_addr_init_i ? ( vid_ram_win_x_swap_i & ~(vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}});
 
-wire                 update_line_addr   =  (vid_ram_addr_init_i | vid_ram_line_done) & vid_ram_win_mode_i;
-wire                 update_pixel_addr  =   update_line_addr    | vid_ram_addr_step_i;
+wire                 update_line_addr    =   vid_ram_addr_init_i | vid_ram_line_done;
+wire                 update_pixel_addr   =   update_line_addr    | vid_ram_addr_step_i;
 
 // Start RAM address of currentely refreshed line
 always @(posedge mclk or posedge puc_rst)

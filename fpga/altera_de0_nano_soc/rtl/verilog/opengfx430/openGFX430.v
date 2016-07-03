@@ -299,7 +299,6 @@ ogfx_gpu  ogfx_gpu_inst (
     .puc_rst                       ( puc_rst                  ),       // Main system reset
 
     .display_width_i               ( display_width            ),       // Display width
-    .display_height_i              ( display_height           ),       // Display height
 
     .gfx_mode_i                    ( gfx_mode                 ),       // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 

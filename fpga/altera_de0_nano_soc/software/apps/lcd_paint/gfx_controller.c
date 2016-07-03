@@ -34,10 +34,10 @@ void init_lt24(void) {
 #ifdef VERILOG_SIMULATION
   #define LT24_DISPLAY_X        0       // X Coordinate
   #define LT24_DISPLAY_Y        0       // Y Coordinate
-  #define LT24_DISPLAY_WIDTH    13 -1   // Display width
+  #define LT24_DISPLAY_WIDTH    20 -1   // Display width
   #define LT24_DISPLAY_HEIGHT   10 -1   // Display height
   #define LT24_DISPLAY_SIZE_HI  0       // 76800>>16
-  #define LT24_DISPLAY_SIZE_LO  130     // 76800-2^16-1
+  #define LT24_DISPLAY_SIZE_LO  200     // 76800-2^16-1
 #else
   #define LT24_DISPLAY_X        0       // X Coordinate
   #define LT24_DISPLAY_Y        0       // Y Coordinate

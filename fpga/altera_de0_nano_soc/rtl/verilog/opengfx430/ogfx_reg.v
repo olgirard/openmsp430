@@ -477,10 +477,12 @@ assign  irq_gfx_o = (gfx_irq_refr_done     & gfx_irq_refr_done_en)     |
 reg  [`LPIX_MSB:0] display_width_o;
 
 wire               display_width_wr = reg_wr[DISPLAY_WIDTH];
+wire [`LPIX_MSB:0] display_w_h_nxt  = (|per_din_i[`LPIX_MSB:0]) ? per_din_i[`LPIX_MSB:0] :
+                                                                  {{`LPIX_MSB{1'b0}}, 1'b1};
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)               display_width_o <=  {`LPIX_MSB+1{1'b0}};
-  else if (display_width_wr) display_width_o <=  per_din_i[`LPIX_MSB:0];
+  if (puc_rst)               display_width_o <=  {{`LPIX_MSB{1'b0}}, 1'b1};
+  else if (display_width_wr) display_width_o <=  display_w_h_nxt;
 
 wire [16:0] display_width_tmp = {{16-`LPIX_MSB{1'b0}}, display_width_o};
 wire [15:0] display_width_rd  = display_width_tmp[15:0];
@@ -493,8 +495,8 @@ reg  [`LPIX_MSB:0] display_height_o;
 wire               display_height_wr = reg_wr[DISPLAY_HEIGHT];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                display_height_o <=  {`LPIX_MSB+1{1'b0}};
-  else if (display_height_wr) display_height_o <=  per_din_i[`LPIX_MSB:0];
+  if (puc_rst)                display_height_o <=  {{`LPIX_MSB{1'b0}}, 1'b1};
+  else if (display_height_wr) display_height_o <=  display_w_h_nxt;
 
 wire [16:0] display_height_tmp = {{16-`LPIX_MSB{1'b0}}, display_height_o};
 wire [15:0] display_height_rd  = display_height_tmp[15:0];
@@ -523,7 +525,7 @@ reg  [`SPIX_LO_MSB:0] display_size_lo;
 wire                  display_size_lo_wr = reg_wr[DISPLAY_SIZE_LO];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                 display_size_lo <=  {`SPIX_LO_MSB+1{1'h0}};
+  if (puc_rst)                 display_size_lo <=  {{`SPIX_LO_MSB{1'h0}}, 1'b1};
   else if (display_size_lo_wr) display_size_lo <=  per_din_i[`SPIX_LO_MSB:0];
 
 wire  [16:0] display_size_lo_tmp = {{16-`SPIX_LO_MSB{1'h0}}, display_size_lo};
@@ -1076,11 +1078,14 @@ wire [15:0] vid_ram0_cfg  = {8'h00, 1'b0,  vid_ram0_win_cl_swap, vid_ram0_win_y_
 //------------------------------------------------
 reg  [`LPIX_MSB:0] vid_ram0_width;
 
-wire               vid_ram0_width_wr = reg_wr[VID_RAM0_WIDTH];
+wire               vid_ram0_width_wr  = reg_wr[VID_RAM0_WIDTH];
+wire [`LPIX_MSB:0] vid_ram_width_nxt  = (|per_din_i[`LPIX_MSB:0]) ? per_din_i[`LPIX_MSB:0] :
+                                                                    {{`LPIX_MSB{1'b0}}, 1'b1};
+
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                vid_ram0_width   <=  {`LPIX_MSB+1{1'b0}};
-  else if (vid_ram0_width_wr) vid_ram0_width   <=  per_din_i[`LPIX_MSB:0];
+  if (puc_rst)                vid_ram0_width   <=  {{`LPIX_MSB{1'b0}}, 1'b1};
+  else if (vid_ram0_width_wr) vid_ram0_width   <=  vid_ram_width_nxt;
 
 wire [16:0] vid_ram0_width_tmp = {{16-`LPIX_MSB{1'b0}}, vid_ram0_width};
 wire [15:0] vid_ram0_width_rd  = vid_ram0_width_tmp[15:0];
@@ -1207,8 +1212,8 @@ reg  [`LPIX_MSB:0] vid_ram1_width;
 wire               vid_ram1_width_wr = reg_wr[VID_RAM1_WIDTH];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                vid_ram1_width   <=  {`LPIX_MSB+1{1'b0}};
-  else if (vid_ram1_width_wr) vid_ram1_width   <=  per_din_i[`LPIX_MSB:0];
+  if (puc_rst)                vid_ram1_width   <=  {{`LPIX_MSB{1'b0}}, 1'b1};
+  else if (vid_ram1_width_wr) vid_ram1_width   <=  vid_ram_width_nxt;
 
 wire [16:0] vid_ram1_width_tmp = {{16-`LPIX_MSB{1'b0}}, vid_ram1_width};
 wire [15:0] vid_ram1_width_rd  = vid_ram1_width_tmp[15:0];

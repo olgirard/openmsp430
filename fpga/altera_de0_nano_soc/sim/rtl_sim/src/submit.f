@@ -115,4 +115,5 @@
 ../../../rtl/verilog/opengfx430/ogfx_gpu.v
 ../../../rtl/verilog/opengfx430/ogfx_gpu_reg.v
 ../../../rtl/verilog/opengfx430/ogfx_gpu_dma.v
+../../../rtl/verilog/opengfx430/ogfx_gpu_dma_addr.v
 ../../../rtl/verilog/opengfx430/ogfx_ram_arbiter.v

@@ -9,6 +9,10 @@
 //#define TEST_2_BPP
 //#define TEST_1_BPP
 
+void init_mem(unsigned int, unsigned int, unsigned int, unsigned int);
+void dma_test(unsigned int, unsigned int, unsigned int);
+
+
 /**
 Main function
 */
@@ -363,46 +367,414 @@ int main(void) {
   // Try GPU
   GFX_CTRL = GFX_CTRL | GFX_GPU_EN;
 
-  GPU_CMD  = 0x1234;
-  GPU_CMD  = 0x5678;
-  GPU_CMD  = 0x9ABC;
-  GPU_CMD  = 0xDEF0;
-  GPU_CMD  = 0xDEAD;
-  GPU_CMD  = 0xBEEF;
-  GPU_CMD  = 0xC001;
-  GPU_CMD  = 0xFEED;
-  GPU_CMD  = 0x1234;
-  GPU_CMD  = 0x5678;
-  GPU_CMD  = 0x9ABC;
-  GPU_CMD  = 0xDEF0;
-  GPU_CMD  = 0xDEAD;
-  GPU_CMD  = 0xBEEF;
-  GPU_CMD  = 0xC001;
-  GPU_CMD  = 0xFEED;
-  GPU_CMD  = 0xFEED;
+
+  GPU_CMD  = GPU_REC_WIDTH  | 0x0123;
+  GPU_CMD  = GPU_REC_HEIGHT | 0x0456;
+
+  GPU_CMD  = GPU_SRC_ADDR   | 0x00AD; GPU_CMD = 0xBEEF;
+  GPU_CMD  = GPU_DST_ADDR   | 0x00DE; GPU_CMD = 0xC001;
+
+  GPU_CMD  = GPU_OF0_ADDR   | 0x0001; GPU_CMD = 0x2345;
+  GPU_CMD  = GPU_OF1_ADDR   | 0x0067; GPU_CMD = 0x89AB;
+  GPU_CMD  = GPU_OF2_ADDR   | 0x00CD; GPU_CMD = 0xEF01;
+  GPU_CMD  = GPU_OF3_ADDR   | 0x0065; GPU_CMD = 0x4321;
+
+  GPU_CMD  = GPU_SET_FILL           ; GPU_CMD = 0xA55A;
+  GPU_CMD  = GPU_SET_TRANS          ; GPU_CMD = 0x5AA5;
+
+
+
+  // Real test
+  GPU_CMD  = GPU_REC_WIDTH  | 0x0003;
+  GPU_CMD  = GPU_REC_HEIGHT | 0x0002;
+  GPU_CMD  = GPU_OF0_ADDR   | 0x0000; GPU_CMD = 0x0000;
+  GPU_CMD  = GPU_DST_ADDR   | 0x0000; GPU_CMD = 100;
+  GPU_CMD  = GPU_SRC_ADDR   | 0x0000; GPU_CMD = 0;
+
+  //-------------------------------------------- FILL --------------------------------------------------------
+  for( idx = 0; idx < 500; idx = idx + 1 ) {__nop();}
+
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_0, 0xDEAD);           //  0xDEAD               # 0 #        S
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5678;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_1, 0xDEAD);           //  0x2152               # 1 #   not S
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_2, 0xDEAD);           //  0x6543   / 0x210F    # 2 #   not D
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5678;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_3, 0xDEAD);           //  0x9AAC   / 0xDEA0    # 3 # S and D
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_4, 0xDEAD);           //  0xDEBD   / 0xDEFD    # 4 # S or  D
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5678;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_5, 0xDEAD);           //  0x4411   / 0x005D    # 5 # S xor D
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_6, 0xDEAD);           //  0x6553   / 0x215F    # 6 # not (S and D)
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5678;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_7, 0xDEAD);           //  0x2142   / 0x2102    # 7 # not (S or  D)
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_8, 0xDEAD);           //  0xBBEE   / 0xFFA2    # 8 # not (S xor D)
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5678;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_9, 0xDEAD);           //  0x0010   / 0x0050    # 9 # (not S) and      D
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_A, 0xDEAD);           //  0x4401   / 0x000D    # A #      S  and (not D)
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5678;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_B, 0xDEAD);           //  0xBBFE   / 0xFFF2    # B # (not S) or       D
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_C, 0xDEAD);           //  0xFFEF   / 0xFFAF    # C #      S  or  (not D)
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_D, 0xDEAD);           //  0x0000               # D # Fill 0            if S not transparent
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0xDEAD;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_D, 0xDEAD);           //  no-write             # D # Fill 0            if S not transparent
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5678;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_E, 0xDEAD);           //  0xFFFF               # E # Fill 1            if S not transparent
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0xDEAD;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_E, 0xDEAD);           //  no-write             # E # Fill 1            if S not transparent
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_F, 0xDEAD);           //  0xDEAD               # F # Fill 'fill_color' if S not transparent
+
+  init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0xDEAD;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_F, 0xDEAD);           //  no-write             # F # Fill 'fill_color' if S not transparent
+
+
+  //-------------------------------------------- COPY --------------------------------------------------------
+  for( idx = 0; idx < 500; idx = idx + 1 ) {__nop();}
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_0, 0xDEAD);           //  0x1234   / 0x9ABC    # 0 #        S
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_1, 0xDEAD);           //  0xEDCB   / 0x6543    # 1 #   not S
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_2, 0xDEAD);           //  0xA987   / 0x210F    # 2 #   not D
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_3, 0xDEAD);           //  0x1230   / 0x9AB0    # 3 # S and D
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_4, 0xDEAD);           //  0x567C   / 0xDEFC    # 4 # S or  D
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEFE);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_5, 0xDEAD);           //  0x444C   / 0x4442    # 5 # S xor D
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_6, 0xDEAD);           //  0xEDCF   / 0x654F    # 6 # not (S and D)
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_7, 0xDEAD);           //  0xA983   / 0x2103    # 7 # not (S or  D)
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEFE);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_8, 0xDEAD);           //  0xBBB3   / 0xBBBD    # 8 # not (S xor D)
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_9, 0xDEAD);           //  0x4448   / 0x4440    # 9 # (not S) and      D
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_A, 0xDEAD);           //  0x0004   / 0x000C    # A #      S  and (not D)
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_B, 0xDEAD);           //  0xFFFB   / 0xFFF3    # B # (not S) or       D
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_C, 0xDEAD);           //  0xBBB7   / 0xBBBF    # C #      S  or  (not D)
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_D, 0xDEAD);           //  0x0000   / 0x0000    # D # Fill 0            if S not transparent
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_D, 0xDEAD);           //  0x0000   / no-write  # D # Fill 0            if S not transparent
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_E, 0xDEAD);           //  0xFFFF   / 0xFFFF    # E # Fill 1            if S not transparent
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_E, 0xDEAD);           //  no-write / 0xFFFF    # E # Fill 1            if S not transparent
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_F, 0xDEAD);           //  0xDEAD   / 0xDEAD    # F # Fill 'fill_color' if S not transparent
+
+  init_mem(0x1234, 0x9ABC, 0x5678, 0xDEF0);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_F, 0xDEAD);           //  0xDEAD   / no-write  # F # Fill 'fill_color' if S not transparent
+
+
+  //-------------------------------------------- COPY TRANSPARENT --------------------------------------------------------
+  for( idx = 0; idx < 500; idx = idx + 1 ) {__nop();}
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_0, 0xDEAD);     //  0x1234   / 0x9ABC    # 0 #       S
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_0, 0xDEAD);     //  0x1234   / no-write  # 0 #       S
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_1, 0xDEAD);     //  0xEDCB   / 0x6543    # 1 #   not S
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_1, 0xDEAD);     //  no-write / 0x6543    # 1 #   not S
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_2, 0xDEAD);     //  0x210F   / 0xA987    # 2 #   not D
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_2, 0xDEAD);     //  0x210F   / 0xA987    # 2 #   not D
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_3, 0xDEAD);     //  0x1230   / 0x1238    # 3 # S and D
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_3, 0xDEAD);     //  no-write / 0x1238    # 3 # S and D
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_4, 0xDEAD);     //  0xDEF4   / 0xDEFC    # 4 # S or  D
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_4, 0xDEAD);     //  0xDEF4   / no-write  # 4 # S or  D
+
+  init_mem(0x1234, 0x9ABC, 0xDEFE, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_5, 0xDEAD);     //  0xCCCA   / 0xCCC4    # 5 # S xor D
+
+  init_mem(0x1234, 0x9ABC, 0xDEFE, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_5, 0xDEAD);     //  no-write / 0xCCC4    # 5 # S xor D
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_6, 0xDEAD);     //  0xEDCF   / 0xEDC7    # 6 # not (S and D)
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_6, 0xDEAD);     //  0xEDCF   / no-write  # 6 # not (S and D)
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_7, 0xDEAD);     //  0x210B   / 0x2103    # 7 # not (S or  D)
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_7, 0xDEAD);     //  no-write / 0x2103    # 7 # not (S or  D)
+
+  init_mem(0x1234, 0x9ABC, 0xDEFE, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_8, 0xDEAD);     //  0x3335   / 0x333B    # 8 # not (S xor D)
+
+  init_mem(0x1234, 0x9ABC,  0xDEFE, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_8, 0xDEAD);     //  0x3335   / no-write  # 8 # not (S xor D)
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_9, 0xDEAD);     //  0xCCC0   / 0x4440    # 9 # (not S) and      D
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_9, 0xDEAD);     //  no-write / 0x4440    # 9 # (not S) and      D
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_A, 0xDEAD);     //  0x0004   / 0x8884    # A #      S  and (not D)
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_A, 0xDEAD);     //  0x0004   / no-write  # A #      S  and (not D)
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_B, 0xDEAD);     //  0xFFFB   / 0x777B    # B # (not S) or       D
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_B, 0xDEAD);     //  no-write / 0x777B    # B # (not S) or       D
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_C, 0xDEAD);     //  0x333F   / 0xBBBF    # C #      S  or  (not D)
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_C, 0xDEAD);     //  0x333F   / no-wrte   # C #      S  or  (not D)
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_D, 0xDEAD);     //  0x0000   / 0x0000    # D # Fill 0            if S not transparent
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_D, 0xDEAD);     //  0x0000   / no-write  # D # Fill 0            if S not transparent
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_E, 0xDEAD);     //  0xFFFF   / 0xFFFF    # E # Fill 1            if S not transparent
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_E, 0xDEAD);     //  no-write / 0xFFFF    # E # Fill 1            if S not transparent
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_F, 0xDEAD);     //  0xDEAD   / 0xDEAD    # F # Fill 'fill_color' if S not transparent
+
+  init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_F, 0xDEAD);     //  0xDEAD   / no-write  # F # Fill 'fill_color' if S not transparent
+
+
+  //-------------------------------------------- COPY ADDRESSING MODES --------------------------------------------------------
+  for( idx = 0; idx < 500; idx = idx + 1 ) {__nop();}
+
+  // COPY DST RD  = NO_X - NO_Y - NO_CL
+  GPU_CMD  = GPU_EXEC_COPY  | GPU_PXOP_0 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
+                                           GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+
+
+  // COPY  = NO_X - NO_Y - NO_CL
+  GPU_CMD  = GPU_EXEC_COPY  | GPU_PXOP_1 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
+                                           GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+
+  // COPY  =    X - NO_Y - NO_CL
+  GPU_CMD  = GPU_EXEC_COPY  | GPU_PXOP_2 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
+                                           GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+
+  // COPY  = NO_X -    Y - NO_CL
+  GPU_CMD  = GPU_EXEC_COPY  | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
+                                           GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+
+  // COPY  =    X -    Y - NO_CL
+  GPU_CMD  = GPU_EXEC_COPY  | GPU_PXOP_4 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
+                                           GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+
+
+  // COPY  = NO_X - NO_Y -    CL
+  GPU_CMD  = GPU_EXEC_COPY  | GPU_PXOP_5 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
+                                           GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+
+  // COPY  =    X - NO_Y -    CL
+  GPU_CMD  = GPU_EXEC_COPY  | GPU_PXOP_6 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
+                                           GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+
+  // COPY  = NO_X -    Y -    CL
+  GPU_CMD  = GPU_EXEC_COPY  | GPU_PXOP_7 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
+                                           GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+
+  // COPY  =    X -    Y -    CL
+  GPU_CMD  = GPU_EXEC_COPY  | GPU_PXOP_8 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
+                                           GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+
 
   return 0;
 }
 
+void init_mem(unsigned int src_data1, unsigned int src_data2, unsigned int dst_data1, unsigned int dst_data2) {
 
-//  // Try to do some funky stuff
-//  while(1) {
-//    for( idx = 0; idx < 14; idx = idx + 1 ) {
-//
-//      LCD_CASET_SC    = 8*idx;             // Column Address Set (START)
-//      LCD_CASET_EC    = 239-8*idx;   // Column Address Set (END)
-//
-//      LCD_PASET_SP    = 12*idx;            // Line Address Set (START)
-//      LCD_PASET_EP    = 319-12*idx;  // Line Address Set (END)
-//
-//      // Simple LFSR to pseudo randomize the color
-//      lfsr_lsb = lfsr & 1;                       /* Get LSB (i.e., the output bit). */
-//      lfsr     >>= 1;                            /* Shift register */
-//      lfsr     ^= (-lfsr_lsb) & 0xB400u;         /* If the output bit is 1, apply toggle mask.
-//                                                  * The value has 1 at bits corresponding
-//                                                  * to taps, 0 elsewhere. */
-//      LCD_REC_DATA    = lfsr;
-//
-//      wait_time(WT_50MS);
-//    }
-//  }
+  // Init memory for test
+  VID_RAM0_CFG     = VID_RAM_NO_RMW_MODE | VID_RAM_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
+  VID_RAM0_WIDTH   = 3;
+
+  // SRC
+  VID_RAM0_ADDR_HI =  0;
+  VID_RAM0_ADDR_LO =  0;
+  VID_RAM0_DATA    =  src_data1;
+  VID_RAM0_DATA    =  src_data2;
+  VID_RAM0_DATA    =  src_data1;
+  VID_RAM0_DATA    =  src_data2;
+  VID_RAM0_DATA    =  src_data1;
+  VID_RAM0_DATA    =  src_data2;
+
+  // DST
+  VID_RAM0_ADDR_HI =  0;
+  VID_RAM0_ADDR_LO =  100;
+  VID_RAM0_DATA    =  dst_data1;
+  VID_RAM0_DATA    =  dst_data2;
+  VID_RAM0_DATA    =  dst_data1;
+  VID_RAM0_DATA    =  dst_data2;
+  VID_RAM0_DATA    =  dst_data1;
+  VID_RAM0_DATA    =  dst_data2;
+
+}
+
+void dma_test(unsigned int dma_mode, unsigned int pixel_op, unsigned int fill_data) {
+
+
+  GPU_CMD  = dma_mode | pixel_op | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
+                                   GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
+
+  if (dma_mode==GPU_EXEC_FILL) {
+    GPU_CMD  = fill_data;
+  }
+
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+}

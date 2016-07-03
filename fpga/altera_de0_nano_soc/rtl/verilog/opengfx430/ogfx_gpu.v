@@ -62,7 +62,6 @@ module  ogfx_gpu (
     puc_rst,                                      // Main system reset
 
     display_width_i,                              // Display width
-    display_height_i,                             // Display height
 
     gfx_mode_i,                                   // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
@@ -91,7 +90,6 @@ input                mclk;                        // Main system clock
 input                puc_rst;                     // Main system reset
 
 input  [`LPIX_MSB:0] display_width_i;             // Display width
-input  [`LPIX_MSB:0] display_height_i;            // Display height
 
 input          [2:0] gfx_mode_i;                  // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
@@ -107,9 +105,10 @@ input                vid_ram_dout_rdy_nxt_i;      // Video-RAM data output ready
 // 1)  WIRE, REGISTERS AND PARAMETER DECLARATION
 //=============================================================================
 
-wire                trig_exec_fill;
-wire                trig_exec_copy;
-wire                trig_exec_copy_trans;
+wire                exec_fill;
+wire                exec_copy;
+wire                exec_copy_trans;
+wire                trig_exec;
 
 wire  [`VRAM_MSB:0] cfg_dst_addr;
 wire                cfg_dst_cl_swp;
@@ -139,9 +138,10 @@ ogfx_gpu_reg ogfx_gpu_reg_inst (
     .gpu_cmd_error_evt_o     (gpu_cmd_error_evt_o   ),     // GPU command error event
     .gpu_get_data_o          (gpu_get_data_o        ),     // GPU get next data
 
-    .trig_exec_fill_o        (trig_exec_fill        ),     // Trigger rectangle fill execution
-    .trig_exec_copy_o        (trig_exec_copy        ),     // Trigger rectangle copy execution
-    .trig_exec_copy_trans_o  (trig_exec_copy_trans  ),     // Trigger rectangle transparent copy execution
+    .exec_fill_o             (exec_fill             ),     // Rectangle fill on going
+    .exec_copy_o             (exec_copy             ),     // Rectangle copy on going
+    .exec_copy_trans_o       (exec_copy_trans       ),     // Rectangle transparent copy on going
+    .trig_exec_o             (trig_exec             ),     // Trigger rectangle execution
 
     .cfg_dst_addr_o          (cfg_dst_addr          ),     // Destination address configuration
     .cfg_dst_cl_swp_o        (cfg_dst_cl_swp        ),     // Destination Column/Line-Swap configuration
@@ -202,15 +202,15 @@ ogfx_gpu_dma ogfx_gpu_dma_inst (
     .cfg_transparent_color_i (cfg_transparent_color ),     // Transparent color (for rectangle transparent copy operation)
 
     .display_width_i         (display_width_i       ),     // Display width
-    .display_height_i        (display_height_i      ),     // Display height
 
     .gfx_mode_i              (gfx_mode_i            ),     // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
     .gpu_enable_i            (gpu_enable_i          ),     // GPU enable
 
-    .trig_exec_fill_i        (trig_exec_fill        ),     // Trigger rectangle fill execution
-    .trig_exec_copy_i        (trig_exec_copy        ),     // Trigger rectangle copy execution
-    .trig_exec_copy_trans_i  (trig_exec_copy_trans  ),     // Trigger rectangle transparent copy execution
+    .exec_fill_i             (exec_fill             ),     // Rectangle fill on going
+    .exec_copy_i             (exec_copy             ),     // Rectangle copy on going
+    .exec_copy_trans_i       (exec_copy_trans       ),     // Rectangle transparent copy on going
+    .trig_exec_i             (trig_exec             ),     // Trigger rectangle execution
 
     .vid_ram_dout_i          (vid_ram_dout_i        ),     // Video-RAM data input
     .vid_ram_dout_rdy_nxt_i  (vid_ram_dout_rdy_nxt_i)      // Video-RAM data output ready during next cycle

@@ -70,6 +70,7 @@ void init_lt24(void);
 #define  GPU_CMD           (*(volatile unsigned int  *) 0x0270)
 #define  GPU_STAT          (*(volatile unsigned int  *) 0x0272)
 
+
 //----------------------------------------------------------
 // GRAPHIC CONTROLLER REGISTER FIELD MAPPING
 //----------------------------------------------------------
@@ -102,7 +103,7 @@ void init_lt24(void);
 #define  GFX_IRQ_REFRESH_DONE      0x0001
 #define  GFX_IRQ_REFRESH_START     0x0002
 #define  GFX_IRQ_GPU_FIFO_DONE     0x0010
-#define  GFX_IRQ_GPU_FIFO_OFVL     0x0020
+#define  GFX_IRQ_GPU_FIFO_OVFL     0x0020
 #define  GFX_IRQ_GPU_CMD_DONE      0x0040
 #define  GFX_IRQ_GPU_CMD_ERROR     0x0080
 
@@ -178,26 +179,88 @@ void init_lt24(void);
 #define  VID_RAM1_FRAME2_SELECT    0x0080
 #define  VID_RAM1_FRAME3_SELECT    0x00C0
 
+#define  LUT_BANK0_SELECT          0x0000
+#define  LUT_BANK1_SELECT          0x8000
+
 // VID_RAMx_CFG Register
 #define  VID_RAM_NO_RMW_MODE       0x0000
 #define  VID_RAM_RMW_MODE          0x0001
 #define  VID_RAM_NO_WIN_MODE       0x0000
 #define  VID_RAM_WIN_MODE          0x0002
 
-#define  VID_RAM_NO_WIN_X_SWAP     0x0000
+#define  VID_RAM_WIN_NO_X_SWAP     0x0000
 #define  VID_RAM_WIN_X_SWAP        0x0010
-#define  VID_RAM_NO_WIN_Y_SWAP     0x0000
+#define  VID_RAM_WIN_NO_Y_SWAP     0x0000
 #define  VID_RAM_WIN_Y_SWAP        0x0020
-#define  VID_RAM_NO_WIN_CL_SWAP    0x0000
+#define  VID_RAM_WIN_NO_CL_SWAP    0x0000
 #define  VID_RAM_WIN_CL_SWAP       0x0040
-
-// GPU_CMD Register
-
 
 // GPU_STAT Register
 #define  GPU_STAT_FIFO_CNT         0x000F
 #define  GPU_STAT_FIFO_EMPTY       0x0010
 #define  GPU_STAT_FIFO_FULL        0x0020
+
+
+//----------------------------------------------------------
+// GPU COMMANDS
+//----------------------------------------------------------
+
+// GPU COMMAND
+#define  GPU_EXEC_FILL             0x0000
+#define  GPU_EXEC_COPY             0x4000
+#define  GPU_EXEC_COPY_TRANS       0x8000
+#define  GPU_REC_WIDTH             0xC000
+#define  GPU_REC_HEIGHT            0xD000
+#define  GPU_SRC_ADDR              0xF000
+#define  GPU_DST_ADDR              0xF100
+#define  GPU_OF0_ADDR              0xF800
+#define  GPU_OF1_ADDR              0xF900
+#define  GPU_OF2_ADDR              0xFA00
+#define  GPU_OF3_ADDR              0xFB00
+#define  GPU_SET_FILL              0xFFFE
+#define  GPU_SET_TRANS             0xFFFF
+
+// ADDRESS SOURCE SELECTION
+#define  GPU_SRC_OF0               0x0000
+#define  GPU_SRC_OF1               0x1000
+#define  GPU_SRC_OF2               0x2000
+#define  GPU_SRC_OF3               0x3000
+#define  GPU_DST_OF0               0x0000
+#define  GPU_DST_OF1               0x0008
+#define  GPU_DST_OF2               0x0010
+#define  GPU_DST_OF3               0x0018
+
+// DMA CONFIGURATION
+#define  GPU_DST_CL_SWP            0x0001
+#define  GPU_DST_Y_SWP             0x0002
+#define  GPU_DST_X_SWP             0x0004
+#define  GPU_SRC_CL_SWP            0x0200
+#define  GPU_SRC_Y_SWP             0x0400
+#define  GPU_SRC_X_SWP             0x0800
+#define  GPU_DST_NO_CL_SWP         0x0000
+#define  GPU_DST_NO_Y_SWP          0x0000
+#define  GPU_DST_NO_X_SWP          0x0000
+#define  GPU_SRC_NO_CL_SWP         0x0000
+#define  GPU_SRC_NO_Y_SWP          0x0000
+#define  GPU_SRC_NO_X_SWP          0x0000
+
+// PIXEL OPERATION
+#define  GPU_PXOP_0                0x0000  // S
+#define  GPU_PXOP_1                0x0020  // not S
+#define  GPU_PXOP_2                0x0040  // not D
+#define  GPU_PXOP_3                0x0060  // S and D
+#define  GPU_PXOP_4                0x0080  // S or  D
+#define  GPU_PXOP_5                0x00A0  // S xor D
+#define  GPU_PXOP_6                0x00C0  // not (S and D)
+#define  GPU_PXOP_7                0x00E0  // not (S or  D)
+#define  GPU_PXOP_8                0x0100  // not (S xor D)
+#define  GPU_PXOP_9                0x0120  // (not S) and      D
+#define  GPU_PXOP_A                0x0140  //      S  and (not D)
+#define  GPU_PXOP_B                0x0160  // (not S) or       D
+#define  GPU_PXOP_C                0x0180  //      S  or  (not D)
+#define  GPU_PXOP_D                0x01A0  // Fill 0            if S not transparent (only COPY_TRANSPARENT command)
+#define  GPU_PXOP_E                0x01C0  // Fill 1            if S not transparent (only COPY_TRANSPARENT command)
+#define  GPU_PXOP_F                0x01E0  // Fill 'fill_color' if S not transparent (only COPY_TRANSPARENT command)
 
 
 #endif

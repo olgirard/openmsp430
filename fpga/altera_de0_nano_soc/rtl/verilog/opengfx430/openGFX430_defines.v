@@ -166,6 +166,7 @@
 `define OP_OF1_ADDR          8'b11111001
 `define OP_OF2_ADDR          8'b11111010
 `define OP_OF3_ADDR          8'b11111011
+`define OP_SET_FILL         16'b1111111111111110
 `define OP_SET_TRANSPARENT  16'b1111111111111111
 
 // Bit possitions of the GPU Command
