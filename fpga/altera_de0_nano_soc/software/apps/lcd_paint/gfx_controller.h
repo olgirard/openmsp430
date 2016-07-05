@@ -211,12 +211,12 @@ void init_lt24(void);
 #define  GPU_EXEC_COPY_TRANS       0x8000
 #define  GPU_REC_WIDTH             0xC000
 #define  GPU_REC_HEIGHT            0xD000
-#define  GPU_SRC_ADDR              0xF000
-#define  GPU_DST_ADDR              0xF100
-#define  GPU_OF0_ADDR              0xF800
-#define  GPU_OF1_ADDR              0xF900
-#define  GPU_OF2_ADDR              0xFA00
-#define  GPU_OF3_ADDR              0xFB00
+#define  GPU_SRC_PX_ADDR           0xE000
+#define  GPU_DST_PX_ADDR           0xE800
+#define  GPU_OF0_ADDR              0xF000
+#define  GPU_OF1_ADDR              0xF100
+#define  GPU_OF2_ADDR              0xF200
+#define  GPU_OF3_ADDR              0xF300
 #define  GPU_SET_FILL              0xFFFE
 #define  GPU_SET_TRANS             0xFFFF
 

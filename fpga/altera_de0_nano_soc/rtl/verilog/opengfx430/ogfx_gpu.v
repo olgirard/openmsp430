@@ -105,26 +105,26 @@ input                vid_ram_dout_rdy_nxt_i;      // Video-RAM data output ready
 // 1)  WIRE, REGISTERS AND PARAMETER DECLARATION
 //=============================================================================
 
-wire                exec_fill;
-wire                exec_copy;
-wire                exec_copy_trans;
-wire                trig_exec;
+wire                 exec_fill;
+wire                 exec_copy;
+wire                 exec_copy_trans;
+wire                 trig_exec;
 
-wire  [`VRAM_MSB:0] cfg_dst_addr;
-wire                cfg_dst_cl_swp;
-wire                cfg_dst_x_swp;
-wire                cfg_dst_y_swp;
-wire         [15:0] cfg_fill_color;
-wire          [3:0] cfg_pix_op_sel;
-wire  [`LPIX_MSB:0] cfg_rec_width;
-wire  [`LPIX_MSB:0] cfg_rec_height;
-wire  [`VRAM_MSB:0] cfg_src_addr;
-wire                cfg_src_cl_swp;
-wire                cfg_src_x_swp;
-wire                cfg_src_y_swp;
-wire         [15:0] cfg_transparent_color;
+wire [`VRAM_MSB+4:0] cfg_dst_px_addr;
+wire                 cfg_dst_cl_swp;
+wire                 cfg_dst_x_swp;
+wire                 cfg_dst_y_swp;
+wire          [15:0] cfg_fill_color;
+wire           [3:0] cfg_pix_op_sel;
+wire   [`LPIX_MSB:0] cfg_rec_width;
+wire   [`LPIX_MSB:0] cfg_rec_height;
+wire [`VRAM_MSB+4:0] cfg_src_px_addr;
+wire                 cfg_src_cl_swp;
+wire                 cfg_src_x_swp;
+wire                 cfg_src_y_swp;
+wire          [15:0] cfg_transparent_color;
 
-wire                gpu_exec_done;
+wire                 gpu_exec_done;
 
 
 //=============================================================================
@@ -143,7 +143,7 @@ ogfx_gpu_reg ogfx_gpu_reg_inst (
     .exec_copy_trans_o       (exec_copy_trans       ),     // Rectangle transparent copy on going
     .trig_exec_o             (trig_exec             ),     // Trigger rectangle execution
 
-    .cfg_dst_addr_o          (cfg_dst_addr          ),     // Destination address configuration
+    .cfg_dst_px_addr_o       (cfg_dst_px_addr       ),     // Destination pixel address configuration
     .cfg_dst_cl_swp_o        (cfg_dst_cl_swp        ),     // Destination Column/Line-Swap configuration
     .cfg_dst_x_swp_o         (cfg_dst_x_swp         ),     // Destination X-Swap configuration
     .cfg_dst_y_swp_o         (cfg_dst_y_swp         ),     // Destination Y-Swap configuration
@@ -151,7 +151,7 @@ ogfx_gpu_reg ogfx_gpu_reg_inst (
     .cfg_pix_op_sel_o        (cfg_pix_op_sel        ),     // Pixel operation to be performed during the copy
     .cfg_rec_width_o         (cfg_rec_width         ),     // Rectangle width configuration
     .cfg_rec_height_o        (cfg_rec_height        ),     // Rectangle height configuration
-    .cfg_src_addr_o          (cfg_src_addr          ),     // Source address configuration
+    .cfg_src_px_addr_o       (cfg_src_px_addr       ),     // Source pixel address configuration
     .cfg_src_cl_swp_o        (cfg_src_cl_swp        ),     // Source Column/Line-Swap configuration
     .cfg_src_x_swp_o         (cfg_src_x_swp         ),     // Source X-Swap configuration
     .cfg_src_y_swp_o         (cfg_src_y_swp         ),     // Source Y-Swap configuration
@@ -164,6 +164,7 @@ ogfx_gpu_reg ogfx_gpu_reg_inst (
 
     .gpu_data_i              (gpu_data_i            ),     // GPU data
     .gpu_data_avail_i        (gpu_data_avail_i      ),     // GPU data available
+    .gfx_mode_i              (gfx_mode_i            ),     // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
     .gpu_enable_i            (gpu_enable_i          ),     // GPU enable
 
     .gpu_exec_done_i         (gpu_exec_done         )      // GPU execution done
@@ -187,7 +188,7 @@ ogfx_gpu_dma ogfx_gpu_dma_inst (
     .mclk                    (mclk                  ),     // Main system clock
     .puc_rst                 (puc_rst               ),     // Main system reset
 
-    .cfg_dst_addr_i          (cfg_dst_addr          ),     // Destination address configuration
+    .cfg_dst_px_addr_i       (cfg_dst_px_addr       ),     // Destination pixel address configuration
     .cfg_dst_cl_swp_i        (cfg_dst_cl_swp        ),     // Destination Column/Line-Swap configuration
     .cfg_dst_x_swp_i         (cfg_dst_x_swp         ),     // Destination X-Swap configuration
     .cfg_dst_y_swp_i         (cfg_dst_y_swp         ),     // Destination Y-Swap configuration
@@ -195,7 +196,7 @@ ogfx_gpu_dma ogfx_gpu_dma_inst (
     .cfg_pix_op_sel_i        (cfg_pix_op_sel        ),     // Pixel operation to be performed during the copy
     .cfg_rec_width_i         (cfg_rec_width         ),     // Rectangle width configuration
     .cfg_rec_height_i        (cfg_rec_height        ),     // Rectangle height configuration
-    .cfg_src_addr_i          (cfg_src_addr          ),     // Source address configuration
+    .cfg_src_px_addr_i       (cfg_src_px_addr       ),     // Source pixel address configuration
     .cfg_src_cl_swp_i        (cfg_src_cl_swp        ),     // Source Column/Line-Swap configuration
     .cfg_src_x_swp_i         (cfg_src_x_swp         ),     // Source X-Swap configuration
     .cfg_src_y_swp_i         (cfg_src_y_swp         ),     // Source Y-Swap configuration

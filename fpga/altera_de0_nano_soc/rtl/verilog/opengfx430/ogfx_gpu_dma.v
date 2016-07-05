@@ -54,7 +54,7 @@ module  ogfx_gpu_dma (
     mclk,                                         // Main system clock
     puc_rst,                                      // Main system reset
 
-    cfg_dst_addr_i,                               // Destination address configuration
+    cfg_dst_px_addr_i,                            // Destination pixel address configuration
     cfg_dst_cl_swp_i,                             // Destination Column/Line-Swap configuration
     cfg_dst_x_swp_i,                              // Destination X-Swap configuration
     cfg_dst_y_swp_i,                              // Destination Y-Swap configuration
@@ -62,7 +62,7 @@ module  ogfx_gpu_dma (
     cfg_pix_op_sel_i,                             // Pixel operation to be performed during the copy
     cfg_rec_width_i,                              // Rectangle width configuration
     cfg_rec_height_i,                             // Rectangle height configuration
-    cfg_src_addr_i,                               // Source address configuration
+    cfg_src_px_addr_i,                            // Source pixel address configuration
     cfg_src_cl_swp_i,                             // Source Column/Line-Swap configuration
     cfg_src_x_swp_i,                              // Source X-Swap configuration
     cfg_src_y_swp_i,                              // Source Y-Swap configuration
@@ -85,45 +85,45 @@ module  ogfx_gpu_dma (
 
 // OUTPUTs
 //=========
-output               gpu_exec_done_o;             // GPU execution done
+output                 gpu_exec_done_o;           // GPU execution done
 
-output [`VRAM_MSB:0] vid_ram_addr_o;              // Video-RAM address
-output        [15:0] vid_ram_din_o;               // Video-RAM data
-output         [1:0] vid_ram_wen_o;               // Video-RAM write strobe (active low)
-output               vid_ram_cen_o;               // Video-RAM chip enable (active low)
+output   [`VRAM_MSB:0] vid_ram_addr_o;            // Video-RAM address
+output          [15:0] vid_ram_din_o;             // Video-RAM data
+output           [1:0] vid_ram_wen_o;             // Video-RAM write strobe (active low)
+output                 vid_ram_cen_o;             // Video-RAM chip enable (active low)
 
 // INPUTs
 //=========
-input                mclk;                        // Main system clock
-input                puc_rst;                     // Main system reset
+input                  mclk;                      // Main system clock
+input                  puc_rst;                   // Main system reset
 
-input  [`VRAM_MSB:0] cfg_dst_addr_i;              // Destination address configuration
-input                cfg_dst_cl_swp_i;            // Destination Column/Line-Swap configuration
-input                cfg_dst_x_swp_i;             // Destination X-Swap configuration
-input                cfg_dst_y_swp_i;             // Destination Y-Swap configuration
-input         [15:0] cfg_fill_color_i;            // Fill color (for rectangle fill operation)
-input          [3:0] cfg_pix_op_sel_i;            // Pixel operation to be performed during the copy
-input  [`LPIX_MSB:0] cfg_rec_width_i;             // Rectangle width configuration
-input  [`LPIX_MSB:0] cfg_rec_height_i;            // Rectangle height configuration
-input  [`VRAM_MSB:0] cfg_src_addr_i;              // Source address configuration
-input                cfg_src_cl_swp_i;            // Source Column/Line-Swap configuration
-input                cfg_src_x_swp_i;             // Source X-Swap configuration
-input                cfg_src_y_swp_i;             // Source Y-Swap configuration
-input         [15:0] cfg_transparent_color_i;     // Transparent color (for rectangle transparent copy operation)
+input  [`VRAM_MSB+4:0] cfg_dst_px_addr_i;         // Destination pixel address configuration
+input                  cfg_dst_cl_swp_i;          // Destination Column/Line-Swap configuration
+input                  cfg_dst_x_swp_i;           // Destination X-Swap configuration
+input                  cfg_dst_y_swp_i;           // Destination Y-Swap configuration
+input           [15:0] cfg_fill_color_i;          // Fill color (for rectangle fill operation)
+input            [3:0] cfg_pix_op_sel_i;          // Pixel operation to be performed during the copy
+input    [`LPIX_MSB:0] cfg_rec_width_i;           // Rectangle width configuration
+input    [`LPIX_MSB:0] cfg_rec_height_i;          // Rectangle height configuration
+input  [`VRAM_MSB+4:0] cfg_src_px_addr_i;         // Source pixel address configuration
+input                  cfg_src_cl_swp_i;          // Source Column/Line-Swap configuration
+input                  cfg_src_x_swp_i;           // Source X-Swap configuration
+input                  cfg_src_y_swp_i;           // Source Y-Swap configuration
+input           [15:0] cfg_transparent_color_i;   // Transparent color (for rectangle transparent copy operation)
 
-input  [`LPIX_MSB:0] display_width_i;             // Display width
+input    [`LPIX_MSB:0] display_width_i;           // Display width
 
-input          [2:0] gfx_mode_i;                  // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
+input            [2:0] gfx_mode_i;                // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
 
-input                gpu_enable_i;                // GPU enable
+input                  gpu_enable_i;              // GPU enable
 
-input                exec_fill_i;                 // Rectangle fill on going
-input                exec_copy_i;                 // Rectangle copy on going
-input                exec_copy_trans_i;           // Rectangle transparent copy on going
-input                trig_exec_i;                 // Trigger rectangle execution
+input                  exec_fill_i;               // Rectangle fill on going
+input                  exec_copy_i;               // Rectangle copy on going
+input                  exec_copy_trans_i;         // Rectangle transparent copy on going
+input                  trig_exec_i;               // Trigger rectangle execution
 
-input         [15:0] vid_ram_dout_i;              // Video-RAM data input
-input                vid_ram_dout_rdy_nxt_i;      // Video-RAM data output ready during next cycle
+input           [15:0] vid_ram_dout_i;            // Video-RAM data input
+input                  vid_ram_dout_rdy_nxt_i;    // Video-RAM data output ready during next cycle
 
 
 //=============================================================================
@@ -270,14 +270,14 @@ assign                      dma_done       = height_cnt_done & width_cnt_done;
 // 4)  SOURCE ADDRESS GENERATION
 //=============================================================================
 
-reg  [`VRAM_MSB:0] vram_src_addr;
-wire [`VRAM_MSB:0] vram_src_addr_nxt;
+reg  [`VRAM_MSB+4:0] vram_src_addr;
+wire [`VRAM_MSB+4:0] vram_src_addr_nxt;
 
-wire               vram_src_addr_inc  = dma_pixel_done & needs_src_read;
+wire                 vram_src_addr_inc  = dma_pixel_done & needs_src_read;
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                 vram_src_addr <=  {`VRAM_HI_MSB+1{1'b0}};
-  else if (trig_exec_i)        vram_src_addr <=  cfg_src_addr_i;
+  if (puc_rst)                 vram_src_addr <=  {`VRAM_MSB+1+4{1'b0}};
+  else if (trig_exec_i)        vram_src_addr <=  cfg_src_px_addr_i;
   else if (vram_src_addr_inc)  vram_src_addr <=  vram_src_addr_nxt;
 
 
@@ -291,6 +291,10 @@ ogfx_gpu_dma_addr ogfx_gpu_dma_src_addr_inst (
     .mclk                    ( mclk                    ),   // Main system clock
     .puc_rst                 ( puc_rst                 ),   // Main system reset
     .display_width_i         ( display_width_i         ),   // Display width
+    .gfx_mode_1_bpp_i        ( gfx_mode_1_bpp          ),   // Graphic mode 1 bpp resolution
+    .gfx_mode_2_bpp_i        ( gfx_mode_2_bpp          ),   // Graphic mode 2 bpp resolution
+    .gfx_mode_4_bpp_i        ( gfx_mode_4_bpp          ),   // Graphic mode 4 bpp resolution
+    .gfx_mode_8_bpp_i        ( gfx_mode_8_bpp          ),   // Graphic mode 8 bpp resolution
     .vid_ram_addr_i          ( vram_src_addr           ),   // Video-RAM address
     .vid_ram_addr_init_i     ( dma_init                ),   // Video-RAM address initialization
     .vid_ram_addr_step_i     ( vram_src_addr_inc       ),   // Video-RAM address step
@@ -305,14 +309,14 @@ ogfx_gpu_dma_addr ogfx_gpu_dma_src_addr_inst (
 // 5)  DESTINATION ADDRESS GENERATION
 //=============================================================================
 
-reg  [`VRAM_MSB:0] vram_dst_addr;
-wire [`VRAM_MSB:0] vram_dst_addr_nxt;
+reg  [`VRAM_MSB+4:0] vram_dst_addr;
+wire [`VRAM_MSB+4:0] vram_dst_addr_nxt;
 
-wire               vram_dst_addr_inc  = dma_pixel_done;
+wire                 vram_dst_addr_inc  = dma_pixel_done;
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                 vram_dst_addr <=  {`VRAM_HI_MSB+1{1'b0}};
-  else if (trig_exec_i)        vram_dst_addr <=  cfg_dst_addr_i;
+  if (puc_rst)                 vram_dst_addr <=  {`VRAM_MSB+1+4{1'b0}};
+  else if (trig_exec_i)        vram_dst_addr <=  cfg_dst_px_addr_i;
   else if (vram_dst_addr_inc)  vram_dst_addr <=  vram_dst_addr_nxt;
 
 
@@ -326,6 +330,10 @@ ogfx_gpu_dma_addr ogfx_gpu_dma_dst_addr_inst (
     .mclk                    ( mclk                    ),   // Main system clock
     .puc_rst                 ( puc_rst                 ),   // Main system reset
     .display_width_i         ( display_width_i         ),   // Display width
+    .gfx_mode_1_bpp_i        ( gfx_mode_1_bpp          ),   // Graphic mode 1 bpp resolution
+    .gfx_mode_2_bpp_i        ( gfx_mode_2_bpp          ),   // Graphic mode 2 bpp resolution
+    .gfx_mode_4_bpp_i        ( gfx_mode_4_bpp          ),   // Graphic mode 4 bpp resolution
+    .gfx_mode_8_bpp_i        ( gfx_mode_8_bpp          ),   // Graphic mode 8 bpp resolution
     .vid_ram_addr_i          ( vram_dst_addr           ),   // Video-RAM address
     .vid_ram_addr_init_i     ( dma_init                ),   // Video-RAM address initialization
     .vid_ram_addr_step_i     ( vram_dst_addr_inc       ),   // Video-RAM address step
@@ -410,8 +418,8 @@ assign      vid_ram_din_o  =  (~data_ready_src & ~data_ready_dst &
                                ~pix_op_13 & ~pix_op_14 & ~pix_op_15) ? rd_data_buf  :
                                                                        dst_data_nxt ;
 
-assign      vid_ram_addr_o =  (dma_state==SRC_READ) ? vram_src_addr :
-                                                      vram_dst_addr ;
+assign      vid_ram_addr_o =  (dma_state==SRC_READ) ? vram_src_addr[`VRAM_MSB+4:4] :
+                                                      vram_dst_addr[`VRAM_MSB+4:4] ;
 
 assign      vid_ram_wen_o  =  {2{~((dma_state==DST_WRITE) & ~pixel_is_transparent)}};
 

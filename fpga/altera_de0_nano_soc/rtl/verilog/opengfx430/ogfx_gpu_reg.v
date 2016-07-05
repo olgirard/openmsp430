@@ -43,7 +43,7 @@
 module  ogfx_gpu_reg (
 
 // OUTPUTs
-    cfg_dst_addr_o,                               // Destination address configuration
+    cfg_dst_px_addr_o,                            // Destination pixel address configuration
     cfg_dst_cl_swp_o,                             // Destination Column/Line-Swap configuration
     cfg_dst_x_swp_o,                              // Destination X-Swap configuration
     cfg_dst_y_swp_o,                              // Destination Y-Swap configuration
@@ -51,7 +51,7 @@ module  ogfx_gpu_reg (
     cfg_pix_op_sel_o,                             // Pixel operation to be performed during the copy
     cfg_rec_width_o,                              // Rectangle width configuration
     cfg_rec_height_o,                             // Rectangle height configuration
-    cfg_src_addr_o,                               // Source address configuration
+    cfg_src_px_addr_o,                            // Source pixel address configuration
     cfg_src_cl_swp_o,                             // Source Column/Line-Swap configuration
     cfg_src_x_swp_o,                              // Source X-Swap configuration
     cfg_src_y_swp_o,                              // Source Y-Swap configuration
@@ -72,6 +72,7 @@ module  ogfx_gpu_reg (
 
     gpu_data_i,                                   // GPU data
     gpu_data_avail_i,                             // GPU data available
+    gfx_mode_i,                                   // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
     gpu_enable_i,                                 // GPU enable
 
     gpu_exec_done_i                               // GPU execution done
@@ -79,74 +80,85 @@ module  ogfx_gpu_reg (
 
 // OUTPUTs
 //=========
-output [`VRAM_MSB:0] cfg_dst_addr_o;              // Destination address configuration
-output               cfg_dst_cl_swp_o;            // Destination Column/Line-Swap configuration
-output               cfg_dst_x_swp_o;             // Destination X-Swap configuration
-output               cfg_dst_y_swp_o;             // Destination Y-Swap configuration
-output        [15:0] cfg_fill_color_o;            // Fill color (for rectangle fill operation)
-output         [3:0] cfg_pix_op_sel_o;            // Pixel operation to be performed during the copy
-output [`LPIX_MSB:0] cfg_rec_width_o;             // Rectangle width configuration
-output [`LPIX_MSB:0] cfg_rec_height_o;            // Rectangle height configuration
-output [`VRAM_MSB:0] cfg_src_addr_o;              // Source address configuration
-output               cfg_src_cl_swp_o;            // Source Column/Line-Swap configuration
-output               cfg_src_x_swp_o;             // Source X-Swap configuration
-output               cfg_src_y_swp_o;             // Source Y-Swap configuration
-output        [15:0] cfg_transparent_color_o;     // Transparent color (for rectangle transparent copy operation)
+output [`VRAM_MSB+4:0] cfg_dst_px_addr_o;         // Destination pixel address configuration
+output                 cfg_dst_cl_swp_o;          // Destination Column/Line-Swap configuration
+output                 cfg_dst_x_swp_o;           // Destination X-Swap configuration
+output                 cfg_dst_y_swp_o;           // Destination Y-Swap configuration
+output          [15:0] cfg_fill_color_o;          // Fill color (for rectangle fill operation)
+output           [3:0] cfg_pix_op_sel_o;          // Pixel operation to be performed during the copy
+output   [`LPIX_MSB:0] cfg_rec_width_o;           // Rectangle width configuration
+output   [`LPIX_MSB:0] cfg_rec_height_o;          // Rectangle height configuration
+output [`VRAM_MSB+4:0] cfg_src_px_addr_o;         // Source pixel address configuration
+output                 cfg_src_cl_swp_o;          // Source Column/Line-Swap configuration
+output                 cfg_src_x_swp_o;           // Source X-Swap configuration
+output                 cfg_src_y_swp_o;           // Source Y-Swap configuration
+output          [15:0] cfg_transparent_color_o;   // Transparent color (for rectangle transparent copy operation)
 
-output               gpu_cmd_done_evt_o;          // GPU command done event
-output               gpu_cmd_error_evt_o;         // GPU command error event
-output               gpu_get_data_o;              // GPU get next data
+output                 gpu_cmd_done_evt_o;        // GPU command done event
+output                 gpu_cmd_error_evt_o;       // GPU command error event
+output                 gpu_get_data_o;            // GPU get next data
 
-output               exec_fill_o;                 // Rectangle fill on going
-output               exec_copy_o;                 // Rectangle copy on going
-output               exec_copy_trans_o;           // Rectangle transparent copy on going
-output               trig_exec_o;                 // Trigger rectangle execution
+output                 exec_fill_o;               // Rectangle fill on going
+output                 exec_copy_o;               // Rectangle copy on going
+output                 exec_copy_trans_o;         // Rectangle transparent copy on going
+output                 trig_exec_o;               // Trigger rectangle execution
 
 // INPUTs
 //=========
-input                mclk;                        // Main system clock
-input                puc_rst;                     // Main system reset
+input                  mclk;                      // Main system clock
+input                  puc_rst;                   // Main system reset
 
-input         [15:0] gpu_data_i;                  // GPU data
-input                gpu_data_avail_i;            // GPU data available
-input                gpu_enable_i;                // GPU enable
+input           [15:0] gpu_data_i;                // GPU data
+input                  gpu_data_avail_i;          // GPU data available
+input            [2:0] gfx_mode_i;                // Video mode (1xx:16bpp / 011:8bpp / 010:4bpp / 001:2bpp / 000:1bpp)
+input                  gpu_enable_i;              // GPU enable
 
-input                gpu_exec_done_i;             // GPU execution done
+input                  gpu_exec_done_i;           // GPU execution done
 
 //=============================================================================
 // 1)  WIRE, REGISTERS AND PARAMETER DECLARATION
 //=============================================================================
 
-reg                exec_fill_o;
-reg                exec_copy_o;
-reg                exec_copy_trans_o;
+// Video modes decoding
+wire                   gfx_mode_1_bpp    =  (gfx_mode_i == 3'b000);
+wire                   gfx_mode_2_bpp    =  (gfx_mode_i == 3'b001);
+wire                   gfx_mode_4_bpp    =  (gfx_mode_i == 3'b010);
+wire                   gfx_mode_8_bpp    =  (gfx_mode_i == 3'b011);
+wire                   gfx_mode_16_bpp   = ~(gfx_mode_8_bpp | gfx_mode_4_bpp | gfx_mode_2_bpp | gfx_mode_1_bpp);
 
-reg          [1:0] src_offset_sel;
-reg                src_x_swp;
-reg                src_y_swp;
-reg                src_cl_swp;
-reg          [3:0] pix_op_sel;
-reg          [1:0] dst_offset_sel;
-reg                dst_x_swp;
-reg                dst_y_swp;
-reg                dst_cl_swp;
+// Remaining wires/registers
+reg                    exec_fill_o;
+reg                    exec_copy_o;
+reg                    exec_copy_trans_o;
 
-reg  [3:0]         reg_access;
-wire [3:0]         reg_access_nxt;
+reg              [1:0] src_offset_sel;
+reg                    src_x_swp;
+reg                    src_y_swp;
+reg                    src_cl_swp;
+reg              [3:0] pix_op_sel;
+reg              [1:0] dst_offset_sel;
+reg                    dst_x_swp;
+reg                    dst_y_swp;
+reg                    dst_cl_swp;
 
-reg  [15:0]        fill_color;
-reg  [`LPIX_MSB:0] rec_width;
-reg  [`LPIX_MSB:0] rec_height;
-wire [`VRAM_MSB:0] src_addr;
-wire [`VRAM_MSB:0] dst_addr;
-wire [`VRAM_MSB:0] of0_addr;
-wire [`VRAM_MSB:0] of1_addr;
-wire [`VRAM_MSB:0] of2_addr;
-wire [`VRAM_MSB:0] of3_addr;
-reg  [15:0]        transparent_color;
+reg              [3:0] reg_access;
+wire             [3:0] reg_access_nxt;
 
-wire [`VRAM_MSB:0] src_offset_addr;
-wire [`VRAM_MSB:0] dst_offset_addr;
+reg             [15:0] fill_color;
+reg      [`LPIX_MSB:0] rec_width;
+reg      [`LPIX_MSB:0] rec_height;
+wire   [`VRAM_MSB+4:0] src_px_addr;
+wire   [`VRAM_MSB+4:0] src_px_addr_align;
+wire   [`VRAM_MSB+4:0] dst_px_addr;
+wire   [`VRAM_MSB+4:0] dst_px_addr_align;
+wire     [`VRAM_MSB:0] of0_addr;
+wire     [`VRAM_MSB:0] of1_addr;
+wire     [`VRAM_MSB:0] of2_addr;
+wire     [`VRAM_MSB:0] of3_addr;
+reg             [15:0] transparent_color;
+
+wire     [`VRAM_MSB:0] src_offset_addr;
+wire     [`VRAM_MSB:0] dst_offset_addr;
 
 
 //=============================================================================
@@ -169,28 +181,28 @@ wire [`VRAM_MSB:0] dst_offset_addr;
 // REC_HEIGHT       - Set rectangle height
 //                    {4'b1101, height[11:0]}
 //
-// SRC_ADDR         - Set source address
-//                    {8'b1111_0000, addr[23:16]}
+// SRC_PX_ADDR      - Set source address
+//                    {5'b1110_0, addr[26:16]}
 //                    {addr[15:0]}
 //
-// DST_ADDR         - Set destination address
-//                    {8'b1111_0001, addr[23:16]}
+// DST_PX_ADDR      - Set destination address
+//                    {5'b1110_1, addr[26:16]}
 //                    {addr[15:0]}
 //
 // OF0_ADDR         - Set address offset 0
-//                    {8'b1111_1000, addr[23:16]}
+//                    {8'b1111_0000, addr[23:16]}
 //                    {addr[15:0]}
 //
 // OF1_ADDR         - Set address offset 1
-//                    {8'b1111_1001, addr[23:16]}
+//                    {8'b1111_0001, addr[23:16]}
 //                    {addr[15:0]}
 //
 // OF2_ADDR         - Set address offset 2
-//                    {8'b1111_1010, addr[23:16]}
+//                    {8'b1111_0010, addr[23:16]}
 //                    {addr[15:0]}
 //
 // OF3_ADDR         - Set address offset 3
-//                    {8'b1111_1011, addr[23:16]}
+//                    {8'b1111_0011, addr[23:16]}
 //                    {addr[15:0]}
 //
 // SET_FILL         - Set fill color
@@ -224,8 +236,8 @@ wire       cmd_not_valid    = ((gpu_data_i[15:14]!= `OP_EXEC_FILL      ) &
                                (gpu_data_i[15:14]!= `OP_EXEC_COPY_TRANS) &
                                (gpu_data_i[15:12]!= `OP_REC_WIDTH      ) &
                                (gpu_data_i[15:12]!= `OP_REC_HEIGHT     ) &
-                               (gpu_data_i[15:8] != `OP_SRC_ADDR       ) &
-                               (gpu_data_i[15:8] != `OP_DST_ADDR       ) &
+                               (gpu_data_i[15:11]!= `OP_SRC_PX_ADDR    ) &
+                               (gpu_data_i[15:11]!= `OP_DST_PX_ADDR    ) &
                                (gpu_data_i[15:8] != `OP_OF0_ADDR       ) &
                                (gpu_data_i[15:8] != `OP_OF1_ADDR       ) &
                                (gpu_data_i[15:8] != `OP_OF2_ADDR       ) &
@@ -234,8 +246,8 @@ wire       cmd_not_valid    = ((gpu_data_i[15:14]!= `OP_EXEC_FILL      ) &
                                (gpu_data_i[15:0] != `OP_SET_TRANSPARENT));
 
 wire       cmd_has_data     =  (gpu_data_i[15:14]== `OP_EXEC_FILL      ) |
-                               (gpu_data_i[15:8] == `OP_SRC_ADDR       ) |
-                               (gpu_data_i[15:8] == `OP_DST_ADDR       ) |
+                               (gpu_data_i[15:11]== `OP_SRC_PX_ADDR    ) |
+                               (gpu_data_i[15:11]== `OP_DST_PX_ADDR    ) |
                                (gpu_data_i[15:8] == `OP_OF0_ADDR       ) |
                                (gpu_data_i[15:8] == `OP_OF1_ADDR       ) |
                                (gpu_data_i[15:8] == `OP_OF2_ADDR       ) |
@@ -308,8 +320,8 @@ always @(posedge mclk or posedge puc_rst)
 parameter REG_EXEC_FILL       = 4'h1;
 parameter REG_REC_WIDTH       = 4'h2;
 parameter REG_REC_HEIGHT      = 4'h3;
-parameter REG_SRC_ADDR        = 4'h4;
-parameter REG_DST_ADDR        = 4'h5;
+parameter REG_SRC_PX_ADDR     = 4'h4;
+parameter REG_DST_PX_ADDR     = 4'h5;
 parameter REG_OF0_ADDR        = 4'h6;
 parameter REG_OF1_ADDR        = 4'h7;
 parameter REG_OF2_ADDR        = 4'h8;
@@ -320,8 +332,8 @@ parameter REG_SET_TRANSPARENT = 4'hB;
 assign    reg_access_nxt      = ({4{gpu_data_i[15:14]== `OP_EXEC_FILL      }} & REG_EXEC_FILL      ) |
                                 ({4{gpu_data_i[15:12]== `OP_REC_WIDTH      }} & REG_REC_WIDTH      ) |
                                 ({4{gpu_data_i[15:12]== `OP_REC_HEIGHT     }} & REG_REC_HEIGHT     ) |
-                                ({4{gpu_data_i[15:8] == `OP_SRC_ADDR       }} & REG_SRC_ADDR       ) |
-                                ({4{gpu_data_i[15:8] == `OP_DST_ADDR       }} & REG_DST_ADDR       ) |
+                                ({4{gpu_data_i[15:11]== `OP_SRC_PX_ADDR    }} & REG_SRC_PX_ADDR    ) |
+                                ({4{gpu_data_i[15:11]== `OP_DST_PX_ADDR    }} & REG_DST_PX_ADDR    ) |
                                 ({4{gpu_data_i[15:8] == `OP_OF0_ADDR       }} & REG_OF0_ADDR       ) |
                                 ({4{gpu_data_i[15:8] == `OP_OF1_ADDR       }} & REG_OF1_ADDR       ) |
                                 ({4{gpu_data_i[15:8] == `OP_OF2_ADDR       }} & REG_OF2_ADDR       ) |
@@ -430,68 +442,80 @@ always @ (posedge mclk or posedge puc_rst)
 assign cfg_rec_height_o = rec_height;
 
 //------------------------------------------------
-// SRC_ADDR_HI Register
+// SRC_PX_ADDR_HI Register
 //------------------------------------------------
-`ifdef VRAM_BIGGER_64_KW
-reg [`VRAM_HI_MSB:0] src_addr_hi;
+`ifdef VRAM_BIGGER_4_KW
+reg [`VRAM_PX_HI_MSB:0] src_px_addr_hi;
 
-wire                 src_addr_hi_wr = (reg_access_nxt==REG_SRC_ADDR) & (gpu_state==CMD_READ);
+wire                    src_px_addr_hi_wr = (reg_access_nxt==REG_SRC_PX_ADDR) & (gpu_state==CMD_READ);
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)             src_addr_hi <=  {`VRAM_HI_MSB+1{1'b0}};
-  else if (src_addr_hi_wr) src_addr_hi <=  gpu_data_i[`VRAM_HI_MSB:0];
+  if (puc_rst)                src_px_addr_hi <=  {`VRAM_PX_HI_MSB+1{1'b0}};
+  else if (src_px_addr_hi_wr) src_px_addr_hi <=  gpu_data_i[`VRAM_PX_HI_MSB:0];
 `endif
 
 //------------------------------------------------
-// SRC_ADDR_LO Register
+// SRC_PX_ADDR_LO Register
 //------------------------------------------------
-reg [`VRAM_LO_MSB:0] src_addr_lo;
+reg [`VRAM_PX_LO_MSB:0] src_px_addr_lo;
 
-wire                 src_addr_lo_wr = (reg_access==REG_SRC_ADDR) & (gpu_state==DATA_READ);
+wire                    src_px_addr_lo_wr = (reg_access==REG_SRC_PX_ADDR) & (gpu_state==DATA_READ);
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)             src_addr_lo <=  {`VRAM_LO_MSB+1{1'b0}};
-  else if (src_addr_lo_wr) src_addr_lo <=  gpu_data_i[`VRAM_LO_MSB:0];
+  if (puc_rst)                src_px_addr_lo <=  {`VRAM_PX_LO_MSB+1{1'b0}};
+  else if (src_px_addr_lo_wr) src_px_addr_lo <=  gpu_data_i[`VRAM_PX_LO_MSB:0];
 
-`ifdef VRAM_BIGGER_64_KW
-assign      src_addr  = {src_addr_hi[`VRAM_HI_MSB:0], src_addr_lo};
+`ifdef VRAM_BIGGER_4_KW
+assign      src_px_addr  = {src_px_addr_hi[`VRAM_PX_HI_MSB:0], src_px_addr_lo};
 `else
-assign      src_addr  = {src_addr_lo[`VRAM_LO_MS:0]};
+assign      src_px_addr  = {src_px_addr_lo[`VRAM_PX_LO_MS:0]};
 `endif
 
-assign cfg_src_addr_o = src_addr + src_offset_addr;
+assign src_px_addr_align =  gfx_mode_1_bpp ? {src_px_addr[`VRAM_MSB+4:0]         } :
+                            gfx_mode_2_bpp ? {src_px_addr[`VRAM_MSB+3:0], 1'b0   } :
+                            gfx_mode_4_bpp ? {src_px_addr[`VRAM_MSB+2:0], 2'b00  } :
+                            gfx_mode_8_bpp ? {src_px_addr[`VRAM_MSB+1:0], 3'b000 } :
+                                             {src_px_addr[`VRAM_MSB+0:0], 4'b0000} ;
+
+assign cfg_src_px_addr_o = src_px_addr_align + {src_offset_addr, 4'b0000};
 
 //------------------------------------------------
-// DST_ADDR_HI Register
+// DST_PX_ADDR_HI Register
 //------------------------------------------------
-`ifdef VRAM_BIGGER_64_KW
-reg [`VRAM_HI_MSB:0] dst_addr_hi;
+`ifdef VRAM_BIGGER_4_KW
+reg [`VRAM_PX_HI_MSB:0] dst_px_addr_hi;
 
-wire                 dst_addr_hi_wr = (reg_access_nxt==REG_DST_ADDR) & (gpu_state==CMD_READ);
+wire                 dst_px_addr_hi_wr = (reg_access_nxt==REG_DST_PX_ADDR) & (gpu_state==CMD_READ);
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)             dst_addr_hi <=  {`VRAM_HI_MSB+1{1'b0}};
-  else if (dst_addr_hi_wr) dst_addr_hi <=  gpu_data_i[`VRAM_HI_MSB:0];
+  if (puc_rst)                dst_px_addr_hi <=  {`VRAM_PX_HI_MSB+1{1'b0}};
+  else if (dst_px_addr_hi_wr) dst_px_addr_hi <=  gpu_data_i[`VRAM_PX_HI_MSB:0];
 `endif
 
 //------------------------------------------------
-// DST_ADDR_LO Register
+// DST_PX_ADDR_LO Register
 //------------------------------------------------
-reg [`VRAM_LO_MSB:0] dst_addr_lo;
+reg [`VRAM_PX_LO_MSB:0] dst_px_addr_lo;
 
-wire                 dst_addr_lo_wr = (reg_access==REG_DST_ADDR) & (gpu_state==DATA_READ);
+wire                 dst_px_addr_lo_wr = (reg_access==REG_DST_PX_ADDR) & (gpu_state==DATA_READ);
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)             dst_addr_lo <=  {`VRAM_LO_MSB+1{1'b0}};
-  else if (dst_addr_lo_wr) dst_addr_lo <=  gpu_data_i[`VRAM_LO_MSB:0];
+  if (puc_rst)                dst_px_addr_lo <=  {`VRAM_PX_LO_MSB+1{1'b0}};
+  else if (dst_px_addr_lo_wr) dst_px_addr_lo <=  gpu_data_i[`VRAM_PX_LO_MSB:0];
 
-`ifdef VRAM_BIGGER_64_KW
-assign      dst_addr  = {dst_addr_hi[`VRAM_HI_MSB:0], dst_addr_lo};
+`ifdef VRAM_BIGGER_4_KW
+assign      dst_px_addr  = {dst_px_addr_hi[`VRAM_PX_HI_MSB:0], dst_px_addr_lo};
 `else
-assign      dst_addr  = {dst_addr_lo[`VRAM_LO_MS:0]};
+assign      dst_px_addr  = {dst_px_addr_lo[`VRAM_PX_LO_MS:0]};
 `endif
 
-assign cfg_dst_addr_o = dst_addr + dst_offset_addr;
+assign dst_px_addr_align =  gfx_mode_1_bpp ? {dst_px_addr[`VRAM_MSB+4:0]         } :
+                            gfx_mode_2_bpp ? {dst_px_addr[`VRAM_MSB+3:0], 1'b0   } :
+                            gfx_mode_4_bpp ? {dst_px_addr[`VRAM_MSB+2:0], 2'b00  } :
+                            gfx_mode_8_bpp ? {dst_px_addr[`VRAM_MSB+1:0], 3'b000 } :
+                                             {dst_px_addr[`VRAM_MSB+0:0], 4'b0000} ;
+
+assign cfg_dst_px_addr_o = dst_px_addr_align + {dst_offset_addr, 4'b0000};
 
 //------------------------------------------------
 // OF0_ADDR_HI Register
@@ -614,13 +638,13 @@ assign      of3_addr  = {of3_addr_lo[`VRAM_LO_MS:0]};
 `endif
 
 // Offset address selection
-assign src_offset_addr = (src_offset_sel==2'h0) ? of0_addr :
-                         (src_offset_sel==2'h1) ? of1_addr :
-			 (src_offset_sel==2'h2) ? of2_addr : of3_addr;
+assign src_offset_addr    = (src_offset_sel==2'h0) ? of0_addr :
+                            (src_offset_sel==2'h1) ? of1_addr :
+                            (src_offset_sel==2'h2) ? of2_addr : of3_addr;
 
-assign dst_offset_addr = (dst_offset_sel==2'h0) ? of0_addr :
-			 (dst_offset_sel==2'h1) ? of1_addr :
-			 (dst_offset_sel==2'h2) ? of2_addr : of3_addr;
+assign dst_offset_addr    = (dst_offset_sel==2'h0) ? of0_addr :
+                            (dst_offset_sel==2'h1) ? of1_addr :
+                            (dst_offset_sel==2'h2) ? of2_addr : of3_addr;
 
 
 //------------------------------------------------

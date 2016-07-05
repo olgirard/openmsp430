@@ -69,8 +69,12 @@
 //-----------------------------------------------------
 // Define if the Video memory is bigger than 64k Words
 // (should be defined if VRAM_AWIDTH is bigger than 16)
+//
+// Define if the Video memory is bigger than 4k Words
+// (should be defined if VRAM_AWIDTH is bigger than 12)
 //-----------------------------------------------------
 `define VRAM_BIGGER_64_KW
+`define VRAM_BIGGER_4_KW
 
 //-----------------------------------------------------
 // Include/Exclude Frame buffer pointers from the
@@ -146,6 +150,12 @@
 `else
  `define VRAM_LO_MSB `VRAM_MSB
 `endif
+`ifdef VRAM_BIGGER_4_KW
+ `define VRAM_PX_HI_MSB (`VRAM_MSB-16+4)
+ `define VRAM_PX_LO_MSB 15
+`else
+ `define VRAM_PX_LO_MSB `VRAM_MSB+4
+`endif
 
 `ifdef WITH_EXTRA_LUT_BANK
  `define LRAM_AWIDTH 9
@@ -160,12 +170,12 @@
 `define OP_EXEC_COPY_TRANS   2'b10
 `define OP_REC_WIDTH         4'b1100
 `define OP_REC_HEIGHT        4'b1101
-`define OP_SRC_ADDR          8'b11110000
-`define OP_DST_ADDR          8'b11110001
-`define OP_OF0_ADDR          8'b11111000
-`define OP_OF1_ADDR          8'b11111001
-`define OP_OF2_ADDR          8'b11111010
-`define OP_OF3_ADDR          8'b11111011
+`define OP_SRC_PX_ADDR       5'b11100
+`define OP_DST_PX_ADDR       5'b11101
+`define OP_OF0_ADDR          8'b11110000
+`define OP_OF1_ADDR          8'b11110001
+`define OP_OF2_ADDR          8'b11110010
+`define OP_OF3_ADDR          8'b11110011
 `define OP_SET_FILL         16'b1111111111111110
 `define OP_SET_TRANSPARENT  16'b1111111111111111
 
