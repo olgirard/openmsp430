@@ -125,14 +125,14 @@ input                puc_rst;                            // Main system reset
 // SW interface, fixed highest priority
 input  [`LRAM_MSB:0] lut_ram_sw_addr_i;                  // LUT-RAM Software address
 input         [15:0] lut_ram_sw_din_i;                   // LUT-RAM Software data
-input          [1:0] lut_ram_sw_wen_i;                   // LUT-RAM Software write strobe (active low)
+input                lut_ram_sw_wen_i;                   // LUT-RAM Software write strobe (active low)
 input                lut_ram_sw_cen_i;                   // LUT-RAM Software chip enable (active low)
 output        [15:0] lut_ram_sw_dout_o;                  // LUT-RAM Software data input
 
 // Refresh-backend, fixed lowest priority
 input  [`LRAM_MSB:0] lut_ram_refr_addr_i;                // LUT-RAM Refresh address
 input         [15:0] lut_ram_refr_din_i;                 // LUT-RAM Refresh data
-input          [1:0] lut_ram_refr_wen_i;                 // LUT-RAM Refresh write strobe (active low)
+input                lut_ram_refr_wen_i;                 // LUT-RAM Refresh write strobe (active low)
 input                lut_ram_refr_cen_i;                 // LUT-RAM Refresh enable (active low)
 output        [15:0] lut_ram_refr_dout_o;                // LUT-RAM Refresh data output
 output               lut_ram_refr_dout_rdy_nxt_o;        // LUT-RAM Refresh data output ready during next cycle
@@ -140,7 +140,7 @@ output               lut_ram_refr_dout_rdy_nxt_o;        // LUT-RAM Refresh data
 // LUT Memory interface
 output [`LRAM_MSB:0] lut_ram_addr_o;                     // LUT-RAM address
 output        [15:0] lut_ram_din_o;                      // LUT-RAM data
-output         [1:0] lut_ram_wen_o;                      // LUT-RAM write strobe (active low)
+output               lut_ram_wen_o;                      // LUT-RAM write strobe (active low)
 output               lut_ram_cen_o;                      // LUT-RAM chip enable (active low)
 input         [15:0] lut_ram_dout_i;                     // LUT-RAM data input
 
@@ -150,14 +150,14 @@ input         [15:0] lut_ram_dout_i;                     // LUT-RAM data input
 // SW interface, fixed highest priority
 input  [`VRAM_MSB:0] vid_ram_sw_addr_i;                  // Video-RAM Software address
 input         [15:0] vid_ram_sw_din_i;                   // Video-RAM Software data
-input          [1:0] vid_ram_sw_wen_i;                   // Video-RAM Software write strobe (active low)
+input                vid_ram_sw_wen_i;                   // Video-RAM Software write strobe (active low)
 input                vid_ram_sw_cen_i;                   // Video-RAM Software chip enable (active low)
 output        [15:0] vid_ram_sw_dout_o;                  // Video-RAM Software data input
 
 // GPU interface (round-robin with refresh-backend)
 input  [`VRAM_MSB:0] vid_ram_gpu_addr_i;                 // Video-RAM GPU address
 input         [15:0] vid_ram_gpu_din_i;                  // Video-RAM GPU data
-input          [1:0] vid_ram_gpu_wen_i;                  // Video-RAM GPU write strobe (active low)
+input                vid_ram_gpu_wen_i;                  // Video-RAM GPU write strobe (active low)
 input                vid_ram_gpu_cen_i;                  // Video-RAM GPU chip enable (active low)
 output        [15:0] vid_ram_gpu_dout_o;                 // Video-RAM GPU data input
 output               vid_ram_gpu_dout_rdy_nxt_o;         // Video-RAM GPU data output ready during next cycle
@@ -165,7 +165,7 @@ output               vid_ram_gpu_dout_rdy_nxt_o;         // Video-RAM GPU data o
 // Refresh-backend (round-robin with GPU interface)
 input  [`VRAM_MSB:0] vid_ram_refr_addr_i;                // Video-RAM Refresh address
 input         [15:0] vid_ram_refr_din_i;                 // Video-RAM Refresh data
-input          [1:0] vid_ram_refr_wen_i;                 // Video-RAM Refresh write strobe (active low)
+input                vid_ram_refr_wen_i;                 // Video-RAM Refresh write strobe (active low)
 input                vid_ram_refr_cen_i;                 // Video-RAM Refresh enable (active low)
 output        [15:0] vid_ram_refr_dout_o;                // Video-RAM Refresh data output
 output               vid_ram_refr_dout_rdy_nxt_o;        // Video-RAM Refresh data output ready during next cycle
@@ -173,7 +173,7 @@ output               vid_ram_refr_dout_rdy_nxt_o;        // Video-RAM Refresh da
 // Video Memory interface
 output [`VRAM_MSB:0] vid_ram_addr_o;                     // Video-RAM address
 output        [15:0] vid_ram_din_o;                      // Video-RAM data
-output         [1:0] vid_ram_wen_o;                      // Video-RAM write strobe (active low)
+output               vid_ram_wen_o;                      // Video-RAM write strobe (active low)
 output               vid_ram_cen_o;                      // Video-RAM chip enable (active low)
 input         [15:0] vid_ram_dout_i;                     // Video-RAM data input
 
@@ -205,8 +205,8 @@ assign  lut_ram_addr_o               = ({`LRAM_AWIDTH{ sw_lram_access_granted  }
 assign  lut_ram_din_o                = ({          16{ sw_lram_access_granted  }} & lut_ram_sw_din_i   ) |
                                        ({          16{ refr_lram_access_granted}} & lut_ram_refr_din_i ) ;
 
-assign  lut_ram_wen_o                = ({           2{~sw_lram_access_granted  }} | lut_ram_sw_wen_i   ) &
-                                       ({           2{~refr_lram_access_granted}} | lut_ram_refr_wen_i ) ;
+assign  lut_ram_wen_o                = (              ~sw_lram_access_granted     | lut_ram_sw_wen_i   ) &
+                                       (              ~refr_lram_access_granted   | lut_ram_refr_wen_i ) ;
 
 assign  lut_ram_cen_o                =  lut_ram_sw_cen_i & lut_ram_refr_cen_i;
 
@@ -249,9 +249,9 @@ assign  vid_ram_din_o                = ({          16{ sw_vram_access_granted  }
                                        ({          16{ gpu_vram_access_granted }} & vid_ram_gpu_din_i  ) |
                                        ({          16{ refr_vram_access_granted}} & vid_ram_refr_din_i ) ;
 
-assign  vid_ram_wen_o                = ({           2{~sw_vram_access_granted  }} | vid_ram_sw_wen_i   ) &
-                                       ({           2{~gpu_vram_access_granted }} | vid_ram_gpu_wen_i  ) &
-                                       ({           2{~refr_vram_access_granted}} | vid_ram_refr_wen_i ) ;
+assign  vid_ram_wen_o                = (              ~sw_vram_access_granted     | vid_ram_sw_wen_i   ) &
+                                       (              ~gpu_vram_access_granted    | vid_ram_gpu_wen_i  ) &
+                                       (              ~refr_vram_access_granted   | vid_ram_refr_wen_i ) ;
 
 assign  vid_ram_cen_o                = vid_ram_sw_cen_i & vid_ram_gpu_cen_i & vid_ram_refr_cen_i;
 

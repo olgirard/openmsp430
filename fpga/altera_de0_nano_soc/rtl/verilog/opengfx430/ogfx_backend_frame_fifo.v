@@ -99,7 +99,7 @@ input        [15:0] vid_ram_dout_i;             // Video-RAM data output
 input               vid_ram_dout_rdy_nxt_i;     // Video-RAM data output ready during next cycle
 
 input               refresh_active_i;           // Display refresh on going
-input [`VRAM_MSB:0] refresh_frame_base_addr_i;  // Refresh frame base address
+input [`APIX_MSB:0] refresh_frame_base_addr_i;  // Refresh frame base address
 
 
 //=============================================================================
@@ -149,8 +149,8 @@ always @(posedge mclk or posedge puc_rst)
 //--------------------------------
 // Video RAM Address generation
 //--------------------------------
-reg  [`VRAM_MSB+4:0] vid_ram_pixel_addr;
-reg  [`VRAM_MSB+4:0] vid_ram_line_addr;
+reg    [`APIX_MSB:0] vid_ram_pixel_addr;
+reg    [`APIX_MSB:0] vid_ram_line_addr;
 reg    [`LPIX_MSB:0] vid_ram_column_count;
 
 // Detect when the fifo is done reading the current pixel data
@@ -159,13 +159,6 @@ wire                 vid_ram_pixel_done = fifo_data_request & fifo_data_ready;
 // Detect when the current line refresh is done
 wire   [`LPIX_MSB:0] line_length        = display_cl_swap_i ? display_height_i : display_width_i;
 wire                 vid_ram_line_done  = vid_ram_pixel_done & (vid_ram_column_count==(line_length-{{`LPIX_MSB{1'b0}}, 1'b1}));
-
-// Shift the refresh base address depending on the color mode
-wire [`VRAM_MSB+4:0] refresh_base_addr_adjust = ({`VRAM_MSB+1+4{gfx_mode_1_bpp }} & {         refresh_frame_base_addr_i, 4'b0000}) |
-                                                ({`VRAM_MSB+1+4{gfx_mode_2_bpp }} & {1'b0,    refresh_frame_base_addr_i, 3'b000 }) |
-                                                ({`VRAM_MSB+1+4{gfx_mode_4_bpp }} & {2'b00,   refresh_frame_base_addr_i, 2'b00  }) |
-                                                ({`VRAM_MSB+1+4{gfx_mode_8_bpp }} & {3'b000,  refresh_frame_base_addr_i, 1'b0   }) |
-                                                ({`VRAM_MSB+1+4{gfx_mode_16_bpp}} & {4'b0000, refresh_frame_base_addr_i         }) ;
 
 // Zero extension for LINT cleanup
 wire [`VRAM_MSB*3:0] display_size_norm  =  {{`VRAM_MSB*3-`SPIX_MSB{1'b0}}, display_size_i};
@@ -184,30 +177,30 @@ wire [`VRAM_MSB*3:0] display_width_norm =  {{`VRAM_MSB*3-`LPIX_MSB{1'b0}}, displ
 //        addr = LAST  -    0    - WIDTH*l_idx - c_idx // X/Y-Swap
 //
 
-wire [`VRAM_MSB+4:0] next_base_addr     =  ~refresh_active_i  ? refresh_base_addr_adjust :
-                                            vid_ram_line_done ? vid_ram_line_addr        :
-                                                                vid_ram_pixel_addr       ;
+wire [`APIX_MSB:0] next_base_addr     =  ~refresh_active_i  ? refresh_frame_base_addr_i :
+                                          vid_ram_line_done ? vid_ram_line_addr         :
+                                                              vid_ram_pixel_addr        ;
 
-wire [`VRAM_MSB+4:0] next_addr          =   next_base_addr
-                                          + (display_size_norm[`VRAM_MSB+4:0]  & {`VRAM_MSB+1+4{refresh_active_i ?  1'b0                                                          : display_y_swap_i}})
-                                          + (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{refresh_active_i ? (~display_y_swap_i &  (display_cl_swap_i ^ vid_ram_line_done)) : display_x_swap_i}})
-                                          - (display_width_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{refresh_active_i ? ( display_y_swap_i &  (display_cl_swap_i ^ vid_ram_line_done)) : display_y_swap_i}})
-                                          + ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{refresh_active_i ? (~display_x_swap_i & ~(display_cl_swap_i ^ vid_ram_line_done)) : 1'b0            }})
-                                          - ({{`VRAM_MSB+4{1'b0}}, 1'b1}       & {`VRAM_MSB+1+4{refresh_active_i ? ( display_x_swap_i & ~(display_cl_swap_i ^ vid_ram_line_done)) : display_x_swap_i}});
+wire [`APIX_MSB:0] next_addr          =   next_base_addr
+                                        + (display_size_norm[`APIX_MSB:0]  & {`APIX_MSB+1{refresh_active_i ?  1'b0                                                          : display_y_swap_i}})
+                                        + (display_width_norm[`APIX_MSB:0] & {`APIX_MSB+1{refresh_active_i ? (~display_y_swap_i &  (display_cl_swap_i ^ vid_ram_line_done)) : display_x_swap_i}})
+                                        - (display_width_norm[`APIX_MSB:0] & {`APIX_MSB+1{refresh_active_i ? ( display_y_swap_i &  (display_cl_swap_i ^ vid_ram_line_done)) : display_y_swap_i}})
+                                        + ({{`APIX_MSB{1'b0}}, 1'b1}       & {`APIX_MSB+1{refresh_active_i ? (~display_x_swap_i & ~(display_cl_swap_i ^ vid_ram_line_done)) : 1'b0            }})
+                                        - ({{`APIX_MSB{1'b0}}, 1'b1}       & {`APIX_MSB+1{refresh_active_i ? ( display_x_swap_i & ~(display_cl_swap_i ^ vid_ram_line_done)) : display_x_swap_i}});
 
-wire                 update_line_addr   =  ~refresh_active_i | vid_ram_line_done;
-wire                 update_pixel_addr  =   update_line_addr | vid_ram_pixel_done;
+wire               update_line_addr   =  ~refresh_active_i | vid_ram_line_done;
+wire               update_pixel_addr  =   update_line_addr | vid_ram_pixel_done;
 
 // Start RAM address of currentely refreshed line
 always @(posedge mclk or posedge puc_rst)
-  if (puc_rst)               vid_ram_line_addr  <=  {`VRAM_MSB+1+4{1'b0}};
+  if (puc_rst)               vid_ram_line_addr  <=  {`APIX_MSB+1{1'b0}};
   else if (update_line_addr) vid_ram_line_addr  <=  next_addr;
 
 // Current RAM address of the currentely refreshed pixel
-wire [`VRAM_MSB+4:0] vid_ram_pixel_addr_nxt = update_pixel_addr ? next_addr : vid_ram_pixel_addr;
+wire [`APIX_MSB:0] vid_ram_pixel_addr_nxt = update_pixel_addr ? next_addr : vid_ram_pixel_addr;
 
 always @(posedge mclk or posedge puc_rst)
-  if (puc_rst) vid_ram_pixel_addr  <=  {`VRAM_MSB+1+4{1'b0}};
+  if (puc_rst) vid_ram_pixel_addr  <=  {`APIX_MSB+1{1'b0}};
   else         vid_ram_pixel_addr  <=  vid_ram_pixel_addr_nxt;
 
 // Count the pixel number in the current line

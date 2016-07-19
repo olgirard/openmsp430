@@ -135,13 +135,13 @@ wire               irq_gfx;
 wire        [15:0] per_dout_gfx;
 
 wire         [8:0] lut_ram_addr;
-wire         [1:0] lut_ram_wen;
+wire               lut_ram_wen;
 wire               lut_ram_cen;
 wire        [15:0] lut_ram_din;
 wire        [15:0] lut_ram_dout;
 
 wire        [16:0] vid_ram_addr;
-wire         [1:0] vid_ram_wen;
+wire               vid_ram_wen;
 wire               vid_ram_cen;
 wire        [15:0] vid_ram_din;
 wire        [15:0] vid_ram_dout;
@@ -378,11 +378,11 @@ openGFX430 opengfx430_0 (
 ram_16x75k vid_ram_16x75k_0 (
 
     .address           ( vid_ram_addr),
-    .byteena	       (~vid_ram_wen),
+    .byteena	       (~{2{vid_ram_wen}}),
     .clken	       (~vid_ram_cen),
     .clock             ( mclk),
     .data              ( vid_ram_din),
-    .wren              (~(&vid_ram_wen)),
+    .wren              (~vid_ram_wen),
     .q	               ( vid_ram_dout)
 );
 
@@ -390,11 +390,11 @@ ram_16x75k vid_ram_16x75k_0 (
 ram_16x512 lut_ram_16x512_0 (
 
     .address           ( lut_ram_addr),
-    .byteena           (~lut_ram_wen),
+    .byteena           (~{2{lut_ram_wen}}),
     .clken             (~lut_ram_cen),
     .clock             ( mclk),
     .data              ( lut_ram_din),
-    .wren              (~(&lut_ram_wen)),
+    .wren              (~lut_ram_wen),
     .q	               ( lut_ram_dout)
 );
 

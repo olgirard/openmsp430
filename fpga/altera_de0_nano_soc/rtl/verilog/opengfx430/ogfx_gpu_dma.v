@@ -89,7 +89,7 @@ output                 gpu_exec_done_o;           // GPU execution done
 
 output   [`VRAM_MSB:0] vid_ram_addr_o;            // Video-RAM address
 output          [15:0] vid_ram_din_o;             // Video-RAM data
-output           [1:0] vid_ram_wen_o;             // Video-RAM write strobe (active low)
+output                 vid_ram_wen_o;             // Video-RAM write strobe (active low)
 output                 vid_ram_cen_o;             // Video-RAM chip enable (active low)
 
 // INPUTs
@@ -165,6 +165,15 @@ reg        data_ready_dst;
 wire       dma_done;
 wire       pixel_is_transparent;
 
+// 16 bits one-hot decoder
+function [15:0] one_hot16;
+   input  [3:0] binary;
+   begin
+      one_hot16         = 16'h0000;
+      one_hot16[binary] =  1'b1;
+   end
+endfunction
+
 
 //=============================================================================
 // 2)  DMA STATE MACHINE
@@ -183,9 +192,9 @@ reg  [2:0] dma_state;
 reg  [2:0] dma_state_nxt;
 
 // State arcs
-wire       needs_src_read    = (exec_copy_i | exec_copy_trans_i              ) & ~(pix_op_02                                                );
-wire       needs_dst_read    = (exec_fill_i | exec_copy_trans_i | exec_copy_i) & ~(pix_op_00 | pix_op_01 | pix_op_13 | pix_op_14 | pix_op_15);
-wire       needs_dst_write   = (exec_fill_i | exec_copy_trans_i | exec_copy_i) & ~pixel_is_transparent;
+wire       needs_src_read    = (exec_copy_i | exec_copy_trans_i              ) &  ~(pix_op_02                                                );
+wire       needs_dst_read    = (exec_fill_i | exec_copy_trans_i | exec_copy_i) & (~(pix_op_00 | pix_op_01 | pix_op_13 | pix_op_14 | pix_op_15) | ~gfx_mode_16_bpp);
+wire       needs_dst_write   = (exec_fill_i | exec_copy_trans_i | exec_copy_i) &  ~pixel_is_transparent;
 
 wire       data_ready_nxt    =   (dma_state==SRC_READ) |
                                (((dma_state==DST_READ) |
@@ -271,30 +280,31 @@ assign                      dma_done       = height_cnt_done & width_cnt_done;
 //=============================================================================
 
 reg  [`VRAM_MSB+4:0] vram_src_addr;
-wire [`VRAM_MSB+4:0] vram_src_addr_nxt;
+wire [`VRAM_MSB+4:0] vram_src_addr_calc;
 
 wire                 vram_src_addr_inc  = dma_pixel_done & needs_src_read;
+wire [`VRAM_MSB+4:0] vram_src_addr_nxt  = trig_exec_i ? cfg_src_px_addr_i : vram_src_addr_calc;
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                 vram_src_addr <=  {`VRAM_MSB+1+4{1'b0}};
-  else if (trig_exec_i)        vram_src_addr <=  cfg_src_px_addr_i;
-  else if (vram_src_addr_inc)  vram_src_addr <=  vram_src_addr_nxt;
+  if (puc_rst)                              vram_src_addr <=  {`VRAM_MSB+1+4{1'b0}};
+  else if (trig_exec_i | vram_src_addr_inc) vram_src_addr <=  vram_src_addr_nxt;
 
 
 // Compute the next address
 ogfx_gpu_dma_addr ogfx_gpu_dma_src_addr_inst (
 
 // OUTPUTs
-    .vid_ram_addr_nxt_o      ( vram_src_addr_nxt       ),   // Next Video-RAM address
+    .vid_ram_addr_nxt_o      ( vram_src_addr_calc      ),   // Next Video-RAM address
 
 // INPUTs
     .mclk                    ( mclk                    ),   // Main system clock
     .puc_rst                 ( puc_rst                 ),   // Main system reset
     .display_width_i         ( display_width_i         ),   // Display width
-    .gfx_mode_1_bpp_i        ( gfx_mode_1_bpp          ),   // Graphic mode 1 bpp resolution
-    .gfx_mode_2_bpp_i        ( gfx_mode_2_bpp          ),   // Graphic mode 2 bpp resolution
-    .gfx_mode_4_bpp_i        ( gfx_mode_4_bpp          ),   // Graphic mode 4 bpp resolution
-    .gfx_mode_8_bpp_i        ( gfx_mode_8_bpp          ),   // Graphic mode 8 bpp resolution
+    .gfx_mode_1_bpp_i        ( gfx_mode_1_bpp          ),   // Graphic mode  1 bpp resolution
+    .gfx_mode_2_bpp_i        ( gfx_mode_2_bpp          ),   // Graphic mode  2 bpp resolution
+    .gfx_mode_4_bpp_i        ( gfx_mode_4_bpp          ),   // Graphic mode  4 bpp resolution
+    .gfx_mode_8_bpp_i        ( gfx_mode_8_bpp          ),   // Graphic mode  8 bpp resolution
+    .gfx_mode_16_bpp_i       ( gfx_mode_16_bpp         ),   // Graphic mode 16 bpp resolution
     .vid_ram_addr_i          ( vram_src_addr           ),   // Video-RAM address
     .vid_ram_addr_init_i     ( dma_init                ),   // Video-RAM address initialization
     .vid_ram_addr_step_i     ( vram_src_addr_inc       ),   // Video-RAM address step
@@ -306,34 +316,72 @@ ogfx_gpu_dma_addr ogfx_gpu_dma_src_addr_inst (
 );
 
 //=============================================================================
-// 5)  DESTINATION ADDRESS GENERATION
+// 5)  SOURCE DATA MASK
+//=============================================================================
+
+reg  [15:0] vram_src_mask;
+wire [15:0] vram_src_mask_shift    = one_hot16(vram_src_addr_nxt[3:0]);
+wire [15:0] vram_src_mask_vram_nxt = ({16{gfx_mode_1_bpp }} &     vram_src_mask_shift       ) |
+                                     ({16{gfx_mode_2_bpp }} & {{2{vram_src_mask_shift[14]}},
+                                                               {2{vram_src_mask_shift[12]}},
+                                                               {2{vram_src_mask_shift[10]}},
+                                                               {2{vram_src_mask_shift[8] }},
+                                                               {2{vram_src_mask_shift[6] }},
+                                                               {2{vram_src_mask_shift[4] }},
+                                                               {2{vram_src_mask_shift[2] }},
+                                                               {2{vram_src_mask_shift[0] }}}) |
+                                     ({16{gfx_mode_4_bpp }} & {{4{vram_src_mask_shift[12]}},
+                                                               {4{vram_src_mask_shift[8] }},
+                                                               {4{vram_src_mask_shift[4] }},
+                                                               {4{vram_src_mask_shift[0] }}}) |
+                                     ({16{gfx_mode_8_bpp }} & {{8{vram_src_mask_shift[8] }},
+                                                               {8{vram_src_mask_shift[0] }}}) |
+                                     ({16{gfx_mode_16_bpp}} & {16{1'b1}}                    ) ;
+
+wire [15:0] vram_src_mask_fill_nxt = ({16{gfx_mode_1_bpp }} &  16'h0001) |
+                                     ({16{gfx_mode_2_bpp }} &  16'h0003) |
+                                     ({16{gfx_mode_4_bpp }} &  16'h000f) |
+                                     ({16{gfx_mode_8_bpp }} &  16'h00ff) |
+                                     ({16{gfx_mode_16_bpp}} &  16'hffff) ;
+
+wire [15:0] vram_src_mask_nxt      = exec_fill_i ? vram_src_mask_fill_nxt :
+                                                   vram_src_mask_vram_nxt ;
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)                               vram_src_mask <=  16'h0000;
+  else if (trig_exec_i | vram_src_addr_inc)  vram_src_mask <=  vram_src_mask_nxt;
+
+
+//=============================================================================
+// 6)  DESTINATION ADDRESS GENERATION
 //=============================================================================
 
 reg  [`VRAM_MSB+4:0] vram_dst_addr;
-wire [`VRAM_MSB+4:0] vram_dst_addr_nxt;
+wire [`VRAM_MSB+4:0] vram_dst_addr_calc;
 
 wire                 vram_dst_addr_inc  = dma_pixel_done;
+wire [`VRAM_MSB+4:0] vram_dst_addr_nxt  = trig_exec_i ? cfg_dst_px_addr_i : vram_dst_addr_calc;
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                 vram_dst_addr <=  {`VRAM_MSB+1+4{1'b0}};
-  else if (trig_exec_i)        vram_dst_addr <=  cfg_dst_px_addr_i;
-  else if (vram_dst_addr_inc)  vram_dst_addr <=  vram_dst_addr_nxt;
+  if (puc_rst)                              vram_dst_addr <=  {`VRAM_MSB+1+4{1'b0}};
+  else if (trig_exec_i | vram_dst_addr_inc) vram_dst_addr <=  vram_dst_addr_nxt;
 
 
 // Compute the next address
 ogfx_gpu_dma_addr ogfx_gpu_dma_dst_addr_inst (
 
 // OUTPUTs
-    .vid_ram_addr_nxt_o      ( vram_dst_addr_nxt       ),   // Next Video-RAM address
+    .vid_ram_addr_nxt_o      ( vram_dst_addr_calc      ),   // Next Video-RAM address
 
 // INPUTs
     .mclk                    ( mclk                    ),   // Main system clock
     .puc_rst                 ( puc_rst                 ),   // Main system reset
     .display_width_i         ( display_width_i         ),   // Display width
-    .gfx_mode_1_bpp_i        ( gfx_mode_1_bpp          ),   // Graphic mode 1 bpp resolution
-    .gfx_mode_2_bpp_i        ( gfx_mode_2_bpp          ),   // Graphic mode 2 bpp resolution
-    .gfx_mode_4_bpp_i        ( gfx_mode_4_bpp          ),   // Graphic mode 4 bpp resolution
-    .gfx_mode_8_bpp_i        ( gfx_mode_8_bpp          ),   // Graphic mode 8 bpp resolution
+    .gfx_mode_1_bpp_i        ( gfx_mode_1_bpp          ),   // Graphic mode  1 bpp resolution
+    .gfx_mode_2_bpp_i        ( gfx_mode_2_bpp          ),   // Graphic mode  2 bpp resolution
+    .gfx_mode_4_bpp_i        ( gfx_mode_4_bpp          ),   // Graphic mode  4 bpp resolution
+    .gfx_mode_8_bpp_i        ( gfx_mode_8_bpp          ),   // Graphic mode  8 bpp resolution
+    .gfx_mode_16_bpp_i       ( gfx_mode_16_bpp         ),   // Graphic mode 16 bpp resolution
     .vid_ram_addr_i          ( vram_dst_addr           ),   // Video-RAM address
     .vid_ram_addr_init_i     ( dma_init                ),   // Video-RAM address initialization
     .vid_ram_addr_step_i     ( vram_dst_addr_inc       ),   // Video-RAM address step
@@ -344,9 +392,36 @@ ogfx_gpu_dma_addr ogfx_gpu_dma_dst_addr_inst (
     .vid_ram_win_cl_swap_i   ( cfg_dst_cl_swp_i        )    // Video-RAM CL-Swap configuration
 );
 
+//=============================================================================
+// 7)  DESTINATION DATA MASK
+//=============================================================================
+
+reg  [15:0] vram_dst_mask;
+wire [15:0] vram_dst_mask_shift = one_hot16(vram_dst_addr_nxt[3:0]);
+wire [15:0] vram_dst_mask_nxt   = ({16{gfx_mode_1_bpp }} &     vram_dst_mask_shift       ) |
+                                  ({16{gfx_mode_2_bpp }} & {{2{vram_dst_mask_shift[14]}},
+                                                            {2{vram_dst_mask_shift[12]}},
+                                                            {2{vram_dst_mask_shift[10]}},
+                                                            {2{vram_dst_mask_shift[8] }},
+                                                            {2{vram_dst_mask_shift[6] }},
+                                                            {2{vram_dst_mask_shift[4] }},
+                                                            {2{vram_dst_mask_shift[2] }},
+                                                            {2{vram_dst_mask_shift[0] }}}) |
+                                  ({16{gfx_mode_4_bpp }} & {{4{vram_dst_mask_shift[12]}},
+                                                            {4{vram_dst_mask_shift[8] }},
+                                                            {4{vram_dst_mask_shift[4] }},
+                                                            {4{vram_dst_mask_shift[0] }}}) |
+                                  ({16{gfx_mode_8_bpp }} & {{8{vram_dst_mask_shift[8] }},
+                                                            {8{vram_dst_mask_shift[0] }}}) |
+                                  ({16{gfx_mode_16_bpp}} & {16{1'b1}}                    ) ;
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)                               vram_dst_mask <=  16'h0000;
+  else if (trig_exec_i | vram_dst_addr_inc)  vram_dst_mask <=  vram_dst_mask_nxt;
+
 
 //=============================================================================
-// 6)  VIDEO-MEMORY INTERFACE
+// 8)  VIDEO-MEMORY INTERFACE
 //=============================================================================
 
 // Detect read accesses
@@ -374,54 +449,79 @@ always @ (posedge mclk or posedge puc_rst)
 assign     pixel_is_transparent = (pixel_is_transparent_nxt | pixel_is_transparent_reg);
 
 
+// Align source data to destination for lower resolution
+wire [15:0] src_data_mask        = ((exec_fill_i ? cfg_fill_color_i : vid_ram_dout_i) & vram_src_mask);
+wire        src_data_mask_1_bpp  =  (|src_data_mask);
+wire  [1:0] src_data_mask_2_bpp  = {(|{src_data_mask[15], src_data_mask[13], src_data_mask[11], src_data_mask[9], src_data_mask[7], src_data_mask[5], src_data_mask[3], src_data_mask[1]}),
+                                    (|{src_data_mask[14], src_data_mask[12], src_data_mask[10], src_data_mask[8], src_data_mask[6], src_data_mask[4], src_data_mask[2], src_data_mask[0]})};
+wire  [3:0] src_data_mask_4_bpp  = {(|{src_data_mask[15], src_data_mask[11], src_data_mask[7] , src_data_mask[3]}),
+                                    (|{src_data_mask[14], src_data_mask[10], src_data_mask[6] , src_data_mask[2]}),
+                                    (|{src_data_mask[13], src_data_mask[9] , src_data_mask[5] , src_data_mask[1]}),
+                                    (|{src_data_mask[12], src_data_mask[8] , src_data_mask[4] , src_data_mask[0]})};
+wire  [7:0] src_data_mask_8_bpp  = {(|{src_data_mask[15], src_data_mask[7]}),
+                                    (|{src_data_mask[14], src_data_mask[6]}),
+                                    (|{src_data_mask[13], src_data_mask[5]}),
+                                    (|{src_data_mask[12], src_data_mask[4]}),
+                                    (|{src_data_mask[11], src_data_mask[3]}),
+                                    (|{src_data_mask[10], src_data_mask[2]}),
+                                    (|{src_data_mask[9] , src_data_mask[1]}),
+                                    (|{src_data_mask[8] , src_data_mask[0]})};
+wire [15:0] src_data_mask_16_bpp =     src_data_mask;
+
+wire [15:0] src_data_align_nxt   =  ({16{gfx_mode_1_bpp }} & {16{src_data_mask_1_bpp}}) |
+                                    ({16{gfx_mode_2_bpp }} &  {8{src_data_mask_2_bpp}}) |
+                                    ({16{gfx_mode_4_bpp }} &  {4{src_data_mask_4_bpp}}) |
+                                    ({16{gfx_mode_8_bpp }} &  {2{src_data_mask_8_bpp}}) |
+                                    ({16{gfx_mode_16_bpp}} &     src_data_mask_16_bpp ) ;
+
 // Compute Data
 reg  [15:0] rd_data_buf;
 
-wire [15:0] src_data     =  exec_fill_i     ?  cfg_fill_color_i :
-                           ~data_ready_src  ?  rd_data_buf      :
-                                               vid_ram_dout_i   ;
+wire [15:0] src_data         = ~gfx_mode_16_bpp ?  src_data_align_nxt :
+                                exec_fill_i     ?  cfg_fill_color_i   :
+                               ~data_ready_src  ?  rd_data_buf        :
+                                                   vid_ram_dout_i     ;
 
+wire [15:0] dst_data_nxt     = ({16{pix_op_00}} &  ( src_data                   )) |  // S
+                               ({16{pix_op_01}} &  (~src_data                   )) |  // not S
+                               ({16{pix_op_02}} &  (             ~vid_ram_dout_i)) |  // not D
 
-wire [15:0] dst_data_nxt = ({16{pix_op_00}} &  ( src_data                   )) |  // S
-                           ({16{pix_op_01}} &  (~src_data                   )) |  // not S
-                           ({16{pix_op_02}} &  (             ~vid_ram_dout_i)) |  // not D
+                               ({16{pix_op_03}} &  ( src_data  &  vid_ram_dout_i)) |  // S and D
+                               ({16{pix_op_04}} &  ( src_data  |  vid_ram_dout_i)) |  // S or  D
+                               ({16{pix_op_05}} &  ( src_data  ^  vid_ram_dout_i)) |  // S xor D
 
-                           ({16{pix_op_03}} &  ( src_data  &  vid_ram_dout_i)) |  // S and D
-                           ({16{pix_op_04}} &  ( src_data  |  vid_ram_dout_i)) |  // S or  D
-                           ({16{pix_op_05}} &  ( src_data  ^  vid_ram_dout_i)) |  // S xor D
+                               ({16{pix_op_06}} & ~( src_data  &  vid_ram_dout_i)) |  // not (S and D)
+                               ({16{pix_op_07}} & ~( src_data  |  vid_ram_dout_i)) |  // not (S or  D)
+                               ({16{pix_op_08}} & ~( src_data  ^  vid_ram_dout_i)) |  // not (S xor D)
 
-                           ({16{pix_op_06}} & ~( src_data  &  vid_ram_dout_i)) |  // not (S and D)
-                           ({16{pix_op_07}} & ~( src_data  |  vid_ram_dout_i)) |  // not (S or  D)
-                           ({16{pix_op_08}} & ~( src_data  ^  vid_ram_dout_i)) |  // not (S xor D)
+                               ({16{pix_op_09}} &  (~src_data  &  vid_ram_dout_i)) |  // (not S) and      D
+                               ({16{pix_op_10}} &  ( src_data  & ~vid_ram_dout_i)) |  //      S  and (not D)
+                               ({16{pix_op_11}} &  (~src_data  |  vid_ram_dout_i)) |  // (not S) or       D
+                               ({16{pix_op_12}} &  ( src_data  | ~vid_ram_dout_i)) |  //      S  or  (not D)
 
-                           ({16{pix_op_09}} &  (~src_data  &  vid_ram_dout_i)) |  // (not S) and      D
-                           ({16{pix_op_10}} &  ( src_data  & ~vid_ram_dout_i)) |  //      S  and (not D)
-                           ({16{pix_op_11}} &  (~src_data  |  vid_ram_dout_i)) |  // (not S) or       D
-                           ({16{pix_op_12}} &  ( src_data  | ~vid_ram_dout_i)) |  //      S  or  (not D)
+                               ({16{pix_op_13}} &  ( 16'h0000                   )) |  // Fill 0 if S not transparent
+                               ({16{pix_op_14}} &  ( 16'hffff                   )) |  // Fill 1 if S not transparent
+                               ({16{pix_op_15}} &  ( cfg_fill_color_i           )) ;  // Fill 'fill_color' if S not transparent
 
-                           ({16{pix_op_13}} &  ( 16'h0000                   )) |  // Fill 0 if S not transparent            (only COPY_TRANSPARENT command)
-                           ({16{pix_op_14}} &  ( 16'hffff                   )) |  // Fill 1 if S not transparent            (only COPY_TRANSPARENT command)
-                           ({16{pix_op_15}} &  ( cfg_fill_color_i           )) ;  // Fill 'fill_color' if S not transparent (only COPY_TRANSPARENT command)
-
-
+wire [15:0] dst_data_msk_nxt = (dst_data_nxt & vram_dst_mask) | (vid_ram_dout_i & ~vram_dst_mask);
 
 
 // Read data buffer
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)              rd_data_buf <=  {16{1'b0}};
   else if (data_ready_src)  rd_data_buf <=  pix_op_01 ? ~src_data : src_data;
-  else if (data_ready_dst)  rd_data_buf <=  dst_data_nxt;
+  else if (data_ready_dst)  rd_data_buf <=  dst_data_msk_nxt;
 
 
 // RAM interface
 assign      vid_ram_din_o  =  (~data_ready_src & ~data_ready_dst &
-                               ~pix_op_13 & ~pix_op_14 & ~pix_op_15) ? rd_data_buf  :
-                                                                       dst_data_nxt ;
+                               ~pix_op_13 & ~pix_op_14 & ~pix_op_15) ? rd_data_buf      :
+                                                                       dst_data_msk_nxt ;
 
 assign      vid_ram_addr_o =  (dma_state==SRC_READ) ? vram_src_addr[`VRAM_MSB+4:4] :
                                                       vram_dst_addr[`VRAM_MSB+4:4] ;
 
-assign      vid_ram_wen_o  =  {2{~((dma_state==DST_WRITE) & ~pixel_is_transparent)}};
+assign      vid_ram_wen_o  = ~( (dma_state==DST_WRITE) & ~pixel_is_transparent) ;
 
 assign      vid_ram_cen_o  = ~( (dma_state==SRC_READ)                           |
                                ((dma_state==DST_READ)  & ~pixel_is_transparent) |

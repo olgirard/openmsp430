@@ -105,13 +105,13 @@ output        [15:0] per_dout_o;          // Peripheral data output
 
 `ifdef WITH_PROGRAMMABLE_LUT
 output [`LRAM_MSB:0] lut_ram_addr_o;      // LUT-RAM address
-output         [1:0] lut_ram_wen_o;       // LUT-RAM write enable (active low)
+output               lut_ram_wen_o;       // LUT-RAM write enable (active low)
 output               lut_ram_cen_o;       // LUT-RAM enable (active low)
 output        [15:0] lut_ram_din_o;       // LUT-RAM data input
 `endif
 
 output [`VRAM_MSB:0] vid_ram_addr_o;      // Video-RAM address
-output         [1:0] vid_ram_wen_o;       // Video-RAM write enable (active low)
+output               vid_ram_wen_o;       // Video-RAM write enable (active low)
 output               vid_ram_cen_o;       // Video-RAM enable (active low)
 output        [15:0] vid_ram_din_o;       // Video-RAM data input
 
@@ -164,7 +164,7 @@ wire               lt24_start_evt;
 `ifdef WITH_PROGRAMMABLE_LUT
 wire [`LRAM_MSB:0] lut_ram_sw_addr;
 wire        [15:0] lut_ram_sw_din;
-wire         [1:0] lut_ram_sw_wen;
+wire               lut_ram_sw_wen;
 wire               lut_ram_sw_cen;
 wire        [15:0] lut_ram_sw_dout;
 wire [`LRAM_MSB:0] lut_ram_refr_addr;
@@ -174,12 +174,12 @@ wire               lut_ram_refr_dout_rdy_nxt;
 `endif
 wire [`VRAM_MSB:0] vid_ram_sw_addr;
 wire        [15:0] vid_ram_sw_din;
-wire         [1:0] vid_ram_sw_wen;
+wire               vid_ram_sw_wen;
 wire               vid_ram_sw_cen;
 wire        [15:0] vid_ram_sw_dout;
 wire [`VRAM_MSB:0] vid_ram_gpu_addr;
 wire        [15:0] vid_ram_gpu_din;
-wire         [1:0] vid_ram_gpu_wen;
+wire               vid_ram_gpu_wen;
 wire               vid_ram_gpu_cen;
 wire        [15:0] vid_ram_gpu_dout;
 wire               vid_ram_gpu_dout_rdy_nxt;
@@ -192,7 +192,7 @@ wire               refresh_active;
 wire        [15:0] refresh_data;
 wire               refresh_data_ready;
 wire               refresh_data_request;
-wire [`VRAM_MSB:0] refresh_frame_addr;
+wire [`APIX_MSB:0] refresh_frame_addr;
 wire         [1:0] refresh_lut_select;
 
 wire               gpu_cmd_done_evt;
@@ -426,7 +426,7 @@ ogfx_ram_arbiter  ogfx_ram_arbiter_inst (
    // Refresh-backend, fixed lowest priority
     .lut_ram_refr_addr_i           ( lut_ram_refr_addr          ),    // LUT-RAM Refresh address
     .lut_ram_refr_din_i            ( 16'h0000                   ),    // LUT-RAM Refresh data
-    .lut_ram_refr_wen_i            ( 2'h3                       ),    // LUT-RAM Refresh write strobe (active low)
+    .lut_ram_refr_wen_i            ( 1'h1                       ),    // LUT-RAM Refresh write strobe (active low)
     .lut_ram_refr_cen_i            ( lut_ram_refr_cen           ),    // LUT-RAM Refresh enable (active low)
     .lut_ram_refr_dout_o           ( lut_ram_refr_dout          ),    // LUT-RAM Refresh data output
     .lut_ram_refr_dout_rdy_nxt_o   ( lut_ram_refr_dout_rdy_nxt  ),    // LUT-RAM Refresh data output ready during next cycle
@@ -458,7 +458,7 @@ ogfx_ram_arbiter  ogfx_ram_arbiter_inst (
    // Refresh-backend (round-robin with GPU interface)
     .vid_ram_refr_addr_i           ( vid_ram_refr_addr          ),    // Video-RAM Refresh address
     .vid_ram_refr_din_i            ( 16'h0000                   ),    // Video-RAM Refresh data
-    .vid_ram_refr_wen_i            ( 2'h3                       ),    // Video-RAM Refresh write strobe (active low)
+    .vid_ram_refr_wen_i            ( 1'h1                       ),    // Video-RAM Refresh write strobe (active low)
     .vid_ram_refr_cen_i            ( vid_ram_refr_cen           ),    // Video-RAM Refresh enable (active low)
     .vid_ram_refr_dout_o           ( vid_ram_refr_dout          ),    // Video-RAM Refresh data output
     .vid_ram_refr_dout_rdy_nxt_o   ( vid_ram_refr_dout_rdy_nxt  ),    // Video-RAM Refresh data output ready during next cycle

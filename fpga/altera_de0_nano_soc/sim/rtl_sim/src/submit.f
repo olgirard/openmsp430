@@ -107,6 +107,7 @@
 ../../../rtl/verilog/opengfx430/openGFX430.v
 ../../../rtl/verilog/opengfx430/ogfx_reg.v
 ../../../rtl/verilog/opengfx430/ogfx_reg_fifo.v
+../../../rtl/verilog/opengfx430/ogfx_reg_vram_if.v
 ../../../rtl/verilog/opengfx430/ogfx_reg_vram_addr.v
 ../../../rtl/verilog/opengfx430/ogfx_if_lt24.v
 ../../../rtl/verilog/opengfx430/ogfx_backend.v

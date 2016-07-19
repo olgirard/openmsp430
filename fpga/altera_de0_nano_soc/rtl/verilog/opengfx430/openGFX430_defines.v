@@ -157,6 +157,18 @@
  `define VRAM_PX_LO_MSB `VRAM_MSB+4
 `endif
 
+`define  APIX_WIDTH  (`VRAM_AWIDTH+4)
+`define  APIX_MSB    (`APIX_WIDTH-1)
+`ifdef VRAM_BIGGER_4_KW
+ `define APIX_HI_MSB (`APIX_MSB-16)
+ `define APIX_LO_MSB 15
+`else
+ `define APIX_LO_MSB `APIX_MSB
+`endif
+
+
+
+
 `ifdef WITH_EXTRA_LUT_BANK
  `define LRAM_AWIDTH 9
 `else

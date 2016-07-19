@@ -122,7 +122,7 @@ input                vid_ram_dout_rdy_nxt_i;      // Video-RAM data output ready
 
 input                refresh_active_i;            // Display refresh on going
 input                refresh_data_request_i;      // Display refresh new data request
-input  [`VRAM_MSB:0] refresh_frame_base_addr_i;   // Refresh frame base address
+input  [`APIX_MSB:0] refresh_frame_base_addr_i;   // Refresh frame base address
 input          [1:0] refresh_lut_select_i;        // Refresh LUT bank selection
 
 

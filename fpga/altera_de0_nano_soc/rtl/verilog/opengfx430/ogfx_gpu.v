@@ -81,7 +81,7 @@ output               gpu_get_data_o;              // GPU get next data
 
 output [`VRAM_MSB:0] vid_ram_addr_o;              // Video-RAM address
 output        [15:0] vid_ram_din_o;               // Video-RAM data
-output         [1:0] vid_ram_wen_o;               // Video-RAM write strobe (active low)
+output               vid_ram_wen_o;               // Video-RAM write strobe (active low)
 output               vid_ram_cen_o;               // Video-RAM chip enable (active low)
 
 // INPUTs

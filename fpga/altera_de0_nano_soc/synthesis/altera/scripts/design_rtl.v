@@ -82,6 +82,7 @@
 `include "../../../rtl/verilog/opengfx430/openGFX430.v"
 `include "../../../rtl/verilog/opengfx430/ogfx_reg.v"
 `include "../../../rtl/verilog/opengfx430/ogfx_reg_fifo.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_reg_vram_if.v"
 `include "../../../rtl/verilog/opengfx430/ogfx_reg_vram_addr.v"
 `include "../../../rtl/verilog/opengfx430/ogfx_if_lt24.v"
 `include "../../../rtl/verilog/opengfx430/ogfx_backend.v"
