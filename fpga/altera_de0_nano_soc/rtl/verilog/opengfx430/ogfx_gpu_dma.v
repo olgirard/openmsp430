@@ -537,14 +537,10 @@ wire [15:0] pixel_data               = ({16{pix_op_00}} &  ( src_data           
                                        ({16{pix_op_14}} &  ( 16'hffff             )) |  // Fill 1 if S not transparent
                                        ({16{pix_op_15}} &  ( fill_color_align     )) ;  // Fill 'fill_color' if S not transparent
 
-wire [15:0] pixel_data_msk           = (pixel_data & vram_dst_mask) | (dst_data & ~vram_dst_mask);
 
 
 // RAM interface
-assign      vid_ram_din_o  =  pixel_data_msk;
-//assign      vid_ram_din_o  =  (~data_ready_src & ~data_ready_dst &
-//                               ~pix_op_13 & ~pix_op_14 & ~pix_op_15) ? rd_data_buf      :
-//                                                                       dst_data_msk_nxt ;
+assign      vid_ram_din_o  =  (pixel_data & vram_dst_mask) | (dst_data & ~vram_dst_mask);
 
 assign      vid_ram_addr_o =  (dma_state==SRC_READ) ? vram_src_addr[`APIX_MSB:4] :
                                                       vram_dst_addr[`APIX_MSB:4] ;
@@ -554,8 +550,6 @@ assign      vid_ram_wen_o  = ~( (dma_state==DST_WRITE) & ~pixel_is_transparent) 
 assign      vid_ram_cen_o  = ~( (dma_state==SRC_READ)                           |
                                ((dma_state==DST_READ)  & ~pixel_is_transparent) |
                                ((dma_state==DST_WRITE) & ~pixel_is_transparent));
-
-
 
 
 endmodule // ogfx_gpu_dma
