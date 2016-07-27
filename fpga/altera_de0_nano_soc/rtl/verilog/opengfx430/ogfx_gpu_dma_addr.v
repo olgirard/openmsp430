@@ -66,7 +66,7 @@ module  ogfx_gpu_dma_addr (
 
 // OUTPUTs
 //=========
-output [`VRAM_MSB+4:0] vid_ram_addr_nxt_o;    //  Next Video-RAM address
+output   [`APIX_MSB:0] vid_ram_addr_nxt_o;    //  Next Video-RAM address
 
 // INPUTs
 //=========
@@ -78,7 +78,7 @@ input                  gfx_mode_2_bpp_i;      // Graphic mode  2 bpp resolution
 input                  gfx_mode_4_bpp_i;      // Graphic mode  4 bpp resolution
 input                  gfx_mode_8_bpp_i;      // Graphic mode  8 bpp resolution
 input                  gfx_mode_16_bpp_i;     // Graphic mode 16 bpp resolution
-input  [`VRAM_MSB+4:0] vid_ram_addr_i;        // Video-RAM address
+input    [`APIX_MSB:0] vid_ram_addr_i;        // Video-RAM address
 input                  vid_ram_addr_init_i;   // Video-RAM address initialization
 input                  vid_ram_addr_step_i;   // Video-RAM address step
 input    [`LPIX_MSB:0] vid_ram_height_i;      // Video-RAM height
@@ -91,7 +91,7 @@ input                  vid_ram_win_cl_swap_i; // Video-RAM CL-Swap configuration
 //=============================================================================
 // 1)  COMPUTE NEXT MEMORY ACCESS
 //=============================================================================
-reg  [`VRAM_MSB+4:0] vid_ram_line_addr;
+reg    [`APIX_MSB:0] vid_ram_line_addr;
 reg    [`LPIX_MSB:0] vid_ram_column_count;
 
 // Swap Width and Height if required
@@ -111,31 +111,31 @@ wire [`LPIX_MSB+4:0] vid_ram_length_align =  {`LPIX_MSB+5{gfx_mode_1_bpp_i }} & 
                                              {`LPIX_MSB+5{gfx_mode_8_bpp_i }} & {1'b0,    vid_ram_length_mux[`LPIX_MSB:0], 3'b000 } |
                                              {`LPIX_MSB+5{gfx_mode_16_bpp_i}} & {         vid_ram_length_mux[`LPIX_MSB:0], 4'b0000} ;
 
-wire [`LPIX_MSB+4:0] plus_one_val         =  {`LPIX_MSB+5{gfx_mode_1_bpp_i }} & {4'b0000, {{`VRAM_MSB{1'b0}}, 1'b1}               } |
-                                             {`LPIX_MSB+5{gfx_mode_2_bpp_i }} & {3'b000,  {{`VRAM_MSB{1'b0}}, 1'b1},       1'b0   } |
-                                             {`LPIX_MSB+5{gfx_mode_4_bpp_i }} & {2'b00,   {{`VRAM_MSB{1'b0}}, 1'b1},       2'b00  } |
-                                             {`LPIX_MSB+5{gfx_mode_8_bpp_i }} & {1'b0,    {{`VRAM_MSB{1'b0}}, 1'b1},       3'b000 } |
-                                             {`LPIX_MSB+5{gfx_mode_16_bpp_i}} & {         {{`VRAM_MSB{1'b0}}, 1'b1},       4'b0000} ;
+wire   [`APIX_MSB:0] plus_one_val         =  {`APIX_MSB+1{gfx_mode_1_bpp_i }} & {4'b0000, {{`VRAM_MSB{1'b0}}, 1'b1}               } |
+                                             {`APIX_MSB+1{gfx_mode_2_bpp_i }} & {3'b000,  {{`VRAM_MSB{1'b0}}, 1'b1},       1'b0   } |
+                                             {`APIX_MSB+1{gfx_mode_4_bpp_i }} & {2'b00,   {{`VRAM_MSB{1'b0}}, 1'b1},       2'b00  } |
+                                             {`APIX_MSB+1{gfx_mode_8_bpp_i }} & {1'b0,    {{`VRAM_MSB{1'b0}}, 1'b1},       3'b000 } |
+                                             {`APIX_MSB+1{gfx_mode_16_bpp_i}} & {         {{`VRAM_MSB{1'b0}}, 1'b1},       4'b0000} ;
 
 // Zero extension for LINT cleanup
-wire [`VRAM_MSB*3:0] vid_ram_length_norm  =  {{`VRAM_MSB*3-`LPIX_MSB-4{1'b0}}, vid_ram_length_align};
+wire [`APIX_MSB*3:0] vid_ram_length_norm  =  {{`APIX_MSB*3-`LPIX_MSB-4{1'b0}}, vid_ram_length_align};
 
 // Select base address for next calculation
-wire [`VRAM_MSB+4:0] next_base_addr       =  (vid_ram_addr_init_i | ~vid_ram_line_done) ? vid_ram_addr_i    :
+wire   [`APIX_MSB:0] next_base_addr       =  (vid_ram_addr_init_i | ~vid_ram_line_done) ? vid_ram_addr_i    :
                                                                                           vid_ram_line_addr ;
 // Compute next address
-wire [`VRAM_MSB+4:0] next_addr            =   next_base_addr
-                                            + (vid_ram_length_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{~vid_ram_addr_init_i ? (~vid_ram_win_y_swap_i &  (vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}})
-                                            - (vid_ram_length_norm[`VRAM_MSB+4:0] & {`VRAM_MSB+1+4{~vid_ram_addr_init_i ? ( vid_ram_win_y_swap_i &  (vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}})
-                                            + (plus_one_val                       & {`VRAM_MSB+1+4{~vid_ram_addr_init_i ? (~vid_ram_win_x_swap_i & ~(vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}})
-                                            - (plus_one_val                       & {`VRAM_MSB+1+4{~vid_ram_addr_init_i ? ( vid_ram_win_x_swap_i & ~(vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}});
+wire   [`APIX_MSB:0] next_addr            =   next_base_addr
+                                            + (vid_ram_length_norm[`APIX_MSB:0] & {`APIX_MSB+1{~vid_ram_addr_init_i ? (~vid_ram_win_y_swap_i &  (vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}})
+                                            - (vid_ram_length_norm[`APIX_MSB:0] & {`APIX_MSB+1{~vid_ram_addr_init_i ? ( vid_ram_win_y_swap_i &  (vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}})
+                                            + (plus_one_val                     & {`APIX_MSB+1{~vid_ram_addr_init_i ? (~vid_ram_win_x_swap_i & ~(vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}})
+                                            - (plus_one_val                     & {`APIX_MSB+1{~vid_ram_addr_init_i ? ( vid_ram_win_x_swap_i & ~(vid_ram_win_cl_swap_i ^ vid_ram_line_done)) : 1'b0}});
 
 wire                 update_line_addr     =   vid_ram_addr_init_i | vid_ram_line_done;
 wire                 update_pixel_addr    =   update_line_addr    | vid_ram_addr_step_i;
 
 // Start RAM address of currentely refreshed line
 always @(posedge mclk or posedge puc_rst)
-  if (puc_rst)               vid_ram_line_addr  <=  {`VRAM_MSB+1+4{1'b0}};
+  if (puc_rst)               vid_ram_line_addr  <=  {`APIX_MSB+1{1'b0}};
   else if (update_line_addr) vid_ram_line_addr  <=  next_addr;
 
 // Current RAM address of the currentely refreshed pixel

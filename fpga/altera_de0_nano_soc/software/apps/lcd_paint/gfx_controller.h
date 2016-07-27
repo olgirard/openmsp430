@@ -185,8 +185,10 @@ void init_lt24(void);
 // VID_RAMx_CFG Register
 #define  VID_RAM_NO_RMW_MODE       0x0000
 #define  VID_RAM_RMW_MODE          0x0001
+#define  VID_RAM_NO_MSK_MODE       0x0000
+#define  VID_RAM_MSK_MODE          0x0002
 #define  VID_RAM_NO_WIN_MODE       0x0000
-#define  VID_RAM_WIN_MODE          0x0002
+#define  VID_RAM_WIN_MODE          0x0004
 
 #define  VID_RAM_WIN_NO_X_SWAP     0x0000
 #define  VID_RAM_WIN_X_SWAP        0x0010
@@ -211,14 +213,14 @@ void init_lt24(void);
 #define  GPU_EXEC_COPY_TRANS       0x8000
 #define  GPU_REC_WIDTH             0xC000
 #define  GPU_REC_HEIGHT            0xD000
-#define  GPU_SRC_PX_ADDR           0xE000
-#define  GPU_DST_PX_ADDR           0xE800
-#define  GPU_OF0_ADDR              0xF000
-#define  GPU_OF1_ADDR              0xF100
-#define  GPU_OF2_ADDR              0xF200
-#define  GPU_OF3_ADDR              0xF300
-#define  GPU_SET_FILL              0xFFFE
-#define  GPU_SET_TRANS             0xFFFF
+#define  GPU_SRC_PX_ADDR           0xF800
+#define  GPU_DST_PX_ADDR           0xF801
+#define  GPU_OF0_ADDR              0xF810
+#define  GPU_OF1_ADDR              0xF811
+#define  GPU_OF2_ADDR              0xF812
+#define  GPU_OF3_ADDR              0xF813
+#define  GPU_SET_FILL              0xF420
+#define  GPU_SET_TRANS             0xF421
 
 // ADDRESS SOURCE SELECTION
 #define  GPU_SRC_OF0               0x0000

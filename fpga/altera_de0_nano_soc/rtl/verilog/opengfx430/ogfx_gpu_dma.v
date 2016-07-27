@@ -97,7 +97,7 @@ output                 vid_ram_cen_o;             // Video-RAM chip enable (acti
 input                  mclk;                      // Main system clock
 input                  puc_rst;                   // Main system reset
 
-input  [`VRAM_MSB+4:0] cfg_dst_px_addr_i;         // Destination pixel address configuration
+input    [`APIX_MSB:0] cfg_dst_px_addr_i;         // Destination pixel address configuration
 input                  cfg_dst_cl_swp_i;          // Destination Column/Line-Swap configuration
 input                  cfg_dst_x_swp_i;           // Destination X-Swap configuration
 input                  cfg_dst_y_swp_i;           // Destination Y-Swap configuration
@@ -105,7 +105,7 @@ input           [15:0] cfg_fill_color_i;          // Fill color (for rectangle f
 input            [3:0] cfg_pix_op_sel_i;          // Pixel operation to be performed during the copy
 input    [`LPIX_MSB:0] cfg_rec_width_i;           // Rectangle width configuration
 input    [`LPIX_MSB:0] cfg_rec_height_i;          // Rectangle height configuration
-input  [`VRAM_MSB+4:0] cfg_src_px_addr_i;         // Source pixel address configuration
+input    [`APIX_MSB:0] cfg_src_px_addr_i;         // Source pixel address configuration
 input                  cfg_src_cl_swp_i;          // Source Column/Line-Swap configuration
 input                  cfg_src_x_swp_i;           // Source X-Swap configuration
 input                  cfg_src_y_swp_i;           // Source Y-Swap configuration
@@ -160,8 +160,6 @@ wire       pix_op_13         =  (cfg_pix_op_sel_i == 4'b1101);  // Fill 0       
 wire       pix_op_14         =  (cfg_pix_op_sel_i == 4'b1110);  // Fill 1            if S not transparent
 wire       pix_op_15         =  (cfg_pix_op_sel_i == 4'b1111);  // Fill 'fill_color' if S not transparent
 
-reg        data_ready_src;
-reg        data_ready_dst;
 wire       dma_done;
 wire       pixel_is_transparent;
 
@@ -269,24 +267,24 @@ always @(posedge mclk or posedge puc_rst)
   else if (width_cnt_init)  width_cnt <= cfg_rec_width_i;
   else if (width_cnt_dec)   width_cnt <= width_cnt-{{`LPIX_MSB{1'h0}},1'b1};
 
-assign                      width_cnt_done = (width_cnt=={{`LPIX_MSB{1'h0}}, 1'b1});
+assign            width_cnt_done = (width_cnt=={{`LPIX_MSB{1'h0}}, 1'b1});
 
 // DMA Transfer is done when both counters are done
-assign                      dma_done       = height_cnt_done & width_cnt_done;
+assign            dma_done       = height_cnt_done & width_cnt_done;
 
 
 //=============================================================================
 // 4)  SOURCE ADDRESS GENERATION
 //=============================================================================
 
-reg  [`VRAM_MSB+4:0] vram_src_addr;
-wire [`VRAM_MSB+4:0] vram_src_addr_calc;
+reg  [`APIX_MSB:0] vram_src_addr;
+wire [`APIX_MSB:0] vram_src_addr_calc;
 
-wire                 vram_src_addr_inc  = dma_pixel_done & needs_src_read;
-wire [`VRAM_MSB+4:0] vram_src_addr_nxt  = trig_exec_i ? cfg_src_px_addr_i : vram_src_addr_calc;
+wire               vram_src_addr_inc  = dma_pixel_done & needs_src_read;
+wire [`APIX_MSB:0] vram_src_addr_nxt  = trig_exec_i ? cfg_src_px_addr_i : vram_src_addr_calc;
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                              vram_src_addr <=  {`VRAM_MSB+1+4{1'b0}};
+  if (puc_rst)                              vram_src_addr <=  {`APIX_MSB+1{1'b0}};
   else if (trig_exec_i | vram_src_addr_inc) vram_src_addr <=  vram_src_addr_nxt;
 
 
@@ -356,14 +354,14 @@ always @ (posedge mclk or posedge puc_rst)
 // 6)  DESTINATION ADDRESS GENERATION
 //=============================================================================
 
-reg  [`VRAM_MSB+4:0] vram_dst_addr;
-wire [`VRAM_MSB+4:0] vram_dst_addr_calc;
+reg  [`APIX_MSB:0] vram_dst_addr;
+wire [`APIX_MSB:0] vram_dst_addr_calc;
 
-wire                 vram_dst_addr_inc  = dma_pixel_done;
-wire [`VRAM_MSB+4:0] vram_dst_addr_nxt  = trig_exec_i ? cfg_dst_px_addr_i : vram_dst_addr_calc;
+wire               vram_dst_addr_inc  = dma_pixel_done;
+wire [`APIX_MSB:0] vram_dst_addr_nxt  = trig_exec_i ? cfg_dst_px_addr_i : vram_dst_addr_calc;
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                              vram_dst_addr <=  {`VRAM_MSB+1+4{1'b0}};
+  if (puc_rst)                              vram_dst_addr <=  {`APIX_MSB+1{1'b0}};
   else if (trig_exec_i | vram_dst_addr_inc) vram_dst_addr <=  vram_dst_addr_nxt;
 
 
@@ -424,30 +422,9 @@ always @ (posedge mclk or posedge puc_rst)
 // 8)  VIDEO-MEMORY INTERFACE
 //=============================================================================
 
-// Detect read accesses
-wire data_ready_src_nxt = ((dma_state==SRC_READ) & data_ready_nxt) | (trig_exec_i & exec_fill_i);
-wire data_ready_dst_nxt = ((dma_state==DST_READ) & data_ready_nxt);
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst) data_ready_src <=  1'b0;
-  else         data_ready_src <=  data_ready_src_nxt;
-
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst) data_ready_dst <=  1'b0;
-  else         data_ready_dst <=  data_ready_dst_nxt;
-
-// Detect Transparency
-wire        pixel_is_transparent_nxt = (exec_copy_trans_i & data_ready_src                                       & (vid_ram_dout_i  ==cfg_transparent_color_i)) |
-                                       (exec_copy_i       & data_ready_src & (pix_op_13 | pix_op_14 | pix_op_15) & (vid_ram_dout_i  ==cfg_transparent_color_i)) |
-                                       (exec_fill_i       &                  (pix_op_13 | pix_op_14 | pix_op_15) & (cfg_fill_color_i==cfg_transparent_color_i));
-reg         pixel_is_transparent_reg;
-always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                                 pixel_is_transparent_reg <=  1'b0;
-  else if (dma_pixel_done | (dma_state==IDLE)) pixel_is_transparent_reg <=  1'b0;
-  else if (pixel_is_transparent_nxt)           pixel_is_transparent_reg <=  1'b1;
-
-assign     pixel_is_transparent = (pixel_is_transparent_nxt | pixel_is_transparent_reg);
-
+//--------------------------
+// Source data
+//--------------------------
 
 // Align source data to destination for lower resolution
 wire [15:0] src_data_mask        = ((exec_fill_i ? cfg_fill_color_i : vid_ram_dout_i) & vram_src_mask);
@@ -468,58 +445,109 @@ wire  [7:0] src_data_mask_8_bpp  = {(|{src_data_mask[15], src_data_mask[7]}),
                                     (|{src_data_mask[8] , src_data_mask[0]})};
 wire [15:0] src_data_mask_16_bpp =     src_data_mask;
 
-wire [15:0] src_data_align_nxt   =  ({16{gfx_mode_1_bpp }} & {16{src_data_mask_1_bpp}}) |
+wire [15:0] src_data_align       =  ({16{gfx_mode_1_bpp }} & {16{src_data_mask_1_bpp}}) |
                                     ({16{gfx_mode_2_bpp }} &  {8{src_data_mask_2_bpp}}) |
                                     ({16{gfx_mode_4_bpp }} &  {4{src_data_mask_4_bpp}}) |
                                     ({16{gfx_mode_8_bpp }} &  {2{src_data_mask_8_bpp}}) |
                                     ({16{gfx_mode_16_bpp}} &     src_data_mask_16_bpp ) ;
 
-// Compute Data
-reg  [15:0] rd_data_buf;
-
-wire [15:0] src_data         = ~gfx_mode_16_bpp ?  src_data_align_nxt :
-                                exec_fill_i     ?  cfg_fill_color_i   :
-                               ~data_ready_src  ?  rd_data_buf        :
-                                                   vid_ram_dout_i     ;
-
-wire [15:0] dst_data_nxt     = ({16{pix_op_00}} &  ( src_data                   )) |  // S
-                               ({16{pix_op_01}} &  (~src_data                   )) |  // not S
-                               ({16{pix_op_02}} &  (             ~vid_ram_dout_i)) |  // not D
-
-                               ({16{pix_op_03}} &  ( src_data  &  vid_ram_dout_i)) |  // S and D
-                               ({16{pix_op_04}} &  ( src_data  |  vid_ram_dout_i)) |  // S or  D
-                               ({16{pix_op_05}} &  ( src_data  ^  vid_ram_dout_i)) |  // S xor D
-
-                               ({16{pix_op_06}} & ~( src_data  &  vid_ram_dout_i)) |  // not (S and D)
-                               ({16{pix_op_07}} & ~( src_data  |  vid_ram_dout_i)) |  // not (S or  D)
-                               ({16{pix_op_08}} & ~( src_data  ^  vid_ram_dout_i)) |  // not (S xor D)
-
-                               ({16{pix_op_09}} &  (~src_data  &  vid_ram_dout_i)) |  // (not S) and      D
-                               ({16{pix_op_10}} &  ( src_data  & ~vid_ram_dout_i)) |  //      S  and (not D)
-                               ({16{pix_op_11}} &  (~src_data  |  vid_ram_dout_i)) |  // (not S) or       D
-                               ({16{pix_op_12}} &  ( src_data  | ~vid_ram_dout_i)) |  //      S  or  (not D)
-
-                               ({16{pix_op_13}} &  ( 16'h0000                   )) |  // Fill 0 if S not transparent
-                               ({16{pix_op_14}} &  ( 16'hffff                   )) |  // Fill 1 if S not transparent
-                               ({16{pix_op_15}} &  ( cfg_fill_color_i           )) ;  // Fill 'fill_color' if S not transparent
-
-wire [15:0] dst_data_msk_nxt = (dst_data_nxt & vram_dst_mask) | (vid_ram_dout_i & ~vram_dst_mask);
-
+// Detect read accesses
+reg         src_data_ready;
+wire        src_data_ready_nxt = ((dma_state==SRC_READ) & data_ready_nxt) | (exec_fill_i & dma_init);
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst) src_data_ready <=  1'b0;
+  else         src_data_ready <=  src_data_ready_nxt;
 
 // Read data buffer
+reg  [15:0] src_data_buf;
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)              rd_data_buf <=  {16{1'b0}};
-  else if (data_ready_src)  rd_data_buf <=  pix_op_01 ? ~src_data : src_data;
-  else if (data_ready_dst)  rd_data_buf <=  dst_data_msk_nxt;
+  if (puc_rst)              src_data_buf <=  16'h0000;
+  else if (src_data_ready)  src_data_buf <=  src_data_align;
+
+// Source data
+wire [15:0] src_data =  src_data_ready ? src_data_align : src_data_buf;
+
+//--------------------------
+// Destination data
+//--------------------------
+
+// Detect read access
+reg         dst_data_ready;
+wire        dst_data_ready_nxt = ((dma_state==DST_READ) & data_ready_nxt);
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst) dst_data_ready <=  1'b0;
+  else         dst_data_ready <=  dst_data_ready_nxt;
+
+// Read data buffer
+reg  [15:0] dst_data_buf;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)              dst_data_buf <=  16'h0000;
+  else if (dst_data_ready)  dst_data_buf <=  vid_ram_dout_i;
+
+// Source data
+wire [15:0] dst_data =  dst_data_ready ? vid_ram_dout_i : dst_data_buf;
+
+//--------------------------
+// Detect transparency
+//--------------------------
+wire [15:0] transparent_color_align  = ({16{gfx_mode_1_bpp }} & {16{cfg_transparent_color_i[0]  }}) |
+                                       ({16{gfx_mode_2_bpp }} &  {8{cfg_transparent_color_i[1:0]}}) |
+                                       ({16{gfx_mode_4_bpp }} &  {4{cfg_transparent_color_i[3:0]}}) |
+                                       ({16{gfx_mode_8_bpp }} &  {2{cfg_transparent_color_i[7:0]}}) |
+                                       ({16{gfx_mode_16_bpp}} &     cfg_transparent_color_i       ) ;
+
+wire        pixel_is_transparent_nxt = ((exec_copy_trans_i & src_data_ready                                      ) |
+                                        (exec_copy_i       & src_data_ready & (pix_op_13 | pix_op_14 | pix_op_15)) |
+                                        (exec_fill_i       &                  (pix_op_13 | pix_op_14 | pix_op_15)) ) & (src_data_align==transparent_color_align);
+reg         pixel_is_transparent_reg;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)                                 pixel_is_transparent_reg <=  1'b0;
+  else if (dma_pixel_done | (dma_state==IDLE)) pixel_is_transparent_reg <=  1'b0;
+  else if (pixel_is_transparent_nxt)           pixel_is_transparent_reg <=  1'b1;
+
+assign      pixel_is_transparent     = (pixel_is_transparent_nxt | pixel_is_transparent_reg);
+
+//--------------------------
+// Pixel operation
+//--------------------------
+wire [15:0] fill_color_align         = ({16{gfx_mode_1_bpp }} & {16{cfg_fill_color_i[0]  }}) |
+                                       ({16{gfx_mode_2_bpp }} &  {8{cfg_fill_color_i[1:0]}}) |
+                                       ({16{gfx_mode_4_bpp }} &  {4{cfg_fill_color_i[3:0]}}) |
+                                       ({16{gfx_mode_8_bpp }} &  {2{cfg_fill_color_i[7:0]}}) |
+                                       ({16{gfx_mode_16_bpp}} &     cfg_fill_color_i       ) ;
+
+wire [15:0] pixel_data               = ({16{pix_op_00}} &  ( src_data             )) |  // S
+                                       ({16{pix_op_01}} &  (~src_data             )) |  // not S
+                                       ({16{pix_op_02}} &  (             ~dst_data)) |  // not D
+
+                                       ({16{pix_op_03}} &  ( src_data  &  dst_data)) |  // S and D
+                                       ({16{pix_op_04}} &  ( src_data  |  dst_data)) |  // S or  D
+                                       ({16{pix_op_05}} &  ( src_data  ^  dst_data)) |  // S xor D
+
+                                       ({16{pix_op_06}} & ~( src_data  &  dst_data)) |  // not (S and D)
+                                       ({16{pix_op_07}} & ~( src_data  |  dst_data)) |  // not (S or  D)
+                                       ({16{pix_op_08}} & ~( src_data  ^  dst_data)) |  // not (S xor D)
+
+                                       ({16{pix_op_09}} &  (~src_data  &  dst_data)) |  // (not S) and      D
+                                       ({16{pix_op_10}} &  ( src_data  & ~dst_data)) |  //      S  and (not D)
+                                       ({16{pix_op_11}} &  (~src_data  |  dst_data)) |  // (not S) or       D
+                                       ({16{pix_op_12}} &  ( src_data  | ~dst_data)) |  //      S  or  (not D)
+
+                                       ({16{pix_op_13}} &  ( 16'h0000             )) |  // Fill 0 if S not transparent
+                                       ({16{pix_op_14}} &  ( 16'hffff             )) |  // Fill 1 if S not transparent
+                                       ({16{pix_op_15}} &  ( fill_color_align     )) ;  // Fill 'fill_color' if S not transparent
+
+wire [15:0] pixel_data_msk           = (pixel_data & vram_dst_mask) | (dst_data & ~vram_dst_mask);
 
 
 // RAM interface
-assign      vid_ram_din_o  =  (~data_ready_src & ~data_ready_dst &
-                               ~pix_op_13 & ~pix_op_14 & ~pix_op_15) ? rd_data_buf      :
-                                                                       dst_data_msk_nxt ;
+assign      vid_ram_din_o  =  pixel_data_msk;
+//assign      vid_ram_din_o  =  (~data_ready_src & ~data_ready_dst &
+//                               ~pix_op_13 & ~pix_op_14 & ~pix_op_15) ? rd_data_buf      :
+//                                                                       dst_data_msk_nxt ;
 
-assign      vid_ram_addr_o =  (dma_state==SRC_READ) ? vram_src_addr[`VRAM_MSB+4:4] :
-                                                      vram_dst_addr[`VRAM_MSB+4:4] ;
+assign      vid_ram_addr_o =  (dma_state==SRC_READ) ? vram_src_addr[`APIX_MSB:4] :
+                                                      vram_dst_addr[`APIX_MSB:4] ;
 
 assign      vid_ram_wen_o  = ~( (dma_state==DST_WRITE) & ~pixel_is_transparent) ;
 

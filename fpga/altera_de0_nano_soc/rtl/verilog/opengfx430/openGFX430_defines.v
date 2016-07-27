@@ -53,6 +53,7 @@
 //-----------------------------------------------------
 // Video display maximum pixel height/width
 //-----------------------------------------------------
+//`define MAX_DISPLAY_PIXEL_LENGTH_4096
 //`define MAX_DISPLAY_PIXEL_LENGTH_2048
 //`define MAX_DISPLAY_PIXEL_LENGTH_1024
 `define MAX_DISPLAY_PIXEL_LENGTH_512
@@ -67,13 +68,9 @@
 `define VRAM_AWIDTH  17
 
 //-----------------------------------------------------
-// Define if the Video memory is bigger than 64k Words
-// (should be defined if VRAM_AWIDTH is bigger than 16)
-//
 // Define if the Video memory is bigger than 4k Words
 // (should be defined if VRAM_AWIDTH is bigger than 12)
 //-----------------------------------------------------
-`define VRAM_BIGGER_64_KW
 `define VRAM_BIGGER_4_KW
 
 //-----------------------------------------------------
@@ -103,6 +100,11 @@
 //==========================================================================//
 //==========================================================================//
 
+`ifdef MAX_DISPLAY_PIXEL_LENGTH_4096
+  `define LPIX_MSB    11
+  `define LPIX_SIZE 4096
+  `define WITH_DISPLAY_SIZE_HI
+`endif
 `ifdef MAX_DISPLAY_PIXEL_LENGTH_2048
   `define LPIX_MSB    10
   `define LPIX_SIZE 2048
@@ -144,19 +146,6 @@
 
 `define  VRAM_MSB    (`VRAM_AWIDTH-1)
 
-`ifdef VRAM_BIGGER_64_KW
- `define VRAM_HI_MSB (`VRAM_MSB-16)
- `define VRAM_LO_MSB 15
-`else
- `define VRAM_LO_MSB `VRAM_MSB
-`endif
-`ifdef VRAM_BIGGER_4_KW
- `define VRAM_PX_HI_MSB (`VRAM_MSB-16+4)
- `define VRAM_PX_LO_MSB 15
-`else
- `define VRAM_PX_LO_MSB `VRAM_MSB+4
-`endif
-
 `define  APIX_WIDTH  (`VRAM_AWIDTH+4)
 `define  APIX_MSB    (`APIX_WIDTH-1)
 `ifdef VRAM_BIGGER_4_KW
@@ -166,9 +155,6 @@
  `define APIX_LO_MSB `APIX_MSB
 `endif
 
-
-
-
 `ifdef WITH_EXTRA_LUT_BANK
  `define LRAM_AWIDTH 9
 `else
@@ -176,20 +162,21 @@
 `endif
 `define LRAM_MSB  (`LRAM_AWIDTH-1)
 
+
 // Opcodes for GPU commands
 `define OP_EXEC_FILL         2'b00
 `define OP_EXEC_COPY         2'b01
 `define OP_EXEC_COPY_TRANS   2'b10
 `define OP_REC_WIDTH         4'b1100
 `define OP_REC_HEIGHT        4'b1101
-`define OP_SRC_PX_ADDR       5'b11100
-`define OP_DST_PX_ADDR       5'b11101
-`define OP_OF0_ADDR          8'b11110000
-`define OP_OF1_ADDR          8'b11110001
-`define OP_OF2_ADDR          8'b11110010
-`define OP_OF3_ADDR          8'b11110011
-`define OP_SET_FILL         16'b1111111111111110
-`define OP_SET_TRANSPARENT  16'b1111111111111111
+`define OP_SRC_PX_ADDR      {4'b1111, 2'b10, 10'b0000000000}
+`define OP_DST_PX_ADDR      {4'b1111, 2'b10, 10'b0000000001}
+`define OP_OF0_ADDR         {4'b1111, 2'b10, 10'b0000010000}
+`define OP_OF1_ADDR         {4'b1111, 2'b10, 10'b0000010001}
+`define OP_OF2_ADDR         {4'b1111, 2'b10, 10'b0000010010}
+`define OP_OF3_ADDR         {4'b1111, 2'b10, 10'b0000010011}
+`define OP_SET_FILL         {4'b1111, 2'b01, 10'b0000100000}
+`define OP_SET_TRANSPARENT  {4'b1111, 2'b01, 10'b0000100001}
 
 // Bit possitions of the GPU Command
 `define SRC_OFFSET          13:12

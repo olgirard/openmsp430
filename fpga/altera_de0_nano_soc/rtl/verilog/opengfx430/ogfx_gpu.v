@@ -110,7 +110,7 @@ wire                 exec_copy;
 wire                 exec_copy_trans;
 wire                 trig_exec;
 
-wire [`VRAM_MSB+4:0] cfg_dst_px_addr;
+wire   [`APIX_MSB:0] cfg_dst_px_addr;
 wire                 cfg_dst_cl_swp;
 wire                 cfg_dst_x_swp;
 wire                 cfg_dst_y_swp;
@@ -118,7 +118,7 @@ wire          [15:0] cfg_fill_color;
 wire           [3:0] cfg_pix_op_sel;
 wire   [`LPIX_MSB:0] cfg_rec_width;
 wire   [`LPIX_MSB:0] cfg_rec_height;
-wire [`VRAM_MSB+4:0] cfg_src_px_addr;
+wire   [`APIX_MSB:0] cfg_src_px_addr;
 wire                 cfg_src_cl_swp;
 wire                 cfg_src_x_swp;
 wire                 cfg_src_y_swp;

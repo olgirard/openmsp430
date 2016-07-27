@@ -10,6 +10,7 @@
 //#define TEST_1_BPP
 
 void init_mem(unsigned int, unsigned int, unsigned int, unsigned int);
+void init_mem_8bpp(void);
 void dma_test(unsigned int, unsigned int, unsigned int);
 
 
@@ -371,25 +372,31 @@ int main(void) {
   GPU_CMD  = GPU_REC_WIDTH   | 0x0123;
   GPU_CMD  = GPU_REC_HEIGHT  | 0x0456;
 
-  GPU_CMD  = GPU_SRC_PX_ADDR | 0x00AD; GPU_CMD = 0xBEEF;
-  GPU_CMD  = GPU_DST_PX_ADDR | 0x00DE; GPU_CMD = 0xC001;
+  GPU_CMD  = GPU_SRC_PX_ADDR; GPU_CMD = 0x00AD; GPU_CMD = 0xBEEF;
+  GPU_CMD  = GPU_DST_PX_ADDR; GPU_CMD = 0x00DE; GPU_CMD = 0xC001;
 
-  GPU_CMD  = GPU_OF0_ADDR    | 0x0001; GPU_CMD = 0x2345;
-  GPU_CMD  = GPU_OF1_ADDR    | 0x0067; GPU_CMD = 0x89AB;
-  GPU_CMD  = GPU_OF2_ADDR    | 0x00CD; GPU_CMD = 0xEF01;
-  GPU_CMD  = GPU_OF3_ADDR    | 0x0065; GPU_CMD = 0x4321;
+  GPU_CMD  = GPU_OF0_ADDR;    GPU_CMD = 0x0001; GPU_CMD = 0x2345;
+  GPU_CMD  = GPU_OF1_ADDR;    GPU_CMD = 0x0067; GPU_CMD = 0x89AB;
+  GPU_CMD  = GPU_OF2_ADDR;    GPU_CMD = 0x00CD; GPU_CMD = 0xEF01;
+  GPU_CMD  = GPU_OF3_ADDR;    GPU_CMD = 0x0065; GPU_CMD = 0x4321;
 
-  GPU_CMD  = GPU_SET_FILL            ; GPU_CMD = 0xA55A;
-  GPU_CMD  = GPU_SET_TRANS           ; GPU_CMD = 0x5AA5;
+  GPU_CMD  = GPU_SET_FILL;    GPU_CMD = 0xA55A;
+  GPU_CMD  = GPU_SET_TRANS;   GPU_CMD = 0x5AA5;
 
 
 
   // Real test
-  GPU_CMD  = GPU_REC_WIDTH   | 0x0003;
-  GPU_CMD  = GPU_REC_HEIGHT  | 0x0002;
-  GPU_CMD  = GPU_OF0_ADDR    | 0x0000; GPU_CMD = 0x0000;
-  GPU_CMD  = GPU_DST_PX_ADDR | 0x0000; GPU_CMD = 100;
-  GPU_CMD  = GPU_SRC_PX_ADDR | 0x0000; GPU_CMD = 0;
+  GPU_CMD  = GPU_REC_WIDTH  | 0x0003;
+  GPU_CMD  = GPU_REC_HEIGHT | 0x0002;
+  GPU_CMD  = GPU_OF0_ADDR   ; GPU_CMD = 0x0000; GPU_CMD = 0x0000;
+  GPU_CMD  = GPU_DST_PX_ADDR; GPU_CMD = 0x0000; GPU_CMD = 100;
+  GPU_CMD  = GPU_SRC_PX_ADDR; GPU_CMD = 0x0000; GPU_CMD = 0;
+
+  GFX_CTRL = GFX_16_BPP | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
+  //GFX_CTRL = GFX_8_BPP  | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
+  //GFX_CTRL = GFX_4_BPP  | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
+  //GFX_CTRL = GFX_2_BPP  | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
+  //GFX_CTRL = GFX_1_BPP  | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
 
   //-------------------------------------------- FILL --------------------------------------------------------
   for( idx = 0; idx < 500; idx = idx + 1 ) {__nop();}
@@ -397,7 +404,7 @@ int main(void) {
 
   init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
   GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
-  dma_test(GPU_EXEC_FILL, GPU_PXOP_0, 0xDEAD);           //  0xDEAD               # 0 #        S
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_0, 0xDEAD);           //  0xDEAD               # 0 #       S
 
   init_mem(0x1234, 0x5678, 0x9ABC, 0xDEF0);
   GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5678;
@@ -657,7 +664,7 @@ int main(void) {
 
   init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
   GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x9ABC;
-  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_C, 0xDEAD);     //  0x333F   / no-wrte   # C #      S  or  (not D)
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_C, 0xDEAD);     //  0x333F   / no-write  # C #      S  or  (not D)
 
   init_mem(0x1234, 0x9ABC, 0xDEF0, 0x5678);
   GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5AA5;
@@ -684,79 +691,437 @@ int main(void) {
   dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_F, 0xDEAD);     //  0xDEAD   / no-write  # F # Fill 'fill_color' if S not transparent
 
 
-  //-------------------------------------------- COPY ADDRESSING MODES --------------------------------------------------------
+  //-------------------------------------------- COPY ADDRESSING MODES 16BPP --------------------------------------------------------
   for( idx = 0; idx < 500; idx = idx + 1 ) {__nop();}
+
+  GFX_CTRL = GFX_16_BPP | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
 
   // Configure
   DISPLAY_WIDTH  = 13;
   DISPLAY_HEIGHT = 15;
-  GPU_CMD        = GPU_REC_WIDTH   | 0x0008;
-  GPU_CMD        = GPU_REC_HEIGHT  | 0x0005;
-  GPU_CMD        = GPU_OF0_ADDR    | 0x0000; GPU_CMD = 0x0000;
+  GPU_CMD        = GPU_REC_WIDTH  | 0x0008;
+  GPU_CMD        = GPU_REC_HEIGHT | 0x0005;
+  GPU_CMD        = GPU_OF0_ADDR;    GPU_CMD = 0x0000; GPU_CMD = 0x0000;
 
+  //---------------------------------------------------------
   // COPY  = NO_X - NO_Y - NO_CL
-  GPU_CMD  = GPU_SRC_PX_ADDR | 0x0000; GPU_CMD = 27;
-  GPU_CMD  = GPU_DST_PX_ADDR | 0x0000; GPU_CMD = 27;//121;
+  //---------------------------------------------------------
+  // 27-121 28-122 29-123 30-124 31-125 32-126 33-127 34-128
+  // 40-134 41-135 42-136 43-137 44-138 45-139 46-140 47-141
+  // 53-147 54-148 55-149 56-150 57-151 58-152 59-153 60-154
+  // 66-160 67-161 68-162 69-163 70-164 71-165 72-166 73-167
+  // 79-173 80-174 81-175 82-176 83-177 84-178 85-179 86-180
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 27;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 121;
   GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
                                             GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
   while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
   for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
 
+  //---------------------------------------------------------
   // COPY  =    X - NO_Y - NO_CL
-  GPU_CMD  = GPU_SRC_PX_ADDR | 0x0000; GPU_CMD = 34;
-  GPU_CMD  = GPU_DST_PX_ADDR | 0x0000; GPU_CMD = 34;//128;
+  //---------------------------------------------------------
+  // 34-128 33-127 32-126 31-125 30-124 29-123 28-122 27-121
+  // 47-141 46-140 45-139 44-138 43-137 42-136 41-135 40-134
+  // 60-154 59-153 58-152 57-151 56-150 55-149 54-148 53-147
+  // 73-167 72-166 71-165 70-164 69-163 68-162 67-161 66-160
+  // 86-180 85-179 84-178 83-177 82-176 81-175 80-174 79-173
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 34;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 128;
   GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_X_SWP    | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
                                             GPU_DST_OF0 | GPU_DST_X_SWP    | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
   while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
   for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
 
+  //---------------------------------------------------------
   // COPY  = NO_X -    Y - NO_CL
-  GPU_CMD  = GPU_SRC_PX_ADDR | 0x0000; GPU_CMD = 79;
-  GPU_CMD  = GPU_DST_PX_ADDR | 0x0000; GPU_CMD = 79;//173;
+  //---------------------------------------------------------
+  // 79-173 80-174 81-175 82-176 83-177 84-178 85-179 86-180
+  // 66-160 67-161 68-162 69-163 70-164 71-165 72-166 73-167
+  // 53-147 54-148 55-149 56-150 57-151 58-152 59-153 60-154
+  // 40-134 41-135 42-136 43-137 44-138 45-139 46-140 47-141
+  // 27-121 28-122 29-123 30-124 31-125 32-126 33-127 34-128
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 79;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 173;
   GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_Y_SWP    | GPU_SRC_NO_CL_SWP |
                                             GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_Y_SWP    | GPU_DST_NO_CL_SWP ;
   while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
   for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
 
+  //---------------------------------------------------------
   // COPY  =    X -    Y - NO_CL
-  GPU_CMD  = GPU_SRC_PX_ADDR | 0x0000; GPU_CMD = 86;
-  GPU_CMD  = GPU_DST_PX_ADDR | 0x0000; GPU_CMD = 86;//180;
+  //---------------------------------------------------------
+  // 86-180 85-179 84-178 83-177 82-176 81-175 80-174 79-173
+  // 73-167 72-166 71-165 70-164 69-163 68-162 67-161 66-160
+  // 60-154 59-153 58-152 57-151 56-150 55-149 54-148 53-147
+  // 47-141 46-140 45-139 44-138 43-137 42-136 41-135 40-134
+  // 34-128 33-127 32-126 31-125 30-124 29-123 28-122 27-121
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 86;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 180;
   GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_X_SWP    | GPU_SRC_Y_SWP    | GPU_SRC_NO_CL_SWP |
                                             GPU_DST_OF0 | GPU_DST_X_SWP    | GPU_DST_Y_SWP    | GPU_DST_NO_CL_SWP ;
   while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
   for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
 
+  //---------------------------------------------------------
   // COPY  = NO_X - NO_Y -    CL
-  GPU_CMD  = GPU_SRC_PX_ADDR | 0x0000; GPU_CMD = 27;
-  GPU_CMD  = GPU_DST_PX_ADDR | 0x0000; GPU_CMD = 27;//121;
+  //---------------------------------------------------------
+  // 27-121 40-134 53-147 66-160 79-173
+  // 28-122 41-135 54-148 67-161 80-174
+  // 29-123 42-136 55-149 68-162 81-175
+  // 30-124 43-137 56-150 69-163 82-176
+  // 31-125 44-138 57-151 70-164 83-177
+  // 32-126 45-139 58-152 71-165 84-178
+  // 33-127 46-140 59-153 72-166 85-179
+  // 34-128 47-141 60-154 73-167 86-180
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 27;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 121;
   GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_CL_SWP    |
                                             GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_CL_SWP    ;
   while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
   for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
 
+  //---------------------------------------------------------
   // COPY  =    X - NO_Y -    CL
-  GPU_CMD  = GPU_SRC_PX_ADDR | 0x0000; GPU_CMD = 34;
-  GPU_CMD  = GPU_DST_PX_ADDR | 0x0000; GPU_CMD = 34;//128;
+  //---------------------------------------------------------
+  // 34-128 47-141 60-154 73-167 86-180
+  // 33-127 46-140 59-153 72-166 85-179
+  // 32-126 45-139 58-152 71-165 84-178
+  // 31-125 44-138 57-151 70-164 83-177
+  // 30-124 43-137 56-150 69-163 82-176
+  // 29-123 42-136 55-149 68-162 81-175
+  // 28-122 41-135 54-148 67-161 80-174
+  // 27-121 40-134 53-147 66-160 79-173
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 34;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 128;
   GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_X_SWP    | GPU_SRC_NO_Y_SWP | GPU_SRC_CL_SWP    |
                                             GPU_DST_OF0 | GPU_DST_X_SWP    | GPU_DST_NO_Y_SWP | GPU_DST_CL_SWP    ;
   while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
   for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
 
+  //---------------------------------------------------------
   // COPY  = NO_X -    Y -    CL
-  GPU_CMD  = GPU_SRC_PX_ADDR | 0x0000; GPU_CMD = 79;
-  GPU_CMD  = GPU_DST_PX_ADDR | 0x0000; GPU_CMD = 79;//173;
+  //---------------------------------------------------------
+  // 79-173 66-160 53-147 40-134 27-121
+  // 80-174 67-161 54-148 41-135 28-122
+  // 81-175 68-162 55-149 42-136 29-123
+  // 82-176 69-163 56-150 43-137 30-124
+  // 83-177 70-164 57-151 44-138 31-125
+  // 84-178 71-165 58-152 45-139 32-126
+  // 85-179 72-166 59-153 46-140 33-127
+  // 86-180 73-167 60-154 47-141 34-128
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 79;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 173;
   GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_Y_SWP    | GPU_SRC_CL_SWP    |
                                             GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_Y_SWP    | GPU_DST_CL_SWP    ;
   while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
   for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
 
+  //---------------------------------------------------------
   // COPY  =    X -    Y -    CL
-  GPU_CMD  = GPU_SRC_PX_ADDR | 0x0000; GPU_CMD = 86;
-  GPU_CMD  = GPU_DST_PX_ADDR | 0x0000; GPU_CMD = 86;//180;
+  //---------------------------------------------------------
+  // 86-180 73-167 60-154 47-141 34-128
+  // 85-179 72-166 59-153 46-140 33-127
+  // 84-178 71-165 58-152 45-139 32-126
+  // 83-177 70-164 57-151 44-138 31-125
+  // 82-176 69-163 56-150 43-137 30-124
+  // 81-175 68-162 55-149 42-136 29-123
+  // 80-174 67-161 54-148 41-135 28-122
+  // 79-173 66-160 53-147 40-134 27-121
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 86;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 180;
   GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_X_SWP    | GPU_SRC_Y_SWP    | GPU_SRC_CL_SWP    |
                                             GPU_DST_OF0 | GPU_DST_X_SWP    | GPU_DST_Y_SWP    | GPU_DST_CL_SWP    ;
   while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
   for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
+
+  //-------------------------------------------- COPY ADDRESSING MODES 8BPP --------------------------------------------------------
+  for( idx = 0; idx < 500; idx = idx + 1 ) {__nop();}
+
+  GFX_CTRL = GFX_8_BPP  | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
+  //GFX_CTRL = GFX_4_BPP  | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
+  //GFX_CTRL = GFX_2_BPP  | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
+  //GFX_CTRL = GFX_1_BPP  | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
+
+  // Configure
+  DISPLAY_WIDTH  = 13;
+  DISPLAY_HEIGHT = 15;
+  GPU_CMD        = GPU_REC_WIDTH  | 0x0005;
+  GPU_CMD        = GPU_REC_HEIGHT | 0x0004;
+  GPU_CMD        = GPU_OF0_ADDR;    GPU_CMD = 0x0000; GPU_CMD = 0x0000;
+
+  //---------------------------------------------------------
+  // COPY  = NO_X - NO_Y - NO_CL
+  //---------------------------------------------------------
+  //  3/0x00FF-33/0xFF00   3/0xFF00-34/0x00FF   4/0x00FF-34/0xFF00   4/0xFF00-35/0x00FF   5/0x00FF-35/0xFF00
+  //  9/0xFF00-40/0x00FF  10/0x00FF-40/0xFF00  10/0xFF00-41/0x00FF  11/0x00FF-41/0xFF00  11/0xFF00-42/0x00FF
+  // 16/0x00FF-46/0xFF00  16/0xFF00-47/0x00FF  17/0x00FF-47/0xFF00  17/0xFF00-48/0x00FF  18/0x00FF-48/0xFF00
+  // 22/0xFF00-53/0x00FF  23/0x00FF-53/0xFF00  23/0xFF00-54/0x00FF  24/0x00FF-54/0xFF00  24/0xFF00-55/0x00FF
+
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD =  6;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 67;
+  GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
+                                            GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+  for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
+
+  //---------------------------------------------------------
+  // COPY  =    X - NO_Y - NO_CL
+  //---------------------------------------------------------
+  //  5/0x00FF-35/0xFF00   4/0xFF00-35/0x00FF   4/0x00FF-34/0xFF00   3/0xFF00-34/0x00FF   3/0x00FF-33/0xFF00
+  // 11/0xFF00-42/0x00FF  11/0x00FF-41/0xFF00  10/0xFF00-41/0x00FF  10/0x00FF-40/0xFF00   9/0xFF00-40/0x00FF
+  // 18/0x00FF-48/0xFF00  17/0xFF00-48/0x00FF  17/0x00FF-47/0xFF00  16/0xFF00-47/0x00FF  16/0x00FF-46/0xFF00
+  // 24/0xFF00-55/0x00FF  24/0x00FF-54/0xFF00  23/0xFF00-54/0x00FF  23/0x00FF-53/0xFF00  22/0xFF00-53/0x00FF
+
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 10;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 71;
+  GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_X_SWP    | GPU_SRC_NO_Y_SWP | GPU_SRC_NO_CL_SWP |
+                                            GPU_DST_OF0 | GPU_DST_X_SWP    | GPU_DST_NO_Y_SWP | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+  for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
+
+  //---------------------------------------------------------
+  // COPY  = NO_X -    Y - NO_CL
+  //---------------------------------------------------------
+  // 22/0xFF00-53/0x00FF  23/0x00FF-53/0xFF00  23/0xFF00-54/0x00FF  24/0x00FF-54/0xFF00  24/0xFF00-55/0x00FF
+  // 16/0x00FF-46/0xFF00  16/0xFF00-47/0x00FF  17/0x00FF-47/0xFF00  17/0xFF00-48/0x00FF  18/0x00FF-48/0xFF00
+  //  9/0xFF00-40/0x00FF  10/0x00FF-40/0xFF00  10/0xFF00-41/0x00FF  11/0x00FF-41/0xFF00  11/0xFF00-42/0x00FF
+  //  3/0x00FF-33/0xFF00   3/0xFF00-34/0x00FF   4/0x00FF-34/0xFF00   4/0xFF00-35/0x00FF   5/0x00FF-35/0xFF00
+
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD =  45;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 106;
+  GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_Y_SWP    | GPU_SRC_NO_CL_SWP |
+                                            GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_Y_SWP    | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+  for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
+
+  //---------------------------------------------------------
+  // COPY  =    X -    Y - NO_CL
+  //---------------------------------------------------------
+  // 24/0xFF00-55/0x00FF  24/0x00FF-54/0xFF00  23/0xFF00-54/0x00FF  23/0x00FF-53/0xFF00  22/0xFF00-53/0x00FF
+  // 18/0x00FF-48/0xFF00  17/0xFF00-48/0x00FF  17/0x00FF-47/0xFF00  16/0xFF00-47/0x00FF  16/0x00FF-46/0xFF00
+  // 11/0xFF00-42/0x00FF  11/0x00FF-41/0xFF00  10/0xFF00-41/0x00FF  10/0x00FF-40/0xFF00   9/0xFF00-40/0x00FF
+  //  5/0x00FF-35/0xFF00   4/0xFF00-35/0x00FF   4/0x00FF-34/0xFF00   3/0xFF00-34/0x00FF   3/0x00FF-33/0xFF00
+
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD =  49;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 110;
+  GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_X_SWP    | GPU_SRC_Y_SWP    | GPU_SRC_NO_CL_SWP |
+                                            GPU_DST_OF0 | GPU_DST_X_SWP    | GPU_DST_Y_SWP    | GPU_DST_NO_CL_SWP ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+  for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
+
+  //---------------------------------------------------------
+  // COPY  = NO_X - NO_Y -    CL
+  //---------------------------------------------------------
+  //  3/0x00FF-33/0xFF00   9/0xFF00-40/0x00FF  16/0x00FF-46/0xFF00  22/0xFF00-53/0x00FF
+  //  3/0xFF00-34/0x00FF  10/0x00FF-40/0xFF00  16/0xFF00-47/0x00FF  23/0x00FF-53/0xFF00
+  //  4/0x00FF-34/0xFF00  10/0xFF00-41/0x00FF  17/0x00FF-47/0xFF00  23/0xFF00-54/0x00FF
+  //  4/0xFF00-35/0x00FF  11/0x00FF-41/0xFF00  17/0xFF00-48/0x00FF  24/0x00FF-54/0xFF00
+  //  5/0x00FF-35/0xFF00  11/0xFF00-42/0x00FF  18/0x00FF-48/0xFF00  24/0xFF00-55/0x00FF
+
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD =  6;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 67;
+  GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_NO_Y_SWP | GPU_SRC_CL_SWP    |
+                                            GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_NO_Y_SWP | GPU_DST_CL_SWP    ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+  for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
+
+  //---------------------------------------------------------
+  // COPY  =    X - NO_Y -    CL
+  //---------------------------------------------------------
+  //  5/0x00FF-35/0xFF00  11/0xFF00-42/0x00FF  18/0x00FF-48/0xFF00  24/0xFF00-55/0x00FF
+  //  4/0xFF00-35/0x00FF  11/0x00FF-41/0xFF00  17/0xFF00-48/0x00FF  24/0x00FF-54/0xFF00
+  //  4/0x00FF-34/0xFF00  10/0xFF00-41/0x00FF  17/0x00FF-47/0xFF00  23/0xFF00-54/0x00FF
+  //  3/0xFF00-34/0x00FF  10/0x00FF-40/0xFF00  16/0xFF00-47/0x00FF  23/0x00FF-53/0xFF00
+  //  3/0x00FF-33/0xFF00   9/0xFF00-40/0x00FF  16/0x00FF-46/0xFF00  22/0xFF00-53/0x00FF
+
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 10;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 71;
+  GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_X_SWP    | GPU_SRC_NO_Y_SWP | GPU_SRC_CL_SWP    |
+                                            GPU_DST_OF0 | GPU_DST_X_SWP    | GPU_DST_NO_Y_SWP | GPU_DST_CL_SWP    ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+  for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
+
+  //---------------------------------------------------------
+  // COPY  = NO_X -    Y -    CL
+  //---------------------------------------------------------
+  //  22/0xFF00-53/0x00FF  16/0x00FF-46/0xFF00   9/0xFF00-40/0x00FF  3/0x00FF-33/0xFF00
+  //  23/0x00FF-53/0xFF00  16/0xFF00-47/0x00FF  10/0x00FF-40/0xFF00  3/0xFF00-34/0x00FF
+  //  23/0xFF00-54/0x00FF  17/0x00FF-47/0xFF00  10/0xFF00-41/0x00FF  4/0x00FF-34/0xFF00
+  //  24/0x00FF-54/0xFF00  17/0xFF00-48/0x00FF  11/0x00FF-41/0xFF00  4/0xFF00-35/0x00FF
+  //  24/0xFF00-55/0x00FF  18/0x00FF-48/0xFF00  11/0xFF00-42/0x00FF  5/0x00FF-35/0xFF00
+
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD =  45;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 106;
+  GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_NO_X_SWP | GPU_SRC_Y_SWP    | GPU_SRC_CL_SWP    |
+                                            GPU_DST_OF0 | GPU_DST_NO_X_SWP | GPU_DST_Y_SWP    | GPU_DST_CL_SWP    ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+  for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
+
+  //---------------------------------------------------------
+  // COPY  =    X -    Y -    CL
+  //---------------------------------------------------------
+  //  24/0xFF00-55/0x00FF  18/0x00FF-48/0xFF00  11/0xFF00-42/0x00FF  5/0x00FF-35/0xFF00
+  //  24/0x00FF-54/0xFF00  17/0xFF00-48/0x00FF  11/0x00FF-41/0xFF00  4/0xFF00-35/0x00FF
+  //  23/0xFF00-54/0x00FF  17/0x00FF-47/0xFF00  10/0xFF00-41/0x00FF  4/0x00FF-34/0xFF00
+  //  23/0x00FF-53/0xFF00  16/0xFF00-47/0x00FF  10/0x00FF-40/0xFF00  3/0xFF00-34/0x00FF
+  //  22/0xFF00-53/0x00FF  16/0x00FF-46/0xFF00   9/0xFF00-40/0x00FF  3/0x00FF-33/0xFF00
+
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD =  49;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 110;
+  GPU_CMD  = GPU_EXEC_COPY   | GPU_PXOP_3 | GPU_SRC_OF0 | GPU_SRC_X_SWP    | GPU_SRC_Y_SWP    | GPU_SRC_CL_SWP    |
+                                            GPU_DST_OF0 | GPU_DST_X_SWP    | GPU_DST_Y_SWP    | GPU_DST_CL_SWP    ;
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+  for( idx = 0; idx < 30; idx = idx + 1 ) {__nop();}
+
+
+  // Real test
+  DISPLAY_WIDTH  = 13;
+  DISPLAY_HEIGHT = 15;
+  GPU_CMD  = GPU_REC_WIDTH   | 0x0003;
+  GPU_CMD  = GPU_REC_HEIGHT  | 0x0002;
+  GPU_CMD  = GPU_OF0_ADDR    ; GPU_CMD = 0; GPU_CMD = 0x0000;
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 81;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD = 0; GPU_CMD = 20;
+
+  GFX_CTRL = GFX_8_BPP  | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
+
+  //-------------------------------------------- FILL 8BPP --------------------------------------------------------
+  for( idx = 0; idx < 500; idx = idx + 1 ) {__nop();}
+
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_0, 0xDEAD);           //  0x34AD 0xADAD 0x77AD         # 0 #       S
+                                                         //  0xAD66 0xBCAD 0xADAD
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5678;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_1, 0xDEAD);           //  0x3452 0x5252 0x7752         # 1 #   not S
+                                                         //  0x5266 0xBC52 0x5252
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_2, 0xDEAD);           //  0x34ED 0xCBED 0x77A9         # 2 #   not D
+                                                         //  0x8766 0xBC65 0x4365
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5678;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_3, 0xDEAD);           //  0x3400 0x2400 0x7704         # 3 # S and D
+                                                         //  0x2866 0xBC88 0xAC88
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_D, 0xDEAD);           //  0x3400 0x0000 0x7700         # D # Fill 0            if S not transparent
+                                                         //  0x0066 0xBC00 0x0000
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0xDEAD;
+  dma_test(GPU_EXEC_FILL, GPU_PXOP_D, 0xDEAD);           //  0x3412 0x3412 0x7756         # D # Fill 0            if S not transparent
+                                                         //  0x7866 0xBC9A 0xBC9A
+
+
+  //-------------------------------------------- COPY 8BPP --------------------------------------------------------
+  for( idx = 0; idx < 500; idx = idx + 1 ) {__nop();}
+
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_0, 0xDEAD);           //  0x34DE 0xF0DE 0x77FE         # 0 #       S
+                                                         //  0xDC66 0xBCBA 0x98BA
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5678;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_1, 0xDEAD);           //  0x3421 0x0F21 0x7701         # 1 #   not S
+                                                         //  0x2366 0xBC45 0x6745
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x1234;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_2, 0xDEAD);           //  0x34ED 0xCBED 0x77A9         # 2 #   not D
+                                                         //  0x8766 0xBC65 0x4365
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5678;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_3, 0xDEAD);           //  0x3412 0x3012 0x7756         # 3 # S and D
+                                                         //  0x5866 0xBC9A 0x989A
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x12F0;
+  dma_test(GPU_EXEC_COPY, GPU_PXOP_D, 0xDEAD);           //  0x3400 no-wr  0x7700         # D # Fill 0            if S not transparent
+                                                         //  0x0066 0xBC00 0x0000
+
+
+  //-------------------------------------------- TRIAL --------------------------------------------------------
+  for( idx = 0; idx < 1000; idx = idx + 1 ) {__nop();}
+//
+//  DISPLAY_WIDTH    = 13;
+//  DISPLAY_HEIGHT   = 10;
+//  DISPLAY_SIZE_HI  = 0;
+//  DISPLAY_SIZE_LO  = 13*10;
+//  FRAME0_PTR_HI    = 0;
+//  FRAME0_PTR_LO    = 0;
+//  GFX_CTRL         = GFX_8_BPP           | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
+//  DISPLAY_CFG      = DISPLAY_NO_X_SWAP   | DISPLAY_NO_Y_SWAP     | DISPLAY_NO_CL_SWAP;
+//
+//  VID_RAM0_CFG     = VID_RAM_NO_RMW_MODE | VID_RAM_NO_MSK_MODE   | VID_RAM_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
+//  VID_RAM0_WIDTH   = 5;
+//
+//  VID_RAM0_ADDR_HI =  0;
+//  VID_RAM0_ADDR_LO =  6;
+//  VID_RAM0_DATA    =  0x5AA5;
+//  VID_RAM0_DATA    =  0xB66B;
+//  VID_RAM0_DATA    =  0x5AA5;
+//  VID_RAM0_DATA    =  0xB66B;
+//  VID_RAM0_DATA    =  0x5AA5;
+//  VID_RAM0_DATA    =  0xB66B;
+//  VID_RAM0_DATA    =  0x5AA5;
+//  VID_RAM0_DATA    =  0xB66B;
+//  VID_RAM0_DATA    =  0x5AA5;
+//  VID_RAM0_DATA    =  0xB66B;
+//  VID_RAM0_DATA    =  0x5AA5;
+//  VID_RAM0_DATA    =  0xB66B;
+//  VID_RAM0_DATA    =  0x5AA5;
+//
+//
+//  for( idx = 0; idx < 100; idx = idx + 1 ) {__nop();}
+//  VID_RAM0_CFG     = VID_RAM_NO_RMW_MODE | VID_RAM_MSK_MODE   | VID_RAM_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
+//  VID_RAM0_WIDTH   = 5;
+//
+//  VID_RAM0_ADDR_HI =  0;
+//  VID_RAM0_ADDR_LO =  6;
+//  VID_RAM0_DATA    =  0x1234;
+//  VID_RAM0_DATA    =  0x5678;
+//  VID_RAM0_DATA    =  0x9ABC;
+//  VID_RAM0_DATA    =  0xDEF0;
+//  VID_RAM0_DATA    =  0xFEDC;
+//  VID_RAM0_DATA    =  0xBA98;
+//  VID_RAM0_DATA    =  0x7654;
+//  VID_RAM0_DATA    =  0x3210;
+//  VID_RAM0_DATA    =  0xdead;
+//  VID_RAM0_DATA    =  0xbeef;
+//  VID_RAM0_DATA    =  0xc001;
+//
+//
+//  for( idx = 0; idx < 100; idx = idx + 1 ) {__nop();}
+//  VID_RAM0_CFG     = VID_RAM_RMW_MODE | VID_RAM_MSK_MODE   | VID_RAM_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
+//  VID_RAM0_WIDTH   = 5;
+//
+//  VID_RAM0_ADDR_HI =  0;
+//  VID_RAM0_ADDR_LO =  6;
+//
+//  temp1            = VID_RAM0_DATA;
+//  VID_RAM0_DATA    = 0xa55a;
+//  temp2            = VID_RAM0_DATA;
+//  VID_RAM0_DATA    = 0xb66b;
+//  temp3            = VID_RAM0_DATA;
+//  VID_RAM0_DATA    = 0xc77c;
+//  temp4            = VID_RAM0_DATA;
+//  VID_RAM0_DATA    = 0xd88d;
+//  temp1            = VID_RAM0_DATA;
+//  VID_RAM0_DATA    = 0xe99e;
+//  temp2            = VID_RAM0_DATA;
+//  VID_RAM0_DATA    = 0xfaaf;
+//  temp3            = VID_RAM0_DATA;
+//  VID_RAM0_DATA    = 0x1221;
+//  temp4            = VID_RAM0_DATA;
+//  VID_RAM0_DATA    = 0x2332;
+//  temp1            = VID_RAM0_DATA;
+//  VID_RAM0_DATA    = 0x3443;
+//  temp2            = VID_RAM0_DATA;
+//  VID_RAM0_DATA    = 0x4554;
+//  temp3            = VID_RAM0_DATA;
+//  VID_RAM0_DATA    = 0x5665;
+//  temp4            = VID_RAM0_DATA;
+
 
   return 0;
 }
@@ -788,6 +1153,34 @@ void init_mem(unsigned int src_data1, unsigned int src_data2, unsigned int dst_d
   VID_RAM0_DATA    =  dst_data2;
 
 }
+
+void init_mem_8bpp(void) {
+
+  // Init memory for test
+  VID_RAM0_CFG     = VID_RAM_NO_RMW_MODE | VID_RAM_MSK_MODE | VID_RAM_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
+  VID_RAM0_WIDTH   = 5;
+
+  // SRC
+  VID_RAM0_ADDR_HI =  0;
+  VID_RAM0_ADDR_LO =  6;
+
+  VID_RAM0_DATA = 0x0055; VID_RAM0_DATA = 0x0055; VID_RAM0_DATA = 0x0055; VID_RAM0_DATA = 0x0055; VID_RAM0_DATA = 0x0055;
+  VID_RAM0_DATA = 0x0066; VID_RAM0_DATA = 0x0012; VID_RAM0_DATA = 0x0034; VID_RAM0_DATA = 0x0056; VID_RAM0_DATA = 0x0077;
+  VID_RAM0_DATA = 0x0066; VID_RAM0_DATA = 0x0078; VID_RAM0_DATA = 0x009A; VID_RAM0_DATA = 0x00BC; VID_RAM0_DATA = 0x0077;
+  VID_RAM0_DATA = 0x0055; VID_RAM0_DATA = 0x0055; VID_RAM0_DATA = 0x0055; VID_RAM0_DATA = 0x0055; VID_RAM0_DATA = 0x0055;
+
+
+  // DST
+  VID_RAM0_ADDR_HI =  0;
+  VID_RAM0_ADDR_LO =  67;
+
+  VID_RAM0_DATA = 0x00AA; VID_RAM0_DATA = 0x00AA; VID_RAM0_DATA = 0x00AA; VID_RAM0_DATA = 0x00AA; VID_RAM0_DATA = 0x00AA;
+  VID_RAM0_DATA = 0x00BB; VID_RAM0_DATA = 0x00DE; VID_RAM0_DATA = 0x00F0; VID_RAM0_DATA = 0x00FE; VID_RAM0_DATA = 0x00CC;
+  VID_RAM0_DATA = 0x00BB; VID_RAM0_DATA = 0x00DC; VID_RAM0_DATA = 0x00BA; VID_RAM0_DATA = 0x0098; VID_RAM0_DATA = 0x00CC;
+  VID_RAM0_DATA = 0x00AA; VID_RAM0_DATA = 0x00AA; VID_RAM0_DATA = 0x00AA; VID_RAM0_DATA = 0x00AA; VID_RAM0_DATA = 0x00AA;
+
+}
+
 
 void dma_test(unsigned int dma_mode, unsigned int pixel_op, unsigned int fill_data) {
 
