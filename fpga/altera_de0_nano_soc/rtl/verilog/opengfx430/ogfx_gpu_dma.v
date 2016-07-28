@@ -190,7 +190,7 @@ reg  [2:0] dma_state;
 reg  [2:0] dma_state_nxt;
 
 // State arcs
-wire       needs_src_read    = (exec_copy_i | exec_copy_trans_i              ) &  ~(pix_op_02                                                );
+wire       needs_src_read    = (exec_copy_i & ~pix_op_02) | exec_copy_trans_i;
 wire       needs_dst_read    = (exec_fill_i | exec_copy_trans_i | exec_copy_i) & (~(pix_op_00 | pix_op_01 | pix_op_13 | pix_op_14 | pix_op_15) | ~gfx_mode_16_bpp);
 wire       needs_dst_write   = (exec_fill_i | exec_copy_trans_i | exec_copy_i) &  ~pixel_is_transparent;
 
