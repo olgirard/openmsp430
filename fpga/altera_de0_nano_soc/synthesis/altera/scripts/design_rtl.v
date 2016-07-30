@@ -89,6 +89,7 @@
 `include "../../../rtl/verilog/opengfx430/ogfx_backend_frame_fifo.v"
 `include "../../../rtl/verilog/opengfx430/ogfx_backend_lut_fifo.v"
 `include "../../../rtl/verilog/opengfx430/ogfx_gpu.v"
-`include "../../../rtl/verilog/opengfx430/ogfx_gpu_dma.v"
 `include "../../../rtl/verilog/opengfx430/ogfx_gpu_reg.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_gpu_dma.v"
+`include "../../../rtl/verilog/opengfx430/ogfx_gpu_dma_addr.v"
 `include "../../../rtl/verilog/opengfx430/ogfx_ram_arbiter.v"

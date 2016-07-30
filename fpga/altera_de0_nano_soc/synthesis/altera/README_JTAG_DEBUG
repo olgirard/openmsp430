@@ -1,0 +1,38 @@
+Turn on and connect the SoCKit board. Check that the Altera “USB Blaster” appears:
+
+$ lsusb | grep 09fb:
+Bus 001 Device 036: ID 09fb:6810 Altera
+
+If it is not listed, the board may not be powered on or the jtag usb port (nearest the corner)
+may not be connected to the workstation. Note that your bus and device number may differ.
+Check the permissions on the port, based on the bus and device you saw above:
+
+$ ls -l /dev/bus/usb/001/036
+crw-rw-rw- 1 root root 189, 35 Jan 17 21:16 /dev/bus/usb/001/036
+
+Finally, verify that the jtag daemon is able to locate the hardware:
+
+$ jtagconfig
+1) CV SoCKit [1-6.2.3]
+02D020DD 5CSEBA6(.|ES)/5CSEMA6/..
+4BA00477 SOCVHPS
+
+Thee most common problem is incorrect permissions (no world write) on the device, e.g.,
+
+$ jtagconfig
+No JTAG hardware available
+
+$ ls -l /dev/bus/usb/001/036
+crw-rw-r-- 1 root root 189, 35 Jan 17 21:16 /dev/bus/usb/001/036
+
+$ sudo killall jtagd
+
+$ lsusb | grep 09fb:
+Bus 001 Device 041: ID 09fb:6810 Altera
+
+$ sudo chmod 666 /dev/bus/usb/001/041
+
+$ jtagconfig
+1) CV SoCKit [1-6.2.3]
+02D020DD 5CSEBA6(.|ES)/5CSEMA6/..
+4BA00477 SOCVHPS

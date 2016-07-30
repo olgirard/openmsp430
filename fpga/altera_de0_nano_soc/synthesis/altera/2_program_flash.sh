@@ -58,7 +58,10 @@ echo " -----------------------------------------------"
 echo "|  PROGRAM FLASH: $jicfile"
 echo " -----------------------------------------------"
 echo ""
-echo "Note: if failing, try running 'jtagd'"
+echo "Note: if failing:"
+echo "                  - try killing 'jtagd', running 'jtagconfig'"
+echo "                  - try as 'root'"
+echo "                  - check dev usb permissions"
 echo ""
 
 # Copy and process CDF file
