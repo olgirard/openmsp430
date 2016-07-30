@@ -408,7 +408,6 @@ wire        gfx_mode_2_bpp           =  (gfx_mode_o == 3'b001);
 wire        gfx_mode_4_bpp           =  (gfx_mode_o == 3'b010);
 wire        gfx_mode_8_bpp           =  (gfx_mode_o == 3'b011);
 wire        gfx_mode_16_bpp          = ~(gfx_mode_8_bpp | gfx_mode_4_bpp | gfx_mode_2_bpp | gfx_mode_1_bpp);
-wire  [3:0] gfx_mode_addr_msk        = ({4{gfx_mode_1_bpp}} | {1'b0, {3{gfx_mode_2_bpp}}} | {2'b00, {2{gfx_mode_4_bpp}}} | {3'b000, gfx_mode_8_bpp});
 
 //------------------------------------------------
 // GFX_STATUS Register
@@ -557,21 +556,21 @@ wire  display_cfg_wr = reg_wr[DISPLAY_CFG];
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)
     begin
-       display_x_swap_o  <=  1'b0;
-       display_y_swap_o  <=  1'b0;
        display_cl_swap_o <=  1'b0;
+       display_y_swap_o  <=  1'b0;
+       display_x_swap_o  <=  1'b0;
     end
   else if (display_cfg_wr)
     begin
-       display_x_swap_o  <=  per_din_i[0];
+       display_cl_swap_o <=  per_din_i[0];
        display_y_swap_o  <=  per_din_i[1];
-       display_cl_swap_o <=  per_din_i[2];
+       display_x_swap_o  <=  per_din_i[2];
     end
 
 wire [15:0] display_cfg = {13'h0000,
-                           display_cl_swap_o,
+                           display_x_swap_o,
                            display_y_swap_o,
-                           display_x_swap_o};
+                           display_cl_swap_o};
 
 //------------------------------------------------
 // LT24_CFG Register

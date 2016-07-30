@@ -158,25 +158,25 @@ reg                vid_ram_win_cl_swap;
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)
     begin
+       vid_ram_win_cl_swap  <=  1'b0;
+       vid_ram_win_y_swap   <=  1'b0;
+       vid_ram_win_x_swap   <=  1'b0;
        vid_ram_rmw_mode     <=  1'b0;
        vid_ram_msk_mode     <=  1'b0;
        vid_ram_win_mode     <=  1'b0;
-       vid_ram_win_x_swap   <=  1'b0;
-       vid_ram_win_y_swap   <=  1'b0;
-       vid_ram_win_cl_swap  <=  1'b0;
     end
   else if (vid_ram_cfg_wr_i)
     begin
-       vid_ram_rmw_mode     <=  per_din_i[0];
-       vid_ram_msk_mode     <=  per_din_i[1];
-       vid_ram_win_mode     <=  per_din_i[2];
-       vid_ram_win_x_swap   <=  per_din_i[4];
-       vid_ram_win_y_swap   <=  per_din_i[5];
-       vid_ram_win_cl_swap  <=  per_din_i[6];
+       vid_ram_win_cl_swap  <=  per_din_i[0];
+       vid_ram_win_y_swap   <=  per_din_i[1];
+       vid_ram_win_x_swap   <=  per_din_i[2];
+       vid_ram_rmw_mode     <=  per_din_i[4];
+       vid_ram_msk_mode     <=  per_din_i[5];
+       vid_ram_win_mode     <=  per_din_i[6];
     end
 
-assign vid_ram_cfg_o  = {8'h00, 1'b0,  vid_ram_win_cl_swap, vid_ram_win_y_swap, vid_ram_win_x_swap,
-                                1'b0,  vid_ram_win_mode,    vid_ram_msk_mode,   vid_ram_rmw_mode};
+assign vid_ram_cfg_o  = {8'h00, 1'b0,  vid_ram_win_mode,   vid_ram_msk_mode,   vid_ram_rmw_mode   ,
+                                1'b0,  vid_ram_win_x_swap, vid_ram_win_y_swap, vid_ram_win_cl_swap};
 
 //------------------------------------------------
 // VID_RAMx_WIDTH Register
@@ -400,7 +400,7 @@ wire [`APIX_MSB:0] vid_ram_addr_offset = vid_ram_base_addr_i + vid_ram_addr_mux;
 wire               vid_ram_access_o    = vid_ram_data_wr_i | vid_ram_data_rd_dly | vid_ram_addr_lo_wr_i | vid_ram_data_rd_msk;
 
 // Mux Address between the two interfaces
-wire [`APIX_MSB:0] vid_ram_addr_nxt_o  = {16{vid_ram_access_o}} & vid_ram_addr_offset;
+wire [`APIX_MSB:0] vid_ram_addr_nxt_o  = {`APIX_MSB+1{vid_ram_access_o}} & vid_ram_addr_offset;
 
 // Increment the address when accessing the VID_RAMx_DATA register:
 // - one clock cycle after a write access

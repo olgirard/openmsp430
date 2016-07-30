@@ -108,12 +108,12 @@ void init_lt24(void);
 #define  GFX_IRQ_GPU_CMD_ERROR     0x0080
 
 // DISPLAY_CFG Register
-#define  DISPLAY_X_SWAP            0x0001
-#define  DISPLAY_NO_X_SWAP         0x0000
+#define  DISPLAY_CL_SWAP           0x0001
 #define  DISPLAY_Y_SWAP            0x0002
-#define  DISPLAY_NO_Y_SWAP         0x0000
-#define  DISPLAY_CL_SWAP           0x0004
+#define  DISPLAY_X_SWAP            0x0004
 #define  DISPLAY_NO_CL_SWAP        0x0000
+#define  DISPLAY_NO_Y_SWAP         0x0000
+#define  DISPLAY_NO_X_SWAP         0x0000
 
 // LT24_CFG Register
 #define  LT24_ON                   0x0001
@@ -183,19 +183,19 @@ void init_lt24(void);
 #define  LUT_BANK1_SELECT          0x8000
 
 // VID_RAMx_CFG Register
+#define  VID_RAM_RMW_MODE          0x0010
+#define  VID_RAM_MSK_MODE          0x0020
+#define  VID_RAM_WIN_MODE          0x0040
 #define  VID_RAM_NO_RMW_MODE       0x0000
-#define  VID_RAM_RMW_MODE          0x0001
 #define  VID_RAM_NO_MSK_MODE       0x0000
-#define  VID_RAM_MSK_MODE          0x0002
 #define  VID_RAM_NO_WIN_MODE       0x0000
-#define  VID_RAM_WIN_MODE          0x0004
 
+#define  VID_RAM_WIN_CL_SWAP       0x0001
+#define  VID_RAM_WIN_Y_SWAP        0x0002
+#define  VID_RAM_WIN_X_SWAP        0x0004
 #define  VID_RAM_WIN_NO_X_SWAP     0x0000
-#define  VID_RAM_WIN_X_SWAP        0x0010
 #define  VID_RAM_WIN_NO_Y_SWAP     0x0000
-#define  VID_RAM_WIN_Y_SWAP        0x0020
 #define  VID_RAM_WIN_NO_CL_SWAP    0x0000
-#define  VID_RAM_WIN_CL_SWAP       0x0040
 
 // GPU_STAT Register
 #define  GPU_STAT_FIFO_CNT         0x000F

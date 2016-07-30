@@ -1039,39 +1039,63 @@ int main(void) {
   dma_test(GPU_EXEC_COPY, GPU_PXOP_D, 0xDEAD);           //  0x3400 no-wr  0x7700         # D # Fill 0            if S not transparent
                                                          //  0x0066 0xBC00 0x0000
 
+  //-------------------------------------------- COPY_TRANS 8BPP --------------------------------------------------------
+  for( idx = 0; idx < 500; idx = idx + 1 ) {__nop();}
+
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x12DE;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_0, 0xDEAD);     //  no-wr  0xF012 0x77FE         # 0 #       S
+                                                         //  0xDC66 0xBCBA 0x98BA
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x56FE;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_1, 0xDEAD);     //  0x3421 0x0F21 no-wr          # 1 #   not S
+                                                         //  0x2366 0xBC45 0x6745
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x12DC;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_2, 0xDEAD);     //  0x34ED 0xCBED 0x77A9         # 2 #   not D
+                                                         //  no-wr  0xBC65 0x4365
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x5698;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_3, 0xDEAD);     //  0x3412 0x3012 0x7756         # 3 # S and D
+                                                         //  0x5866 0xBC9A no-wr
+  init_mem_8bpp();
+  GPU_CMD  = GPU_SET_TRANS; GPU_CMD = 0x12F0;
+  dma_test(GPU_EXEC_COPY_TRANS, GPU_PXOP_D, 0xDEAD);     //  0x3400 no-wr  0x7700         # D # Fill 0            if S not transparent
+                                                         //  0x0066 0xBC00 0x0000
+
 
   //-------------------------------------------- TRIAL --------------------------------------------------------
   for( idx = 0; idx < 1000; idx = idx + 1 ) {__nop();}
-//
-//  DISPLAY_WIDTH    = 13;
-//  DISPLAY_HEIGHT   = 10;
-//  DISPLAY_SIZE_HI  = 0;
-//  DISPLAY_SIZE_LO  = 13*10;
-//  FRAME0_PTR_HI    = 0;
-//  FRAME0_PTR_LO    = 0;
-//  GFX_CTRL         = GFX_8_BPP           | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
-//  DISPLAY_CFG      = DISPLAY_NO_X_SWAP   | DISPLAY_NO_Y_SWAP     | DISPLAY_NO_CL_SWAP;
-//
-//  VID_RAM0_CFG     = VID_RAM_NO_RMW_MODE | VID_RAM_NO_MSK_MODE   | VID_RAM_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
-//  VID_RAM0_WIDTH   = 5;
-//
-//  VID_RAM0_ADDR_HI =  0;
-//  VID_RAM0_ADDR_LO =  6;
-//  VID_RAM0_DATA    =  0x5AA5;
-//  VID_RAM0_DATA    =  0xB66B;
-//  VID_RAM0_DATA    =  0x5AA5;
-//  VID_RAM0_DATA    =  0xB66B;
-//  VID_RAM0_DATA    =  0x5AA5;
-//  VID_RAM0_DATA    =  0xB66B;
-//  VID_RAM0_DATA    =  0x5AA5;
-//  VID_RAM0_DATA    =  0xB66B;
-//  VID_RAM0_DATA    =  0x5AA5;
-//  VID_RAM0_DATA    =  0xB66B;
-//  VID_RAM0_DATA    =  0x5AA5;
-//  VID_RAM0_DATA    =  0xB66B;
-//  VID_RAM0_DATA    =  0x5AA5;
-//
-//
+
+  DISPLAY_WIDTH    = 13;
+  DISPLAY_HEIGHT   = 10;
+  DISPLAY_SIZE_HI  = 0;
+  DISPLAY_SIZE_LO  = 13*10;
+  FRAME0_PTR_HI    = 0;
+  FRAME0_PTR_LO    = 0;
+  GFX_CTRL         = GFX_16_BPP           | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
+  DISPLAY_CFG      = DISPLAY_NO_X_SWAP   | DISPLAY_NO_Y_SWAP     | DISPLAY_NO_CL_SWAP;
+
+  VID_RAM0_CFG     = VID_RAM_NO_RMW_MODE | VID_RAM_NO_MSK_MODE   | VID_RAM_NO_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
+  VID_RAM0_WIDTH   = 5;
+
+  VID_RAM0_ADDR_HI =  0x0001;
+  VID_RAM0_ADDR_LO =  0xFFFA;
+  VID_RAM0_DATA    =  0x5AA5;
+  VID_RAM0_DATA    =  0xB66B;
+  VID_RAM0_DATA    =  0x5AA5;
+  VID_RAM0_DATA    =  0xB66B;
+  VID_RAM0_DATA    =  0x5AA5;
+  VID_RAM0_DATA    =  0xB66B;
+  VID_RAM0_DATA    =  0x5AA5;
+  VID_RAM0_DATA    =  0xB66B;
+  VID_RAM0_DATA    =  0x5AA5;
+  VID_RAM0_DATA    =  0xB66B;
+  VID_RAM0_DATA    =  0x5AA5;
+  VID_RAM0_DATA    =  0xB66B;
+  VID_RAM0_DATA    =  0x5AA5;
+
+
 //  for( idx = 0; idx < 100; idx = idx + 1 ) {__nop();}
 //  VID_RAM0_CFG     = VID_RAM_NO_RMW_MODE | VID_RAM_MSK_MODE   | VID_RAM_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
 //  VID_RAM0_WIDTH   = 5;
