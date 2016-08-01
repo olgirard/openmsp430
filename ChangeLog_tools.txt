@@ -1,3 +1,13 @@
+2016-08-01 [r217]  
+
+	* Update openmsp430-gdb-proxy tool to fix Get Register procedure
+	  when using the TI GDB (thanks to Simon Fröhlich for this one).
+
+2016-03-12 [r214]  
+
+	* Fix multiwindow environment issue & close window with 'X'. Thanks
+	  to Fabian Mauroner for this one
+
 2015-11-17 [r210]  
 
 	* Add support for both MSPGCC and TI/RH-GCC toolchains. Add
