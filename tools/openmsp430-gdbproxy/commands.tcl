@@ -22,9 +22,9 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #------------------------------------------------------------------------------
-# 
+#
 # File Name: commands.tcl
-# 
+#
 # Author(s):
 #             - Olivier Girard,    olgirard@gmail.com
 #
@@ -97,16 +97,21 @@ proc rspParse {CpuNr sock rsp_cmd} {
 # Read CPU registers                                                          #
 #-----------------------------------------------------------------------------#
 proc rsp_g {CpuNr} {
-    
+
+    global mspgcc_compat_mode
+
     # Read register value
     set reg_val [ReadRegAll $CpuNr]
 
     # Format answer
     set rsp_answer ""
     for {set i 0} {$i < [llength $reg_val]} {incr i} {
-
         regexp {0x(..)(..)} [lindex $reg_val $i] match msb lsb
-        append rsp_answer "$lsb$msb"
+        if {$mspgcc_compat_mode} {
+            append rsp_answer "$lsb$msb"
+        } else {
+            append rsp_answer "$lsb${msb}0000"
+        }
     }
 
     return $rsp_answer
@@ -116,15 +121,24 @@ proc rsp_g {CpuNr} {
 # Write CPU registers                                                         #
 #-----------------------------------------------------------------------------#
 proc rsp_G {CpuNr cmd} {
-    
-    # Format register value
-    set num_reg [expr [string length $cmd]/4]
 
+    global mspgcc_compat_mode
+
+    # Format register value
+    if {$mspgcc_compat_mode} {
+        set num_reg [expr [string length $cmd]/4]
+    } else {
+        set num_reg [expr [string length $cmd]/8]
+    }
     set reg_val ""
     for {set i 0} {$i < $num_reg} {incr i} {
-
-        set lsb "[string index $cmd [expr $i*4+0]][string index $cmd [expr $i*4+1]]"
-        set msb "[string index $cmd [expr $i*4+2]][string index $cmd [expr $i*4+3]]"
+        if {$mspgcc_compat_mode} {
+            set lsb "[string index $cmd [expr $i*4+0]][string index $cmd [expr $i*4+1]]"
+            set msb "[string index $cmd [expr $i*4+2]][string index $cmd [expr $i*4+3]]"
+        } else {
+            set lsb "[string index $cmd [expr $i*8+0]][string index $cmd [expr $i*8+1]]"
+            set msb "[string index $cmd [expr $i*8+2]][string index $cmd [expr $i*8+3]]"
+        }
         lappend reg_val "0x$msb$lsb"
     }
 
@@ -134,14 +148,15 @@ proc rsp_G {CpuNr cmd} {
     return "OK"
 }
 
+
 #-----------------------------------------------------------------------------#
 # Kill request.                                                               #
 #-----------------------------------------------------------------------------#
 proc rsp_k {CpuNr cmd} {
-    
+
     # Reset & Stop CPU
     ExecutePOR_Halt $CpuNr
- 
+
     return "-1"
 }
 
@@ -149,16 +164,16 @@ proc rsp_k {CpuNr cmd} {
 # Write length bytes of memory.                                               #
 #-----------------------------------------------------------------------------#
 proc rsp_M {CpuNr cmd} {
-    
+
     global mem_breakpoint
     global mem_mapping
     global breakSelect
-    
+
     # Parse command
     regexp {(.*),(.*):(.*)} $cmd match addr length data
     set addr   [format %04x "0x$addr"]
     set length [format %d   "0x$length"]
-    
+
     # Format data
     set mem_val ""
     for {set i 0} {$i<$length} {incr i} {
@@ -175,18 +190,18 @@ proc rsp_M {CpuNr cmd} {
 
     # Eventually re-set the software breakpoints in case they have been overwritten
     if {$breakSelect==0} {
-	set addr_start [format %d "0x$addr"]
-	foreach {brk_addr brk_val} [array get mem_breakpoint] {
-	    regsub {,} $brk_addr { } brk_addr_lst
-	    if {[lindex $brk_addr_lst 0]==$mem_mapping($CpuNr)} {
-		set brk_addr_dec    [format %d "0x[lindex $brk_addr_lst 1]"]
-		set brk_addr_offset [expr $brk_addr_dec-$addr_start]
-		if {(0<=$brk_addr_offset) && ($brk_addr_offset<=$length)} {
-		    set mem_breakpoint($brk_addr) [lindex $mem_val $brk_addr_offset]
-		    WriteMem $CpuNr 0 "0x[lindex $brk_addr 1]" 0x4343
-		}
-	    }
-	}
+        set addr_start [format %d "0x$addr"]
+        foreach {brk_addr brk_val} [array get mem_breakpoint] {
+            regsub {,} $brk_addr { } brk_addr_lst
+            if {[lindex $brk_addr_lst 0]==$mem_mapping($CpuNr)} {
+                set brk_addr_dec    [format %d "0x[lindex $brk_addr_lst 1]"]
+                set brk_addr_offset [expr $brk_addr_dec-$addr_start]
+                if {(0<=$brk_addr_offset) && ($brk_addr_offset<=$length)} {
+                    set mem_breakpoint($brk_addr) [lindex $mem_val $brk_addr_offset]
+                    WriteMem $CpuNr 0 "0x[lindex $brk_addr 1]" 0x4343
+                }
+            }
+        }
     }
 
     return "OK"
@@ -197,7 +212,7 @@ proc rsp_M {CpuNr cmd} {
 # Read length bytes from memory.                                              #
 #-----------------------------------------------------------------------------#
 proc rsp_m {CpuNr cmd} {
-    
+
     global mem_breakpoint
     global mem_mapping
     global breakSelect
@@ -209,21 +224,21 @@ proc rsp_m {CpuNr cmd} {
 
     # Read memory
     set data [ReadMemQuick8  $CpuNr "0x$addr" $length]
-    
+
 
     # Eventually replace read data by the original software breakpoint value
     if {$breakSelect==0} {
-	set addr_start [format %d "0x$addr"]
-	foreach {brk_addr brk_val} [array get mem_breakpoint] {
-	    regsub {,} $brk_addr { } brk_addr_lst
-	    if {[lindex $brk_addr_lst 0]==$mem_mapping($CpuNr)} {
-		set brk_addr_dec    [format %d "0x[lindex $brk_addr_lst 1]"]
-		set brk_addr_offset [expr $brk_addr_dec-$addr_start]
-		if {(0<=$brk_addr_offset) && ($brk_addr_offset<=$length)} {
-		    set data [lreplace $data $brk_addr_offset $brk_addr_offset "0x$mem_breakpoint($brk_addr)"]
-		}
-	    }
-	}
+        set addr_start [format %d "0x$addr"]
+        foreach {brk_addr brk_val} [array get mem_breakpoint] {
+            regsub {,} $brk_addr { } brk_addr_lst
+            if {[lindex $brk_addr_lst 0]==$mem_mapping($CpuNr)} {
+                set brk_addr_dec    [format %d "0x[lindex $brk_addr_lst 1]"]
+                set brk_addr_offset [expr $brk_addr_dec-$addr_start]
+                if {(0<=$brk_addr_offset) && ($brk_addr_offset<=$length)} {
+                    set data [lreplace $data $brk_addr_offset $brk_addr_offset "0x$mem_breakpoint($brk_addr)"]
+                }
+            }
+        }
     }
 
     # Format data
@@ -250,19 +265,19 @@ proc rsp_Z {CpuNr sock cmd} {
     switch -exact -- $type {
         "0"     {# Soft Memory breakpoint
                  if {$breakSelect==0} {
-		     if {![info exists mem_breakpoint($mem_mapping($CpuNr),$addr)]} {
-			 set mem_breakpoint($mem_mapping($CpuNr),$addr) [ReadMem $CpuNr 0 "0x$addr"]
-			 WriteMem $CpuNr 0 "0x$addr" 0x4343
-		     }
-		     return "OK"
+                     if {![info exists mem_breakpoint($mem_mapping($CpuNr),$addr)]} {
+                         set mem_breakpoint($mem_mapping($CpuNr),$addr) [ReadMem $CpuNr 0 "0x$addr"]
+                         WriteMem $CpuNr 0 "0x$addr" 0x4343
+                     }
+                     return "OK"
 
                  # Hard Memory breakpoint
                  } else {
                      if {[SetHWBreak $CpuNr 1 [format "0x%04x" 0x$addr] 1 0]} {
-			 #putsLog "CORE $CpuNr: --- INFO --- SET HARDWARE MEMORY BREAKPOINT. "
+                         #putsLog "CORE $CpuNr: --- INFO --- SET HARDWARE MEMORY BREAKPOINT. "
                          return "OK"
                      }
-		     putsLog "CORE $CpuNr: --- ERROR --- NO MORE HARDWARE MEMORY BREAKPOINT AVAILABLE. "
+                     putsLog "CORE $CpuNr: --- ERROR --- NO MORE HARDWARE MEMORY BREAKPOINT AVAILABLE. "
                      return ""
                  }
                 }
@@ -271,7 +286,7 @@ proc rsp_Z {CpuNr sock cmd} {
                  if {[SetHWBreak $CpuNr 1 [format "0x%04x" 0x$addr] 1 0]} {
                      return "OK"
                  }
-	         putsLog "CORE $CpuNr: --- ERROR --- NO MORE HARDWARE BREAKPOINT AVAILABLE. "
+                 putsLog "CORE $CpuNr: --- ERROR --- NO MORE HARDWARE BREAKPOINT AVAILABLE. "
                  return ""
                 }
 
@@ -279,7 +294,7 @@ proc rsp_Z {CpuNr sock cmd} {
                  if {[SetHWBreak $CpuNr 0 [format "0x%04x" 0x$addr] 0 1]} {
                      return "OK"
                  }
-	         putsLog "CORE $CpuNr: --- ERROR --- NO MORE WRITE WATCHPOINT AVAILABLE. "
+                 putsLog "CORE $CpuNr: --- ERROR --- NO MORE WRITE WATCHPOINT AVAILABLE. "
                  return ""
                 }
 
@@ -287,7 +302,7 @@ proc rsp_Z {CpuNr sock cmd} {
                  if {[SetHWBreak $CpuNr 0 [format "0x%04x" 0x$addr] 1 0]} {
                      return "OK"
                  }
-	         putsLog "CORE $CpuNr: --- ERROR --- NO MORE READ WATCHPOINT AVAILABLE. "
+                 putsLog "CORE $CpuNr: --- ERROR --- NO MORE READ WATCHPOINT AVAILABLE. "
                  return ""
                 }
 
@@ -295,7 +310,7 @@ proc rsp_Z {CpuNr sock cmd} {
                  if {[SetHWBreak $CpuNr 0 [format "0x%04x" 0x$addr] 1 1]} {
                      return "OK"
                  }
-	         putsLog "CORE $CpuNr: --- ERROR --- NO MORE ACCESS WATCHPOINT AVAILABLE. "
+                 putsLog "CORE $CpuNr: --- ERROR --- NO MORE ACCESS WATCHPOINT AVAILABLE. "
                  return ""
                 }
 
@@ -319,19 +334,19 @@ proc rsp_z {CpuNr sock cmd} {
     switch -exact -- $type {
         "0"     {# Soft Memory breakpoint
                  if {$breakSelect==0} {
-		     if {[info exists mem_breakpoint($mem_mapping($CpuNr),$addr)]} {
-			 WriteMem $CpuNr 0 "0x$addr" $mem_breakpoint($mem_mapping($CpuNr),$addr)
-			 unset mem_breakpoint($mem_mapping($CpuNr),$addr)
-		     }
+                     if {[info exists mem_breakpoint($mem_mapping($CpuNr),$addr)]} {
+                         WriteMem $CpuNr 0 "0x$addr" $mem_breakpoint($mem_mapping($CpuNr),$addr)
+                         unset mem_breakpoint($mem_mapping($CpuNr),$addr)
+                     }
                      return "OK"
 
                  # Hard Memory breakpoint
                  } else {
                      if {[ClearHWBreak $CpuNr 1 [format "0x%04x" 0x$addr]]} {
-			 #putsLog "CORE $CpuNr: --- INFO --- RELEASE HARDWARE MEMORY BREAKPOINT. "
+                         #putsLog "CORE $CpuNr: --- INFO --- RELEASE HARDWARE MEMORY BREAKPOINT. "
                          return "OK"
                      }
-		     putsLog "CORE $CpuNr: --- ERROR --- COULD NOT REMOVE HARDWARE MEMORY BREAKPOINT. "
+                     putsLog "CORE $CpuNr: --- ERROR --- COULD NOT REMOVE HARDWARE MEMORY BREAKPOINT. "
                      return ""
                  }
                 }
@@ -372,7 +387,7 @@ proc rsp_z {CpuNr sock cmd} {
 # Continue.                                                                   #
 #-----------------------------------------------------------------------------#
 proc rsp_c {CpuNr sock cmd} {
-    
+
     # Set address if required
     if {$cmd!=""} {
         set cmd [format %04x "0x$cmd"]
@@ -393,7 +408,7 @@ proc rsp_c {CpuNr sock cmd} {
 # Step.                                                                       #
 #-----------------------------------------------------------------------------#
 proc rsp_s {CpuNr sock cmd} {
-    
+
     # Set address if required
     if {$cmd!=""} {
         set cmd [format %04x "0x$cmd"]
@@ -450,15 +465,15 @@ proc rsp_stop_reply {CpuNr sock cmd {opt_val "0"}} {
     # value changes. If not, return an error otherwise GDB will
     # end-up in an infinite loop.
     if {$cmd == "s"} {
-	if {$opt_val == $pc} {
-	    return "E05"
-	}
+        if {$opt_val == $pc} {
+            return "E05"
+        }
     }
 
     if {$mspgcc_compat_mode} {
-	return "T0500:$pc_lo$pc_hi;04:$r4_lo$r4_hi;"               ;# 16bit word Response for older MSPGCC versions
+        return "T0500:$pc_lo$pc_hi;04:$r4_lo$r4_hi;"               ;# 16bit word Response for older MSPGCC versions
     } else {
-	return "T0500:$pc_lo${pc_hi}0000;04:$r4_lo${r4_hi}0000;"   ;# 32bit word Response starting with TI/RedHat GCC port
+        return "T0500:$pc_lo${pc_hi}0000;04:$r4_lo${r4_hi}0000;"   ;# 32bit word Response starting with TI/RedHat GCC port
     }
 }
 
@@ -467,7 +482,7 @@ proc rsp_stop_reply {CpuNr sock cmd {opt_val "0"}} {
 #                                                                             #
 #-----------------------------------------------------------------------------#
 proc rsp_q {CpuNr sock cmd} {
-    
+
        switch -regexp -- $cmd {
 
         "C"       {set rsp_answer ""}
