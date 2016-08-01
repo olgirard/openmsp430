@@ -23,7 +23,7 @@ void init_gfx_ctrl (uint16_t gfx_mode, uint16_t refresh_rate) {
   VID_RAM0_ADDR_LO  = 0x0000;
 
   // Configure Video mode
-  GFX_CTRL          = gfx_mode | GFX_REFR_START_IRQ_DIS | GFX_REFR_DONE_IRQ_DIS;
+  GFX_CTRL          = gfx_mode | GFX_REFR_START_IRQ_DIS | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
 
   // Configure Refresh Rate
   LT24_REFRESH_SYNC = LT24_REFR_SYNC | 0x0000;
