@@ -92,6 +92,7 @@ module  ogfx_reg (
     dbg_freeze_i,                              // Freeze address auto-incr on read
     gpu_cmd_done_evt_i,                        // GPU command done event
     gpu_cmd_error_evt_i,                       // GPU command error event
+    gpu_dma_busy_i,                            // GPU DMA execution on going
     gpu_get_data_i,                            // GPU get next data
     lt24_status_i,                             // LT24 FSM Status
     lt24_start_evt_i,                          // LT24 FSM is starting
@@ -160,6 +161,7 @@ output               vid_ram_cen_o;            // Video-RAM chip enable (active 
 input                dbg_freeze_i;             // Freeze address auto-incr on read
 input                gpu_cmd_done_evt_i;       // GPU command done event
 input                gpu_cmd_error_evt_i;      // GPU command error event
+input                gpu_dma_busy_i;           // GPU DMA execution on going
 input                gpu_get_data_i;           // GPU get next data
 input          [4:0] lt24_status_i;            // LT24 FSM Status
 input                lt24_start_evt_i;         // LT24 FSM is starting
@@ -193,8 +195,8 @@ parameter [DEC_WD-1:0] GFX_CTRL            = 'h00,  // General control/status/ir
 
                        DISPLAY_WIDTH       = 'h10,  // Display configuration
                        DISPLAY_HEIGHT      = 'h12,
-                       DISPLAY_SIZE_HI     = 'h14,
-                       DISPLAY_SIZE_LO     = 'h16,
+                       DISPLAY_SIZE_LO     = 'h14,
+                       DISPLAY_SIZE_HI     = 'h16,
                        DISPLAY_CFG         = 'h18,
 
                        LT24_CFG            = 'h20,  // LT24 configuration and Generic command sending
@@ -209,29 +211,30 @@ parameter [DEC_WD-1:0] GFX_CTRL            = 'h00,  // General control/status/ir
                        LUT_RAM_DATA        = 'h32,
 
                        FRAME_SELECT        = 'h3E,  // Frame pointers and selection
-                       FRAME0_PTR_HI       = 'h40,
-                       FRAME0_PTR_LO       = 'h42,
-                       FRAME1_PTR_HI       = 'h44,
-                       FRAME1_PTR_LO       = 'h46,
-                       FRAME2_PTR_HI       = 'h48,
-                       FRAME2_PTR_LO       = 'h4A,
-                       FRAME3_PTR_HI       = 'h4C,
-                       FRAME3_PTR_LO       = 'h4E,
+                       FRAME0_PTR_LO       = 'h40,
+                       FRAME0_PTR_HI       = 'h42,
+                       FRAME1_PTR_LO       = 'h44,
+                       FRAME1_PTR_HI       = 'h46,
+                       FRAME2_PTR_LO       = 'h48,
+                       FRAME2_PTR_HI       = 'h4A,
+                       FRAME3_PTR_LO       = 'h4C,
+                       FRAME3_PTR_HI       = 'h4E,
 
                        VID_RAM0_CFG        = 'h50,  // First Video Memory Access Gate
                        VID_RAM0_WIDTH      = 'h52,
-                       VID_RAM0_ADDR_HI    = 'h54,
-                       VID_RAM0_ADDR_LO    = 'h56,
+                       VID_RAM0_ADDR_LO    = 'h54,
+                       VID_RAM0_ADDR_HI    = 'h56,
                        VID_RAM0_DATA       = 'h58,
 
                        VID_RAM1_CFG        = 'h60,  // Second Video Memory Access Gate
                        VID_RAM1_WIDTH      = 'h62,
-                       VID_RAM1_ADDR_HI    = 'h64,
-                       VID_RAM1_ADDR_LO    = 'h66,
+                       VID_RAM1_ADDR_LO    = 'h64,
+                       VID_RAM1_ADDR_HI    = 'h66,
                        VID_RAM1_DATA       = 'h68,
 
-                       GPU_CMD             = 'h70,  // Graphic Processing Unit
-                       GPU_STAT            = 'h72;
+                       GPU_CMD_LO          = 'h70,  // Graphic Processing Unit
+                       GPU_CMD_HI          = 'h72,
+                       GPU_STAT            = 'h74;
 
 
 // Register one-hot decoder utilities
@@ -245,8 +248,8 @@ parameter [DEC_SZ-1:0] GFX_CTRL_D          = (BASE_REG << GFX_CTRL          ),
 
                        DISPLAY_WIDTH_D     = (BASE_REG << DISPLAY_WIDTH     ),
                        DISPLAY_HEIGHT_D    = (BASE_REG << DISPLAY_HEIGHT    ),
-                       DISPLAY_SIZE_HI_D   = (BASE_REG << DISPLAY_SIZE_HI   ),
                        DISPLAY_SIZE_LO_D   = (BASE_REG << DISPLAY_SIZE_LO   ),
+                       DISPLAY_SIZE_HI_D   = (BASE_REG << DISPLAY_SIZE_HI   ),
                        DISPLAY_CFG_D       = (BASE_REG << DISPLAY_CFG       ),
 
                        LT24_CFG_D          = (BASE_REG << LT24_CFG          ),
@@ -261,28 +264,29 @@ parameter [DEC_SZ-1:0] GFX_CTRL_D          = (BASE_REG << GFX_CTRL          ),
                        LUT_RAM_DATA_D      = (BASE_REG << LUT_RAM_DATA      ),
 
                        FRAME_SELECT_D      = (BASE_REG << FRAME_SELECT      ),
-                       FRAME0_PTR_HI_D     = (BASE_REG << FRAME0_PTR_HI     ),
                        FRAME0_PTR_LO_D     = (BASE_REG << FRAME0_PTR_LO     ),
-                       FRAME1_PTR_HI_D     = (BASE_REG << FRAME1_PTR_HI     ),
+                       FRAME0_PTR_HI_D     = (BASE_REG << FRAME0_PTR_HI     ),
                        FRAME1_PTR_LO_D     = (BASE_REG << FRAME1_PTR_LO     ),
-                       FRAME2_PTR_HI_D     = (BASE_REG << FRAME2_PTR_HI     ),
+                       FRAME1_PTR_HI_D     = (BASE_REG << FRAME1_PTR_HI     ),
                        FRAME2_PTR_LO_D     = (BASE_REG << FRAME2_PTR_LO     ),
-                       FRAME3_PTR_HI_D     = (BASE_REG << FRAME3_PTR_HI     ),
+                       FRAME2_PTR_HI_D     = (BASE_REG << FRAME2_PTR_HI     ),
                        FRAME3_PTR_LO_D     = (BASE_REG << FRAME3_PTR_LO     ),
+                       FRAME3_PTR_HI_D     = (BASE_REG << FRAME3_PTR_HI     ),
 
                        VID_RAM0_CFG_D      = (BASE_REG << VID_RAM0_CFG      ),
                        VID_RAM0_WIDTH_D    = (BASE_REG << VID_RAM0_WIDTH    ),
-                       VID_RAM0_ADDR_HI_D  = (BASE_REG << VID_RAM0_ADDR_HI  ),
                        VID_RAM0_ADDR_LO_D  = (BASE_REG << VID_RAM0_ADDR_LO  ),
+                       VID_RAM0_ADDR_HI_D  = (BASE_REG << VID_RAM0_ADDR_HI  ),
                        VID_RAM0_DATA_D     = (BASE_REG << VID_RAM0_DATA     ),
 
                        VID_RAM1_CFG_D      = (BASE_REG << VID_RAM1_CFG      ),
                        VID_RAM1_WIDTH_D    = (BASE_REG << VID_RAM1_WIDTH    ),
-                       VID_RAM1_ADDR_HI_D  = (BASE_REG << VID_RAM1_ADDR_HI  ),
                        VID_RAM1_ADDR_LO_D  = (BASE_REG << VID_RAM1_ADDR_LO  ),
+                       VID_RAM1_ADDR_HI_D  = (BASE_REG << VID_RAM1_ADDR_HI  ),
                        VID_RAM1_DATA_D     = (BASE_REG << VID_RAM1_DATA     ),
 
-                       GPU_CMD_D           = (BASE_REG << GPU_CMD           ),
+                       GPU_CMD_LO_D        = (BASE_REG << GPU_CMD_LO        ),
+                       GPU_CMD_HI_D        = (BASE_REG << GPU_CMD_HI        ),
                        GPU_STAT_D          = (BASE_REG << GPU_STAT          );
 
 
@@ -303,8 +307,8 @@ wire  [DEC_SZ-1:0] reg_dec   =  (GFX_CTRL_D          &  {DEC_SZ{(reg_addr == GFX
 
                                 (DISPLAY_WIDTH_D     &  {DEC_SZ{(reg_addr == DISPLAY_WIDTH     )}})  |
                                 (DISPLAY_HEIGHT_D    &  {DEC_SZ{(reg_addr == DISPLAY_HEIGHT    )}})  |
-                                (DISPLAY_SIZE_HI_D   &  {DEC_SZ{(reg_addr == DISPLAY_SIZE_HI   )}})  |
                                 (DISPLAY_SIZE_LO_D   &  {DEC_SZ{(reg_addr == DISPLAY_SIZE_LO   )}})  |
+                                (DISPLAY_SIZE_HI_D   &  {DEC_SZ{(reg_addr == DISPLAY_SIZE_HI   )}})  |
                                 (DISPLAY_CFG_D       &  {DEC_SZ{(reg_addr == DISPLAY_CFG       )}})  |
 
                                 (LT24_CFG_D          &  {DEC_SZ{(reg_addr == LT24_CFG          )}})  |
@@ -319,28 +323,29 @@ wire  [DEC_SZ-1:0] reg_dec   =  (GFX_CTRL_D          &  {DEC_SZ{(reg_addr == GFX
                                 (LUT_RAM_DATA_D      &  {DEC_SZ{(reg_addr == LUT_RAM_DATA      )}})  |
 
                                 (FRAME_SELECT_D      &  {DEC_SZ{(reg_addr == FRAME_SELECT      )}})  |
-                                (FRAME0_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME0_PTR_HI     )}})  |
                                 (FRAME0_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME0_PTR_LO     )}})  |
-                                (FRAME1_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME1_PTR_HI     )}})  |
+                                (FRAME0_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME0_PTR_HI     )}})  |
                                 (FRAME1_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME1_PTR_LO     )}})  |
-                                (FRAME2_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME2_PTR_HI     )}})  |
+                                (FRAME1_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME1_PTR_HI     )}})  |
                                 (FRAME2_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME2_PTR_LO     )}})  |
-                                (FRAME3_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME3_PTR_HI     )}})  |
+                                (FRAME2_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME2_PTR_HI     )}})  |
                                 (FRAME3_PTR_LO_D     &  {DEC_SZ{(reg_addr == FRAME3_PTR_LO     )}})  |
+                                (FRAME3_PTR_HI_D     &  {DEC_SZ{(reg_addr == FRAME3_PTR_HI     )}})  |
 
                                 (VID_RAM0_CFG_D      &  {DEC_SZ{(reg_addr == VID_RAM0_CFG      )}})  |
                                 (VID_RAM0_WIDTH_D    &  {DEC_SZ{(reg_addr == VID_RAM0_WIDTH    )}})  |
-                                (VID_RAM0_ADDR_HI_D  &  {DEC_SZ{(reg_addr == VID_RAM0_ADDR_HI  )}})  |
                                 (VID_RAM0_ADDR_LO_D  &  {DEC_SZ{(reg_addr == VID_RAM0_ADDR_LO  )}})  |
+                                (VID_RAM0_ADDR_HI_D  &  {DEC_SZ{(reg_addr == VID_RAM0_ADDR_HI  )}})  |
                                 (VID_RAM0_DATA_D     &  {DEC_SZ{(reg_addr == VID_RAM0_DATA     )}})  |
 
                                 (VID_RAM1_CFG_D      &  {DEC_SZ{(reg_addr == VID_RAM1_CFG      )}})  |
                                 (VID_RAM1_WIDTH_D    &  {DEC_SZ{(reg_addr == VID_RAM1_WIDTH    )}})  |
-                                (VID_RAM1_ADDR_HI_D  &  {DEC_SZ{(reg_addr == VID_RAM1_ADDR_HI  )}})  |
                                 (VID_RAM1_ADDR_LO_D  &  {DEC_SZ{(reg_addr == VID_RAM1_ADDR_LO  )}})  |
+                                (VID_RAM1_ADDR_HI_D  &  {DEC_SZ{(reg_addr == VID_RAM1_ADDR_HI  )}})  |
                                 (VID_RAM1_DATA_D     &  {DEC_SZ{(reg_addr == VID_RAM1_DATA     )}})  |
 
-                                (GPU_CMD_D           &  {DEC_SZ{(reg_addr == GPU_CMD           )}})  |
+                                (GPU_CMD_LO_D        &  {DEC_SZ{(reg_addr == GPU_CMD_LO        )}})  |
+                                (GPU_CMD_HI_D        &  {DEC_SZ{(reg_addr == GPU_CMD_HI        )}})  |
                                 (GPU_STAT_D          &  {DEC_SZ{(reg_addr == GPU_STAT          )}});
 
 // Read/Write probes
@@ -367,8 +372,6 @@ wire [`APIX_MSB:0] vid_ram1_base_addr;
 `ifdef WITH_EXTRA_LUT_BANK
 reg                lut_bank_select;
 `endif
-reg                vid_ram0_addr_lo_wr_dly;
-reg                vid_ram1_addr_lo_wr_dly;
 wire               gpu_fifo_done_evt;
 wire               gpu_fifo_ovfl_evt;
 
@@ -1088,9 +1091,7 @@ ogfx_reg_vram_if ogfx_reg_vram0_if_inst (
 
     .vid_ram_cfg_wr_i        ( reg_wr[VID_RAM0_CFG]     ),   // VID_RAM0_CFG     Write strobe
     .vid_ram_width_wr_i      ( reg_wr[VID_RAM0_WIDTH]   ),   // VID_RAM0_WIDTH   Write strobe
-`ifdef VRAM_BIGGER_4_KW
     .vid_ram_addr_hi_wr_i    ( reg_wr[VID_RAM0_ADDR_HI] ),   // VID_RAM0_ADDR_HI Write strobe
-`endif
     .vid_ram_addr_lo_wr_i    ( reg_wr[VID_RAM0_ADDR_LO] ),   // VID_RAM0_ADDR_LO Write strobe
     .vid_ram_data_wr_i       ( reg_wr[VID_RAM0_DATA]    ),   // VID_RAM0_DATA    Write strobe
     .vid_ram_data_rd_i       ( reg_rd[VID_RAM0_DATA]    ),   // VID_RAM0_DATA    Read  strobe
@@ -1148,9 +1149,7 @@ ogfx_reg_vram_if ogfx_reg_vram1_if_inst (
 
     .vid_ram_cfg_wr_i        ( reg_wr[VID_RAM1_CFG]     ),   // VID_RAM1_CFG     Write strobe
     .vid_ram_width_wr_i      ( reg_wr[VID_RAM1_WIDTH]   ),   // VID_RAM1_WIDTH   Write strobe
-`ifdef VRAM_BIGGER_4_KW
     .vid_ram_addr_hi_wr_i    ( reg_wr[VID_RAM1_ADDR_HI] ),   // VID_RAM1_ADDR_HI Write strobe
-`endif
     .vid_ram_addr_lo_wr_i    ( reg_wr[VID_RAM1_ADDR_LO] ),   // VID_RAM1_ADDR_LO Write strobe
     .vid_ram_data_wr_i       ( reg_wr[VID_RAM1_DATA]    ),   // VID_RAM1_DATA    Write strobe
     .vid_ram_data_rd_i       ( reg_rd[VID_RAM1_DATA]    ),   // VID_RAM1_DATA    Read  strobe
@@ -1173,8 +1172,11 @@ ogfx_reg_vram_if ogfx_reg_vram1_if_inst (
 //------------------------------------------------
 
 wire [3:0] gpu_stat_fifo_cnt;
+wire [3:0] gpu_stat_fifo_cnt_empty;
 wire       gpu_stat_fifo_empty;
 wire       gpu_stat_fifo_full;
+wire       gpu_stat_fifo_full_less_2;
+wire       gpu_stat_fifo_full_less_3;
 
 ogfx_reg_fifo ogfx_reg_fifo_gpu_inst (
 
@@ -1183,6 +1185,7 @@ ogfx_reg_fifo ogfx_reg_fifo_gpu_inst (
     .fifo_data_o             ( gpu_data_o               ),   // Read data output
     .fifo_done_evt_o         ( gpu_fifo_done_evt        ),   // Fifo has been emptied
     .fifo_empty_o            ( gpu_stat_fifo_empty      ),   // Fifo is currentely empty
+    .fifo_empty_cnt_o        ( gpu_stat_fifo_cnt_empty  ),   // Fifo empty words counter
     .fifo_full_o             ( gpu_stat_fifo_full       ),   // Fifo is currentely full
     .fifo_ovfl_evt_o         ( gpu_fifo_ovfl_evt        ),   // Fifo overflow event
 
@@ -1193,12 +1196,17 @@ ogfx_reg_fifo ogfx_reg_fifo_gpu_inst (
     .fifo_data_i             ( per_din_i                ),   // Read data input
     .fifo_enable_i           ( gpu_enable_o             ),   // Enable fifo (flushed when disabled)
     .fifo_pop_i              ( gpu_get_data_i           ),   // Pop data from the fifo
-    .fifo_push_i             ( reg_wr[GPU_CMD]          )    // Push new data to the fifo
+    .fifo_push_i             ( reg_wr[GPU_CMD_LO] |
+                               reg_wr[GPU_CMD_HI]       )    // Push new data to the fifo
 );
 
 assign      gpu_data_avail_o = ~gpu_stat_fifo_empty;
 
-wire [15:0] gpu_stat         = {10'h000, gpu_stat_fifo_full, gpu_stat_fifo_empty, gpu_stat_fifo_cnt};
+wire        gpu_busy         = ~gpu_stat_fifo_empty | gpu_dma_busy_i;
+
+wire [15:0] gpu_stat         = {gpu_busy, 2'b00, gpu_dma_busy_i,
+                                2'b00   , gpu_stat_fifo_full, gpu_stat_fifo_empty,
+                                gpu_stat_fifo_cnt, gpu_stat_fifo_cnt_empty};
 
 
 //============================================================================
@@ -1212,10 +1220,10 @@ wire [15:0] gfx_irq_read           = gfx_irq              & {16{reg_rd[GFX_IRQ  
 
 wire [15:0] display_width_read     = display_width_rd     & {16{reg_rd[DISPLAY_WIDTH     ]}};
 wire [15:0] display_height_read    = display_height_rd    & {16{reg_rd[DISPLAY_HEIGHT    ]}};
+wire [15:0] display_size_lo_read   = display_size_lo_rd   & {16{reg_rd[DISPLAY_SIZE_LO   ]}};
 `ifdef WITH_DISPLAY_SIZE_HI
 wire [15:0] display_size_hi_read   = display_size_hi_rd   & {16{reg_rd[DISPLAY_SIZE_HI   ]}};
 `endif
-wire [15:0] display_size_lo_read   = display_size_lo_rd   & {16{reg_rd[DISPLAY_SIZE_LO   ]}};
 wire [15:0] display_cfg_read       = display_cfg          & {16{reg_rd[DISPLAY_CFG       ]}};
 
 wire [15:0] lt24_cfg_read          = lt24_cfg             & {16{reg_rd[LT24_CFG          ]}};
@@ -1230,44 +1238,45 @@ wire [15:0] lut_ram_addr_read      = lut_ram_addr_rd      & {16{reg_rd[LUT_RAM_A
 wire [15:0] lut_ram_data_read      = lut_ram_data         & {16{reg_rd[LUT_RAM_DATA      ]}};
 
 wire [15:0] frame_select_read      = frame_select         & {16{reg_rd[FRAME_SELECT      ]}};
+wire [15:0] frame0_ptr_lo_read     = frame0_ptr_lo_rd     & {16{reg_rd[FRAME0_PTR_LO     ]}};
 `ifdef VRAM_BIGGER_4_KW
 wire [15:0] frame0_ptr_hi_read     = frame0_ptr_hi_rd     & {16{reg_rd[FRAME0_PTR_HI     ]}};
 `endif
-wire [15:0] frame0_ptr_lo_read     = frame0_ptr_lo_rd     & {16{reg_rd[FRAME0_PTR_LO     ]}};
 `ifdef WITH_FRAME1_POINTER
+  wire [15:0] frame1_ptr_lo_read   = frame1_ptr_lo_rd     & {16{reg_rd[FRAME1_PTR_LO     ]}};
   `ifdef VRAM_BIGGER_4_KW
   wire [15:0] frame1_ptr_hi_read   = frame1_ptr_hi_rd     & {16{reg_rd[FRAME1_PTR_HI     ]}};
   `endif
-  wire [15:0] frame1_ptr_lo_read   = frame1_ptr_lo_rd     & {16{reg_rd[FRAME1_PTR_LO     ]}};
 `endif
 `ifdef WITH_FRAME2_POINTER
+  wire [15:0] frame2_ptr_lo_read   = frame2_ptr_lo_rd     & {16{reg_rd[FRAME2_PTR_LO     ]}};
   `ifdef VRAM_BIGGER_4_KW
   wire [15:0] frame2_ptr_hi_read   = frame2_ptr_hi_rd     & {16{reg_rd[FRAME2_PTR_HI     ]}};
   `endif
-  wire [15:0] frame2_ptr_lo_read   = frame2_ptr_lo_rd     & {16{reg_rd[FRAME2_PTR_LO     ]}};
 `endif
 `ifdef WITH_FRAME3_POINTER
+  wire [15:0] frame3_ptr_lo_read   = frame3_ptr_lo_rd     & {16{reg_rd[FRAME3_PTR_LO     ]}};
   `ifdef VRAM_BIGGER_4_KW
   wire [15:0] frame3_ptr_hi_read   = frame3_ptr_hi_rd     & {16{reg_rd[FRAME3_PTR_HI     ]}};
   `endif
-  wire [15:0] frame3_ptr_lo_read   = frame3_ptr_lo_rd     & {16{reg_rd[FRAME3_PTR_LO     ]}};
 `endif
 wire [15:0] vid_ram0_cfg_read      = vid_ram0_cfg         & {16{reg_rd[VID_RAM0_CFG      ]}};
 wire [15:0] vid_ram0_width_read    = vid_ram0_width       & {16{reg_rd[VID_RAM0_WIDTH    ]}};
+wire [15:0] vid_ram0_addr_lo_read  = vid_ram0_addr_lo     & {16{reg_rd[VID_RAM0_ADDR_LO  ]}};
 `ifdef VRAM_BIGGER_4_KW
 wire [15:0] vid_ram0_addr_hi_read  = vid_ram0_addr_hi     & {16{reg_rd[VID_RAM0_ADDR_HI  ]}};
 `endif
-wire [15:0] vid_ram0_addr_lo_read  = vid_ram0_addr_lo     & {16{reg_rd[VID_RAM0_ADDR_LO  ]}};
 wire [15:0] vid_ram0_data_read     = vid_ram0_data        & {16{reg_rd[VID_RAM0_DATA     ]}};
 
 wire [15:0] vid_ram1_cfg_read      = vid_ram1_cfg         & {16{reg_rd[VID_RAM1_CFG      ]}};
 wire [15:0] vid_ram1_width_read    = vid_ram1_width       & {16{reg_rd[VID_RAM1_WIDTH    ]}};
+wire [15:0] vid_ram1_addr_lo_read  = vid_ram1_addr_lo     & {16{reg_rd[VID_RAM1_ADDR_LO  ]}};
 `ifdef VRAM_BIGGER_4_KW
 wire [15:0] vid_ram1_addr_hi_read  = vid_ram1_addr_hi     & {16{reg_rd[VID_RAM1_ADDR_HI  ]}};
 `endif
-wire [15:0] vid_ram1_addr_lo_read  = vid_ram1_addr_lo     & {16{reg_rd[VID_RAM1_ADDR_LO  ]}};
 wire [15:0] vid_ram1_data_read     = vid_ram1_data        & {16{reg_rd[VID_RAM1_DATA     ]}};
-wire [15:0] gpu_cmd_read           = 16'h0000             & {16{reg_rd[GPU_CMD           ]}};
+wire [15:0] gpu_cmd_lo_read        = 16'h0000             & {16{reg_rd[GPU_CMD_LO        ]}};
+wire [15:0] gpu_cmd_hi_read        = 16'h0000             & {16{reg_rd[GPU_CMD_HI        ]}};
 wire [15:0] gpu_stat_read          = gpu_stat             & {16{reg_rd[GPU_STAT          ]}};
 
 
@@ -1277,10 +1286,10 @@ wire [15:0] per_dout_o             = gfx_ctrl_read          |
 
                                      display_width_read     |
                                      display_height_read    |
+                                     display_size_lo_read   |
                                   `ifdef WITH_DISPLAY_SIZE_HI
                                      display_size_hi_read   |
                                   `endif
-                                     display_size_lo_read   |
                                      display_cfg_read       |
 
                                      lt24_cfg_read          |
@@ -1295,44 +1304,45 @@ wire [15:0] per_dout_o             = gfx_ctrl_read          |
                                      lut_ram_data_read      |
 
                                      frame_select_read      |
+                                     frame0_ptr_lo_read     |
                                   `ifdef VRAM_BIGGER_4_KW
                                      frame0_ptr_hi_read     |
                                   `endif
-                                     frame0_ptr_lo_read     |
                                 `ifdef WITH_FRAME1_POINTER
+                                     frame1_ptr_lo_read     |
                                   `ifdef VRAM_BIGGER_4_KW
                                      frame1_ptr_hi_read     |
                                   `endif
-                                     frame1_ptr_lo_read     |
                                 `endif
                                 `ifdef WITH_FRAME2_POINTER
+                                     frame2_ptr_lo_read     |
                                   `ifdef VRAM_BIGGER_4_KW
                                      frame2_ptr_hi_read     |
                                   `endif
-                                     frame2_ptr_lo_read     |
                                 `endif
                                 `ifdef WITH_FRAME3_POINTER
+                                     frame3_ptr_lo_read     |
                                   `ifdef VRAM_BIGGER_4_KW
                                      frame3_ptr_hi_read     |
                                   `endif
-                                     frame3_ptr_lo_read     |
                                 `endif
                                      vid_ram0_cfg_read      |
                                      vid_ram0_width_read    |
+                                     vid_ram0_addr_lo_read  |
                                   `ifdef VRAM_BIGGER_4_KW
                                      vid_ram0_addr_hi_read  |
                                   `endif
-                                     vid_ram0_addr_lo_read  |
                                      vid_ram0_data_read     |
 
                                      vid_ram1_cfg_read      |
                                      vid_ram1_width_read    |
+                                     vid_ram1_addr_lo_read  |
                                   `ifdef VRAM_BIGGER_4_KW
                                      vid_ram1_addr_hi_read  |
                                   `endif
-                                     vid_ram1_addr_lo_read  |
                                      vid_ram1_data_read     |
-                                     gpu_cmd_read           |
+                                     gpu_cmd_lo_read        |
+                                     gpu_cmd_hi_read        |
                                      gpu_stat_read;
 
 
@@ -1341,16 +1351,16 @@ wire [15:0] per_dout_o             = gfx_ctrl_read          |
 //============================================================================
 
 // Write access strobe
-assign             vid_ram_wen_o      = ~(vid_ram0_we       | vid_ram1_we);
+assign             vid_ram_wen_o      = ~(vid_ram0_we       | vid_ram1_we      );
 
 // Chip enable.
-assign             vid_ram_cen_o      = ~(vid_ram0_ce       | vid_ram1_ce);
+assign             vid_ram_cen_o      = ~(vid_ram0_ce       | vid_ram1_ce      );
 
 // Data to be written
-assign             vid_ram_din_o      =  (vid_ram0_din      | vid_ram1_din);
+assign             vid_ram_din_o      =  (vid_ram0_din      | vid_ram1_din     );
 
 // Detect memory accesses for ADDR update
-wire               vid_ram_access     =  (vid_ram0_access   | vid_ram1_access);
+wire               vid_ram_access     =  (vid_ram0_access   | vid_ram1_access  );
 
 // Next Address
 wire [`APIX_MSB:0] vid_ram_addr_nxt   =  (vid_ram0_addr_nxt | vid_ram1_addr_nxt);

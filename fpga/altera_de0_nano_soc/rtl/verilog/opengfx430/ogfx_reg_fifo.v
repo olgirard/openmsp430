@@ -43,41 +43,43 @@
 module  ogfx_reg_fifo (
 
 // OUTPUTs
-    fifo_cnt_o,                         // Fifo counter
-    fifo_data_o,                        // Read data output
-    fifo_done_evt_o,                    // Fifo has been emptied
-    fifo_empty_o,                       // Fifo is currentely empty
-    fifo_full_o,                        // Fifo is currentely full
-    fifo_ovfl_evt_o,                    // Fifo overflow event
+    fifo_cnt_o,                          // Fifo counter
+    fifo_empty_cnt_o,                    // Fifo empty words counter
+    fifo_data_o,                         // Read data output
+    fifo_done_evt_o,                     // Fifo has been emptied
+    fifo_empty_o,                        // Fifo is currentely empty
+    fifo_full_o,                         // Fifo is currentely full
+    fifo_ovfl_evt_o,                     // Fifo overflow event
 
 // INPUTs
-    mclk,                               // Main system clock
-    puc_rst,                            // Main system reset
+    mclk,                                // Main system clock
+    puc_rst,                             // Main system reset
 
-    fifo_data_i,                        // Read data input
-    fifo_enable_i,                      // Enable fifo (flushed when disabled)
-    fifo_pop_i,                         // Pop data from the fifo
-    fifo_push_i                         // Push new data to the fifo
+    fifo_data_i,                         // Read data input
+    fifo_enable_i,                       // Enable fifo (flushed when disabled)
+    fifo_pop_i,                          // Pop data from the fifo
+    fifo_push_i                          // Push new data to the fifo
 );
 
 // OUTPUTs
 //=========
-output         [3:0] fifo_cnt_o;        // Fifo counter
-output        [15:0] fifo_data_o;       // Read data output
-output               fifo_done_evt_o;   // Fifo has been emptied
-output               fifo_empty_o;      // Fifo is currentely empty
-output               fifo_full_o;       // Fifo is currentely full
-output               fifo_ovfl_evt_o;   // Fifo overflow event
+output         [3:0] fifo_cnt_o;         // Fifo counter
+output         [3:0] fifo_empty_cnt_o;   // Fifo empty word counter
+output        [15:0] fifo_data_o;        // Read data output
+output               fifo_done_evt_o;    // Fifo has been emptied
+output               fifo_empty_o;       // Fifo is currentely empty
+output               fifo_full_o;        // Fifo is currentely full
+output               fifo_ovfl_evt_o;    // Fifo overflow event
 
 // INPUTs
 //=========
-input                mclk;              // Main system clock
-input                puc_rst;           // Main system reset
+input                mclk;               // Main system clock
+input                puc_rst;            // Main system reset
 
-input         [15:0] fifo_data_i;       // Read data input
-input                fifo_enable_i;     // Enable fifo (flushed when disabled)
-input                fifo_pop_i;        // Pop data from the fifo
-input                fifo_push_i;       // Push new data to the fifo
+input         [15:0] fifo_data_i;        // Read data input
+input                fifo_enable_i;      // Enable fifo (flushed when disabled)
+input                fifo_pop_i;         // Pop data from the fifo
+input                fifo_push_i;        // Push new data to the fifo
 
 
 //=============================================================================
@@ -98,10 +100,11 @@ wire   [3:0] fifo_cnt_nxt;
 //============================================================================
 
 // Control signals
-wire      fifo_full_o     =  (fifo_cnt_o == FIFO_FULL);
-wire      fifo_empty_o    =  (fifo_cnt_o == FIFO_EMPTY);
-wire      fifo_push_int   =  fifo_push_i & !fifo_full_o;
-wire      fifo_pop_int    =  fifo_pop_i  & !fifo_empty_o;
+assign    fifo_full_o        =  (fifo_cnt_o == FIFO_FULL);
+assign    fifo_empty_o       =  (fifo_cnt_o == FIFO_EMPTY);
+assign    fifo_empty_cnt_o   =  (FIFO_FULL-fifo_cnt_o);
+wire      fifo_push_int      =  fifo_push_i & !fifo_full_o;
+wire      fifo_pop_int       =  fifo_pop_i  & !fifo_empty_o;
 
 // Events
 assign    fifo_done_evt_o = ~fifo_empty_o & (fifo_cnt_nxt == FIFO_EMPTY);

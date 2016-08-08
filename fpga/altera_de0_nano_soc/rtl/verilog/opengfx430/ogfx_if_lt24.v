@@ -376,30 +376,30 @@ always @(posedge mclk or posedge puc_rst)
 reg [15:0] lt24_d_nxt;
 always @(lt24_state_nxt or cmd_generic_cmd_val_i or cmd_generic_param_val_i or lt24_d_o or cmd_dfill_i or refresh_data_i)
   case(lt24_state_nxt)
-    STATE_IDLE               : lt24_d_nxt <= 16'h0000;
+    STATE_IDLE               : lt24_d_nxt = 16'h0000;
 
     STATE_CMD_LO,
-    STATE_CMD_HI             : lt24_d_nxt <= {8'h00, cmd_generic_cmd_val_i};
+    STATE_CMD_HI	     : lt24_d_nxt = {8'h00, cmd_generic_cmd_val_i};
     STATE_CMD_PARAM_LO,
-    STATE_CMD_PARAM_HI       : lt24_d_nxt <= cmd_generic_param_val_i;
-    STATE_CMD_PARAM_WAIT     : lt24_d_nxt <= lt24_d_o;
+    STATE_CMD_PARAM_HI	     : lt24_d_nxt = cmd_generic_param_val_i;
+    STATE_CMD_PARAM_WAIT     : lt24_d_nxt = lt24_d_o;
 
     STATE_RAMWR_INIT_CMD_LO,
-    STATE_RAMWR_INIT_CMD_HI  : lt24_d_nxt <= 16'h002C;
+    STATE_RAMWR_INIT_CMD_HI  : lt24_d_nxt = 16'h002C;
     STATE_RAMWR_INIT_DATA_LO,
-    STATE_RAMWR_INIT_DATA_HI : lt24_d_nxt <= cmd_dfill_i;
+    STATE_RAMWR_INIT_DATA_HI : lt24_d_nxt = cmd_dfill_i;
 
     STATE_SCANLINE_CMD_LO,
-    STATE_SCANLINE_CMD_HI    : lt24_d_nxt <= 16'h0045;
+    STATE_SCANLINE_CMD_HI    : lt24_d_nxt = 16'h0045;
 
     STATE_RAMWR_REFR_CMD_LO,
-    STATE_RAMWR_REFR_CMD_HI  : lt24_d_nxt <= 16'h002C;
-    STATE_RAMWR_REFR_DATA_LO : lt24_d_nxt <= refresh_data_i;
-    STATE_RAMWR_REFR_DATA_HI : lt24_d_nxt <= lt24_d_o;
-    STATE_RAMWR_REFR_WAIT    : lt24_d_nxt <= lt24_d_o;
+    STATE_RAMWR_REFR_CMD_HI  : lt24_d_nxt = 16'h002C;
+    STATE_RAMWR_REFR_DATA_LO : lt24_d_nxt = refresh_data_i;
+    STATE_RAMWR_REFR_DATA_HI : lt24_d_nxt = lt24_d_o;
+    STATE_RAMWR_REFR_WAIT    : lt24_d_nxt = lt24_d_o;
 
     // pragma coverage off
-    default                  : lt24_d_nxt <= 16'h0000;
+    default                  : lt24_d_nxt = 16'h0000;
     // pragma coverage on
   endcase
 
@@ -424,20 +424,21 @@ always @(posedge mclk or posedge puc_rst)
 //============================================================================
 
 reg  [1:0] status_gts_msb;
-wire       status_gts_msb_wr = ((lt24_state == STATE_SCANLINE_GTS1_LO) & (lt24_state_nxt == STATE_SCANLINE_GTS1_HI));
+wire       status_gts_msb_wr  = ((lt24_state == STATE_SCANLINE_GTS1_LO) & (lt24_state_nxt == STATE_SCANLINE_GTS1_HI));
 always @(posedge mclk or posedge puc_rst)
   if (puc_rst)                status_gts_msb <= 2'h0;
   else if (status_gts_msb_wr) status_gts_msb <= lt24_d_i[1:0];
 
 reg  [7:0] status_gts_lsb;
-wire       status_gts_lsb_wr = ((lt24_state == STATE_SCANLINE_GTS2_LO) & (lt24_state_nxt == STATE_SCANLINE_GTS2_HI));
+wire       status_gts_lsb_wr  = ((lt24_state == STATE_SCANLINE_GTS2_LO) & (lt24_state_nxt == STATE_SCANLINE_GTS2_HI));
 always @(posedge mclk or posedge puc_rst)
   if (puc_rst)                status_gts_lsb <= 8'h00;
   else if (status_gts_lsb_wr) status_gts_lsb <= lt24_d_i[7:0];
 
-wire [9:0] status_gts        = {status_gts_msb, status_gts_lsb};
+wire [7:0] unused_lt24_d_15_8 = lt24_d_i[15:8];
+wire [9:0] status_gts         = {status_gts_msb, status_gts_lsb};
 
-assign     status_gts_match  = (status_gts == cfg_lt24_refresh_sync_val_i);
+assign     status_gts_match   = (status_gts == cfg_lt24_refresh_sync_val_i);
 
 //============================================================================
 // 8) REFRESH TIMER & TRIGGER

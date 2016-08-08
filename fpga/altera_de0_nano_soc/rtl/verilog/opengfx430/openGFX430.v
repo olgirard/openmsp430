@@ -197,6 +197,7 @@ wire         [1:0] refresh_lut_select;
 
 wire               gpu_cmd_done_evt;
 wire               gpu_cmd_error_evt;
+wire               gpu_dma_busy;
 wire               gpu_get_data;
 wire        [15:0] gpu_data;
 wire               gpu_data_avail;
@@ -260,6 +261,7 @@ ogfx_reg  ogfx_reg_inst (
     .dbg_freeze_i                  ( dbg_freeze_i             ),       // Freeze address auto-incr on read
     .gpu_cmd_done_evt_i            ( gpu_cmd_done_evt         ),       // GPU command done event
     .gpu_cmd_error_evt_i           ( gpu_cmd_error_evt        ),       // GPU command error event
+    .gpu_dma_busy_i                ( gpu_dma_busy             ),       // GPU DMA execution on going
     .gpu_get_data_i                ( gpu_get_data             ),       // GPU get next data
     .lt24_status_i                 ( lt24_status              ),       // LT24 FSM Status
     .lt24_start_evt_i              ( lt24_start_evt           ),       // LT24 FSM start event
@@ -287,6 +289,7 @@ ogfx_gpu  ogfx_gpu_inst (
 // OUTPUTs
     .gpu_cmd_done_evt_o            ( gpu_cmd_done_evt         ),       // GPU command done event
     .gpu_cmd_error_evt_o           ( gpu_cmd_error_evt        ),       // GPU command error event
+    .gpu_dma_busy_o                ( gpu_dma_busy             ),       // GPU DMA execution on going
     .gpu_get_data_o                ( gpu_get_data             ),       // GPU get next data
 
     .vid_ram_addr_o                ( vid_ram_gpu_addr         ),       // Video-RAM address

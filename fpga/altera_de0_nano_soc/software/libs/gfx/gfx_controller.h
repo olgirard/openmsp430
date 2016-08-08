@@ -12,78 +12,84 @@
 #ifdef VERILOG_SIMULATION
   #define SCREEN_WIDTH         5
   #define SCREEN_HEIGHT        3
-  #define SCREEN_SIZE_HI       0
-  #define SCREEN_SIZE_LO       15
 #else
   #define SCREEN_WIDTH         320
   #define SCREEN_HEIGHT        240
-  #define SCREEN_SIZE_HI       0x0001    // 76800>>16
-  #define SCREEN_SIZE_LO       0x2C00    // 76800-2^16-1
 #endif
 
-#define FRAME_MEMORY_KB_SIZE 75*2
+#define   FRAME_MEMORY_KB_SIZE 75*2
 
 //#define LT24_ROTATE
 
 //----------------------------------------------------------
-// AVAILABLE FUNCTIONS
+// UTILITY MACROS
 //----------------------------------------------------------
 
+// Convert pixel coordinates into memory address
+#define PIX_ADDR(X, Y) ((((uint32_t)(Y)) * ((uint32_t)(SCREEN_WIDTH))) + ((uint32_t)(X)))
+
+
+//----------------------------------------------------------
+// FUNCTIONS
+//----------------------------------------------------------
+
+// Initialization functions
 void init_gfx_ctrl (uint16_t gfx_mode, uint16_t refresh_rate);
 void start_gfx_ctrl(void);
 
+// LT24 specific functions
 void init_lt24(uint16_t lt24_clk_div);
 void start_lt24(void);
+
+// GPU Functions
+void gpu_fill (uint32_t addr, uint16_t width, uint16_t length, uint16_t color, uint16_t configuration);
+void gpu_copy (uint32_t src_addr, uint32_t dst_addr, uint16_t width, uint16_t length, uint16_t configuration);
+void gpu_copy_transparent (uint32_t src_addr, uint32_t dst_addr, uint16_t width, uint16_t length, uint16_t trans_color, uint16_t configuration);
+inline void gpu_wait_done (void);
 
 
 //----------------------------------------------------------
 // GRAPHIC CONTROLLER REGISTERS
 //----------------------------------------------------------
-#define  GFX_CTRL          (*(volatile unsigned int  *) 0x0200)
-#define  GFX_STATUS        (*(volatile unsigned int  *) 0x0208)
-#define  GFX_IRQ           (*(volatile unsigned int  *) 0x020A)
+#define  GFX_CTRL          (*(volatile uint16_t  *) 0x0200)
+#define  GFX_STATUS        (*(volatile uint16_t  *) 0x0208)
+#define  GFX_IRQ           (*(volatile uint16_t  *) 0x020A)
 
-#define  DISPLAY_WIDTH     (*(volatile unsigned int  *) 0x0210)
-#define  DISPLAY_HEIGHT    (*(volatile unsigned int  *) 0x0212)
-#define  DISPLAY_SIZE_HI   (*(volatile unsigned int  *) 0x0214)
-#define  DISPLAY_SIZE_LO   (*(volatile unsigned int  *) 0x0216)
-#define  DISPLAY_CFG       (*(volatile unsigned int  *) 0x0218)
+#define  DISPLAY_WIDTH     (*(volatile uint16_t  *) 0x0210)
+#define  DISPLAY_HEIGHT    (*(volatile uint16_t  *) 0x0212)
+#define  DISPLAY_SIZE      (*(volatile uint32_t  *) 0x0214)
+#define  DISPLAY_CFG       (*(volatile uint16_t  *) 0x0218)
 
-#define  LT24_CFG          (*(volatile unsigned int  *) 0x0220)
-#define  LT24_REFRESH      (*(volatile unsigned int  *) 0x0222)
-#define  LT24_REFRESH_SYNC (*(volatile unsigned int  *) 0x0224)
-#define  LT24_CMD          (*(volatile unsigned int  *) 0x0226)
-#define  LT24_CMD_PARAM    (*(volatile unsigned int  *) 0x0228)
-#define  LT24_CMD_DFILL    (*(volatile unsigned int  *) 0x022A)
-#define  LT24_STATUS       (*(volatile unsigned int  *) 0x022C)
+#define  LT24_CFG          (*(volatile uint16_t  *) 0x0220)
+#define  LT24_REFRESH      (*(volatile uint16_t  *) 0x0222)
+#define  LT24_REFRESH_SYNC (*(volatile uint16_t  *) 0x0224)
+#define  LT24_CMD          (*(volatile uint16_t  *) 0x0226)
+#define  LT24_CMD_PARAM    (*(volatile uint16_t  *) 0x0228)
+#define  LT24_CMD_DFILL    (*(volatile uint16_t  *) 0x022A)
+#define  LT24_STATUS       (*(volatile uint16_t  *) 0x022C)
 
-#define  LUT_RAM_ADDR      (*(volatile unsigned int  *) 0x0230)
-#define  LUT_RAM_DATA      (*(volatile unsigned int  *) 0x0232)
+#define  LUT_RAM_ADDR      (*(volatile uint16_t  *) 0x0230)
+#define  LUT_RAM_DATA      (*(volatile uint16_t  *) 0x0232)
 
-#define  FRAME_SELECT      (*(volatile unsigned int  *) 0x023E)
-#define  FRAME0_PTR_HI     (*(volatile unsigned int  *) 0x0240)
-#define  FRAME0_PTR_LO     (*(volatile unsigned int  *) 0x0242)
-#define  FRAME1_PTR_HI     (*(volatile unsigned int  *) 0x0244)
-#define  FRAME1_PTR_LO     (*(volatile unsigned int  *) 0x0246)
-#define  FRAME2_PTR_HI     (*(volatile unsigned int  *) 0x0248)
-#define  FRAME2_PTR_LO     (*(volatile unsigned int  *) 0x024A)
-#define  FRAME3_PTR_HI     (*(volatile unsigned int  *) 0x024C)
-#define  FRAME3_PTR_LO     (*(volatile unsigned int  *) 0x024E)
+#define  FRAME_SELECT      (*(volatile uint16_t  *) 0x023E)
+#define  FRAME0_PTR        (*(volatile uint32_t  *) 0x0240)
+#define  FRAME1_PTR        (*(volatile uint32_t  *) 0x0244)
+#define  FRAME2_PTR        (*(volatile uint32_t  *) 0x0248)
+#define  FRAME3_PTR        (*(volatile uint32_t  *) 0x024C)
 
-#define  VID_RAM0_CFG      (*(volatile unsigned int  *) 0x0250)
-#define  VID_RAM0_WIDTH    (*(volatile unsigned int  *) 0x0252)
-#define  VID_RAM0_ADDR_HI  (*(volatile unsigned int  *) 0x0254)
-#define  VID_RAM0_ADDR_LO  (*(volatile unsigned int  *) 0x0256)
-#define  VID_RAM0_DATA     (*(volatile unsigned int  *) 0x0258)
+#define  VID_RAM0_CFG      (*(volatile uint16_t  *) 0x0250)
+#define  VID_RAM0_WIDTH    (*(volatile uint16_t  *) 0x0252)
+#define  VID_RAM0_ADDR     (*(volatile uint32_t  *) 0x0254)
+#define  VID_RAM0_DATA     (*(volatile uint16_t  *) 0x0258)
 
-#define  VID_RAM1_CFG      (*(volatile unsigned int  *) 0x0260)
-#define  VID_RAM1_WIDTH    (*(volatile unsigned int  *) 0x0262)
-#define  VID_RAM1_ADDR_HI  (*(volatile unsigned int  *) 0x0264)
-#define  VID_RAM1_ADDR_LO  (*(volatile unsigned int  *) 0x0266)
-#define  VID_RAM1_DATA     (*(volatile unsigned int  *) 0x0268)
+#define  VID_RAM1_CFG      (*(volatile uint16_t  *) 0x0260)
+#define  VID_RAM1_WIDTH    (*(volatile uint16_t  *) 0x0262)
+#define  VID_RAM1_ADDR     (*(volatile uint32_t  *) 0x0264)
+#define  VID_RAM1_DATA     (*(volatile uint16_t  *) 0x0268)
 
-#define  GPU_CMD           (*(volatile unsigned int  *) 0x0270)
-#define  GPU_STAT          (*(volatile unsigned int  *) 0x0272)
+#define  GPU_CMD           (*(volatile uint16_t  *) 0x0270)
+#define  GPU_CMD32         (*(volatile uint32_t  *) 0x0270)
+#define  GPU_STAT          (*(volatile uint16_t  *) 0x0274)
 
 
 //----------------------------------------------------------
@@ -212,9 +218,12 @@ void start_lt24(void);
 #define  VID_RAM_WIN_NO_X_SWAP     0x0000
 
 // GPU_STAT Register
-#define  GPU_STAT_FIFO_CNT         0x000F
-#define  GPU_STAT_FIFO_EMPTY       0x0010
-#define  GPU_STAT_FIFO_FULL        0x0020
+#define  GPU_STAT_FIFO_CNT_EMPTY   0x000F
+#define  GPU_STAT_FIFO_CNT         0x00F0
+#define  GPU_STAT_FIFO_EMPTY       0x0100
+#define  GPU_STAT_FIFO_FULL        0x0200
+#define  GPU_STAT_DMA_BUSY         0x1000
+#define  GPU_STAT_BUSY             0x8000
 
 //----------------------------------------------------------
 // GPU COMMANDS

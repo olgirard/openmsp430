@@ -142,10 +142,10 @@ wire   [2:0] fifo_counter_nxt;
 wire  [15:0] lut_hw_data_1_bpp = ({5'b00000, 6'b000000, 5'b00000} & {16{frame_data_i[0]  ==1'b0   }}) |                            // 1 bpp:  Black
                                  ({5'b11111, 6'b111111, 5'b11111} & {16{frame_data_i[0]  ==1'b1   }}) ;                            //         White
 
-wire  [15:0] lut_hw_data_2_bpp = ({5'b00000, 6'b000000, 5'b00000} & {16{frame_data_i[0]  ==2'b00  }}) |                            // 2 bpp:  Black
-                                 ({5'b01000, 6'b010000, 5'b01000} & {16{frame_data_i[0]  ==2'b01  }}) |                            //         Dark Gray
-                                 ({5'b11000, 6'b110000, 5'b11000} & {16{frame_data_i[0]  ==2'b10  }}) |                            //         Light Gray
-                                 ({5'b11111, 6'b111111, 5'b11111} & {16{frame_data_i[0]  ==2'b11  }}) ;                            //         White
+wire  [15:0] lut_hw_data_2_bpp = ({5'b00000, 6'b000000, 5'b00000} & {16{frame_data_i[1:0]==2'b00  }}) |                            // 2 bpp:  Black
+                                 ({5'b01000, 6'b010000, 5'b01000} & {16{frame_data_i[1:0]==2'b01  }}) |                            //         Dark Gray
+                                 ({5'b11000, 6'b110000, 5'b11000} & {16{frame_data_i[1:0]==2'b10  }}) |                            //         Light Gray
+                                 ({5'b11111, 6'b111111, 5'b11111} & {16{frame_data_i[1:0]==2'b11  }}) ;                            //         White
 
 wire  [15:0] lut_hw_data_4_bpp = ({5'b00000, 6'b000000, 5'b00000} & {16{frame_data_i[3:0]==4'b0000}}) |                            // 4 bpp:  Black
                                  ({5'b00000, 6'b000000, 5'b10000} & {16{frame_data_i[3:0]==4'b0001}}) |                            //         Dark Blue

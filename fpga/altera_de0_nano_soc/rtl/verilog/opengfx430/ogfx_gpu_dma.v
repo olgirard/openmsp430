@@ -44,6 +44,7 @@ module  ogfx_gpu_dma (
 
 // OUTPUTs
     gpu_exec_done_o,                              // GPU execution done
+    gpu_dma_busy_o,                               // GPU DMA execution on going
 
     vid_ram_addr_o,                               // Video-RAM address
     vid_ram_din_o,                                // Video-RAM data
@@ -86,6 +87,7 @@ module  ogfx_gpu_dma (
 // OUTPUTs
 //=========
 output                 gpu_exec_done_o;           // GPU execution done
+output                 gpu_dma_busy_o;            // GPU DMA execution on going
 
 output   [`VRAM_MSB:0] vid_ram_addr_o;            // Video-RAM address
 output          [15:0] vid_ram_din_o;             // Video-RAM data
@@ -237,6 +239,7 @@ wire   dma_init        = (dma_state==INIT);
 wire   dma_pixel_done  = (dma_state==SKIP) | ((dma_state==DST_READ)  & pixel_is_transparent) |
                                              ((dma_state==DST_WRITE) & data_ready_nxt      ) ;
 assign gpu_exec_done_o = (dma_state==IDLE) & ~trig_exec_i;
+assign gpu_dma_busy_o  = (dma_state!=IDLE);
 
 
 //=============================================================================
@@ -306,7 +309,6 @@ ogfx_gpu_dma_addr ogfx_gpu_dma_src_addr_inst (
     .vid_ram_addr_i          ( vram_src_addr           ),   // Video-RAM address
     .vid_ram_addr_init_i     ( dma_init                ),   // Video-RAM address initialization
     .vid_ram_addr_step_i     ( vram_src_addr_inc       ),   // Video-RAM address step
-    .vid_ram_height_i        ( cfg_rec_height_i        ),   // Video-RAM height
     .vid_ram_width_i         ( cfg_rec_width_i         ),   // Video-RAM width
     .vid_ram_win_x_swap_i    ( cfg_src_x_swp_i         ),   // Video-RAM X-Swap configuration
     .vid_ram_win_y_swap_i    ( cfg_src_y_swp_i         ),   // Video-RAM Y-Swap configuration
@@ -383,7 +385,6 @@ ogfx_gpu_dma_addr ogfx_gpu_dma_dst_addr_inst (
     .vid_ram_addr_i          ( vram_dst_addr           ),   // Video-RAM address
     .vid_ram_addr_init_i     ( dma_init                ),   // Video-RAM address initialization
     .vid_ram_addr_step_i     ( vram_dst_addr_inc       ),   // Video-RAM address step
-    .vid_ram_height_i        ( cfg_rec_height_i        ),   // Video-RAM height
     .vid_ram_width_i         ( cfg_rec_width_i         ),   // Video-RAM width
     .vid_ram_win_x_swap_i    ( cfg_dst_x_swp_i         ),   // Video-RAM X-Swap configuration
     .vid_ram_win_y_swap_i    ( cfg_dst_y_swp_i         ),   // Video-RAM Y-Swap configuration

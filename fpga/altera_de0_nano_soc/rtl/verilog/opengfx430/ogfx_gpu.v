@@ -50,6 +50,7 @@ module  ogfx_gpu (
 // OUTPUTs
     gpu_cmd_done_evt_o,                           // GPU command done event
     gpu_cmd_error_evt_o,                          // GPU command error event
+    gpu_dma_busy_o,                               // GPU DMA execution on going
     gpu_get_data_o,                               // GPU get next data
 
     vid_ram_addr_o,                               // Video-RAM address
@@ -77,6 +78,7 @@ module  ogfx_gpu (
 //=========
 output               gpu_cmd_done_evt_o;          // GPU command done event
 output               gpu_cmd_error_evt_o;         // GPU command error event
+output               gpu_dma_busy_o;              // GPU DMA execution on going
 output               gpu_get_data_o;              // GPU get next data
 
 output [`VRAM_MSB:0] vid_ram_addr_o;              // Video-RAM address
@@ -178,6 +180,7 @@ ogfx_gpu_dma ogfx_gpu_dma_inst (
 
 // OUTPUTs
     .gpu_exec_done_o         (gpu_exec_done         ),     // GPU execution done
+    .gpu_dma_busy_o          (gpu_dma_busy_o        ),     // GPU DMA execution on going
 
     .vid_ram_addr_o          (vid_ram_addr_o        ),     // Video-RAM address
     .vid_ram_din_o           (vid_ram_din_o         ),     // Video-RAM data

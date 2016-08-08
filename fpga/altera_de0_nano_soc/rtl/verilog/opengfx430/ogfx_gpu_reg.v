@@ -183,33 +183,33 @@ wire   [`APIX_MSB:0] dst_offset_addr;
 //
 // SRC_PX_ADDR      - Set source address
 //                    {4'b1111, 2'b10, 10'b0000000000}
-//                    {addr[31:16]                   }
 //                    {addr[15:0]                    }
+//                    {addr[31:16]                   }
 //
 // DST_PX_ADDR      - Set destination address
 //                    {4'b1111, 2'b10, 10'b0000000001}
-//                    {addr[31:16]                   }
 //                    {addr[15:0]                    }
+//                    {addr[31:16]                   }
 //
 // OF0_ADDR         - Set address offset 0
 //                    {4'b1111, 2'b10, 10'b0000010000}
-//                    {addr[31:16]                   }
 //                    {addr[15:0]                    }
+//                    {addr[31:16]                   }
 //
 // OF1_ADDR         - Set address offset 1
 //                    {4'b1111, 2'b10, 10'b0000010001}
-//                    {addr[31:16]                   }
 //                    {addr[15:0]                    }
+//                    {addr[31:16]                   }
 //
 // OF2_ADDR         - Set address offset 2
 //                    {4'b1111, 2'b10, 10'b0000010010}
-//                    {addr[31:16]                   }
 //                    {addr[15:0]                    }
+//                    {addr[31:16]                   }
 //
 // OF3_ADDR         - Set address offset 3
 //                    {4'b1111, 2'b10, 10'b0000010011}
-//                    {addr[31:16]                   }
 //                    {addr[15:0]                    }
+//                    {addr[31:16]                   }
 //
 // SET_FILL         - Set fill color
 //                    {4'b1111, 2'b01, 10'b0000100000}
@@ -467,7 +467,7 @@ assign cfg_rec_height_o = rec_height;
 `ifdef VRAM_BIGGER_4_KW
 reg [`APIX_HI_MSB:0] src_px_addr_hi;
 
-wire                 src_px_addr_hi_wr = (reg_access==REG_SRC_PX_ADDR) & (gpu_state==DATA2B1_READ);
+wire                 src_px_addr_hi_wr = (reg_access==REG_SRC_PX_ADDR) & (gpu_state==DATA2B2_READ);
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)                src_px_addr_hi <=  {`APIX_HI_MSB+1{1'b0}};
@@ -479,7 +479,7 @@ always @ (posedge mclk or posedge puc_rst)
 //------------------------------------------------
 reg [`APIX_LO_MSB:0] src_px_addr_lo;
 
-wire                 src_px_addr_lo_wr = (reg_access==REG_SRC_PX_ADDR) & (gpu_state==DATA2B2_READ);
+wire                 src_px_addr_lo_wr = (reg_access==REG_SRC_PX_ADDR) & (gpu_state==DATA2B1_READ);
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)                src_px_addr_lo <=  {`APIX_LO_MSB+1{1'b0}};
@@ -488,7 +488,7 @@ always @ (posedge mclk or posedge puc_rst)
 `ifdef VRAM_BIGGER_4_KW
 assign      src_px_addr  = {src_px_addr_hi[`APIX_HI_MSB:0], src_px_addr_lo};
 `else
-assign      src_px_addr  = {src_px_addr_lo[`APIX_LO_MS:0]};
+assign      src_px_addr  = {src_px_addr_lo[`APIX_LO_MSB:0]};
 `endif
 
 assign src_px_addr_align = src_px_addr + src_offset_addr;
@@ -504,7 +504,7 @@ assign cfg_src_px_addr_o = {`APIX_MSB+1{gfx_mode_1_bpp }} & {src_px_addr_align[`
 `ifdef VRAM_BIGGER_4_KW
 reg [`APIX_HI_MSB:0] dst_px_addr_hi;
 
-wire                 dst_px_addr_hi_wr = (reg_access==REG_DST_PX_ADDR) & (gpu_state==DATA2B1_READ);
+wire                 dst_px_addr_hi_wr = (reg_access==REG_DST_PX_ADDR) & (gpu_state==DATA2B2_READ);
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)                dst_px_addr_hi <=  {`APIX_HI_MSB+1{1'b0}};
@@ -516,7 +516,7 @@ always @ (posedge mclk or posedge puc_rst)
 //------------------------------------------------
 reg [`APIX_LO_MSB:0] dst_px_addr_lo;
 
-wire                 dst_px_addr_lo_wr = (reg_access==REG_DST_PX_ADDR) & (gpu_state==DATA2B2_READ);
+wire                 dst_px_addr_lo_wr = (reg_access==REG_DST_PX_ADDR) & (gpu_state==DATA2B1_READ);
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)                dst_px_addr_lo <=  {`APIX_LO_MSB+1{1'b0}};
@@ -525,7 +525,7 @@ always @ (posedge mclk or posedge puc_rst)
 `ifdef VRAM_BIGGER_4_KW
 assign      dst_px_addr  = {dst_px_addr_hi[`APIX_HI_MSB:0], dst_px_addr_lo};
 `else
-assign      dst_px_addr  = {dst_px_addr_lo[`APIX_LO_MS:0]};
+assign      dst_px_addr  = {dst_px_addr_lo[`APIX_LO_MSB:0]};
 `endif
 
 assign dst_px_addr_align = dst_px_addr + dst_offset_addr;
@@ -541,7 +541,7 @@ assign cfg_dst_px_addr_o = {`APIX_MSB+1{gfx_mode_1_bpp }} & {dst_px_addr_align[`
 `ifdef VRAM_BIGGER_4_KW
 reg [`APIX_HI_MSB:0] of0_addr_hi;
 
-wire                 of0_addr_hi_wr = (reg_access==REG_OF0_ADDR) & (gpu_state==DATA2B1_READ);
+wire                 of0_addr_hi_wr = (reg_access==REG_OF0_ADDR) & (gpu_state==DATA2B2_READ);
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)             of0_addr_hi <=  {`APIX_HI_MSB+1{1'b0}};
@@ -553,7 +553,7 @@ always @ (posedge mclk or posedge puc_rst)
 //------------------------------------------------
 reg [`APIX_LO_MSB:0] of0_addr_lo;
 
-wire                 of0_addr_lo_wr = (reg_access==REG_OF0_ADDR) & (gpu_state==DATA2B2_READ);
+wire                 of0_addr_lo_wr = (reg_access==REG_OF0_ADDR) & (gpu_state==DATA2B1_READ);
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)             of0_addr_lo <=  {`APIX_LO_MSB+1{1'b0}};
@@ -562,7 +562,7 @@ always @ (posedge mclk or posedge puc_rst)
 `ifdef VRAM_BIGGER_4_KW
 assign      of0_addr  = {of0_addr_hi[`APIX_HI_MSB:0], of0_addr_lo};
 `else
-assign      of0_addr  = {of0_addr_lo[`APIX_LO_MS:0]};
+assign      of0_addr  = {of0_addr_lo[`APIX_LO_MSB:0]};
 `endif
 
 //------------------------------------------------
@@ -571,7 +571,7 @@ assign      of0_addr  = {of0_addr_lo[`APIX_LO_MS:0]};
 `ifdef VRAM_BIGGER_4_KW
 reg [`APIX_HI_MSB:0] of1_addr_hi;
 
-wire                 of1_addr_hi_wr = (reg_access==REG_OF1_ADDR) & (gpu_state==DATA2B1_READ);
+wire                 of1_addr_hi_wr = (reg_access==REG_OF1_ADDR) & (gpu_state==DATA2B2_READ);
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)             of1_addr_hi <=  {`APIX_HI_MSB+1{1'b0}};
@@ -583,7 +583,7 @@ always @ (posedge mclk or posedge puc_rst)
 //------------------------------------------------
 reg [`APIX_LO_MSB:0] of1_addr_lo;
 
-wire                 of1_addr_lo_wr = (reg_access==REG_OF1_ADDR) & (gpu_state==DATA2B2_READ);
+wire                 of1_addr_lo_wr = (reg_access==REG_OF1_ADDR) & (gpu_state==DATA2B1_READ);
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)             of1_addr_lo <=  {`APIX_LO_MSB+1{1'b0}};
@@ -592,7 +592,7 @@ always @ (posedge mclk or posedge puc_rst)
 `ifdef VRAM_BIGGER_4_KW
 assign      of1_addr  = {of1_addr_hi[`APIX_HI_MSB:0], of1_addr_lo};
 `else
-assign      of1_addr  = {of1_addr_lo[`APIX_LO_MS:0]};
+assign      of1_addr  = {of1_addr_lo[`APIX_LO_MSB:0]};
 `endif
 
 //------------------------------------------------
@@ -601,7 +601,7 @@ assign      of1_addr  = {of1_addr_lo[`APIX_LO_MS:0]};
 `ifdef VRAM_BIGGER_4_KW
 reg [`APIX_HI_MSB:0] of2_addr_hi;
 
-wire                 of2_addr_hi_wr = (reg_access==REG_OF2_ADDR) & (gpu_state==DATA2B1_READ);
+wire                 of2_addr_hi_wr = (reg_access==REG_OF2_ADDR) & (gpu_state==DATA2B2_READ);
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)             of2_addr_hi <=  {`APIX_HI_MSB+1{1'b0}};
@@ -613,7 +613,7 @@ always @ (posedge mclk or posedge puc_rst)
 //------------------------------------------------
 reg [`APIX_LO_MSB:0] of2_addr_lo;
 
-wire                 of2_addr_lo_wr = (reg_access==REG_OF2_ADDR) & (gpu_state==DATA2B2_READ);
+wire                 of2_addr_lo_wr = (reg_access==REG_OF2_ADDR) & (gpu_state==DATA2B1_READ);
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)             of2_addr_lo <=  {`APIX_LO_MSB+1{1'b0}};
@@ -622,7 +622,7 @@ always @ (posedge mclk or posedge puc_rst)
 `ifdef VRAM_BIGGER_4_KW
 assign      of2_addr  = {of2_addr_hi[`APIX_HI_MSB:0], of2_addr_lo};
 `else
-assign      of2_addr  = {of2_addr_lo[`APIX_LO_MS:0]};
+assign      of2_addr  = {of2_addr_lo[`APIX_LO_MSB:0]};
 `endif
 
 //------------------------------------------------
@@ -631,7 +631,7 @@ assign      of2_addr  = {of2_addr_lo[`APIX_LO_MS:0]};
 `ifdef VRAM_BIGGER_4_KW
 reg [`APIX_HI_MSB:0] of3_addr_hi;
 
-wire                 of3_addr_hi_wr = (reg_access==REG_OF3_ADDR) & (gpu_state==DATA2B1_READ);
+wire                 of3_addr_hi_wr = (reg_access==REG_OF3_ADDR) & (gpu_state==DATA2B2_READ);
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)             of3_addr_hi <=  {`APIX_HI_MSB+1{1'b0}};
@@ -643,7 +643,7 @@ always @ (posedge mclk or posedge puc_rst)
 //------------------------------------------------
 reg [`APIX_LO_MSB:0] of3_addr_lo;
 
-wire                 of3_addr_lo_wr = (reg_access==REG_OF3_ADDR) & (gpu_state==DATA2B2_READ);
+wire                 of3_addr_lo_wr = (reg_access==REG_OF3_ADDR) & (gpu_state==DATA2B1_READ);
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)             of3_addr_lo <=  {`APIX_LO_MSB+1{1'b0}};
@@ -652,7 +652,7 @@ always @ (posedge mclk or posedge puc_rst)
 `ifdef VRAM_BIGGER_4_KW
 assign      of3_addr  = {of3_addr_hi[`APIX_HI_MSB:0], of3_addr_lo};
 `else
-assign      of3_addr  = {of3_addr_lo[`APIX_LO_MS:0]};
+assign      of3_addr  = {of3_addr_lo[`APIX_LO_MSB:0]};
 `endif
 
 // Offset address selection

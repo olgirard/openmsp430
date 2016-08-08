@@ -57,7 +57,6 @@ module  ogfx_gpu_dma_addr (
     vid_ram_addr_i,                           // Video-RAM address
     vid_ram_addr_init_i,                      // Video-RAM address initialization
     vid_ram_addr_step_i,                      // Video-RAM address step
-    vid_ram_height_i,                         // Video-RAM height
     vid_ram_width_i,                          // Video-RAM width
     vid_ram_win_x_swap_i,                     // Video-RAM X-Swap configuration
     vid_ram_win_y_swap_i,                     // Video-RAM Y-Swap configuration
@@ -81,7 +80,6 @@ input                  gfx_mode_16_bpp_i;     // Graphic mode 16 bpp resolution
 input    [`APIX_MSB:0] vid_ram_addr_i;        // Video-RAM address
 input                  vid_ram_addr_init_i;   // Video-RAM address initialization
 input                  vid_ram_addr_step_i;   // Video-RAM address step
-input    [`LPIX_MSB:0] vid_ram_height_i;      // Video-RAM height
 input    [`LPIX_MSB:0] vid_ram_width_i;       // Video-RAM width
 input                  vid_ram_win_x_swap_i;  // Video-RAM X-Swap configuration
 input                  vid_ram_win_y_swap_i;  // Video-RAM Y-Swap configuration
@@ -94,15 +92,11 @@ input                  vid_ram_win_cl_swap_i; // Video-RAM CL-Swap configuration
 reg    [`APIX_MSB:0] vid_ram_line_addr;
 reg    [`LPIX_MSB:0] vid_ram_column_count;
 
-// Swap Width and Height if required
-wire   [`LPIX_MSB:0] vid_ram_length       = vid_ram_win_cl_swap_i ? vid_ram_height_i : vid_ram_width_i;
-
 // Detect when the current line refresh is done
-wire                 vid_ram_line_done    = vid_ram_addr_step_i & (vid_ram_column_count==(vid_ram_length-{{`LPIX_MSB{1'b0}}, 1'b1}));
-
+wire                 vid_ram_line_done    = vid_ram_addr_step_i & (vid_ram_column_count==(vid_ram_width_i-{{`LPIX_MSB{1'b0}}, 1'b1}));
 
 // Mux between initialization value and display width
-wire   [`LPIX_MSB:0] vid_ram_length_mux   = vid_ram_addr_init_i ? vid_ram_length : display_width_i ;
+wire   [`LPIX_MSB:0] vid_ram_length_mux   = vid_ram_addr_init_i ? vid_ram_width_i : display_width_i ;
 
 // Align depending on graphic mode
 wire [`LPIX_MSB+4:0] vid_ram_length_align =  {`LPIX_MSB+5{gfx_mode_1_bpp_i }} & {4'b0000, vid_ram_length_mux[`LPIX_MSB:0]         } |

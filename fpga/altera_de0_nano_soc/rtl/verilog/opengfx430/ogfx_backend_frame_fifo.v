@@ -212,18 +212,18 @@ always @(posedge mclk or posedge puc_rst)
   else if (vid_ram_pixel_done) vid_ram_column_count  <=  vid_ram_column_count + {{`LPIX_MSB{1'b0}}, 1'b1};
 
 // Depending on the color mode, format the address for doing the RAM accesses.
-assign      vid_ram_addr_o   = ({`VRAM_MSB+1{gfx_mode_1_bpp }} & vid_ram_pixel_addr[`VRAM_MSB+4:4]) |
-                               ({`VRAM_MSB+1{gfx_mode_2_bpp }} & vid_ram_pixel_addr[`VRAM_MSB+3:3]) |
-                               ({`VRAM_MSB+1{gfx_mode_4_bpp }} & vid_ram_pixel_addr[`VRAM_MSB+2:2]) |
-                               ({`VRAM_MSB+1{gfx_mode_8_bpp }} & vid_ram_pixel_addr[`VRAM_MSB+1:1]) |
-                               ({`VRAM_MSB+1{gfx_mode_16_bpp}} & vid_ram_pixel_addr[`VRAM_MSB+0:0]) ;
+assign              vid_ram_addr_o   = ({`VRAM_MSB+1{gfx_mode_1_bpp }} & vid_ram_pixel_addr[`VRAM_MSB+4:4]) |
+                                       ({`VRAM_MSB+1{gfx_mode_2_bpp }} & vid_ram_pixel_addr[`VRAM_MSB+3:3]) |
+                                       ({`VRAM_MSB+1{gfx_mode_4_bpp }} & vid_ram_pixel_addr[`VRAM_MSB+2:2]) |
+                                       ({`VRAM_MSB+1{gfx_mode_8_bpp }} & vid_ram_pixel_addr[`VRAM_MSB+1:1]) |
+                                       ({`VRAM_MSB+1{gfx_mode_16_bpp}} & vid_ram_pixel_addr[`VRAM_MSB+0:0]) ;
 
 // Compute the next RAM address to detect when a new address is generated
-wire [16:0] vid_ram_addr_nxt = ({`VRAM_MSB+1{gfx_mode_1_bpp }} & vid_ram_pixel_addr_nxt[`VRAM_MSB+4:4]) |
-                               ({`VRAM_MSB+1{gfx_mode_2_bpp }} & vid_ram_pixel_addr_nxt[`VRAM_MSB+3:3]) |
-                               ({`VRAM_MSB+1{gfx_mode_4_bpp }} & vid_ram_pixel_addr_nxt[`VRAM_MSB+2:2]) |
-                               ({`VRAM_MSB+1{gfx_mode_8_bpp }} & vid_ram_pixel_addr_nxt[`VRAM_MSB+1:1]) |
-                               ({`VRAM_MSB+1{gfx_mode_16_bpp}} & vid_ram_pixel_addr_nxt[`VRAM_MSB+0:0]) ;
+wire [`VRAM_MSB:0] vid_ram_addr_nxt = ({`VRAM_MSB+1{gfx_mode_1_bpp }} & vid_ram_pixel_addr_nxt[`VRAM_MSB+4:4]) |
+                                      ({`VRAM_MSB+1{gfx_mode_2_bpp }} & vid_ram_pixel_addr_nxt[`VRAM_MSB+3:3]) |
+                                      ({`VRAM_MSB+1{gfx_mode_4_bpp }} & vid_ram_pixel_addr_nxt[`VRAM_MSB+2:2]) |
+                                      ({`VRAM_MSB+1{gfx_mode_8_bpp }} & vid_ram_pixel_addr_nxt[`VRAM_MSB+1:1]) |
+                                      ({`VRAM_MSB+1{gfx_mode_16_bpp}} & vid_ram_pixel_addr_nxt[`VRAM_MSB+0:0]) ;
 
 // Detect when a new word needs to be fetched from the memory
 // (i.e. detect when the RAM address is updated)

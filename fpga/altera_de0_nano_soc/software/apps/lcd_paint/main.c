@@ -12,6 +12,8 @@
 void init_mem(unsigned int, unsigned int, unsigned int, unsigned int);
 void init_mem_8bpp(void);
 void dma_test(unsigned int, unsigned int, unsigned int);
+void draw_block_sw(uint32_t, uint16_t, uint16_t, uint16_t, uint16_t);
+void draw_block_hw(uint32_t, uint16_t, uint16_t, uint16_t, uint16_t);
 
 
 /**
@@ -48,9 +50,8 @@ int main(void) {
   //VID_RAM0_CFG     = VID_RAM_NO_RMW_MODE | VID_RAM_WIN_MODE | VID_RAM_WIN_X_SWAP | VID_RAM_WIN_Y_SWAP | VID_RAM_WIN_CL_SWAP;
   //VID_RAM0_WIDTH   = 8;
   VID_RAM0_WIDTH   = 5;
-  VID_RAM0_ADDR_HI = 0x0000;
-  //VID_RAM0_ADDR_LO = 27;
-  VID_RAM0_ADDR_LO = 86;
+  //VID_RAM0_ADDR = 27;
+  VID_RAM0_ADDR = 86;
 
 #ifdef TEST_16_BPP
   __nop();
@@ -296,18 +297,14 @@ int main(void) {
   VID_RAM0_DATA    = 0b1001110100110101;
 #endif
 
-  VID_RAM1_ADDR_HI = 0x0001;
-  VID_RAM1_ADDR_LO = 0x0000;
+  VID_RAM1_ADDR    = 0x00010000;
 
   VID_RAM1_DATA    = 0x1111;
   VID_RAM1_DATA    = 0x2222;
   VID_RAM1_DATA    = 0x3333;
   VID_RAM1_DATA    = 0x4444;
 
-  VID_RAM0_ADDR_HI = 0x0001;
-  VID_RAM0_ADDR_HI = 0x0000;
-  VID_RAM0_ADDR_HI = 0x0001;
-  VID_RAM0_ADDR_LO = 0x0000;
+  VID_RAM0_ADDR    = 0x00010000;
   //__nop();
   //__nop();
   //__nop();
@@ -320,7 +317,7 @@ int main(void) {
   temp3           = VID_RAM0_DATA;
   temp4           = VID_RAM0_DATA;
 
-  VID_RAM1_ADDR_LO = 0x0002;
+  VID_RAM1_ADDR   = 0x00000002;
   __nop();
   temp1           = VID_RAM1_DATA;
   temp2           = VID_RAM1_DATA;
@@ -350,14 +347,11 @@ int main(void) {
 
   LT24_CMD      = 0x0004 | LT24_CMD_NO_PARAM;
 
-//  FRAME0_PTR_HI   = 0x0001;
-//  FRAME0_PTR_LO   = 0x2345;
+  FRAME0_PTR    = 0x00012345;
 
-  FRAME0_PTR_HI   = 0x0000;
-  FRAME0_PTR_LO   = 0x0000;
+  FRAME0_PTR    = 0x00000000;
 
-  FRAME1_PTR_HI   = 0x0000;
-  FRAME1_PTR_LO   = 0xfff8;
+  FRAME1_PTR    = 0x0005fff8;
 
   FRAME_SELECT    = REFRESH_FRAME0_SELECT;
 
@@ -1069,18 +1063,15 @@ int main(void) {
 
   DISPLAY_WIDTH    = 13;
   DISPLAY_HEIGHT   = 10;
-  DISPLAY_SIZE_HI  = 0;
-  DISPLAY_SIZE_LO  = 13*10;
-  FRAME0_PTR_HI    = 0;
-  FRAME0_PTR_LO    = 0;
+  DISPLAY_SIZE     = 13*10;
+  FRAME0_PTR       = 0;
   GFX_CTRL         = GFX_16_BPP           | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
   DISPLAY_CFG      = DISPLAY_NO_X_SWAP   | DISPLAY_NO_Y_SWAP     | DISPLAY_NO_CL_SWAP;
 
   VID_RAM0_CFG     = VID_RAM_NO_RMW_MODE | VID_RAM_NO_MSK_MODE   | VID_RAM_NO_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
   VID_RAM0_WIDTH   = 5;
 
-  VID_RAM0_ADDR_HI =  0x0001;
-  VID_RAM0_ADDR_LO =  0xFFFA;
+  VID_RAM0_ADDR    =  0x0001FFFA;
   VID_RAM0_DATA    =  0x5AA5;
   VID_RAM0_DATA    =  0xB66B;
   VID_RAM0_DATA    =  0x5AA5;
@@ -1095,60 +1086,103 @@ int main(void) {
   VID_RAM0_DATA    =  0xB66B;
   VID_RAM0_DATA    =  0x5AA5;
 
+  for( idx = 0; idx < 1000; idx = idx + 1 ) {__nop();}
+  draw_block_sw(320*(15    )+150+  8, 8, 24, 0x1234, DST_SWAP_CL);
 
-//  for( idx = 0; idx < 100; idx = idx + 1 ) {__nop();}
-//  VID_RAM0_CFG     = VID_RAM_NO_RMW_MODE | VID_RAM_MSK_MODE   | VID_RAM_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
-//  VID_RAM0_WIDTH   = 5;
-//
-//  VID_RAM0_ADDR_HI =  0;
-//  VID_RAM0_ADDR_LO =  6;
-//  VID_RAM0_DATA    =  0x1234;
-//  VID_RAM0_DATA    =  0x5678;
-//  VID_RAM0_DATA    =  0x9ABC;
-//  VID_RAM0_DATA    =  0xDEF0;
-//  VID_RAM0_DATA    =  0xFEDC;
-//  VID_RAM0_DATA    =  0xBA98;
-//  VID_RAM0_DATA    =  0x7654;
-//  VID_RAM0_DATA    =  0x3210;
-//  VID_RAM0_DATA    =  0xdead;
-//  VID_RAM0_DATA    =  0xbeef;
-//  VID_RAM0_DATA    =  0xc001;
-//
-//
-//  for( idx = 0; idx < 100; idx = idx + 1 ) {__nop();}
-//  VID_RAM0_CFG     = VID_RAM_RMW_MODE | VID_RAM_MSK_MODE   | VID_RAM_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
-//  VID_RAM0_WIDTH   = 5;
-//
-//  VID_RAM0_ADDR_HI =  0;
-//  VID_RAM0_ADDR_LO =  6;
-//
-//  temp1            = VID_RAM0_DATA;
-//  VID_RAM0_DATA    = 0xa55a;
-//  temp2            = VID_RAM0_DATA;
-//  VID_RAM0_DATA    = 0xb66b;
-//  temp3            = VID_RAM0_DATA;
-//  VID_RAM0_DATA    = 0xc77c;
-//  temp4            = VID_RAM0_DATA;
-//  VID_RAM0_DATA    = 0xd88d;
-//  temp1            = VID_RAM0_DATA;
-//  VID_RAM0_DATA    = 0xe99e;
-//  temp2            = VID_RAM0_DATA;
-//  VID_RAM0_DATA    = 0xfaaf;
-//  temp3            = VID_RAM0_DATA;
-//  VID_RAM0_DATA    = 0x1221;
-//  temp4            = VID_RAM0_DATA;
-//  VID_RAM0_DATA    = 0x2332;
-//  temp1            = VID_RAM0_DATA;
-//  VID_RAM0_DATA    = 0x3443;
-//  temp2            = VID_RAM0_DATA;
-//  VID_RAM0_DATA    = 0x4554;
-//  temp3            = VID_RAM0_DATA;
-//  VID_RAM0_DATA    = 0x5665;
-//  temp4            = VID_RAM0_DATA;
+  for( idx = 0; idx < 1000; idx = idx + 1 ) {__nop();}
+  draw_block_hw(320*(15    )+150+  8, 8, 24, 0x1234, DST_SWAP_CL);
+
+  FRAME1_PTR = 0x12345678;
+  for( idx = 0; idx < 1000; idx = idx + 1 ) {__nop();}
+  //FRAME0_PTR = PIX_ADDR(235,300);
+  GPU_CMD  = GPU_SRC_PX_ADDR ; GPU_CMD32 = 0x00012345;
+  GPU_CMD  = GPU_DST_PX_ADDR ; GPU_CMD32 = 0x00123456;
+
+  //-----------------------------------
+
+  for( idx = 0; idx < 100; idx = idx + 1 ) {__nop();}
+  VID_RAM0_CFG     = VID_RAM_NO_RMW_MODE | VID_RAM_MSK_MODE   | VID_RAM_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
+  VID_RAM0_WIDTH   = 5;
+
+  VID_RAM0_ADDR    =  6;
+  VID_RAM0_DATA    =  0x1234;
+  VID_RAM0_DATA    =  0x5678;
+  VID_RAM0_DATA    =  0x9ABC;
+  VID_RAM0_DATA    =  0xDEF0;
+  VID_RAM0_DATA    =  0xFEDC;
+  VID_RAM0_DATA    =  0xBA98;
+  VID_RAM0_DATA    =  0x7654;
+  VID_RAM0_DATA    =  0x3210;
+  VID_RAM0_DATA    =  0xdead;
+  VID_RAM0_DATA    =  0xbeef;
+  VID_RAM0_DATA    =  0xc001;
+
+
+  for( idx = 0; idx < 100; idx = idx + 1 ) {__nop();}
+  VID_RAM0_CFG     = VID_RAM_RMW_MODE | VID_RAM_MSK_MODE   | VID_RAM_WIN_MODE | VID_RAM_WIN_NO_X_SWAP | VID_RAM_WIN_NO_Y_SWAP | VID_RAM_WIN_NO_CL_SWAP;
+  VID_RAM0_WIDTH   = 5;
+
+  VID_RAM0_ADDR    =  6;
+
+  temp1            = VID_RAM0_DATA;
+  VID_RAM0_DATA    = 0xa55a;
+  temp2            = VID_RAM0_DATA;
+  VID_RAM0_DATA    = 0xb66b;
+  temp3            = VID_RAM0_DATA;
+  VID_RAM0_DATA    = 0xc77c;
+  temp4            = VID_RAM0_DATA;
+  VID_RAM0_DATA    = 0xd88d;
+  temp1            = VID_RAM0_DATA;
+  VID_RAM0_DATA    = 0xe99e;
+  temp2            = VID_RAM0_DATA;
+  VID_RAM0_DATA    = 0xfaaf;
+  temp3            = VID_RAM0_DATA;
+  VID_RAM0_DATA    = 0x1221;
+  temp4            = VID_RAM0_DATA;
+  VID_RAM0_DATA    = 0x2332;
+  temp1            = VID_RAM0_DATA;
+  VID_RAM0_DATA    = 0x3443;
+  temp2            = VID_RAM0_DATA;
+  VID_RAM0_DATA    = 0x4554;
+  temp3            = VID_RAM0_DATA;
+  VID_RAM0_DATA    = 0x5665;
+  temp4            = VID_RAM0_DATA;
 
 
   return 0;
 }
+
+
+void draw_block_sw(uint32_t addr, uint16_t width, uint16_t length, uint16_t color, uint16_t swap_configuration) {
+
+  unsigned int line, column;
+
+  VID_RAM0_WIDTH   = width;
+  VID_RAM0_CFG     = VID_RAM_WIN_MODE | swap_configuration;
+  VID_RAM0_ADDR    = addr;
+
+  for( line = 0; line < length; line = line + 1 ) {
+    for( column = 0; column < width; column = column + 1 ) {
+      VID_RAM0_DATA = color;
+    }
+  }
+}
+
+void draw_block_hw(uint32_t addr, uint16_t width, uint16_t length, uint16_t color, uint16_t swap_configuration) {
+
+  unsigned int line, column;
+
+  while((GPU_STAT & GPU_STAT_FIFO_EMPTY)==0);
+  GPU_CMD   = GPU_REC_WIDTH  | width;
+  GPU_CMD   = GPU_REC_HEIGHT | length;
+  GPU_CMD   = GPU_DST_PX_ADDR;
+  GPU_CMD32 = addr;
+  GPU_CMD   = GPU_EXEC_FILL  | GPU_PXOP_0 | GPU_SRC_OF0 | SRC_SWAP_NONE      |
+                                            GPU_DST_OF0 | swap_configuration ;
+  GPU_CMD   = color;
+}
+
+
 
 void init_mem(unsigned int src_data1, unsigned int src_data2, unsigned int dst_data1, unsigned int dst_data2) {
 
@@ -1157,8 +1191,7 @@ void init_mem(unsigned int src_data1, unsigned int src_data2, unsigned int dst_d
   VID_RAM0_WIDTH   = 3;
 
   // SRC
-  VID_RAM0_ADDR_HI =  0;
-  VID_RAM0_ADDR_LO =  0;
+  VID_RAM0_ADDR    =  0;
   VID_RAM0_DATA    =  src_data1;
   VID_RAM0_DATA    =  src_data2;
   VID_RAM0_DATA    =  src_data1;
@@ -1167,8 +1200,7 @@ void init_mem(unsigned int src_data1, unsigned int src_data2, unsigned int dst_d
   VID_RAM0_DATA    =  src_data2;
 
   // DST
-  VID_RAM0_ADDR_HI =  0;
-  VID_RAM0_ADDR_LO =  100;
+  VID_RAM0_ADDR    =  100;
   VID_RAM0_DATA    =  dst_data1;
   VID_RAM0_DATA    =  dst_data2;
   VID_RAM0_DATA    =  dst_data1;
@@ -1185,8 +1217,7 @@ void init_mem_8bpp(void) {
   VID_RAM0_WIDTH   = 5;
 
   // SRC
-  VID_RAM0_ADDR_HI =  0;
-  VID_RAM0_ADDR_LO =  6;
+  VID_RAM0_ADDR    =  6;
 
   VID_RAM0_DATA = 0x0055; VID_RAM0_DATA = 0x0055; VID_RAM0_DATA = 0x0055; VID_RAM0_DATA = 0x0055; VID_RAM0_DATA = 0x0055;
   VID_RAM0_DATA = 0x0066; VID_RAM0_DATA = 0x0012; VID_RAM0_DATA = 0x0034; VID_RAM0_DATA = 0x0056; VID_RAM0_DATA = 0x0077;
@@ -1195,8 +1226,7 @@ void init_mem_8bpp(void) {
 
 
   // DST
-  VID_RAM0_ADDR_HI =  0;
-  VID_RAM0_ADDR_LO =  67;
+  VID_RAM0_ADDR   =  67;
 
   VID_RAM0_DATA = 0x00AA; VID_RAM0_DATA = 0x00AA; VID_RAM0_DATA = 0x00AA; VID_RAM0_DATA = 0x00AA; VID_RAM0_DATA = 0x00AA;
   VID_RAM0_DATA = 0x00BB; VID_RAM0_DATA = 0x00DE; VID_RAM0_DATA = 0x00F0; VID_RAM0_DATA = 0x00FE; VID_RAM0_DATA = 0x00CC;

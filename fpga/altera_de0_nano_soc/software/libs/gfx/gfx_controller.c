@@ -11,16 +11,14 @@ void init_gfx_ctrl (uint16_t gfx_mode, uint16_t refresh_rate) {
 
   // Initialize frame buffer
 #ifndef VERILOG_SIMULATION
-  VID_RAM0_ADDR_HI  = 0x0000;
-  VID_RAM0_ADDR_LO  = 0x0000;
+  VID_RAM0_ADDR  = PIX_ADDR(0, 0);
   for( kb_idx = 0; kb_idx < FRAME_MEMORY_KB_SIZE/2; kb_idx = kb_idx + 1 ) {
     for( b_idx = 0; b_idx < 1024; b_idx = b_idx + 1 ) {
       VID_RAM0_DATA = 0x0000;
     }
   }
 #endif
-  VID_RAM0_ADDR_HI  = 0x0000;
-  VID_RAM0_ADDR_LO  = 0x0000;
+  VID_RAM0_ADDR     = PIX_ADDR(0, 0);
 
   // Configure Video mode
   GFX_CTRL          = gfx_mode | GFX_REFR_START_IRQ_DIS | GFX_REFR_DONE_IRQ_DIS | GFX_GPU_EN;
@@ -32,8 +30,7 @@ void init_gfx_ctrl (uint16_t gfx_mode, uint16_t refresh_rate) {
   // Global configuration registers
   DISPLAY_WIDTH     = SCREEN_WIDTH;
   DISPLAY_HEIGHT    = SCREEN_HEIGHT;
-  DISPLAY_SIZE_HI   = SCREEN_SIZE_HI;
-  DISPLAY_SIZE_LO   = SCREEN_SIZE_LO;
+  DISPLAY_SIZE      = (uint32_t)SCREEN_WIDTH * (uint32_t)SCREEN_HEIGHT;
 
 #ifdef LT24_ROTATE
   DISPLAY_CFG       = DISPLAY_NO_X_SWAP | DISPLAY_NO_Y_SWAP | DISPLAY_NO_CL_SWAP;
@@ -159,4 +156,45 @@ void start_lt24(void) {
   ta_wait_no_lpm(WT_100MS);
 
   return;
+}
+
+//==========================================================
+// GPU FUNCTIONS
+//==========================================================
+
+void gpu_fill (uint32_t addr, uint16_t width, uint16_t length, uint16_t color, uint16_t configuration) {
+
+  while((GPU_STAT & GPU_STAT_FIFO_CNT_EMPTY)<7);
+  GPU_CMD   = GPU_REC_WIDTH  | width;
+  GPU_CMD   = GPU_REC_HEIGHT | length;
+  GPU_CMD   = GPU_DST_PX_ADDR; GPU_CMD32 = addr;
+  GPU_CMD   = GPU_EXEC_FILL  | configuration ;
+  GPU_CMD   = color;
+}
+
+
+void gpu_copy (uint32_t src_addr, uint32_t dst_addr, uint16_t width, uint16_t length, uint16_t configuration) {
+
+  while((GPU_STAT & GPU_STAT_FIFO_CNT_EMPTY)<9);
+  GPU_CMD  = GPU_REC_WIDTH  | width;
+  GPU_CMD  = GPU_REC_HEIGHT | length;
+  GPU_CMD  = GPU_DST_PX_ADDR; GPU_CMD32 = dst_addr;
+  GPU_CMD  = GPU_SRC_PX_ADDR; GPU_CMD32 = src_addr;
+  GPU_CMD  = GPU_EXEC_COPY  | configuration ;
+}
+
+
+void gpu_copy_transparent (uint32_t src_addr, uint32_t dst_addr, uint16_t width, uint16_t length, uint16_t trans_color, uint16_t configuration) {
+
+  while((GPU_STAT & GPU_STAT_FIFO_CNT_EMPTY)<9);
+  GPU_CMD  = GPU_REC_WIDTH  | width;
+  GPU_CMD  = GPU_REC_HEIGHT | length;
+  GPU_CMD  = GPU_SET_TRANS;   GPU_CMD   = trans_color;
+  GPU_CMD  = GPU_DST_PX_ADDR; GPU_CMD32 = dst_addr;
+  GPU_CMD  = GPU_SRC_PX_ADDR; GPU_CMD32 = src_addr;
+  GPU_CMD  = GPU_EXEC_COPY_TRANS  | configuration ;
+}
+
+inline void gpu_wait_done (void) {
+    while((GPU_STAT & GPU_STAT_BUSY)!=0);
 }

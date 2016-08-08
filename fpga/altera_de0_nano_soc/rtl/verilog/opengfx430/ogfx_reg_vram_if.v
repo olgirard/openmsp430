@@ -63,9 +63,7 @@ module  ogfx_reg_vram_if (
 
     vid_ram_cfg_wr_i,                          // VID_RAMx_CFG     Write strobe
     vid_ram_width_wr_i,                        // VID_RAMx_WIDTH   Write strobe
-`ifdef VRAM_BIGGER_4_KW
     vid_ram_addr_hi_wr_i,                      // VID_RAMx_ADDR_HI Write strobe
-`endif
     vid_ram_addr_lo_wr_i,                      // VID_RAMx_ADDR_LO Write strobe
     vid_ram_data_wr_i,                         // VID_RAMx_DATA    Write strobe
     vid_ram_data_rd_i,                         // VID_RAMx_DATA    Read  strobe
@@ -106,9 +104,7 @@ input                puc_rst;                  // Main system reset
 
 input                vid_ram_cfg_wr_i;         // VID_RAMx_CFG     Write strobe
 input                vid_ram_width_wr_i;       // VID_RAMx_WIDTH   Write strobe
-`ifdef VRAM_BIGGER_4_KW
 input                vid_ram_addr_hi_wr_i;     // VID_RAMx_ADDR_HI Write strobe
-`endif
 input                vid_ram_addr_lo_wr_i;     // VID_RAMx_ADDR_LO Write strobe
 input                vid_ram_data_wr_i;        // VID_RAMx_DATA    Write strobe
 input                vid_ram_data_rd_i;        // VID_RAMx_DATA    Read  strobe
@@ -200,6 +196,7 @@ assign      vid_ram_width_o   = vid_ram_width_tmp[15:0];
 wire   [`APIX_MSB:0] vid_ram_addr;
 wire   [`APIX_MSB:0] vid_ram_addr_inc;
 wire                 vid_ram_addr_inc_wr;
+reg                  vid_ram_addr_hi_wr_dly;
 
 `ifdef VRAM_BIGGER_4_KW
 reg [`APIX_HI_MSB:0] vid_ram_addr_hi;
@@ -217,7 +214,6 @@ assign      vid_ram_addr_hi_o   = vid_ram_addr_hi_tmp[15:0];
 // VID_RAMx_ADDR_LO Register
 //------------------------------------------------
 reg [`APIX_LO_MSB:0] vid_ram_addr_lo;
-reg                  vid_ram_addr_lo_wr_dly;
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)                   vid_ram_addr_lo <=  {`APIX_LO_MSB+1{1'b0}};
@@ -249,7 +245,7 @@ ogfx_reg_vram_addr ogfx_reg_vram_addr_inst (
     .gfx_mode_8_bpp_i        ( gfx_mode_8_bpp_i       ),   // Graphic mode  8 bpp resolution
     .gfx_mode_16_bpp_i       ( gfx_mode_16_bpp_i      ),   // Graphic mode 16 bpp resolution
     .vid_ram_addr_i          ( vid_ram_addr           ),   // Video-RAM address
-    .vid_ram_addr_init_i     ( vid_ram_addr_lo_wr_dly ),   // Video-RAM address initialization
+    .vid_ram_addr_init_i     ( vid_ram_addr_hi_wr_dly ),   // Video-RAM address initialization
     .vid_ram_addr_step_i     ( vid_ram_addr_inc_wr    ),   // Video-RAM address step
     .vid_ram_width_i         ( vid_ram_width          ),   // Video-RAM width
     .vid_ram_msk_mode_i      ( vid_ram_msk_mode       ),   // Video-RAM Mask mode enable
@@ -332,8 +328,8 @@ assign      vid_ram_data_o              =  ({16{gfx_mode_1_bpp_i  &  vid_ram_msk
 
 // Strobe writing to VID_RAMx_ADDR_LO register
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst) vid_ram_addr_lo_wr_dly  <= 1'b0;
-  else         vid_ram_addr_lo_wr_dly  <= vid_ram_addr_lo_wr_i;
+  if (puc_rst) vid_ram_addr_hi_wr_dly  <= 1'b0;
+  else         vid_ram_addr_hi_wr_dly  <= vid_ram_addr_hi_wr_i;
 
 // Strobe reading from VID_RAMx_DATA register
 reg        vid_ram_data_rd_dly;
@@ -348,7 +344,7 @@ always @ (posedge mclk or posedge puc_rst)
   else         vid_ram_data_wr_dly     <= vid_ram_data_wr_i;
 
 // Trigger read access after a write in MSK mode
-wire       vid_ram_data_rd_msk   = ((vid_ram_data_wr_dly  | vid_ram_data_rd_dly | vid_ram_addr_lo_wr_i) & vid_ram_msk_mode & ~gfx_mode_16_bpp_i);
+wire       vid_ram_data_rd_msk   = ((vid_ram_data_wr_dly  | vid_ram_data_rd_dly | vid_ram_addr_hi_wr_i) & vid_ram_msk_mode & ~gfx_mode_16_bpp_i);
 
 
 //------------------------------------------------
@@ -363,7 +359,7 @@ assign vid_ram_we_o     =  vid_ram_data_wr_dly;
 // Note: we perform a data read access:
 //       - one cycle after a VID_RAM_DATA register read access (so that the address has been incremented)
 //       - one cycle after a VID_RAM_ADDR_LO register write
-wire   vid_ram_ce_early = (vid_ram_addr_lo_wr_i | vid_ram_data_rd_dly | vid_ram_data_rd_msk | // Read access
+wire   vid_ram_ce_early = (vid_ram_addr_hi_wr_i | vid_ram_data_rd_dly | vid_ram_data_rd_msk | // Read access
                            vid_ram_data_wr_i);                                                // Write access
 
 reg [1:0] vid_ram_ce;
@@ -386,18 +382,18 @@ assign vid_ram_dout_rdy = vid_ram_ce[1];
 
 // Mux ram address for early read access when ADDR_LO is updated
 `ifdef VRAM_BIGGER_4_KW
-wire [`APIX_MSB:0] vid_ram_addr_mux    = vid_ram_addr_lo_wr_i ? {vid_ram_addr[`APIX_MSB:16], per_din_i} :
-                                         vid_ram_data_rd_msk  ?  vid_ram_addr_inc                       : vid_ram_addr;
+wire [`APIX_MSB:0] vid_ram_addr_mux    = vid_ram_addr_hi_wr_i ? {per_din_i[`APIX_HI_MSB:0], vid_ram_addr[15:0]} :
+                                         vid_ram_data_rd_msk  ?  vid_ram_addr_inc                               : vid_ram_addr;
 `else
-wire [`APIX_MSB:0] vid_ram_addr_mux    = vid_ram_addr_lo_wr_i ? {per_din_i[`APIX_LO_MSB:0]}             :
-                                         vid_ram_data_rd_msk  ?  vid_ram_addr_inc                       : vid_ram_addr;
+wire [`APIX_MSB:0] vid_ram_addr_mux    = vid_ram_addr_hi_wr_i ? {per_din_i[`APIX_LO_MSB:0]}                     :
+                                         vid_ram_data_rd_msk  ?  vid_ram_addr_inc                               : vid_ram_addr;
 `endif
 
 // Add frame pointer offset
 wire [`APIX_MSB:0] vid_ram_addr_offset = vid_ram_base_addr_i + vid_ram_addr_mux;
 
 // Detect memory accesses for ADDR update
-wire               vid_ram_access_o    = vid_ram_data_wr_i | vid_ram_data_rd_dly | vid_ram_addr_lo_wr_i | vid_ram_data_rd_msk;
+wire               vid_ram_access_o    = vid_ram_data_wr_i | vid_ram_data_rd_dly | vid_ram_addr_hi_wr_i | vid_ram_data_rd_msk;
 
 // Mux Address between the two interfaces
 wire [`APIX_MSB:0] vid_ram_addr_nxt_o  = {`APIX_MSB+1{vid_ram_access_o}} & vid_ram_addr_offset;
@@ -405,7 +401,7 @@ wire [`APIX_MSB:0] vid_ram_addr_nxt_o  = {`APIX_MSB+1{vid_ram_access_o}} & vid_r
 // Increment the address when accessing the VID_RAMx_DATA register:
 // - one clock cycle after a write access
 // - with the read access (if not in read-modify-write mode)
-assign             vid_ram_addr_inc_wr = vid_ram_addr_lo_wr_dly | vid_ram_data_wr_dly | (vid_ram_data_rd_i & ~dbg_freeze_i & ~vid_ram_rmw_mode);
+assign             vid_ram_addr_inc_wr = vid_ram_addr_hi_wr_dly | vid_ram_data_wr_dly | (vid_ram_data_rd_i & ~dbg_freeze_i & ~vid_ram_rmw_mode);
 
 // Compute mask for the address LSBs depending on BPP resolution
 wire         [3:0] gfx_mode_addr_msk   = (        {4{gfx_mode_1_bpp_i}}  | // Take  4 address LSBs in  1bpp mode
