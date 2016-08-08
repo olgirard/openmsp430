@@ -11,7 +11,7 @@ if [ $# -ne $EXPECTED_ARGS ]; then
     echo "EXAMPLE        : ./2_program_flash.sh    leds"
     echo ""
     echo "AVAILABLE BITSTREAMS:"
-    for fullfile in ./bitstreams/*.jic ; do
+    for fullfile in ./bitstreams/*.sof ; do
         filename=$(basename "$fullfile")
         filename="${filename%.*}"
         echo "                       - $filename"
@@ -23,11 +23,12 @@ fi
 ###############################################################################
 #                     Check if the required files exist                       #
 ###############################################################################
+soffile=./bitstreams/$1.sof;
 jicfile=./bitstreams/$1.jic;
 
-if [ ! -e $jicfile ]; then
+if [ ! -e $soffile ]; then
     echo ""
-    echo "ERROR: Specified JIC file doesn't exist: $jicfile"
+    echo "ERROR: Specified SOF file doesn't exist: $soffile"
     echo ""
     exit 1
 fi
@@ -35,28 +36,32 @@ fi
 ###############################################################################
 #                             Generate JIC file
 ###############################################################################
-#echo " -----------------------------------------------"
-#echo "|  GENERATE JIC FILE"
-#echo " -----------------------------------------------"
-#echo ""
-#
-## Copy and process COF file
-#cp scripts/sof2jic.cof ./bitstreams/.
-#sed -ie "s/BITSTREAM_NAME/$1/g"  ./bitstreams/sof2jic.cof
-#
-## Convert SOF file to JIC
-#quartus_cpf -c ./bitstreams/sof2jic.cof
-#
-## Cleanup
-#rm -rf ./bitstreams/sof2jic.cof*
+echo " ---------------------------------------------------------"
+echo "|  GENERATE JIC FILE"
+echo "|"
+echo "|  $soffile --> $jicfile"
+echo "|"
+echo " ---------------------------------------------------------"
+echo ""
+
+# Copy and process COF file
+cp scripts/sof2jic.cof ./bitstreams/.
+sed -ie "s/BITSTREAM_NAME/$1/g"  ./bitstreams/sof2jic.cof
+
+# Convert SOF file to JIC
+quartus_cpf -c ./bitstreams/sof2jic.cof
+
+# Cleanup
+rm -rf ./bitstreams/sof2jic.cof*
 
 
 ###############################################################################
 #                             Program FLASH                                   #
 ###############################################################################
-echo " -----------------------------------------------"
+echo ""
+echo " ---------------------------------------------------------"
 echo "|  PROGRAM FLASH: $jicfile"
-echo " -----------------------------------------------"
+echo " ---------------------------------------------------------"
 echo ""
 echo "Note: if failing:"
 echo "                  - try killing 'jtagd', running 'jtagconfig'"
@@ -66,7 +71,6 @@ echo ""
 
 # Copy and process CDF file
 cp scripts/chain_with_flash.cdf  ./bitstreams/.
-#sed -ie "s/BITSTREAM_NAME/$1/g"  ./bitstreams/chain_with_flash.cdf
 sed -ie "s/BITSTREAM_NAME/$1/g"  ./bitstreams/chain_with_flash.cdf
 
 # Program flash
