@@ -158,6 +158,34 @@ void start_lt24(void) {
   return;
 }
 
+//----------------------------------------------------------
+// Wait for the refresh to be done
+//----------------------------------------------------------
+void sync_screen_refresh_done(void) {
+
+  // Clear IRQ flag
+  GFX_IRQ |= GFX_IRQ_REFRESH_DONE;
+
+  // Wait for flag to be set
+  while((GFX_IRQ & GFX_IRQ_REFRESH_DONE)==0);
+
+  return;
+}
+
+//----------------------------------------------------------
+// Wait for the refresh to start
+//----------------------------------------------------------
+void sync_screen_refresh_start(void) {
+
+  // Clear IRQ flag
+  GFX_IRQ |= GFX_IRQ_REFRESH_START;
+
+  // Wait for flag to be set
+  while((GFX_IRQ & GFX_IRQ_REFRESH_START)==0);
+
+  return;
+}
+
 //==========================================================
 // GPU FUNCTIONS
 //==========================================================

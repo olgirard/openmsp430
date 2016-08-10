@@ -47,6 +47,10 @@ void gpu_copy (uint32_t src_addr, uint32_t dst_addr, uint16_t width, uint16_t le
 void gpu_copy_transparent (uint32_t src_addr, uint32_t dst_addr, uint16_t width, uint16_t length, uint16_t trans_color, uint16_t configuration);
 inline void gpu_wait_done (void);
 
+// Other Functions
+void sync_screen_refresh_done(void);
+void sync_screen_refresh_start(void);
+
 
 //----------------------------------------------------------
 // GRAPHIC CONTROLLER REGISTERS
@@ -152,15 +156,15 @@ inline void gpu_wait_done (void);
 // LT24_REFRESH Register
 #define  LT24_REFR_START           0x0001
 #define  LT24_REFR_MANUAL          0x0000
-#define  LT24_REFR_48MS            (((48000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
-#define  LT24_REFR_40MS            (((40000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
-#define  LT24_REFR_32MS            (((32000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
-#define  LT24_REFR_24MS            (((24000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
-#define  LT24_REFR_16MS            (((16000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
-#define  LT24_REFR_8MS             ((( 8000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
-#define  LT24_REFR_4MS             ((( 4000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
-#define  LT24_REFR_2MS             ((( 2000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
-#define  LT24_REFR_1MS             ((( 1000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
+#define  LT24_REFR_21_FPS          (((48000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
+#define  LT24_REFR_24_FPS          (((40000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
+#define  LT24_REFR_31_FPS          (((32000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
+#define  LT24_REFR_42_FPS          (((24000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
+#define  LT24_REFR_62_FPS          (((16000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
+#define  LT24_REFR_125_FPS         ((( 8000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
+#define  LT24_REFR_250_FPS         ((( 4000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
+#define  LT24_REFR_500_FPS         ((( 2000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
+#define  LT24_REFR_1000_FPS        ((( 1000000/DCO_CLK_PERIOD)>>8) & 0xFFF0)
 #define  LT24_REFR_MASK            0xFFF0
 
 // LT24_REFRESH_SYNC Register
@@ -184,6 +188,7 @@ inline void gpu_wait_done (void);
 #define  REFRESH_FRAME1_SELECT     0x0001
 #define  REFRESH_FRAME2_SELECT     0x0002
 #define  REFRESH_FRAME3_SELECT     0x0003
+#define  REFRESH_FRAME_MASK        0x0003
 
 #define  REFRESH_SW_LUT_DISABLE    0x0000
 #define  REFRESH_SW_LUT_ENABLE     0x0004
@@ -194,11 +199,13 @@ inline void gpu_wait_done (void);
 #define  VID_RAM0_FRAME1_SELECT    0x0010
 #define  VID_RAM0_FRAME2_SELECT    0x0020
 #define  VID_RAM0_FRAME3_SELECT    0x0030
+#define  VID_RAM0_FRAME_MASK       0x0030
 
 #define  VID_RAM1_FRAME0_SELECT    0x0000
 #define  VID_RAM1_FRAME1_SELECT    0x0040
 #define  VID_RAM1_FRAME2_SELECT    0x0080
 #define  VID_RAM1_FRAME3_SELECT    0x00C0
+#define  VID_RAM1_FRAME_MASK       0x00C0
 
 #define  LUT_BANK0_SELECT          0x0000
 #define  LUT_BANK1_SELECT          0x8000
