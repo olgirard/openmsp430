@@ -1,9 +1,9 @@
 # makfile configuration
 NAME            = gfx_demo
-OBJECTS         = main.o demo_16bpp.o demo_8bpp.o ../../libs/gfx/gfx_controller.o ../../libs/tA/timerA.o
+OBJECTS         = main.o demo_16bpp.o demo_8bpp.o demo_4bpp.o demo_2bpp.o demo_1bpp.o ../../libs/gfx/gfx_controller.o ../../libs/tA/timerA.o
 
 # Compiler performance option (-Os / -O2 / -O3)
-PORT_CFLAGS     = -O0 -Wno-overflow
+PORT_CFLAGS     = -O2 -Wno-overflow
 
 # Choose GCC toolchain prefix ('msp430' for MSPGCC / 'msp430-elf' for GCC RedHat/TI)
 ifndef MSPGCC_PFX
@@ -65,5 +65,8 @@ FORCE:
 main.o: main.c
 demo_16bpp.o: demo_16bpp.c
 demo_8bpp.o: demo_8bpp.c
+demo_4bpp.o: demo_4bpp.c
+demo_2bpp.o: demo_2bpp.c
+demo_1bpp.o: demo_1bpp.c
 ../../libs/gfx/gfx_controller.o: ../../libs/gfx/gfx_controller.c
 ../../libs/tA/timerA.o: ../../libs/tA/timerA.c

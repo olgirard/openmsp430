@@ -198,6 +198,7 @@ parameter [DEC_WD-1:0] GFX_CTRL            = 'h00,  // General control/status/ir
                        DISPLAY_SIZE_LO     = 'h14,
                        DISPLAY_SIZE_HI     = 'h16,
                        DISPLAY_CFG         = 'h18,
+                       DISPLAY_REFR_CNT    = 'h1A,
 
                        LT24_CFG            = 'h20,  // LT24 configuration and Generic command sending
                        LT24_REFRESH        = 'h22,
@@ -251,6 +252,7 @@ parameter [DEC_SZ-1:0] GFX_CTRL_D          = (BASE_REG << GFX_CTRL          ),
                        DISPLAY_SIZE_LO_D   = (BASE_REG << DISPLAY_SIZE_LO   ),
                        DISPLAY_SIZE_HI_D   = (BASE_REG << DISPLAY_SIZE_HI   ),
                        DISPLAY_CFG_D       = (BASE_REG << DISPLAY_CFG       ),
+                       DISPLAY_REFR_CNT_D  = (BASE_REG << DISPLAY_REFR_CNT  ),
 
                        LT24_CFG_D          = (BASE_REG << LT24_CFG          ),
                        LT24_REFRESH_D      = (BASE_REG << LT24_REFRESH      ),
@@ -310,6 +312,7 @@ wire  [DEC_SZ-1:0] reg_dec   =  (GFX_CTRL_D          &  {DEC_SZ{(reg_addr == GFX
                                 (DISPLAY_SIZE_LO_D   &  {DEC_SZ{(reg_addr == DISPLAY_SIZE_LO   )}})  |
                                 (DISPLAY_SIZE_HI_D   &  {DEC_SZ{(reg_addr == DISPLAY_SIZE_HI   )}})  |
                                 (DISPLAY_CFG_D       &  {DEC_SZ{(reg_addr == DISPLAY_CFG       )}})  |
+                                (DISPLAY_REFR_CNT_D  &  {DEC_SZ{(reg_addr == DISPLAY_REFR_CNT  )}})  |
 
                                 (LT24_CFG_D          &  {DEC_SZ{(reg_addr == LT24_CFG          )}})  |
                                 (LT24_REFRESH_D      &  {DEC_SZ{(reg_addr == LT24_REFRESH      )}})  |
@@ -574,6 +577,19 @@ wire [15:0] display_cfg = {13'h0000,
                            display_x_swap_o,
                            display_y_swap_o,
                            display_cl_swap_o};
+
+//------------------------------------------------
+// DISPLAY_REFR_CNT Register
+//------------------------------------------------
+reg  [15:0] display_refr_cnt;
+
+wire        display_refr_cnt_wr  = reg_wr[DISPLAY_REFR_CNT];
+wire        display_refr_cnt_dec = gfx_irq_refr_done_set & (display_refr_cnt != 16'h0000);
+
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)                   display_refr_cnt <=  16'h0000;
+  else if (display_refr_cnt_wr)  display_refr_cnt <=  per_din_i;
+  else if (display_refr_cnt_dec) display_refr_cnt <=  display_refr_cnt + 16'hFFFF; // -1
 
 //------------------------------------------------
 // LT24_CFG Register
@@ -1225,6 +1241,7 @@ wire [15:0] display_size_lo_read   = display_size_lo_rd   & {16{reg_rd[DISPLAY_S
 wire [15:0] display_size_hi_read   = display_size_hi_rd   & {16{reg_rd[DISPLAY_SIZE_HI   ]}};
 `endif
 wire [15:0] display_cfg_read       = display_cfg          & {16{reg_rd[DISPLAY_CFG       ]}};
+wire [15:0] display_refr_cnt_read  = display_refr_cnt     & {16{reg_rd[DISPLAY_REFR_CNT  ]}};
 
 wire [15:0] lt24_cfg_read          = lt24_cfg             & {16{reg_rd[LT24_CFG          ]}};
 wire [15:0] lt24_refresh_read      = lt24_refresh         & {16{reg_rd[LT24_REFRESH      ]}};
@@ -1291,6 +1308,7 @@ wire [15:0] per_dout_o             = gfx_ctrl_read          |
                                      display_size_hi_read   |
                                   `endif
                                      display_cfg_read       |
+                                     display_refr_cnt_read  |
 
                                      lt24_cfg_read          |
                                      lt24_refresh_read      |

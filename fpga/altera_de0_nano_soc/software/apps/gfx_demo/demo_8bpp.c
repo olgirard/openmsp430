@@ -8,9 +8,8 @@
 void demo_8bpp(void) {
 
   unsigned int  line, column;
-  unsigned int  color_idx    = 0;
   unsigned int  color        = 0;
-  unsigned int  use_gpu      = 1;
+  unsigned int  use_gpu      = 0;
   unsigned int  wait_sel     = 0;
   unsigned int  x_coord      = 0;
   unsigned int  y_coord      = 0;
@@ -60,18 +59,15 @@ void demo_8bpp(void) {
   gpu_wait_done();
 
   // Fill the screen with all possible colors
-  color_idx     = 0x0000;
-  color         = 0x0000;
+  color = 0x0000;
   for( line = 0; line <29; line = line + 1 ) {
     for( column = 0; column < 20; column = column + 1 ) {
 
       draw_block(PIX_ADDR(x_coord, y_coord), 13, 13, color, DST_SWAP_NONE, use_gpu);
-      if (color_idx==255) { color_idx= 0;}
-      else                { color_idx++; }
-      color    = color_idx;
+      if (color==255) { color= 0;}
+      else            { color++; }
       x_coord += 16;
     }
-
     y_coord += 16;
     x_coord  =  0;
   }
@@ -92,19 +88,20 @@ void demo_8bpp(void) {
 
     // Select rotation & GPU use
     switch(loop & 0x0003) {
-    case 0 : DISPLAY_CFG = DST_SWAP_CL;  wait_sel = 0;
+    case 0 : DISPLAY_CFG = DST_SWAP_CL;  wait_sel = 3;
              break;
-    case 1 : DISPLAY_CFG = DST_SWAP_CL;  wait_sel = 1;
+    case 1 : DISPLAY_CFG = DST_SWAP_CL;  wait_sel = 2;
              break;
-    case 2 : DISPLAY_CFG = DST_SWAP_CL;  wait_sel = 2;
+    case 2 : DISPLAY_CFG = DST_SWAP_CL;  wait_sel = 1;
              break;
-    default: DISPLAY_CFG = DST_SWAP_CL;  wait_sel = 3;
+    default: DISPLAY_CFG = DST_SWAP_CL;  wait_sel = 0;
              break;
     }
     loop++;
     move_to_next_mode = 0;
 
     // Move the starting point of the buffer refresh
+    DISPLAY_REFR_CNT =  0;
     while (!move_to_next_mode) {
 
       FRAME1_PTR = address;
@@ -117,11 +114,11 @@ void demo_8bpp(void) {
       // Wait according to config
       switch(wait_sel) {
       case 0 : break;
-      case 1 :                          sync_screen_refresh_start();
+      case 1 : while(DISPLAY_REFR_CNT!=0); DISPLAY_REFR_CNT = 1;
   	       break;
-      case 2 : sync_screen_refresh_start(); ta_wait_no_lpm(WT_20MS); sync_screen_refresh_start();
+      case 2 : while(DISPLAY_REFR_CNT!=0); DISPLAY_REFR_CNT = 2;
 	       break;
-      default: sync_screen_refresh_start(); ta_wait_no_lpm(WT_50MS); sync_screen_refresh_start();
+      default: while(DISPLAY_REFR_CNT!=0); DISPLAY_REFR_CNT = 3;
    	       break;
       }
     }

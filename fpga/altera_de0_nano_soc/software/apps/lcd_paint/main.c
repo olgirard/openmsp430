@@ -1148,6 +1148,11 @@ int main(void) {
   VID_RAM0_DATA    = 0x5665;
   temp4            = VID_RAM0_DATA;
 
+  LT24_REFRESH      = LT24_REFR_START | LT24_REFR_1MS;
+  for( idx = 0; idx < 100; idx = idx + 1 ) {__nop();}
+  for( idx = 0; idx < 100; idx = idx + 1 ) {__nop();}
+  for( idx = 0; idx < 100; idx = idx + 1 ) {__nop();}
+
 
   return 0;
 }

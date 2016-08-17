@@ -63,6 +63,7 @@ void sync_screen_refresh_start(void);
 #define  DISPLAY_HEIGHT    (*(volatile uint16_t  *) 0x0212)
 #define  DISPLAY_SIZE      (*(volatile uint32_t  *) 0x0214)
 #define  DISPLAY_CFG       (*(volatile uint16_t  *) 0x0218)
+#define  DISPLAY_REFR_CNT  (*(volatile uint16_t  *) 0x021A)
 
 #define  LT24_CFG          (*(volatile uint16_t  *) 0x0220)
 #define  LT24_REFRESH      (*(volatile uint16_t  *) 0x0222)

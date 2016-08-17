@@ -74,6 +74,18 @@ int main(void) {
     gfx_mode_init(GFX_8_BPP,  LT24_REFR_1000_FPS);
     demo_8bpp();
     move_to_next_mode = 0;
+
+    gfx_mode_init(GFX_4_BPP,  LT24_REFR_1000_FPS);
+    demo_4bpp();
+    move_to_next_mode = 0;
+
+    gfx_mode_init(GFX_2_BPP,  LT24_REFR_1000_FPS);
+    demo_2bpp();
+    move_to_next_mode = 0;
+
+    gfx_mode_init(GFX_1_BPP,  LT24_REFR_1000_FPS);
+    demo_1bpp();
+    move_to_next_mode = 0;
   };
 
   return 0;
