@@ -106,6 +106,8 @@ void sync_screen_refresh_start(void);
 #define  GFX_REFR_DONE_IRQ_DIS     0x0000
 #define  GFX_REFR_START_IRQ_EN     0x0002
 #define  GFX_REFR_START_IRQ_DIS    0x0000
+#define  GFX_REFR_CNT_DONE_IRQ_EN  0x0004
+#define  GFX_REFR_CNT_DONE_IRQ_DIS 0x0000
 #define  GFX_GPU_FIFO_DONE_IRQ_EN  0x0010
 #define  GFX_GPU_FIFO_DONE_IRQ_DIS 0x0000
 #define  GFX_GPU_FIFO_OVFL_IRQ_EN  0x0020
@@ -130,6 +132,7 @@ void sync_screen_refresh_start(void);
 // GFX_IRQ Register
 #define  GFX_IRQ_REFRESH_DONE      0x0001
 #define  GFX_IRQ_REFRESH_START     0x0002
+#define  GFX_IRQ_REFRESH_CNT_DONE  0x0004
 #define  GFX_IRQ_GPU_FIFO_DONE     0x0010
 #define  GFX_IRQ_GPU_FIFO_OVFL     0x0020
 #define  GFX_IRQ_GPU_CMD_DONE      0x0040
