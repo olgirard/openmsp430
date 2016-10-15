@@ -375,6 +375,7 @@ wire [`APIX_MSB:0] vid_ram1_base_addr;
 `ifdef WITH_EXTRA_LUT_BANK
 reg                lut_bank_select;
 `endif
+wire               refr_cnt_done_evt;
 wire               gpu_fifo_done_evt;
 wire               gpu_fifo_ovfl_evt;
 
@@ -397,6 +398,7 @@ always @ (posedge mclk or posedge puc_rst)
 // Bitfield assignments
 wire        gfx_irq_refr_done_en     =  gfx_ctrl[0];
 wire        gfx_irq_refr_start_en    =  gfx_ctrl[1];
+wire        gfx_irq_refr_cnt_done_en =  gfx_ctrl[2];
 wire        gfx_irq_gpu_fifo_done_en =  gfx_ctrl[4];
 wire        gfx_irq_gpu_fifo_ovfl_en =  gfx_ctrl[5];
 wire        gfx_irq_gpu_cmd_done_en  =  gfx_ctrl[6];
@@ -419,9 +421,15 @@ wire        gfx_mode_16_bpp          = ~(gfx_mode_8_bpp | gfx_mode_4_bpp | gfx_m
 // GFX_STATUS Register
 //------------------------------------------------
 wire  [15:0] gfx_status;
+wire         gpu_busy;
 
 assign       gfx_status[0]    = lt24_status_i[2]; // Screen Refresh is busy
-assign       gfx_status[15:1] = 15'h0000;
+assign       gfx_status[3:1]  = 3'b000;
+assign       gfx_status[4]    = gpu_data_avail_o;
+assign       gfx_status[5]    = 1'b0;
+assign       gfx_status[6]    = gpu_busy;
+assign       gfx_status[7]    = 1'b0;
+assign       gfx_status[15:8] = 15'h0000;
 
 //------------------------------------------------
 // GFX_IRQ Register
@@ -434,6 +442,9 @@ wire        gfx_irq_refr_done_set     = lt24_done_evt_i;
 
 wire        gfx_irq_refr_start_clr    = per_din_i[1] & reg_wr[GFX_IRQ];
 wire        gfx_irq_refr_start_set    = lt24_start_evt_i;
+
+wire        gfx_irq_refr_cnt_done_clr = per_din_i[2] & reg_wr[GFX_IRQ];
+wire        gfx_irq_refr_cnt_done_set = refr_cnt_done_evt;
 
 wire        gfx_irq_gpu_fifo_done_clr = per_din_i[4] & reg_wr[GFX_IRQ];
 wire        gfx_irq_gpu_fifo_done_set = gpu_fifo_done_evt;
@@ -449,6 +460,7 @@ wire        gfx_irq_gpu_cmd_error_set = gpu_cmd_error_evt_i;
 
 reg         gfx_irq_refr_done;
 reg         gfx_irq_refr_start;
+reg         gfx_irq_refr_cnt_done;
 reg         gfx_irq_gpu_fifo_done;
 reg         gfx_irq_gpu_fifo_ovfl;
 reg         gfx_irq_gpu_cmd_done;
@@ -458,6 +470,7 @@ always @ (posedge mclk or posedge puc_rst)
     begin
        gfx_irq_refr_done     <=  1'b0;
        gfx_irq_refr_start    <=  1'b0;
+       gfx_irq_refr_cnt_done <=  1'b0;
        gfx_irq_gpu_fifo_done <=  1'b0;
        gfx_irq_gpu_fifo_ovfl <=  1'b0;
        gfx_irq_gpu_cmd_done  <=  1'b0;
@@ -467,6 +480,7 @@ always @ (posedge mclk or posedge puc_rst)
     begin
        gfx_irq_refr_done     <=  (gfx_irq_refr_done_set     | (~gfx_irq_refr_done_clr     & gfx_irq_refr_done    )); // IRQ set has priority over clear
        gfx_irq_refr_start    <=  (gfx_irq_refr_start_set    | (~gfx_irq_refr_start_clr    & gfx_irq_refr_start   )); // IRQ set has priority over clear
+       gfx_irq_refr_cnt_done <=  (gfx_irq_refr_cnt_done_set | (~gfx_irq_refr_cnt_done_clr & gfx_irq_refr_cnt_done)); // IRQ set has priority over clear
        gfx_irq_gpu_fifo_done <=  (gfx_irq_gpu_fifo_done_set | (~gfx_irq_gpu_fifo_done_clr & gfx_irq_gpu_fifo_done)); // IRQ set has priority over clear
        gfx_irq_gpu_fifo_ovfl <=  (gfx_irq_gpu_fifo_ovfl_set | (~gfx_irq_gpu_fifo_ovfl_clr & gfx_irq_gpu_fifo_ovfl)); // IRQ set has priority over clear
        gfx_irq_gpu_cmd_done  <=  (gfx_irq_gpu_cmd_done_set  | (~gfx_irq_gpu_cmd_done_clr  & gfx_irq_gpu_cmd_done )); // IRQ set has priority over clear
@@ -479,6 +493,7 @@ assign  gfx_irq   = {8'h00,
 
 assign  irq_gfx_o = (gfx_irq_refr_done     & gfx_irq_refr_done_en)     |
                     (gfx_irq_refr_start    & gfx_irq_refr_start_en)    |
+                    (gfx_irq_refr_cnt_done & gfx_irq_refr_cnt_done_en) |
                     (gfx_irq_gpu_cmd_error & gfx_irq_gpu_cmd_error_en) |
                     (gfx_irq_gpu_cmd_done  & gfx_irq_gpu_cmd_done_en)  |
                     (gfx_irq_gpu_fifo_ovfl & gfx_irq_gpu_fifo_ovfl_en) |
@@ -590,6 +605,8 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)                   display_refr_cnt <=  16'h0000;
   else if (display_refr_cnt_wr)  display_refr_cnt <=  per_din_i;
   else if (display_refr_cnt_dec) display_refr_cnt <=  display_refr_cnt + 16'hFFFF; // -1
+
+assign      refr_cnt_done_evt = (display_refr_cnt==16'h0001) & display_refr_cnt_dec;
 
 //------------------------------------------------
 // LT24_CFG Register
@@ -1218,7 +1235,7 @@ ogfx_reg_fifo ogfx_reg_fifo_gpu_inst (
 
 assign      gpu_data_avail_o = ~gpu_stat_fifo_empty;
 
-wire        gpu_busy         = ~gpu_stat_fifo_empty | gpu_dma_busy_i;
+assign      gpu_busy         = ~gpu_stat_fifo_empty | gpu_dma_busy_i;
 
 wire [15:0] gpu_stat         = {gpu_busy, 2'b00, gpu_dma_busy_i,
                                 2'b00   , gpu_stat_fifo_full, gpu_stat_fifo_empty,

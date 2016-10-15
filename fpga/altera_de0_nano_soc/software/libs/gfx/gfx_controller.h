@@ -124,6 +124,8 @@ void sync_screen_refresh_start(void);
 
 // GFX_STATUS Register
 #define  STATUS_REFRESH_BUSY       0x0001
+#define  STATUS_GPU_FIFO           0x0010
+#define  STATUS_GPU_BUSY           0x0040
 
 // GFX_IRQ Register
 #define  GFX_IRQ_REFRESH_DONE      0x0001
