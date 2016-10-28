@@ -9,3 +9,11 @@ log
 *.elf
 *.lst
 *.size
+INCA_libs
+*.log
+*.dsn
+*.trn
+WORK
+*.key
+*.ihex
+*.map

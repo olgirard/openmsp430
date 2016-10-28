@@ -69,7 +69,12 @@ module  ogfx_backend_lut_fifo (
 
     refresh_active_i,                            // Display refresh on going
     refresh_data_request_i,                      // Request for next refresh data
-    refresh_lut_select_i                         // Refresh LUT bank selection
+
+    hw_lut_palette_sel_i,                        // Hardware LUT palette configuration
+    hw_lut_bgcolor_i,                            // Hardware LUT background-color selection
+    hw_lut_fgcolor_i,                            // Hardware LUT foreground-color selection
+    sw_lut_enable_i,                             // Refresh LUT-RAM enable
+    sw_lut_bank_select_i                         // Refresh LUT-RAM bank selection
 );
 
 // OUTPUTs
@@ -101,7 +106,12 @@ input                lut_ram_dout_rdy_nxt_i;     // LUT-RAM data output ready du
 
 input                refresh_active_i;           // Display refresh on going
 input                refresh_data_request_i;     // Request for next refresh data
-input          [1:0] refresh_lut_select_i;       // Refresh LUT bank selection
+
+input          [2:0] hw_lut_palette_sel_i;       // Hardware LUT palette configuration
+input          [3:0] hw_lut_bgcolor_i;           // Hardware LUT background-color selection
+input          [3:0] hw_lut_fgcolor_i;           // Hardware LUT foreground-color selection
+input                sw_lut_enable_i;            // Refresh LUT-RAM enable
+input                sw_lut_bank_select_i;       // Refresh LUT-RAM bank selection
 
 
 //=============================================================================
@@ -139,42 +149,113 @@ wire   [2:0] fifo_counter_nxt;
 // 2) HARD CODED LOOKUP TABLE
 //============================================================================
 
-wire  [15:0] lut_hw_data_1_bpp = ({5'b00000, 6'b000000, 5'b00000} & {16{frame_data_i[0]  ==1'b0   }}) |                            // 1 bpp:  Black
-                                 ({5'b11111, 6'b111111, 5'b11111} & {16{frame_data_i[0]  ==1'b1   }}) ;                            //         White
+// 16 full CGA color selection
+parameter [3:0] CGA_BLACK         = 4'h0,
+                CGA_BLUE          = 4'h1,
+                CGA_GREEN         = 4'h2,
+                CGA_CYAN          = 4'h3,
+                CGA_RED           = 4'h4,
+                CGA_MAGENTA       = 4'h5,
+                CGA_BROWN         = 4'h6,
+                CGA_LIGHT_GRAY    = 4'h7,
+                CGA_GRAY          = 4'h8,
+                CGA_LIGHT_BLUE    = 4'h9,
+                CGA_LIGHT_GREEN   = 4'hA,
+                CGA_LIGHT_CYAN    = 4'hB,
+                CGA_LIGHT_RED     = 4'hC,
+                CGA_LIGHT_MAGENTA = 4'hD,
+                CGA_YELLOW        = 4'hE,
+                CGA_WHITE         = 4'hF;
 
-wire  [15:0] lut_hw_data_2_bpp = ({5'b00000, 6'b000000, 5'b00000} & {16{frame_data_i[1:0]==2'b00  }}) |                            // 2 bpp:  Black
-                                 ({5'b01000, 6'b010000, 5'b01000} & {16{frame_data_i[1:0]==2'b01  }}) |                            //         Dark Gray
-                                 ({5'b11000, 6'b110000, 5'b11000} & {16{frame_data_i[1:0]==2'b10  }}) |                            //         Light Gray
-                                 ({5'b11111, 6'b111111, 5'b11111} & {16{frame_data_i[1:0]==2'b11  }}) ;                            //         White
+// Decode CGA 4 color mode (2bpp)
+wire         cga_palette0_hi   = (hw_lut_palette_sel_i==3'h0);
+wire         cga_palette0_lo   = (hw_lut_palette_sel_i==3'h1);
+wire         cga_palette1_hi   = (hw_lut_palette_sel_i==3'h2);
+wire         cga_palette1_lo   = (hw_lut_palette_sel_i==3'h3);
+wire         cga_palette2_hi   = (hw_lut_palette_sel_i==3'h4);
+wire         cga_palette2_lo   = (hw_lut_palette_sel_i==3'h5) | (hw_lut_palette_sel_i==3'h6) | (hw_lut_palette_sel_i==3'h7);
 
-wire  [15:0] lut_hw_data_4_bpp = ({5'b00000, 6'b000000, 5'b00000} & {16{frame_data_i[3:0]==4'b0000}}) |                            // 4 bpp:  Black
-                                 ({5'b00000, 6'b000000, 5'b10000} & {16{frame_data_i[3:0]==4'b0001}}) |                            //         Dark Blue
-                                 ({5'b10000, 6'b000000, 5'b00000} & {16{frame_data_i[3:0]==4'b0010}}) |                            //         Dark Red
-                                 ({5'b10000, 6'b000000, 5'b10000} & {16{frame_data_i[3:0]==4'b0011}}) |                            //         Dark Magenta
-                                 ({5'b00000, 6'b100000, 5'b00000} & {16{frame_data_i[3:0]==4'b0100}}) |                            //         Dark Green
-                                 ({5'b00000, 6'b100000, 5'b10000} & {16{frame_data_i[3:0]==4'b0101}}) |                            //         Dark Cyan
-                                 ({5'b10000, 6'b100000, 5'b00000} & {16{frame_data_i[3:0]==4'b0110}}) |                            //         Dark Yellow
-                                 ({5'b10000, 6'b100000, 5'b10000} & {16{frame_data_i[3:0]==4'b0111}}) |                            //         Gray
-                                 ({5'b00000, 6'b000000, 5'b00000} & {16{frame_data_i[3:0]==4'b1000}}) |                            //         Black
-                                 ({5'b00000, 6'b000000, 5'b11111} & {16{frame_data_i[3:0]==4'b1001}}) |                            //         Blue
-                                 ({5'b11111, 6'b000000, 5'b00000} & {16{frame_data_i[3:0]==4'b1010}}) |                            //         Red
-                                 ({5'b11111, 6'b000000, 5'b11111} & {16{frame_data_i[3:0]==4'b1011}}) |                            //         Magenta
-                                 ({5'b00000, 6'b111111, 5'b00000} & {16{frame_data_i[3:0]==4'b1100}}) |                            //         Green
-                                 ({5'b00000, 6'b111111, 5'b11111} & {16{frame_data_i[3:0]==4'b1101}}) |                            //         Cyan
-                                 ({5'b11111, 6'b111111, 5'b00000} & {16{frame_data_i[3:0]==4'b1110}}) |                            //         Yellow
-                                 ({5'b11111, 6'b111111, 5'b11111} & {16{frame_data_i[3:0]==4'b1111}});                             //         White
+// LUT color decoding
+                                 // 1 BPP
+wire   [3:0] lut_hw_sel_1bpp   = ({4{gfx_mode_1_bpp                   & (frame_data_i[0]  ==1'b0 )}} & hw_lut_bgcolor_i ) |  // 1 bpp:  Black        (default bgcolor)
+                                 ({4{gfx_mode_1_bpp                   & (frame_data_i[0]  ==1'b1 )}} & hw_lut_fgcolor_i ) ;  //         White        (default fgcolor)
 
+                                 // 2 BPP (Palette #0, low-intensity)
+wire   [3:0] lut_hw_sel_2bpp   = ({4{gfx_mode_2_bpp & cga_palette0_lo & (frame_data_i[1:0]==2'b00)}} & hw_lut_bgcolor_i ) |  // 2 bpp:  Black        (default bgcolor)
+                                 ({4{gfx_mode_2_bpp & cga_palette0_lo & (frame_data_i[1:0]==2'b01)}} & CGA_GREEN        ) |  //         Green
+                                 ({4{gfx_mode_2_bpp & cga_palette0_lo & (frame_data_i[1:0]==2'b10)}} & CGA_RED          ) |  //         Red
+                                 ({4{gfx_mode_2_bpp & cga_palette0_lo & (frame_data_i[1:0]==2'b11)}} & CGA_BROWN        ) |  //         Brown
+
+                                 // 2 BPP (Palette #0, high-intensity)
+                                 ({4{gfx_mode_2_bpp & cga_palette0_hi & (frame_data_i[1:0]==2'b00)}} & hw_lut_bgcolor_i ) |  // 2 bpp:  Black        (default bgcolor)
+                                 ({4{gfx_mode_2_bpp & cga_palette0_hi & (frame_data_i[1:0]==2'b01)}} & CGA_LIGHT_GREEN  ) |  //         Light-Green
+                                 ({4{gfx_mode_2_bpp & cga_palette0_hi & (frame_data_i[1:0]==2'b10)}} & CGA_LIGHT_RED    ) |  //         Light-Red
+                                 ({4{gfx_mode_2_bpp & cga_palette0_hi & (frame_data_i[1:0]==2'b11)}} & CGA_YELLOW       ) |  //         Yellow
+
+                                 // 2 BPP (Palette #1, low-intensity)
+                                 ({4{gfx_mode_2_bpp & cga_palette1_lo & (frame_data_i[1:0]==2'b00)}} & hw_lut_bgcolor_i ) |  // 2 bpp:  Black        (default bgcolor)
+                                 ({4{gfx_mode_2_bpp & cga_palette1_lo & (frame_data_i[1:0]==2'b01)}} & CGA_CYAN         ) |  //         Cyan
+                                 ({4{gfx_mode_2_bpp & cga_palette1_lo & (frame_data_i[1:0]==2'b10)}} & CGA_MAGENTA      ) |  //         Magenta
+                                 ({4{gfx_mode_2_bpp & cga_palette1_lo & (frame_data_i[1:0]==2'b11)}} & CGA_LIGHT_GRAY   ) |  //         Light-Gray
+
+                                 // 2 BPP (Palette #1, high-intensity)
+                                 ({4{gfx_mode_2_bpp & cga_palette1_hi & (frame_data_i[1:0]==2'b00)}} & hw_lut_bgcolor_i ) |  // 2 bpp:  Black        (default bgcolor)
+                                 ({4{gfx_mode_2_bpp & cga_palette1_hi & (frame_data_i[1:0]==2'b01)}} & CGA_LIGHT_CYAN   ) |  //         Light-Cyan
+                                 ({4{gfx_mode_2_bpp & cga_palette1_hi & (frame_data_i[1:0]==2'b10)}} & CGA_LIGHT_MAGENTA) |  //         Light-Magenta
+                                 ({4{gfx_mode_2_bpp & cga_palette1_hi & (frame_data_i[1:0]==2'b11)}} & CGA_WHITE        ) |  //         White
+
+                                 // 2 BPP (Palette #2, low-intensity)
+                                 ({4{gfx_mode_2_bpp & cga_palette2_lo & (frame_data_i[1:0]==2'b00)}} & hw_lut_bgcolor_i ) |  // 2 bpp:  Black        (default bgcolor)
+                                 ({4{gfx_mode_2_bpp & cga_palette2_lo & (frame_data_i[1:0]==2'b01)}} & CGA_CYAN         ) |  //         Cyan
+                                 ({4{gfx_mode_2_bpp & cga_palette2_lo & (frame_data_i[1:0]==2'b10)}} & CGA_RED          ) |  //         Red
+                                 ({4{gfx_mode_2_bpp & cga_palette2_lo & (frame_data_i[1:0]==2'b11)}} & CGA_LIGHT_GRAY   ) |  //         Light-Gray
+
+                                 // 2 BPP (Palette #2, high-intensity)
+                                 ({4{gfx_mode_2_bpp & cga_palette2_hi & (frame_data_i[1:0]==2'b00)}} & hw_lut_bgcolor_i ) |  // 2 bpp:  Black        (default bgcolor)
+                                 ({4{gfx_mode_2_bpp & cga_palette2_hi & (frame_data_i[1:0]==2'b01)}} & CGA_LIGHT_CYAN   ) |  //         Light-Cyan
+                                 ({4{gfx_mode_2_bpp & cga_palette2_hi & (frame_data_i[1:0]==2'b10)}} & CGA_LIGHT_RED    ) |  //         Light-Red
+                                 ({4{gfx_mode_2_bpp & cga_palette2_hi & (frame_data_i[1:0]==2'b11)}} & CGA_WHITE        ) ;  //         White
+
+                                 // 4 BPP (full CGA 16-color palette)
+wire   [3:0] lut_hw_sel_4bpp   = ({4{gfx_mode_4_bpp}}                 &  frame_data_i[3:0]);
+
+wire   [3:0] lut_hw_color_sel  =  lut_hw_sel_4bpp | lut_hw_sel_2bpp | lut_hw_sel_1bpp;
+
+// Color encoding for 1-bit / 2-bit and 4-bit modes
+reg   [15:0] lut_hw_data_1_2_4_bpp;
+always @(lut_hw_color_sel)
+  case(lut_hw_color_sel)
+    CGA_BLACK         :  lut_hw_data_1_2_4_bpp  =  {5'b00000, 6'b000000, 5'b00000};     // Black
+    CGA_BLUE          :  lut_hw_data_1_2_4_bpp  =  {5'b00000, 6'b000000, 5'b10101};     // Blue
+    CGA_GREEN         :  lut_hw_data_1_2_4_bpp  =  {5'b00000, 6'b101011, 5'b00000};     // Green
+    CGA_CYAN          :  lut_hw_data_1_2_4_bpp  =  {5'b00000, 6'b101011, 5'b10101};     // Cyan
+    CGA_RED           :  lut_hw_data_1_2_4_bpp  =  {5'b10101, 6'b000000, 5'b00000};     // Red
+    CGA_MAGENTA       :  lut_hw_data_1_2_4_bpp  =  {5'b10101, 6'b000000, 5'b10101};     // Magenta
+    CGA_BROWN         :  lut_hw_data_1_2_4_bpp  =  {5'b10101, 6'b010101, 5'b00000};     // Brown
+    CGA_LIGHT_GRAY    :  lut_hw_data_1_2_4_bpp  =  {5'b10101, 6'b101011, 5'b10101};     // Light Gray
+    CGA_GRAY          :  lut_hw_data_1_2_4_bpp  =  {5'b01011, 6'b010101, 5'b01011};     // Gray
+    CGA_LIGHT_BLUE    :  lut_hw_data_1_2_4_bpp  =  {5'b01011, 6'b010101, 5'b11111};     // Light Blue
+    CGA_LIGHT_GREEN   :  lut_hw_data_1_2_4_bpp  =  {5'b01011, 6'b111111, 5'b01011};     // Light Green
+    CGA_LIGHT_CYAN    :  lut_hw_data_1_2_4_bpp  =  {5'b01011, 6'b111111, 5'b11111};     // Light Cyan
+    CGA_LIGHT_RED     :  lut_hw_data_1_2_4_bpp  =  {5'b11111, 6'b010101, 5'b01011};     // Light Red
+    CGA_LIGHT_MAGENTA :  lut_hw_data_1_2_4_bpp  =  {5'b11111, 6'b010101, 5'b11111};     // Light Magenta
+    CGA_YELLOW        :  lut_hw_data_1_2_4_bpp  =  {5'b11111, 6'b111111, 5'b01011};     // Yellow
+    CGA_WHITE         :  lut_hw_data_1_2_4_bpp  =  {5'b11111, 6'b111111, 5'b11111};     // White
+    // pragma coverage off
+    default           :  lut_hw_data_1_2_4_bpp  =  16'h0000;
+    // pragma coverage on
+  endcase
+
+// 8-bit truecolor RGB mapping (3-bit red / 3-bit green / 2-bit blue)
 wire  [15:0] lut_hw_data_8_bpp = {frame_data_i[7],frame_data_i[6],frame_data_i[5],frame_data_i[5],frame_data_i[5],                 // 8 bpp:  R = D<7,6,5,5,5>
                                   frame_data_i[4],frame_data_i[3],frame_data_i[2],frame_data_i[2],frame_data_i[2],frame_data_i[2], //         G = D<4,3,2,2,2,2>
                                   frame_data_i[1],frame_data_i[0],frame_data_i[0],frame_data_i[0],frame_data_i[0]};                //         B = D<1,0,0,0,0>
 
-wire  [15:0] lut_hw_data       = (lut_hw_data_1_bpp & {16{gfx_mode_1_bpp}}) |
-	                         (lut_hw_data_2_bpp & {16{gfx_mode_2_bpp}}) |
-	                         (lut_hw_data_4_bpp & {16{gfx_mode_4_bpp}}) |
-	                         (lut_hw_data_8_bpp & {16{gfx_mode_8_bpp}});
+wire  [15:0] lut_hw_data       = (lut_hw_data_1_2_4_bpp & {16{gfx_mode_1_bpp | gfx_mode_2_bpp | gfx_mode_4_bpp}}) |
+                                 (lut_hw_data_8_bpp     & {16{gfx_mode_8_bpp}});
 
-wire         lut_hw_enabled    = ~gfx_mode_16_bpp   & ~refresh_lut_select_i[0];
-wire         lut_sw_enabled    = ~gfx_mode_16_bpp   &  refresh_lut_select_i[0];
+wire         lut_hw_enabled    = ~gfx_mode_16_bpp   & ~sw_lut_enable_i;
+wire         lut_sw_enabled    = ~gfx_mode_16_bpp   &  sw_lut_enable_i;
 
 
 //============================================================================
@@ -247,7 +328,7 @@ assign frame_data_request_o = (lut_state == STATE_FRAME_DATA);
     reg refresh_lut_bank_select_sync;
     always @(posedge mclk or posedge puc_rst)
       if (puc_rst)                refresh_lut_bank_select_sync  <=  1'b0;
-      else if (~refresh_active_i) refresh_lut_bank_select_sync  <=  refresh_lut_select_i[1];
+      else if (~refresh_active_i) refresh_lut_bank_select_sync  <=  sw_lut_bank_select_i;
 
     assign lut_ram_addr_o = {refresh_lut_bank_select_sync, frame_data_i[7:0]} & {9{~lut_ram_cen_o}};
   `else

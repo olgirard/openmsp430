@@ -36,16 +36,20 @@ void gfx_mode_init(uint16_t gfx_mode, uint16_t refresh_rate) {
   //  LUT_RAM_DATA  = palette_64k[idx];
   //}
 
+  // LUT Configuration
+  LUT_CFG      = HW_LUT_BG_BLACK     |
+                 HW_LUT_FG_WHITE     |
+                 HW_LUT_PALETTE_0_HI |
+                 SW_LUT_BANK0_SELECT |
+                 SW_LUT_DISABLE;
+
   // Initialize Frame pointers
   FRAME0_PTR   = PIX_ADDR(0, 0);
   FRAME1_PTR   = PIX_ADDR(0, 0);
 
   FRAME_SELECT = REFRESH_FRAME0_SELECT  |
-                 REFRESH_SW_LUT_DISABLE |
-                 REFRESH_SW_LUT0_SELECT |
                  VID_RAM0_FRAME0_SELECT |
-                 VID_RAM1_FRAME0_SELECT |
-                 LUT_BANK0_SELECT;
+                 VID_RAM1_FRAME0_SELECT;
 
   // Start Graphic controller
   start_gfx_ctrl();

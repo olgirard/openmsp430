@@ -74,7 +74,12 @@ module  ogfx_reg (
     per_dout_o,                                // Peripheral data output
 
     refresh_frame_addr_o,                      // Refresh frame base address
-    refresh_lut_select_o,                      // Refresh LUT bank selection
+
+    hw_lut_palette_sel_o,                      // Hardware LUT palette configuration
+    hw_lut_bgcolor_o,                          // Hardware LUT background-color selection
+    hw_lut_fgcolor_o,                          // Hardware LUT foreground-color selection
+    sw_lut_enable_o,                           // Refresh LUT-RAM enable
+    sw_lut_bank_select_o,                      // Refresh LUT-RAM bank selection
 
 `ifdef WITH_PROGRAMMABLE_LUT
     lut_ram_addr_o,                            // LUT-RAM address
@@ -109,8 +114,15 @@ module  ogfx_reg (
     vid_ram_dout_i                             // Video-RAM data input
 );
 
+// PARAMETERs
+//============
+
+parameter     [14:0] BASE_ADDR = 15'h0200;     // Register base address
+                                               //  - 7 LSBs must stay cleared: 0x0080, 0x0100,
+                                               //                              0x0180, 0x0200,
+                                               //                              0x0280, ...
 // OUTPUTs
-//=========
+//============
 output               irq_gfx_o;                // Graphic Controller interrupt
 
 output        [15:0] gpu_data_o;               // GPU data
@@ -142,7 +154,12 @@ output         [2:0] gfx_mode_o;               // Video mode (1xx:16bpp / 011:8b
 output        [15:0] per_dout_o;               // Peripheral data output
 
 output [`APIX_MSB:0] refresh_frame_addr_o;     // Refresh frame base address
-output         [1:0] refresh_lut_select_o;     // Refresh LUT bank selection
+
+output         [2:0] hw_lut_palette_sel_o;     // Hardware LUT palette configuration
+output         [3:0] hw_lut_bgcolor_o;         // Hardware LUT background-color selection
+output         [3:0] hw_lut_fgcolor_o;         // Hardware LUT foreground-color selection
+output               sw_lut_enable_o;          // Refresh LUT-RAM enable
+output               sw_lut_bank_select_o;     // Refresh LUT-RAM bank selection
 
 `ifdef WITH_PROGRAMMABLE_LUT
 output [`LRAM_MSB:0] lut_ram_addr_o;           // LUT-RAM address
@@ -157,7 +174,7 @@ output               vid_ram_wen_o;            // Video-RAM write strobe (active
 output               vid_ram_cen_o;            // Video-RAM chip enable (active low)
 
 // INPUTs
-//=========
+//============
 input                dbg_freeze_i;             // Freeze address auto-incr on read
 input                gpu_cmd_done_evt_i;       // GPU command done event
 input                gpu_cmd_error_evt_i;      // GPU command error event
@@ -182,9 +199,6 @@ input         [15:0] vid_ram_dout_i;           // Video-RAM data input
 // 1)  PARAMETER DECLARATION
 //=============================================================================
 
-// Register base address (must be aligned to decoder bit width)
-parameter       [14:0] BASE_ADDR           = 15'h0200;
-
 // Decoder bit width (defines how many bits are considered for address decoding)
 parameter              DEC_WD              =  7;
 
@@ -208,8 +222,9 @@ parameter [DEC_WD-1:0] GFX_CTRL            = 'h00,  // General control/status/ir
                        LT24_CMD_DFILL      = 'h2A,
                        LT24_STATUS         = 'h2C,
 
-                       LUT_RAM_ADDR        = 'h30,  // LUT Memory Access Gate
-                       LUT_RAM_DATA        = 'h32,
+                       LUT_CFG             = 'h30,  // LUT Configuration & Memory Access Gate
+                       LUT_RAM_ADDR        = 'h32,
+                       LUT_RAM_DATA        = 'h34,
 
                        FRAME_SELECT        = 'h3E,  // Frame pointers and selection
                        FRAME0_PTR_LO       = 'h40,
@@ -262,6 +277,7 @@ parameter [DEC_SZ-1:0] GFX_CTRL_D          = (BASE_REG << GFX_CTRL          ),
                        LT24_CMD_DFILL_D    = (BASE_REG << LT24_CMD_DFILL    ),
                        LT24_STATUS_D       = (BASE_REG << LT24_STATUS       ),
 
+                       LUT_CFG_D           = (BASE_REG << LUT_CFG           ),
                        LUT_RAM_ADDR_D      = (BASE_REG << LUT_RAM_ADDR      ),
                        LUT_RAM_DATA_D      = (BASE_REG << LUT_RAM_DATA      ),
 
@@ -322,6 +338,7 @@ wire  [DEC_SZ-1:0] reg_dec   =  (GFX_CTRL_D          &  {DEC_SZ{(reg_addr == GFX
                                 (LT24_CMD_DFILL_D    &  {DEC_SZ{(reg_addr == LT24_CMD_DFILL    )}})  |
                                 (LT24_STATUS_D       &  {DEC_SZ{(reg_addr == LT24_STATUS       )}})  |
 
+                                (LUT_CFG_D           &  {DEC_SZ{(reg_addr == LUT_CFG           )}})  |
                                 (LUT_RAM_ADDR_D      &  {DEC_SZ{(reg_addr == LUT_RAM_ADDR      )}})  |
                                 (LUT_RAM_DATA_D      &  {DEC_SZ{(reg_addr == LUT_RAM_DATA      )}})  |
 
@@ -372,9 +389,6 @@ wire [`APIX_MSB:0] frame3_ptr;
 `endif
 wire [`APIX_MSB:0] vid_ram0_base_addr;
 wire [`APIX_MSB:0] vid_ram1_base_addr;
-`ifdef WITH_EXTRA_LUT_BANK
-reg                lut_bank_select;
-`endif
 wire               refr_cnt_done_evt;
 wire               gpu_fifo_done_evt;
 wire               gpu_fifo_ovfl_evt;
@@ -631,7 +645,7 @@ reg        lt24_cmd_refr_o;
 reg [11:0] lt24_cfg_refr_o;
 
 wire      lt24_refresh_wr   = reg_wr[LT24_REFRESH];
-wire      lt24_cmd_refr_clr = lt24_done_evt_i & lt24_status_i[2] & (lt24_cfg_refr_o==8'h00); // Auto-clear in manual refresh mode when done
+wire      lt24_cmd_refr_clr = lt24_done_evt_i & lt24_status_i[2] & (lt24_cfg_refr_o==12'h000); // Auto-clear in manual refresh mode when done
 
 always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)                lt24_cmd_refr_o      <=  1'h0;
@@ -645,7 +659,7 @@ always @ (posedge mclk or posedge puc_rst)
 wire [15:0] lt24_refresh = {lt24_cfg_refr_o, 3'h0, lt24_cmd_refr_o};
 
 //------------------------------------------------
-// LT24_REFRESH Register
+// LT24_REFRESH_SYNC Register
 //------------------------------------------------
 reg        lt24_cfg_refr_sync_en_o;
 reg  [9:0] lt24_cfg_refr_sync_val_o;
@@ -716,6 +730,49 @@ assign       lt24_status[3]    = lt24_status_i[3]; // WAIT_FOR_SCANLINE
 assign       lt24_status[4]    = lt24_status_i[4]; // DATA_FILL_BUSY
 assign       lt24_status[15:5] = 11'h000;
 
+//------------------------------------------------
+// LUT_CFG Register
+//------------------------------------------------
+
+wire       lut_cfg_wr = reg_wr[LUT_CFG];
+
+`ifdef WITH_PROGRAMMABLE_LUT
+  reg      sw_lut_enable_o;
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)         sw_lut_enable_o      <=  1'b0;
+    else if (lut_cfg_wr) sw_lut_enable_o      <=  per_din_i[0]; // Enable software color LUT
+
+  `ifdef WITH_EXTRA_LUT_BANK
+  reg      sw_lut_bank_select_o;
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)         sw_lut_bank_select_o <=  1'b0;
+    else if (lut_cfg_wr) sw_lut_bank_select_o <=  per_din_i[2];
+  `else
+  assign   sw_lut_bank_select_o  =  1'b0;
+  `endif
+`else
+  assign   sw_lut_bank_select_o  =  1'b0;
+  assign   sw_lut_enable_o       =  1'b0;
+`endif
+
+reg  [2:0] hw_lut_palette_sel_o;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)           hw_lut_palette_sel_o <=  3'h0;
+  else if (lut_cfg_wr)   hw_lut_palette_sel_o <=  per_din_i[6:4];
+
+reg  [3:0] hw_lut_bgcolor_o;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)           hw_lut_bgcolor_o     <=  4'h0;
+  else if (lut_cfg_wr)   hw_lut_bgcolor_o     <=  per_din_i[11:8];
+
+reg  [3:0] hw_lut_fgcolor_o;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)           hw_lut_fgcolor_o     <=  4'hf;
+  else if (lut_cfg_wr)   hw_lut_fgcolor_o     <=  per_din_i[15:12];
+
+wire [15:0] lut_cfg_rd  = {hw_lut_fgcolor_o, hw_lut_bgcolor_o,
+                           1'b0,             hw_lut_palette_sel_o,
+                           1'b0, sw_lut_bank_select_o, 1'b0, sw_lut_enable_o};
 
 //------------------------------------------------
 // LUT_RAM_ADDR Register
@@ -723,27 +780,37 @@ assign       lt24_status[15:5] = 11'h000;
 `ifdef WITH_PROGRAMMABLE_LUT
 
 reg  [7:0] lut_ram_addr;
-wire [7:0] lut_ram_addr_inc;
+wire [8:0] lut_ram_addr_inc;
 wire       lut_ram_addr_inc_wr;
 
 wire       lut_ram_addr_wr = reg_wr[LUT_RAM_ADDR];
 
 always @ (posedge mclk or posedge puc_rst)
-  if (puc_rst)                  lut_ram_addr <=  8'h00;
-  else if (lut_ram_addr_wr)     lut_ram_addr <=  per_din_i[7:0];
-  else if (lut_ram_addr_inc_wr) lut_ram_addr <=  lut_ram_addr_inc;
+  if (puc_rst)                  lut_ram_addr    <=  8'h00;
+  else if (lut_ram_addr_wr)     lut_ram_addr    <=  per_din_i[7:0];
+  else if (lut_ram_addr_inc_wr) lut_ram_addr    <=  lut_ram_addr_inc[7:0];
 
-assign      lut_ram_addr_inc = lut_ram_addr + 8'h01;
-wire [15:0] lut_ram_addr_rd  = {8'h00, lut_ram_addr};
+`ifdef WITH_EXTRA_LUT_BANK
+reg        lut_bank_select;
+always @ (posedge mclk or posedge puc_rst)
+  if (puc_rst)                  lut_bank_select <=  1'b0;
+  else if (lut_ram_addr_wr)     lut_bank_select <=  per_din_i[8];
+  else if (lut_ram_addr_inc_wr) lut_bank_select <=  lut_ram_addr_inc[8];
+`else
+wire        lut_bank_select  =  1'b0;
+`endif
 
- `ifdef WITH_EXTRA_LUT_BANK
-   assign lut_ram_addr_o = {lut_bank_select, lut_ram_addr};
- `else
-   assign lut_ram_addr_o = lut_ram_addr;
- `endif
+assign      lut_ram_addr_inc =        {lut_bank_select, lut_ram_addr} + 9'h001;
+wire [15:0] lut_ram_addr_rd  = {7'h00, lut_bank_select, lut_ram_addr};
+
+`ifdef WITH_EXTRA_LUT_BANK
+assign      lut_ram_addr_o   = {lut_bank_select, lut_ram_addr};
+`else
+assign      lut_ram_addr_o   =                   lut_ram_addr;
+`endif
 
 `else
-wire [15:0] lut_ram_addr_rd  = 16'h0000;
+wire [15:0] lut_ram_addr_rd  =  16'h0000;
 `endif
 
 //------------------------------------------------
@@ -805,36 +872,6 @@ wire [15:0] lut_ram_data  = 16'h0000;
 
 wire  frame_select_wr = reg_wr[FRAME_SELECT];
 
-`ifdef WITH_PROGRAMMABLE_LUT
-  reg        refresh_sw_lut_enable;
-
-  always @ (posedge mclk or posedge puc_rst)
-    if (puc_rst)              refresh_sw_lut_enable  <=  1'b0;
-    else if (frame_select_wr) refresh_sw_lut_enable  <=  per_din_i[2];
-`else
-  wire       refresh_sw_lut_enable = 1'b0;
-`endif
-
-`ifdef WITH_EXTRA_LUT_BANK
-  reg        refresh_sw_lut_select;
-
-  always @ (posedge mclk or posedge puc_rst)
-    if (puc_rst)
-      begin
-         refresh_sw_lut_select <=  1'b0;
-         lut_bank_select       <=  1'b0;
-      end
-    else if (frame_select_wr)
-      begin
-         refresh_sw_lut_select <=  per_din_i[3];
-         lut_bank_select       <=  per_din_i[15];
-      end
-`else
-  assign refresh_sw_lut_select  =  1'b0;
-  wire   lut_bank_select        =  1'b0;
-`endif
-  wire [1:0] refresh_lut_select_o = {refresh_sw_lut_select, refresh_sw_lut_enable};
-
 `ifdef WITH_FRAME1_POINTER
   `ifdef WITH_FRAME2_POINTER
   reg  [1:0] refresh_frame_select;
@@ -855,7 +892,7 @@ wire  frame_select_wr = reg_wr[FRAME_SELECT];
          vid_ram1_frame_select <= per_din_i[7:6];
       end
 
-  wire [15:0] frame_select = {lut_bank_select, 7'h00, vid_ram1_frame_select, vid_ram0_frame_select, refresh_lut_select_o, refresh_frame_select};
+  wire [15:0] frame_select = {8'h00,       vid_ram1_frame_select,       vid_ram0_frame_select, 2'h0,       refresh_frame_select};
   `else
   reg        refresh_frame_select;
   reg        vid_ram0_frame_select;
@@ -875,10 +912,10 @@ wire  frame_select_wr = reg_wr[FRAME_SELECT];
          vid_ram1_frame_select <= per_din_i[6];
       end
 
-  wire [15:0] frame_select = {lut_bank_select, 7'h00, 1'h0, vid_ram1_frame_select, 1'h0, vid_ram0_frame_select, refresh_lut_select_o, 1'h0, refresh_frame_select};
+  wire [15:0] frame_select = {8'h00, 1'h0, vid_ram1_frame_select, 1'h0, vid_ram0_frame_select, 2'h0, 1'h0, refresh_frame_select};
   `endif
 `else
-  wire [15:0] frame_select = {lut_bank_select, 11'h000, refresh_lut_select_o, 2'h0};
+  wire [15:0] frame_select = 16'h0000;
 `endif
 
 // Frame pointer selections
@@ -1268,6 +1305,7 @@ wire [15:0] lt24_cmd_param_read    = lt24_cmd_param_o     & {16{reg_rd[LT24_CMD_
 wire [15:0] lt24_cmd_dfill_read    = lt24_cmd_dfill_o     & {16{reg_rd[LT24_CMD_DFILL    ]}};
 wire [15:0] lt24_status_read       = lt24_status          & {16{reg_rd[LT24_STATUS       ]}};
 
+wire [15:0] lut_cfg_read           = lut_cfg_rd           & {16{reg_rd[LUT_CFG           ]}};
 wire [15:0] lut_ram_addr_read      = lut_ram_addr_rd      & {16{reg_rd[LUT_RAM_ADDR      ]}};
 wire [15:0] lut_ram_data_read      = lut_ram_data         & {16{reg_rd[LUT_RAM_DATA      ]}};
 
@@ -1335,6 +1373,7 @@ wire [15:0] per_dout_o             = gfx_ctrl_read          |
                                      lt24_cmd_dfill_read    |
                                      lt24_status_read       |
 
+                                     lut_cfg_read           |
                                      lut_ram_addr_read      |
                                      lut_ram_data_read      |
 

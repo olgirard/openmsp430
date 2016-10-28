@@ -9,9 +9,9 @@ void init_lt24(void) {
   // Enable LCD, generate a reset and set LCD clock
   LT24_CFG       = 0x0000;
   wait_time(WT_1MS);
-  LT24_CFG       = LT24_ON | LT24_CLK_DIV1 | LT24_RESET;
+  LT24_CFG       = LT24_ON | LT24_CLK_DIV2 | LT24_RESET;
   wait_time(WT_1MS);
-  LT24_CFG       = LT24_ON | LT24_CLK_DIV1;
+  LT24_CFG       = LT24_ON | LT24_CLK_DIV2;
   wait_time(WT_500MS+WT_20MS);
 
   // Set color mode to 16bits/pixel

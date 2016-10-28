@@ -73,8 +73,9 @@ void sync_screen_refresh_start(void);
 #define  LT24_CMD_DFILL    (*(volatile uint16_t  *) 0x022A)
 #define  LT24_STATUS       (*(volatile uint16_t  *) 0x022C)
 
-#define  LUT_RAM_ADDR      (*(volatile uint16_t  *) 0x0230)
-#define  LUT_RAM_DATA      (*(volatile uint16_t  *) 0x0232)
+#define  LUT_CFG           (*(volatile uint16_t  *) 0x0230)
+#define  LUT_RAM_ADDR      (*(volatile uint16_t  *) 0x0232)
+#define  LUT_RAM_DATA      (*(volatile uint16_t  *) 0x0234)
 
 #define  FRAME_SELECT      (*(volatile uint16_t  *) 0x023E)
 #define  FRAME0_PTR        (*(volatile uint32_t  *) 0x0240)
@@ -189,17 +190,61 @@ void sync_screen_refresh_start(void);
 #define  LT24_STATUS_REFRESH_WAIT  0x0008
 #define  LT24_STATUS_DFILL_BUSY    0x0010
 
+// LUT_CFG Register
+#define  SW_LUT_DISABLE            0x0000
+#define  SW_LUT_ENABLE             0x0001
+#define  SW_LUT_BANK0_SELECT       0x0000
+#define  SW_LUT_BANK1_SELECT       0x0004
+#define  HW_LUT_PALETTE_0_HI       0x0000
+#define  HW_LUT_PALETTE_0_LO       0x0010
+#define  HW_LUT_PALETTE_1_HI       0x0020
+#define  HW_LUT_PALETTE_1_LO       0x0030
+#define  HW_LUT_PALETTE_2_HI       0x0040
+#define  HW_LUT_PALETTE_2_LO       0x0050
+#define  HW_LUT_PALETTE_MSK        0x0070
+#define  HW_LUT_BGCOLOR_MSK        0x0F00
+#define  HW_LUT_FGCOLOR_MSK        0xF000
+
+#define  HW_LUT_BG_BLACK           0x0000
+#define  HW_LUT_BG_BLUE            0x0100
+#define  HW_LUT_BG_GREEN           0x0200
+#define  HW_LUT_BG_CYAN            0x0300
+#define  HW_LUT_BG_RED             0x0400
+#define  HW_LUT_BG_MAGENTA         0x0500
+#define  HW_LUT_BG_BROWN           0x0600
+#define  HW_LUT_BG_LIGHT_GRAY      0x0700
+#define  HW_LUT_BG_GRAY            0x0800
+#define  HW_LUT_BG_LIGHT_BLUE      0x0900
+#define  HW_LUT_BG_LIGHT_GREEN     0x0A00
+#define  HW_LUT_BG_LIGHT_CYAN      0x0B00
+#define  HW_LUT_BG_LIGHT_RED       0x0C00
+#define  HW_LUT_BG_LIGHT_MAGENTA   0x0D00
+#define  HW_LUT_BG_YELLOW          0x0E00
+#define  HW_LUT_BG_WHITE           0x0F00
+
+#define  HW_LUT_FG_BLACK           0x0000
+#define  HW_LUT_FG_BLUE            0x1000
+#define  HW_LUT_FG_GREEN           0x2000
+#define  HW_LUT_FG_CYAN            0x3000
+#define  HW_LUT_FG_RED             0x4000
+#define  HW_LUT_FG_MAGENTA         0x5000
+#define  HW_LUT_FG_BROWN           0x6000
+#define  HW_LUT_FG_LIGHT_GRAY      0x7000
+#define  HW_LUT_FG_GRAY            0x8000
+#define  HW_LUT_FG_LIGHT_BLUE      0x9000
+#define  HW_LUT_FG_LIGHT_GREEN     0xA000
+#define  HW_LUT_FG_LIGHT_CYAN      0xB000
+#define  HW_LUT_FG_LIGHT_RED       0xC000
+#define  HW_LUT_FG_LIGHT_MAGENTA   0xD000
+#define  HW_LUT_FG_YELLOW          0xE000
+#define  HW_LUT_FG_WHITE           0xF000
+
 // FRAME_SELECT Register
 #define  REFRESH_FRAME0_SELECT     0x0000
 #define  REFRESH_FRAME1_SELECT     0x0001
 #define  REFRESH_FRAME2_SELECT     0x0002
 #define  REFRESH_FRAME3_SELECT     0x0003
 #define  REFRESH_FRAME_MASK        0x0003
-
-#define  REFRESH_SW_LUT_DISABLE    0x0000
-#define  REFRESH_SW_LUT_ENABLE     0x0004
-#define  REFRESH_SW_LUT0_SELECT    0x0000
-#define  REFRESH_SW_LUT1_SELECT    0x0008
 
 #define  VID_RAM0_FRAME0_SELECT    0x0000
 #define  VID_RAM0_FRAME1_SELECT    0x0010
@@ -212,9 +257,6 @@ void sync_screen_refresh_start(void);
 #define  VID_RAM1_FRAME2_SELECT    0x0080
 #define  VID_RAM1_FRAME3_SELECT    0x00C0
 #define  VID_RAM1_FRAME_MASK       0x00C0
-
-#define  LUT_BANK0_SELECT          0x0000
-#define  LUT_BANK1_SELECT          0x8000
 
 // VID_RAMx_CFG Register
 #define  VID_RAM_RMW_MODE          0x0010

@@ -333,7 +333,7 @@ io_buf io_buf_lt24_data_15 (.datain(lt24_d_out[15]), .oe(lt24_d_out_en), .dataou
 
 
 
-openGFX430 opengfx430_0 (
+openGFX430 #(.BASE_ADDR(16'h0200)) opengfx430_0 (
 
 // OUTPUTs
     .irq_gfx_o             (irq_gfx),                 // Graphic Controller interrupt

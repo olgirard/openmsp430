@@ -46,8 +46,9 @@ void init_lt24(void);
 #define  LT24_CMD_DFILL    (*(volatile uint16_t  *) 0x022A)
 #define  LT24_STATUS       (*(volatile uint16_t  *) 0x022C)
 
-#define  LUT_RAM_ADDR      (*(volatile uint16_t  *) 0x0230)
-#define  LUT_RAM_DATA      (*(volatile uint16_t  *) 0x0232)
+#define  LUT_CFG           (*(volatile uint16_t  *) 0x0230)
+#define  LUT_RAM_ADDR      (*(volatile uint16_t  *) 0x0232)
+#define  LUT_RAM_DATA      (*(volatile uint16_t  *) 0x0234)
 
 #define  FRAME_SELECT      (*(volatile uint16_t  *) 0x023E)
 #define  FRAME0_PTR        (*(volatile uint32_t  *) 0x0240)
@@ -79,6 +80,8 @@ void init_lt24(void);
 #define  GFX_REFR_DONE_IRQ_DIS     0x0000
 #define  GFX_REFR_START_IRQ_EN     0x0002
 #define  GFX_REFR_START_IRQ_DIS    0x0000
+#define  GFX_REFR_CNT_DONE_IRQ_EN  0x0004
+#define  GFX_REFR_CNT_DONE_IRQ_DIS 0x0000
 #define  GFX_GPU_FIFO_DONE_IRQ_EN  0x0010
 #define  GFX_GPU_FIFO_DONE_IRQ_DIS 0x0000
 #define  GFX_GPU_FIFO_OVFL_IRQ_EN  0x0020
@@ -97,10 +100,13 @@ void init_lt24(void);
 
 // GFX_STATUS Register
 #define  STATUS_REFRESH_BUSY       0x0001
+#define  STATUS_GPU_FIFO           0x0010
+#define  STATUS_GPU_BUSY           0x0040
 
 // GFX_IRQ Register
 #define  GFX_IRQ_REFRESH_DONE      0x0001
 #define  GFX_IRQ_REFRESH_START     0x0002
+#define  GFX_IRQ_REFRESH_CNT_DONE  0x0004
 #define  GFX_IRQ_GPU_FIFO_DONE     0x0010
 #define  GFX_IRQ_GPU_FIFO_OVFL     0x0020
 #define  GFX_IRQ_GPU_CMD_DONE      0x0040
@@ -157,29 +163,39 @@ void init_lt24(void);
 #define  LT24_STATUS_REFRESH_WAIT  0x0008
 #define  LT24_STATUS_DFILL_BUSY    0x0010
 
+// LUT_CFG Register
+#define  SW_LUT_DISABLE            0x0000
+#define  SW_LUT_ENABLE             0x0001
+#define  SW_LUT_BANK0_SELECT       0x0000
+#define  SW_LUT_BANK1_SELECT       0x0004
+#define  HW_LUT_PALETTE_0_LO       0x0000
+#define  HW_LUT_PALETTE_0_HI       0x0010
+#define  HW_LUT_PALETTE_1_LO       0x0020
+#define  HW_LUT_PALETTE_1_HI       0x0030
+#define  HW_LUT_PALETTE_2_LO       0x0040
+#define  HW_LUT_PALETTE_2_HI       0x0050
+#define  HW_LUT_PALETTE_MSK        0x0070
+#define  HW_LUT_BGCOLOR_MSK        0x0F00
+#define  HW_LUT_FGCOLOR_MSK        0xF000
+
 // FRAME_SELECT Register
 #define  REFRESH_FRAME0_SELECT     0x0000
 #define  REFRESH_FRAME1_SELECT     0x0001
 #define  REFRESH_FRAME2_SELECT     0x0002
 #define  REFRESH_FRAME3_SELECT     0x0003
-
-#define  REFRESH_SW_LUT_DISABLE    0x0000
-#define  REFRESH_SW_LUT_ENABLE     0x0004
-#define  REFRESH_SW_LUT0_SELECT    0x0000
-#define  REFRESH_SW_LUT1_SELECT    0x0008
+#define  REFRESH_FRAME_MASK        0x0003
 
 #define  VID_RAM0_FRAME0_SELECT    0x0000
 #define  VID_RAM0_FRAME1_SELECT    0x0010
 #define  VID_RAM0_FRAME2_SELECT    0x0020
 #define  VID_RAM0_FRAME3_SELECT    0x0030
+#define  VID_RAM0_FRAME_MASK       0x0030
 
 #define  VID_RAM1_FRAME0_SELECT    0x0000
 #define  VID_RAM1_FRAME1_SELECT    0x0040
 #define  VID_RAM1_FRAME2_SELECT    0x0080
 #define  VID_RAM1_FRAME3_SELECT    0x00C0
-
-#define  LUT_BANK0_SELECT          0x0000
-#define  LUT_BANK1_SELECT          0x8000
+#define  VID_RAM1_FRAME_MASK       0x00C0
 
 // VID_RAMx_CFG Register
 #define  VID_RAM_RMW_MODE          0x0010
@@ -192,9 +208,9 @@ void init_lt24(void);
 #define  VID_RAM_WIN_CL_SWAP       0x0001
 #define  VID_RAM_WIN_Y_SWAP        0x0002
 #define  VID_RAM_WIN_X_SWAP        0x0004
-#define  VID_RAM_WIN_NO_X_SWAP     0x0000
-#define  VID_RAM_WIN_NO_Y_SWAP     0x0000
 #define  VID_RAM_WIN_NO_CL_SWAP    0x0000
+#define  VID_RAM_WIN_NO_Y_SWAP     0x0000
+#define  VID_RAM_WIN_NO_X_SWAP     0x0000
 
 // GPU_STAT Register
 #define  GPU_STAT_FIFO_CNT_EMPTY   0x000F

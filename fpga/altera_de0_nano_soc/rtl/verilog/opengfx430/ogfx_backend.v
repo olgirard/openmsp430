@@ -82,7 +82,12 @@ module  ogfx_backend (
     refresh_active_i,                             // Display refresh on going
     refresh_data_request_i,                       // Display refresh new data request
     refresh_frame_base_addr_i,                    // Refresh frame base address
-    refresh_lut_select_i                          // Refresh LUT bank selection
+
+    hw_lut_palette_sel_i,                         // Hardware LUT palette configuration
+    hw_lut_bgcolor_i,                             // Hardware LUT background-color selection
+    hw_lut_fgcolor_i,                             // Hardware LUT foreground-color selection
+    sw_lut_enable_i,                              // Refresh LUT-RAM enable
+    sw_lut_bank_select_i                          // Refresh LUT-RAM bank selection
 );
 
 // OUTPUTs
@@ -123,7 +128,12 @@ input                vid_ram_dout_rdy_nxt_i;      // Video-RAM data output ready
 input                refresh_active_i;            // Display refresh on going
 input                refresh_data_request_i;      // Display refresh new data request
 input  [`APIX_MSB:0] refresh_frame_base_addr_i;   // Refresh frame base address
-input          [1:0] refresh_lut_select_i;        // Refresh LUT bank selection
+
+input          [2:0] hw_lut_palette_sel_i;        // Hardware LUT palette configuration
+input          [3:0] hw_lut_bgcolor_i;            // Hardware LUT background-color selection
+input          [3:0] hw_lut_fgcolor_i;            // Hardware LUT foreground-color selection
+input                sw_lut_enable_i;             // Refresh LUT-RAM enable
+input                sw_lut_bank_select_i;        // Refresh LUT-RAM bank selection
 
 
 //=============================================================================
@@ -205,7 +215,12 @@ ogfx_backend_lut_fifo  ogfx_backend_lut_fifo_inst (
 
     .refresh_active_i              ( refresh_active_i          ),  // Display refresh on going
     .refresh_data_request_i        ( refresh_data_request_i    ),  // Request for next refresh data
-    .refresh_lut_select_i          ( refresh_lut_select_i      )   // Refresh LUT bank selection
+
+    .hw_lut_palette_sel_i          ( hw_lut_palette_sel_i      ),  // Hardware LUT palette configuration
+    .hw_lut_bgcolor_i              ( hw_lut_bgcolor_i          ),  // Hardware LUT background-color selection
+    .hw_lut_fgcolor_i              ( hw_lut_fgcolor_i          ),  // Hardware LUT foreground-color selection
+    .sw_lut_enable_i               ( sw_lut_enable_i           ),  // Refresh LUT-RAM enable
+    .sw_lut_bank_select_i          ( sw_lut_bank_select_i      )   // Refresh LUT-RAM bank selection
 );
 
 
