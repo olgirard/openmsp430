@@ -166,6 +166,8 @@ void init_lt24(void);
 // LUT_CFG Register
 #define  SW_LUT_DISABLE            0x0000
 #define  SW_LUT_ENABLE             0x0001
+#define  SW_LUT_RAM_RMW_MODE       0x0002
+#define  SW_LUT_RAM_NO_RMW_MODE    0x0000
 #define  SW_LUT_BANK0_SELECT       0x0000
 #define  SW_LUT_BANK1_SELECT       0x0004
 #define  HW_LUT_PALETTE_0_LO       0x0000

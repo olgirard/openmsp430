@@ -25,6 +25,11 @@ int main(void) {
     LUT_RAM_DATA  = palette_64k[idx1];
   }
 
+  // LUT Configuration
+  LUT_CFG         = SW_LUT_DISABLE      |
+                    SW_LUT_BANK0_SELECT |
+                    HW_LUT_PALETTE_0_LO;
+
   // Initialize Frame pointers
   FRAME0_PTR_HI   = 0x0000;
   FRAME0_PTR_LO   = 0x0000;
@@ -33,11 +38,8 @@ int main(void) {
   FRAME1_PTR_LO   = 0x0000;
 
   FRAME_SELECT    = REFRESH_FRAME0_SELECT  |
-                    REFRESH_SW_LUT_ENABLE  |
-                    REFRESH_SW_LUT0_SELECT |
                     VID_RAM0_FRAME0_SELECT |
-		    VID_RAM1_FRAME0_SELECT |
-                    LUT_BANK0_SELECT;
+                    VID_RAM1_FRAME0_SELECT;
 
   start_gfx_ctrl();            // Start Graphic controller
 

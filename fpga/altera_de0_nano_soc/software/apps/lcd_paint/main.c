@@ -47,6 +47,39 @@ int main(void) {
   GFX_CTRL = GFX_1_BPP  | GFX_REFR_DONE_IRQ_DIS ;
 #endif
 
+  //LUT_CFG = LUT_CFG | SW_LUT_RAM_RMW_MODE     ;
+  LUT_RAM_ADDR   = 86;
+  __nop();
+  __nop();
+  LUT_RAM_DATA   =  0; // 86
+  LUT_RAM_DATA   =  1; // 87
+  LUT_RAM_DATA   =  2; // 88
+  LUT_RAM_DATA   =  3; // 89
+  LUT_RAM_DATA   =  4; // 90
+  LUT_RAM_DATA   =  5; // 91
+  LUT_RAM_DATA   =  6; // 92
+  LUT_RAM_DATA   =  7; // 93
+  LUT_RAM_DATA   =  8; // 94
+  __nop();
+  __nop();
+  __nop();
+  LUT_RAM_ADDR   = 90;
+  __nop();
+  __nop();
+  temp1          = LUT_RAM_DATA; // 90
+  temp2          = LUT_RAM_DATA; // 91
+  temp3          = LUT_RAM_DATA; // 92
+  temp4          = LUT_RAM_DATA; // 93
+  __nop();
+  __nop();
+  __nop();
+  __nop();
+  __nop();
+  __nop();
+  __nop();
+  __nop();
+
+
   //VID_RAM0_CFG     = VID_RAM_NO_RMW_MODE | VID_RAM_WIN_MODE | VID_RAM_WIN_X_SWAP | VID_RAM_WIN_Y_SWAP | VID_RAM_WIN_CL_SWAP;
   //VID_RAM0_WIDTH   = 8;
   VID_RAM0_WIDTH   = 5;

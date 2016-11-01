@@ -742,6 +742,11 @@ wire       lut_cfg_wr = reg_wr[LUT_CFG];
     if (puc_rst)         sw_lut_enable_o      <=  1'b0;
     else if (lut_cfg_wr) sw_lut_enable_o      <=  per_din_i[0]; // Enable software color LUT
 
+  reg      sw_lut_ram_rmw_mode;
+  always @ (posedge mclk or posedge puc_rst)
+    if (puc_rst)         sw_lut_ram_rmw_mode  <=  1'b0;
+    else if (lut_cfg_wr) sw_lut_ram_rmw_mode  <=  per_din_i[1];
+
   `ifdef WITH_EXTRA_LUT_BANK
   reg      sw_lut_bank_select_o;
   always @ (posedge mclk or posedge puc_rst)
@@ -753,6 +758,7 @@ wire       lut_cfg_wr = reg_wr[LUT_CFG];
 `else
   assign   sw_lut_bank_select_o  =  1'b0;
   assign   sw_lut_enable_o       =  1'b0;
+  wire     sw_lut_ram_rmw_mode   =  1'b0;
 `endif
 
 reg  [2:0] hw_lut_palette_sel_o;
@@ -770,9 +776,10 @@ always @ (posedge mclk or posedge puc_rst)
   if (puc_rst)           hw_lut_fgcolor_o     <=  4'hf;
   else if (lut_cfg_wr)   hw_lut_fgcolor_o     <=  per_din_i[15:12];
 
-wire [15:0] lut_cfg_rd  = {hw_lut_fgcolor_o, hw_lut_bgcolor_o,
-                           1'b0,             hw_lut_palette_sel_o,
-                           1'b0, sw_lut_bank_select_o, 1'b0, sw_lut_enable_o};
+wire [15:0] lut_cfg_rd  = {hw_lut_fgcolor_o,    hw_lut_bgcolor_o,
+                           1'b0,                hw_lut_palette_sel_o,
+                           1'b0,                sw_lut_bank_select_o,
+                           sw_lut_ram_rmw_mode, sw_lut_enable_o};
 
 //------------------------------------------------
 // LUT_RAM_ADDR Register
@@ -831,7 +838,9 @@ always @ (posedge mclk or posedge puc_rst)
   else if (lut_ram_dout_rdy) lut_ram_data <=  lut_ram_dout_i;
 
 // Increment the address after a write or read access to the LUT_RAM_DATA register
-assign lut_ram_addr_inc_wr = lut_ram_data_wr | lut_ram_data_rd;
+// - one clock cycle after a write access
+// - with the read access (if not in read-modify-write mode)
+assign lut_ram_addr_inc_wr = lut_ram_data_wr | (lut_ram_data_rd & ~dbg_freeze_i & ~sw_lut_ram_rmw_mode);
 
 // Apply peripheral data bus % write strobe during VID_RAMx_DATA write access
 assign lut_ram_din_o       =    per_din_i & {16{lut_ram_data_wr}};
