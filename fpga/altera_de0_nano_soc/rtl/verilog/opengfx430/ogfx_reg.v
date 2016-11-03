@@ -897,11 +897,11 @@ wire  frame_select_wr = reg_wr[FRAME_SELECT];
     else if (frame_select_wr)
       begin
          refresh_frame_select  <= per_din_i[1:0];
-         vid_ram0_frame_select <= per_din_i[5:4];
-         vid_ram1_frame_select <= per_din_i[7:6];
+         vid_ram0_frame_select <= per_din_i[9:8];
+         vid_ram1_frame_select <= per_din_i[13:12];
       end
 
-  wire [15:0] frame_select = {8'h00,       vid_ram1_frame_select,       vid_ram0_frame_select, 2'h0,       refresh_frame_select};
+  wire [15:0] frame_select = {2'h0, vid_ram1_frame_select, 2'h0, vid_ram0_frame_select, 6'h00, refresh_frame_select};
   `else
   reg        refresh_frame_select;
   reg        vid_ram0_frame_select;
@@ -917,11 +917,11 @@ wire  frame_select_wr = reg_wr[FRAME_SELECT];
     else if (frame_select_wr)
       begin
          refresh_frame_select  <= per_din_i[0];
-         vid_ram0_frame_select <= per_din_i[4];
-         vid_ram1_frame_select <= per_din_i[6];
+         vid_ram0_frame_select <= per_din_i[8];
+         vid_ram1_frame_select <= per_din_i[12];
       end
 
-  wire [15:0] frame_select = {8'h00, 1'h0, vid_ram1_frame_select, 1'h0, vid_ram0_frame_select, 2'h0, 1'h0, refresh_frame_select};
+  wire [15:0] frame_select = {3'h0, vid_ram1_frame_select, 3'h0, vid_ram0_frame_select, 7'h00, refresh_frame_select};
   `endif
 `else
   wire [15:0] frame_select = 16'h0000;
