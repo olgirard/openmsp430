@@ -96,7 +96,7 @@ namespace eval utils {
                           set serial_base "HKEY_LOCAL_MACHINE\\HARDWARE\\DEVICEMAP\\SERIALCOMM"
                           set values [registry values $serial_base]
                           foreach valueName $values {
-			      lappend serial_ports "[registry get $serial_base $valueName]:"
+			      lappend serial_ports "[registry get $serial_base $valueName]"
 			  }
                          }
             default      {set serial_ports ""}
@@ -119,9 +119,16 @@ namespace eval utils {
         global serial_ch
 
 	# Open device for reading and writing
-	if {[catch {open $Device [list RDWR]} serial_ch]} {
-	    uart_close
-	    return 0
+    if {[catch {open $Device [list RDWR]} serial_ch]} {
+        if {[string eq "Windows NT" $::tcl_platform(os)]} {
+            if {[catch {open [join [list $Device ":"] ""] [list RDWR]} serial_ch]} {
+                uart_close
+                return 0
+            }
+        } else {
+            uart_close
+            return 0
+        }
 	}
 
 	if {$Configure} {
